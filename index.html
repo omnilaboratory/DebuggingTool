@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OBD Debugging Tool</title>
+</head>
+
+<script>
+    function callAPI(obj) {
+        // 
+        var api_name = obj.innerHTML;
+        document.getElementById("api_name").innerHTML = api_name;
+
+        // 
+        var api_description = "This is description of API:  " + obj.innerHTML;
+        document.getElementById("api_description").innerHTML = api_description;
+        
+        //
+        var js_func = obj.getAttribute("js_func");
+        document.getElementById("js_func").innerHTML = js_func;
+        
+        //
+        var type_id = "type ( " + obj.getAttribute("type_id") + " )";
+        document.getElementById("type_id").innerHTML = type_id;
+    }
+</script>
+
+<body>
+
+    <!-- <div id="container" style="width:1440px"> -->
+    <div id="container" style="width:device-width">
+ 
+        <!-- Header -->
+        <div id="header" style="background-color:#FFA500;
+            height:60px;">
+
+            <h1>OBD Debugging Tool</h1>
+        </div>
+         
+        <!-- Left Side Menu -->
+        <div id="menu" style="background-color:#FFD700;
+            height:500px;width:220px;float:left;">
+
+            <p style="font-family: Arial, Helvetica, sans-serif;
+            color: gray;">Start</p>
+            <a href="#">Connect to OBD node</a>
+            
+            <br><br><br>
+
+            <!-- APIs for Util -->
+            <p style="font-family: Arial, Helvetica, sans-serif;
+            color: gray;">Util</p>
+
+            <!-- API List -->
+            <!-- <a href="javascript:void(0);" api-name="NewAddress" 
+            onclick = "callAPI(this)">NewAddress</a> -->
+                
+            <p><a href="#" js_func = "getNewAddress" type_id = "1001" 
+                onclick = "callAPI(this)">NewAddress</a></p>
+                
+            <p><a href="#" js_func = "getNewAddressWithMnemonic" type_id = "-200" 
+                onclick = "callAPI(this)">NewAddressWithMnemonic</a></p>
+            
+        </div>
+         
+        <!-- API invoked area, click left side menu to display. -->
+        <div id="content" style="background-color:#EEEEEE;
+            height:500px;width:360px;float:left;">
+
+            <!-- API Name -->
+            <h2 id="api_name">api_name</h2>
+            <p id="api_description">api_description</p>
+
+            <!-- Request -->
+            <h2>Request</h2>
+
+            <text style="font-family: Arial, Helvetica, sans-serif;
+            color: gray;">func:</text>
+
+            <a id="js_func">js_func</a>
+
+            <a id="type_id" style="font-family: Arial, Helvetica, sans-serif;
+            color: gray;">type()</a>
+
+            <!-- OBD Responses -->
+            <h2>OBD Responses</h2>
+        </div>
+         
+        <!-- Footer for display copyright info, etc. -->
+        <div id="footer" style="background-color:#FFA500;
+        clear:both;text-align:center;">
+        
+            Copyright © OmniLab
+        </div>
+         
+    </div>
+
+</body>
+</html>
