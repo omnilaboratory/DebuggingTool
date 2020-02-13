@@ -23,6 +23,72 @@
         //
         var type_id = "type ( " + obj.getAttribute("type_id") + " )";
         document.getElementById("type_id").innerHTML = type_id;
+
+        // TESTING - for logIn, create all input paras data.
+        // First, delete children of input_para div
+        var parent = document.getElementById('input_para');
+        var children_amount = parent.children.length;
+        console.log('children = ' + children_amount);
+        
+        if (children_amount != 0) {
+            for (let index = children_amount - 1; index >= 0; index--) {
+                console.log('index = ' + index);
+                parent.removeChild(parent.children[index]);
+            }
+        }
+
+        // create new elements for Input Parameters div area.
+        var para = obj.getAttribute("para");
+        if (para == 1) {
+
+            // get div object
+            var input_para = document.getElementById('input_para');
+
+            // create [title] element
+            var top_title = document.createElement('p');
+            top_title.id = 'top_title';
+            top_title.innerText = 'Input Parameters:';
+            input_para.appendChild(top_title);
+
+            // create [para_1_title] element
+            var para_1_title = document.createElement('b');
+            para_1_title.id = 'para_1_title';
+            para_1_title.innerText = 'mnemonic:';
+            input_para.appendChild(para_1_title);
+
+            // create [para_1_input_box] element
+            var para_1_input_box = document.createElement('input');
+            para_1_input_box.id = 'para_1_input_box';
+            input_para.appendChild(para_1_input_box);
+
+            // create [button_get_it] element
+            var button_get_it = document.createElement('button');
+            button_get_it.id = 'button_get_it';
+            button_get_it.setAttribute('onclick', 'getIt()');
+            button_get_it.innerText = 'Get It';
+            input_para.appendChild(button_get_it);
+
+            // create [button_auto_create] element
+            var button_auto_create = document.createElement('button');
+            button_auto_create.id = 'button_auto_create';
+            button_auto_create.setAttribute('onclick', 'getMnemonic()');
+            button_auto_create.innerText = 'Auto Create';
+            input_para.appendChild(button_auto_create);
+
+        }
+    }
+
+    function getIt() {
+        console.log('getIt func invoked!');
+        var api_SignUp = document.getElementById('api_SignUp');
+        callAPI(api_SignUp);
+    }
+
+    // Generate new mnemonic words.
+    function getMnemonic() {
+        // alert('getMnemonic func invoked!');
+        var mnemonic = document.getElementById('para_1_input_box');
+        mnemonic.value = 'word-1 word-2 word-3 word-4 word-5';
     }
 </script>
 
@@ -61,6 +127,12 @@
                 
             <p><a href="#" js_func = "getNewAddressWithMnemonic" type_id = "-200" 
                 onclick = "callAPI(this)">NewAddressWithMnemonic</a></p>
+                
+            <p><a id="api_SignUp" href="#" js_func = "signUp" type_id = "101"  
+                onclick = "callAPI(this)">SignUp</a></p>
+                
+            <p><a href="#" js_func = "logIn" type_id = "1" para="1" 
+                onclick = "callAPI(this)">LogIn</a></p>
             
         </div>
          
@@ -83,8 +155,13 @@
             <a id="type_id" style="font-family: Arial, Helvetica, sans-serif;
             color: gray;">type()</a>
 
+            <button onclick="">Send</button>
+
+            <!-- Input Parameters div area -->
+            <div id="input_para"></div>
+
             <!-- OBD Responses -->
-            <h2>OBD Responses</h2>
+            <h2 id="obd_responses">OBD Responses</h2>
         </div>
          
         <!-- Footer for display copyright info, etc. -->
