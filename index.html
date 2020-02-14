@@ -13,7 +13,10 @@
 
 <script>
     function startRun() {
-        alert("startRun")
+        let requestURL = 'json/api_list.json';
+        $.getJSON(requestURL, function(data) {
+            console.info(data);
+        });
     }
     startRun();
 
