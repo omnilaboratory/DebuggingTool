@@ -12,6 +12,14 @@
 </head>
 
 <script>
+    function startRun() {
+        let requestURL = 'json/api_list.json';
+        $.getJSON(requestURL, function(data) {
+            console.info(data);
+        });
+    }
+    startRun();
+
 
     function callAPI(obj) {
 
