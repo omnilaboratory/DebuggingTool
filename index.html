@@ -1,9 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>OBD Debugging Tool</title>
+    <script src="js/common.js"></script>
 </head>
 
 <script>
@@ -15,11 +17,11 @@
         // 
         var api_description = "This is description of API:  " + obj.innerHTML;
         document.getElementById("api_description").innerHTML = api_description;
-        
+
         //
         var js_func = obj.getAttribute("js_func");
         document.getElementById("js_func").innerHTML = js_func;
-        
+
         //
         var type_id = "type ( " + obj.getAttribute("type_id") + " )";
         document.getElementById("type_id").innerHTML = type_id;
@@ -29,7 +31,7 @@
         var parent = document.getElementById('input_para');
         var children_amount = parent.children.length;
         console.log('children = ' + children_amount);
-        
+
         if (children_amount != 0) {
             for (let index = children_amount - 1; index >= 0; index--) {
                 console.log('index = ' + index);
@@ -96,14 +98,14 @@
 
     <!-- <div id="container" style="width:1440px"> -->
     <div id="container" style="width:device-width">
- 
+
         <!-- Header -->
         <div id="header" style="background-color:#FFA500;
             height:60px;">
 
             <h1>OBD Debugging Tool</h1>
         </div>
-         
+
         <!-- Left Side Menu -->
         <div id="menu" style="background-color:#FFD700;
             height:500px;width:220px;float:left;">
@@ -111,7 +113,7 @@
             <p style="font-family: Arial, Helvetica, sans-serif;
             color: gray;">Start</p>
             <a href="#">Connect to OBD node</a>
-            
+
             <br><br><br>
 
             <!-- APIs for Util -->
@@ -121,21 +123,17 @@
             <!-- API List -->
             <!-- <a href="javascript:void(0);" api-name="NewAddress" 
             onclick = "callAPI(this)">NewAddress</a> -->
-                
-            <p><a href="#" js_func = "getNewAddress" type_id = "1001" 
-                onclick = "callAPI(this)">NewAddress</a></p>
-                
-            <p><a href="#" js_func = "getNewAddressWithMnemonic" type_id = "-200" 
-                onclick = "callAPI(this)">NewAddressWithMnemonic</a></p>
-                
-            <p><a id="api_SignUp" href="#" js_func = "signUp" type_id = "101"  
-                onclick = "callAPI(this)">SignUp</a></p>
-                
-            <p><a href="#" js_func = "logIn" type_id = "1" para="1" 
-                onclick = "callAPI(this)">LogIn</a></p>
-            
+
+            <p><a href="#" js_func="getNewAddress" type_id="1001" onclick="callAPI(this)">NewAddress</a></p>
+
+            <p><a href="#" js_func="getNewAddressWithMnemonic" type_id="-200" onclick="callAPI(this)">NewAddressWithMnemonic</a></p>
+
+            <p><a id="api_SignUp" href="#" js_func="signUp" type_id="101" onclick="callAPI(this)">SignUp</a></p>
+
+            <p><a href="#" js_func="logIn" type_id="1" para="1" onclick="callAPI(this)">LogIn</a></p>
+
         </div>
-         
+
         <!-- API invoked area, click left side menu to display. -->
         <div id="content" style="background-color:#EEEEEE;
             height:500px;width:360px;float:left;">
@@ -155,7 +153,7 @@
             <a id="type_id" style="font-family: Arial, Helvetica, sans-serif;
             color: gray;">type()</a>
 
-            <button onclick="">Send</button>
+            <button onclick="login()">Send</button>
 
             <!-- Input Parameters div area -->
             <div id="input_para"></div>
@@ -163,15 +161,16 @@
             <!-- OBD Responses -->
             <h2 id="obd_responses">OBD Responses</h2>
         </div>
-         
+
         <!-- Footer for display copyright info, etc. -->
         <div id="footer" style="background-color:#FFA500;
         clear:both;text-align:center;">
-        
+
             Copyright © OmniLab
         </div>
-         
+
     </div>
 
 </body>
+
 </html>
