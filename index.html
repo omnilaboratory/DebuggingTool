@@ -12,6 +12,12 @@
 </head>
 
 <script>
+    function startRun() {
+        alert("startRun")
+    }
+    startRun();
+
+
     function callAPI(obj) {
 
         // test to parse json object
@@ -26,7 +32,7 @@
         //设置XHR访问text格式数据
         // request.responseType = 'text';
         request.send();
-    
+
         //处理来自服务器的数据
         // request.onload = function() {
         let superHeroesText = request.response;
