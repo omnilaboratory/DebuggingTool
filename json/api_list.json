@@ -1,0 +1,62 @@
+﻿{
+    "data": [
+        {
+            "id": "signUp",
+            "type_id": 101,
+            "name": "SignUp",
+            "description": "SignUp is used to sign up a new user by hirarchecal deterministic wallet system integrated in OBD. OBD returns mnemonic words to the client who signs up, and create a new user by the hash of the mnemonic words as the UserID.",
+            "parameters": []
+        },
+        {
+            "id": "logIn",
+            "type_id": 1,
+            "name": "LogIn",
+            "description": "LogIn is used to login to OBD.",
+            "parameters": [
+                {
+                    "name": "mnemonic",
+                    "buttons": [
+                        {
+                            "innerText": "Get It",
+                            "onclick": "getIt()"
+                        },
+                        {
+                            "innerText": "Auto Create",
+                            "onclick": "getMnemonic()"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "openChannel",
+            "type_id": -32,
+            "name": "OpenChannel",
+            "description": "OpenChannel is used to request to create a channel with someone.",
+            "parameters": [
+                {
+                    "name": "funding_pubkey",
+                    "buttons": [
+                        {
+                            "innerText": "Get It",
+                            "onclick": "getIt()"
+                        },
+                        {
+                            "innerText": "Auto Create",
+                            "onclick": "getMnemonic()"
+                        }
+                    ]
+                },
+                {
+                    "name": "recipient_peer_id",
+                    "buttons": [
+                        {
+                            "innerText": "Select",
+                            "onclick": "Select()"
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}
