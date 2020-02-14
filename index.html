@@ -13,7 +13,7 @@
 
 <script>
 
-    // getAPIList() invoked when page refresh.
+    // invoked when page refresh.
     getAPIList();
 
     function invokeSignUp() {
@@ -63,21 +63,10 @@
 
             <br>
 
-            <!-- API List -->
-            <!-- TODO: Need to dynamic create. -->
-
-            <!-- <a href="javascript:void(0);" api-name="NewAddress" 
-            onclick = "callAPI(this)">NewAddress</a> -->
-
+            <!-- APIs for Debugging - Dynamic create -->
             <p style="font-family: Arial, Helvetica, sans-serif;
-            color: gray;">APIs for Debug</p>
-
-            <!-- APIs for Debug div area -->
+                color: gray;">APIs for Debugging</p>
             <div id="api_list"></div>
-
-            <!-- <p><a id="api_SignUp" href="#" js_func="signUp" type_id="101" onclick="callAPI(this)">SignUp</a></p>
-            <p><a href="#" js_func="logIn" type_id="1" para="1" onclick="callAPI(this)">LogIn</a></p> -->
-
         </div>
 
         <!-- API invoked area, click left side menu to display. -->
@@ -92,31 +81,28 @@
             <h2>Request</h2>
 
             <text style="font-family: Arial, Helvetica, sans-serif;
-            color: gray;">func:</text>
+                color: gray;">func:</text>
 
             <a id="js_func">js_func</a>
-
             <a id="type_id" style="font-family: Arial, Helvetica, sans-serif;
-            color: gray;">type()</a>
+                color: gray;">type()</a>
 
+            <!-- Send Button -->
             <button onclick="onClickSend(this)">Send</button>
 
-            <!-- Input Parameters div area -->
+            <!-- Input Parameter - Dynamic create -->
             <div id="input_para"></div>
 
-            <!-- OBD Responses -->
+            <!-- OBD Responses - Dynamic create -->
             <h2 id="obd_responses">OBD Responses</h2>
         </div>
 
         <!-- Footer for display copyright info, etc. -->
         <div id="footer" style="background-color:#FFA500;
-        clear:both;text-align:center;">
+            clear:both;text-align:center;">
 
             Copyright © OmniLab
         </div>
-
     </div>
-
 </body>
-
 </html>
