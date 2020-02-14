@@ -1,10 +1,7 @@
 var wsAddress = "ws://127.0.0.1:60020/ws"
 var ws;
+
 var isConnectToOBD = false;
-var message = {
-    type: 0,
-    data: {}
-}
 var api = {};
 
 api.connectToOBD = function() {
@@ -23,7 +20,7 @@ api.connectToOBD = function() {
         jsonData = JSON.parse(e.data)
         console.info("get data from obd: ", jsonData);
         if (jsonData.status == false) {
-            if (jsonData.type != 0) {
+            if (jsonData.type != ApiType.MsgType_Error_0) {
                 alert(jsonData.result);
             }
             return;
@@ -31,16 +28,16 @@ api.connectToOBD = function() {
         resultData = jsonData.result;
         console.info("data:", resultData);
         switch (jsonData.type) {
-            case 1:
+            case ApiType.MsgType_UserLogin_1:
                 api.OnLogin(resultData);
                 break;
-            case 1001:
+            case ApiType.MsgType_GetMnemonic_101:
                 api.OnGetNewAddress(resultData);
                 break;
-            case 1205:
+            case ApiType.MsgType_Core_Omni_ListProperties_1205:
                 api.OnListProperties(resultData);
                 break;
-            case -200:
+            case ApiType.MsgType_Mnemonic_CreateAddress_N200:
                 api.OnSendNewAddressOnLogin(resultData);
                 break;
             default:
@@ -62,7 +59,7 @@ var isLogin = false;
 api.SendLogin = function(e) {
     console.info(e)
     if (isLogin == false) {
-        message.type = 1
+        message.type = ApiType.MsgType_UserLogin_1
         data = {
             "mnemonic": "unfold tortoise zoo hand sausage project boring corn test same elevator mansion bargain coffee brick tilt forum purpose hundred embody weapon ripple when narrow"
         };
@@ -76,21 +73,21 @@ api.OnLogin = function(jsonData) {
 
 /* type 1205 */
 api.SendListProperties = function() {
-    message.type = 1205;
+    message.type = ApiType.MsgType_Core_Omni_ListProperties_1205;
     ws.sendData(message);
 }
 api.OnListProperties = function(jsonData) {}
 
 /* type 1001 get new address by omnicore */
 api.SendGetNewAddress = function() {
-    message.type = 1001;
+    message.type = ApiType.MsgType_Core_GetNewAddress_1001;
     ws.sendData(message);
 }
 api.OnGetNewAddress = function(jsonData) {}
 
 /* type -200 get new address by  mnemonic*/
 api.SendNewAddressOnLogin = function() {
-    message.type = -200;
+    message.type = ApiType.MsgType_Mnemonic_CreateAddress_N200;
     ws.sendData(message);
 }
 api.OnSendNewAddressOnLogin = function(jsonData) {}
