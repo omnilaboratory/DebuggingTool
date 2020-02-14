@@ -15,10 +15,11 @@
             "parameters": [
                 {
                     "name": "mnemonic",
+                    "input": "mnemonic",
                     "buttons": [
                         {
                             "innerText": "Get It",
-                            "onclick": "getIt()"
+                            "onclick": "invokeSignUp()"
                         },
                         {
                             "innerText": "Auto Create",
@@ -36,19 +37,21 @@
             "parameters": [
                 {
                     "name": "funding_pubkey",
+                    "input": "funding_pubkey",
                     "buttons": [
                         {
                             "innerText": "Get It",
-                            "onclick": "getIt()"
+                            "onclick": "openUserData()"
                         },
                         {
                             "innerText": "Auto Create",
-                            "onclick": "getMnemonic()"
+                            "onclick": "getFundingPubkey()"
                         }
                     ]
                 },
                 {
                     "name": "recipient_peer_id",
+                    "input": "recipient_peer_id",
                     "buttons": [
                         {
                             "innerText": "Select",

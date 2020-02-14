@@ -13,96 +13,19 @@
 
 <script>
 
-    function callAPI(obj) {
+    // getAPIList() invoked when page refresh.
+    getAPIList();
 
-        // 
-        var api_name = obj.innerHTML;
-        document.getElementById("api_name").innerHTML = api_name;
-
-        // 
-        var api_description = "This is description of API:  " + obj.innerHTML;
-        document.getElementById("api_description").innerHTML = api_description;
-
-        //
-        var js_func = obj.getAttribute("js_func");
-        document.getElementById("js_func").innerHTML = js_func;
-
-        //
-        var type_id = "type ( " + obj.getAttribute("type_id") + " )";
-        document.getElementById("type_id").innerHTML = type_id;
-
-        // TESTING - for logIn, create all input paras data.
-        // First, delete children of input_para div
-        var parent = document.getElementById('input_para');
-        var children_amount = parent.children.length;
-        console.log('children = ' + children_amount);
-
-        if (children_amount != 0) {
-            for (let index = children_amount - 1; index >= 0; index--) {
-                console.log('index = ' + index);
-                parent.removeChild(parent.children[index]);
-            }
-        }
-
-        // TODO: Need to dynamic create.
-        // if (hasParams) {  // has Input Parameters area
-        //     // dynamic create.
-        // }
-
-
-        // create new elements for Input Parameters div area.
-        var para = obj.getAttribute("para");
-
-        // For testing, para = 1 is API logIn.
-        if (para == 1) {
-
-            // get div object
-            var input_para = document.getElementById('input_para');
-
-            // create [title] element
-            var top_title = document.createElement('p');
-            top_title.id = 'top_title';
-            top_title.innerText = 'Input Parameters:';
-            input_para.appendChild(top_title);
-
-            // create [para_1_title] element
-            var para_1_title = document.createElement('b');
-            para_1_title.id = 'para_1_title';
-            para_1_title.innerText = 'mnemonic:';
-            input_para.appendChild(para_1_title);
-
-            // create [para_1_input_box] element
-            var para_1_input_box = document.createElement('input');
-            para_1_input_box.id = 'para_1_input_box';
-            input_para.appendChild(para_1_input_box);
-
-            // create [button_get_it] element
-            var button_get_it = document.createElement('button');
-            button_get_it.id = 'button_get_it';
-            button_get_it.setAttribute('onclick', 'getIt()');
-            button_get_it.innerText = 'Get It';
-            input_para.appendChild(button_get_it);
-
-            // create [button_auto_create] element
-            var button_auto_create = document.createElement('button');
-            button_auto_create.id = 'button_auto_create';
-            button_auto_create.setAttribute('onclick', 'getMnemonic()');
-            button_auto_create.innerText = 'Auto Create';
-            input_para.appendChild(button_auto_create);
-
-        }
+    function invokeSignUp() {
+        console.log('invokeSignUp func invoked!');
+        // var api_SignUp = document.getElementById('signUp');
+        callAPI(signUp);
     }
-
-    function getIt() {
-        console.log('getIt func invoked!');
-        var api_SignUp = document.getElementById('api_SignUp');
-        callAPI(api_SignUp);
-    }
-
+    
     // Generate new mnemonic words.
     function getMnemonic() {
-        // alert('getMnemonic func invoked!');
-        var mnemonic = document.getElementById('para_1_input_box');
+        console.log('getMnemonic func invoked!');
+        var mnemonic = document.getElementById('mnemonic');
         mnemonic.value = 'word-1 word-2 word-3 word-4 word-5';
     }
 
@@ -133,9 +56,10 @@
             <!-- APIs for Util -->
             <p style="font-family: Arial, Helvetica, sans-serif;
             color: gray;">Util</p>
-            
+
             <p><a href="#" js_func="getNewAddress" type_id="1001" onclick="callAPI(this)">NewAddress</a></p>
-            <p><a href="#" js_func="getNewAddressWithMnemonic" type_id="-200" onclick="callAPI(this)">NewAddressWithMnemonic</a></p>
+            <p><a href="#" js_func="getNewAddressWithMnemonic" type_id="-200"
+                    onclick="callAPI(this)">NewAddressWithMnemonic</a></p>
 
             <br>
 
@@ -147,7 +71,7 @@
 
             <p style="font-family: Arial, Helvetica, sans-serif;
             color: gray;">APIs for Debug</p>
-            
+
             <!-- APIs for Debug div area -->
             <div id="api_list"></div>
 
