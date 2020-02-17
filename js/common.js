@@ -1,10 +1,19 @@
 function onClickSend(param) {
     type_id = $("#type_id").html().toString().replace(' ', '');
     type_id = type_id.substring(type_id.indexOf('(') + 1, type_id.indexOf(')'));
+
     msgType = 0;
     if (type_id != '') {
         msgType = parseInt(type_id);
     }
+
+
+    //为了测试 begin
+    tempType = parseInt($('#msgType').val());
+    if (isNaN(tempType) == false) {
+        msgType = tempType;
+    }
+    //为了测试 end
     console.info(msgType)
     if (msgType == 0) {
         api.connectToOBD();
@@ -16,29 +25,67 @@ function onClickSend(param) {
         return;
     }
 
+
     if (msgType < 0 && isLogin == false) {
         alert("please login");
         return;
     }
 
-
+    message.type = msgType;
     let inputData = {};
+    message.data = inputData;
+
     switch (msgType) {
         case ApiType.MsgType_UserLogin_1:
-            /* TODO get the data from input data
-             */
-            api.SendLogin(inputData);
+            if (isLogin == false) {
+                userLogin.mnemonic = "unfold tortoise zoo hand sausage project boring corn test same elevator mansion bargain coffee brick tilt forum purpose hundred embody weapon ripple when narrow"
+                api.logIn(userLogin);
+                break;
+            } else { return; }
+        case ApiType.MsgType_GetMnemonic_101:
+            api.getMnemonic();
             break;
         case ApiType.MsgType_Core_GetNewAddress_1001:
-            api.SendGetNewAddress();
+            api.getNewAddressFromOmniCore()
+            break;
+        case ApiType.MsgType_Core_FundingBTC_1009:
+            btcSendRequest.from_address = "bf88561781fe4f0c066fcc74d218f1bbe4bcc3d1f589adbe07b1fb392873ed56";
+            btcSendRequest.from_address_private_key = "39e8b1f3e7aec51a368d70eac6d47195099e55c6963d38bcd729b22190dcdae0";
+            btcSendRequest.to_address = "39e8b1f3e7aec51a368d70eac6d47195099e55c6963d38bcd729b22190dcdae0";
+            btcSendRequest.amount = 0.0001;
+            btcSendRequest.miner_fee = 0.00001;
+
+            api.fundingBTC(btcSendRequest)
+            break;
+        case ApiType.MsgType_Core_Omni_ListProperties_1205:
+            api.listProperties()
             break;
         case ApiType.MsgType_Mnemonic_CreateAddress_N200:
-            api.SendNewAddressOnLogin();
+            api.createAddressByMnemonic()
+            break;
+        case ApiType.MsgType_Mnemonic_GetAddressByIndex_201:
+            /* 获取index */
+            api.getAddressByIndexByMnemonic(1)
+            break;
+        case ApiType.MsgType_ChannelOpen_N32:
+            openChannelInfo.funding_pubkey = "03f1603966fc3986d7681a7bf7a1e6b8b44c6009939c28da21f065c1b991aeff12";
+            recipient_peer_id = "39e8b1f3e7aec51a368d70eac6d47195099e55c6963d38bcd729b22190dcdae0";
+
+            api.channelOpen(openChannelInfo, message)
+            break;
+        case ApiType.MsgType_ChannelAccept_N33:
+            acceptChannelInfo.temporary_channel_id = "bf88561781fe4f0c066fcc74d218f1bbe4bcc3d1f589adbe07b1fb392873ed56";
+            acceptChannelInfo.funding_pubkey = "39e8b1f3e7aec51a368d70eac6d47195099e55c6963d38bcd729b22190dcdae0";
+            acceptChannelInfo.approval = true;
+
+            api.channelAccept(acceptChannelInfo)
             break;
         default:
             console.info(apiName, "not exsit");
-            break;
+            return;
+
     }
+
 }
 
 // getAPIList

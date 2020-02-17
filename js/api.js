@@ -29,16 +29,31 @@ api.connectToOBD = function() {
         console.info("data:", resultData);
         switch (jsonData.type) {
             case ApiType.MsgType_UserLogin_1:
-                api.OnLogin(resultData);
+                api.onLogin(resultData);
                 break;
             case ApiType.MsgType_GetMnemonic_101:
-                api.OnGetNewAddress(resultData);
+                api.onGetMnemonic(resultData);
+                break;
+            case ApiType.MsgType_Core_GetNewAddress_1001:
+                api.onGetNewAddressFromOmniCore(resultData);
+                break;
+            case ApiType.MsgType_Core_FundingBTC_1009:
+                api.onFundingBTC(resultData)
                 break;
             case ApiType.MsgType_Core_Omni_ListProperties_1205:
-                api.OnListProperties(resultData);
+                api.onListProperties(resultData);
                 break;
             case ApiType.MsgType_Mnemonic_CreateAddress_N200:
-                api.OnSendNewAddressOnLogin(resultData);
+                api.onCreateAddressByMnemonic(resultData);
+                break;
+            case ApiType.MsgType_Mnemonic_GetAddressByIndex_201:
+                api.onGetAddressByIndexByMnemonic(resultData);
+                break;
+            case ApiType.MsgType_ChannelOpen_N32:
+                api.onChannelOpen(resultData)
+                break;
+            case ApiType.MsgType_ChannelAccept_N33:
+                api.onChannelAccept(resultData)
                 break;
             default:
                 break;
@@ -54,40 +69,74 @@ api.connectToOBD = function() {
     };
 }
 
-/* type 1 login  */
+/* MsgType_UserLogin_1  */
 var isLogin = false;
-api.SendLogin = function(e) {
-    console.info(e)
-    if (isLogin == false) {
-        message.type = ApiType.MsgType_UserLogin_1
-        data = {
-            "mnemonic": "unfold tortoise zoo hand sausage project boring corn test same elevator mansion bargain coffee brick tilt forum purpose hundred embody weapon ripple when narrow"
-        };
-        message.data = data;
-        ws.sendData(message)
-    }
+api.logIn = function(userLogin) {
+    message.type = ApiType.MsgType_UserLogin_1
+    message.data = userLogin
+    ws.sendData(message)
 }
-api.OnLogin = function(jsonData) {
+api.onLogin = function(jsonData) {
     isLogin = true;
 }
 
-/* type 1205 */
-api.SendListProperties = function() {
-    message.type = ApiType.MsgType_Core_Omni_ListProperties_1205;
-    ws.sendData(message);
+/* MsgType_GetMnemonic_101 */
+api.getMnemonic = function() {
+    message.type = ApiType.MsgType_GetMnemonic_101
+    ws.sendData(message)
 }
-api.OnListProperties = function(jsonData) {}
+api.onGetMnemonic = function(jsonData) {}
 
-/* type 1001 get new address by omnicore */
-api.SendGetNewAddress = function() {
-    message.type = ApiType.MsgType_Core_GetNewAddress_1001;
-    ws.sendData(message);
+/* MsgType_Core_GetNewAddress_1001 */
+api.getNewAddressFromOmniCore = function() {
+    message.type = ApiType.MsgType_Core_GetNewAddress_1001
+    ws.sendData(message)
 }
-api.OnGetNewAddress = function(jsonData) {}
+api.onGetNewAddressFromOmniCore = function(jsonData) {}
 
-/* type -200 get new address by  mnemonic*/
-api.SendNewAddressOnLogin = function() {
-    message.type = ApiType.MsgType_Mnemonic_CreateAddress_N200;
+/* MsgType_Core_FundingBTC_1009 */
+api.fundingBTC = function(btcSendRequest) {
+    message.type = ApiType.MsgType_Core_FundingBTC_1009
+    message.data = btcSendRequest
     ws.sendData(message);
 }
-api.OnSendNewAddressOnLogin = function(jsonData) {}
+api.onFundingBTC = function(jsonData) {}
+
+/* MsgType_Core_Omni_ListProperties_1205 */
+api.listProperties = function() {
+    message.type = ApiType.MsgType_Core_Omni_ListProperties_1205
+    ws.sendData(message)
+}
+api.onListProperties = function(jsonData) {}
+
+/* MsgType_Mnemonic_CreateAddress_N200 */
+api.createAddressByMnemonic = function() {
+    message.type = ApiType.MsgType_Mnemonic_CreateAddress_N200
+    ws.sendData(message)
+}
+api.onCreateAddressByMnemonic = function(jsonData) {}
+
+/* MsgType_Mnemonic_GetAddressByIndex_201 */
+api.getAddressByIndexByMnemonic = function(index) {
+    message.type = ApiType.MsgType_Mnemonic_GetAddressByIndex_201
+    message.data = index
+    ws.sendData(message)
+}
+api.onGetAddressByIndexByMnemonic = function(jsonData) {}
+
+/* MsgType_ChannelOpen_N32 */
+api.channelOpen = function(OpenChannelInfo, recipient_peer_id) {
+    message.type = ApiType.MsgType_ChannelOpen_N32
+    message.data = OpenChannelInfo
+    message.recipient_peer_id = recipient_peer_id
+    ws.sendData(message)
+}
+api.onChannelOpen = function(jsonData) {}
+
+/* MsgType_ChannelAccept_N33 */
+api.channelAccept = function(AcceptChannelInfo) {
+    message.type = ApiType.MsgType_ChannelAccept_N33
+    message.data = AcceptChannelInfo
+    ws.sendData(message)
+}
+api.onChannelAccept = function(jsonData) {}
