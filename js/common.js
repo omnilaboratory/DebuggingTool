@@ -71,7 +71,7 @@ function onClickSend(param) {
             openChannelInfo.funding_pubkey = "03f1603966fc3986d7681a7bf7a1e6b8b44c6009939c28da21f065c1b991aeff12";
             recipient_peer_id = "39e8b1f3e7aec51a368d70eac6d47195099e55c6963d38bcd729b22190dcdae0";
 
-            api.openChannel(openChannelInfo, message)
+            api.openChannel(openChannelInfo, recipient_peer_id)
             break;
         case ApiType.MsgType_ChannelAccept_N33:
             acceptChannelInfo.temporary_channel_id = "bf88561781fe4f0c066fcc74d218f1bbe4bcc3d1f589adbe07b1fb392873ed56";
