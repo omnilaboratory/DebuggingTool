@@ -119,13 +119,16 @@ api.connectToOBD = function() {
         console.info("send msg: ", msg);
         ws.send(JSON.stringify(msg));
     }
+
     ws.onerror = function(event) {
         console.info(event.data)
-    };
+    }
+
     ws.onclose = function(event) {
         console.info("websocket close");
         isConnectToOBD = false;
-    };
+        isLogin = false;
+    }
 }
 
 /* MsgType_UserLogin_1  */
