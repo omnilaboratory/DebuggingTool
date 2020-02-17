@@ -1,25 +1,38 @@
 function onClickSend(param) {
-    apiName = $("#api_name").html()
-    console.info(apiName)
-    if (apiName == 'api_name') {
+    type_id = $("#type_id").html().toString().replace(' ', '');
+    type_id = type_id.substring(type_id.indexOf('(') + 1, type_id.indexOf(')'));
+    msgType = 0;
+    if (type_id != '') {
+        msgType = parseInt(type_id);
+    }
+    console.info(msgType)
+    if (msgType == 0) {
         api.connectToOBD();
         return;
     }
+
     if (isConnectToOBD == false) {
         alert("not connetToOBD");
         return;
     }
+
+    if (msgType < 0 && isLogin == false) {
+        alert("please login");
+        return;
+    }
+
+
     let inputData = {};
-    switch (apiName) {
-        case 'LogIn':
+    switch (msgType) {
+        case ApiType.MsgType_UserLogin_1:
             /* TODO get the data from input data
              */
             api.SendLogin(inputData);
             break;
-        case 'NewAddress':
+        case ApiType.MsgType_Core_GetNewAddress_1001:
             api.SendGetNewAddress();
             break;
-        case 'NewAddressWithMnemonic':
+        case ApiType.MsgType_Mnemonic_CreateAddress_N200:
             api.SendNewAddressOnLogin();
             break;
         default:
@@ -30,18 +43,18 @@ function onClickSend(param) {
 
 // getAPIList
 function getAPIList() {
-    
+
     var api_id, type_id, api_name, description, apiItem, p;
     let requestURL = 'json/api_list.json';
 
     // dynamic create api_list div.
-    $.getJSON(requestURL, function (result) {
+    $.getJSON(requestURL, function(result) {
         // get [api_list] div
         var apiList = $("#api_list");
 
         for (let index = 0; index < result.data.length; index++) {
-            api_id   = result.data[index].id;
-            type_id  = result.data[index].type_id;
+            api_id = result.data[index].id;
+            type_id = result.data[index].type_id;
             api_name = result.data[index].name;
             description = result.data[index].description;
 
@@ -54,7 +67,7 @@ function getAPIList() {
             apiItem.setAttribute('onclick', 'callAPI(this)');
             apiItem.innerText = api_name;
             apiList.append(apiItem);
-    
+
             p = document.createElement('p');
             apiList.append(p);
         }
@@ -106,7 +119,7 @@ function createInputParamDiv(js_func) {
 
     let requestURL = 'json/api_list.json';
 
-    $.getJSON(requestURL, function (result) {
+    $.getJSON(requestURL, function(result) {
         // get [input_para] div
         var input_para = $("#input_para");
 
@@ -114,7 +127,7 @@ function createInputParamDiv(js_func) {
             if (js_func == result.data[index].id) {
                 var arrParams = result.data[index].parameters;
                 console.info('arrParams = ' + arrParams.length);
-                
+
                 // No parameter.
                 if (arrParams.length == 0) {
                     break;
@@ -124,7 +137,7 @@ function createInputParamDiv(js_func) {
                 var top_title = document.createElement('p');
                 top_title.innerText = 'Input Parameters:';
                 input_para.append(top_title);
-    
+
                 // Parameters
                 createParamOfAPI(arrParams);
             }
@@ -159,7 +172,7 @@ function createButtonOfParam(arrParams, index) {
     var arrButtons = arrParams[index].buttons;
 
     for (let index = 0; index < arrButtons.length; index++) {
-        innerText  = arrButtons[index].innerText;
+        innerText = arrButtons[index].innerText;
         invokeFunc = arrButtons[index].onclick;
 
         // create [button] element
