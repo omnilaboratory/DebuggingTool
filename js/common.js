@@ -31,7 +31,10 @@ function onClickSend(param) {
         return;
     }
 
-    let inputData = {};
+    message.type = msgType
+    message.data = {}
+    message.recipient_peer_id = ""
+
     switch (msgType) {
         case ApiType.MsgType_UserLogin_1:
             if (isLogin == false) {

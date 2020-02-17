@@ -12,7 +12,7 @@ api.connectToOBD = function() {
     ws = new WebSocket(wsAddress);
     ws.onopen = function() {
         //当WebSocket创建成功时，触发onopen事件
-        ws.send("connect obd first"); //将消息发送到服务端
+        ws.send("connect obd  at first time"); //将消息发送到服务端
         isConnectToOBD = true;
     }
 
@@ -112,11 +112,19 @@ api.connectToOBD = function() {
     }
 
     ws.sendData = function(msg) {
+        if (isConnectToOBD == false) {
+            alert("please try to connect obd again")
+            return;
+        }
         console.info("send msg: ", msg);
         ws.send(JSON.stringify(msg));
     }
     ws.onerror = function(event) {
         console.info(event.data)
+    };
+    ws.onclose = function(event) {
+        console.info("websocket close");
+        isConnectToOBD = false;
     };
 }
 
