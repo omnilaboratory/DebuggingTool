@@ -18,7 +18,7 @@ api.connectToOBD = function() {
 
     ws.onmessage = function(e) {　　 //当客户端收到服务端发来的消息时，触发onmessage事件，参数e.data包含server传递过来的数据
         jsonData = JSON.parse(e.data)
-        console.info("get data from obd: ", jsonData);
+        console.info("data from obd: ", jsonData);
         if (jsonData.status == false) {
             if (jsonData.type != ApiType.MsgType_Error_0) {
                 alert(jsonData.result);
