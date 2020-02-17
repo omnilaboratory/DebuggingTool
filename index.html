@@ -13,8 +13,9 @@
 
 <script>
     // invoked when page refresh.
+    getUtilList();
     getAPIList();
-
+    
     function invokeSignUp() {
         console.log('invokeSignUp func invoked!');
         // var api_SignUp = document.getElementById('signUp');
@@ -46,25 +47,25 @@
             height:500px;width:220px;float:left;">
 
             <p style="font-family: Arial, Helvetica, sans-serif;
-            color: gray;">Start</p>
+                color: gray;">Start</p>
 
             <!-- First, you need to connect to a OBD node. -->
-            <a href="#" onclick="callAPI(this)">Connect to OBD node</a>
+            <a href="#" onclick="connectNode()">Connect to OBD node</a>
 
             <br><br><br>
 
-            <!-- APIs for Util -->
+            <!-- APIs for Util - Dynamic create -->
             <p style="font-family: Arial, Helvetica, sans-serif;
-            color: gray;">Util</p>
+                color: gray;">Util</p>
 
-            <p><a href="#" js_func="getNewAddress" type_id="1001" onclick="callAPI(this)">NewAddress</a></p>
-            <p><a href="#" js_func="getNewAddressWithMnemonic" type_id="-200" onclick="callAPI(this)">NewAddressWithMnemonic</a></p>
+            <div id="util_list"></div>
 
             <br>
 
             <!-- APIs for Debugging - Dynamic create -->
             <p style="font-family: Arial, Helvetica, sans-serif;
-                color: gray;">APIs for Debugging</p>
+                color:gray;">APIs for Debugging</p>
+
             <div id="api_list"></div>
         </div>
 
@@ -72,32 +73,7 @@
         <div id="content" style="background-color:#EEEEEE;
             height:500px;width:360px;float:left;">
 
-            <!-- API Name -->
-            <h2 id="api_name">api_name</h2>
-            <p id="api_description">api_description</p>
-
-            <!-- Request -->
-            <h2>Request</h2>
-
-            <text style="font-family: Arial, Helvetica, sans-serif;
-                color: gray;">func:</text>
-
-            <a id="js_func">js_func</a>
-            <a id="type_id" style="font-family: Arial, Helvetica, sans-serif;
-                color: gray;">type()</a>
-
-            <!-- Send Button -->
-            <div>
-                输入消息编号：
-                <input type="text" name="" id="msgType">
-            </div>
-            <button onclick="onClickSend(this)">Send</button>
-
-            <!-- Input Parameter - Dynamic create -->
-            <div id="input_para"></div>
-
-            <!-- OBD Responses - Dynamic create -->
-            <h2 id="obd_responses">OBD Responses</h2>
+            <!-- Dynamic create in 'common.js' -->
         </div>
 
         <!-- Footer for display copyright info, etc. -->
@@ -108,5 +84,4 @@
         </div>
     </div>
 </body>
-
 </html>

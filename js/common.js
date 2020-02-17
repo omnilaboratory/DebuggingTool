@@ -88,16 +88,32 @@ function onClickSend(param) {
 
 }
 
+// getUtilList
+function getUtilList() {
+    var jsonFile = "json/util_list.json";
+    var divName  = "#util_list";
+
+    createLeftSideMenu(jsonFile, divName);
+}
+
 // getAPIList
 function getAPIList() {
+    var jsonFile = "json/api_list.json";
+    var divName  = "#api_list";
+
+    createLeftSideMenu(jsonFile, divName);
+}
+
+// createLeftSideMenu
+function createLeftSideMenu(jsonFile, divName) {
     
     var api_id, type_id, description, apiItem, p;
-    let requestURL = 'json/api_list.json';
+    let requestURL = jsonFile;
 
     // dynamic create api_list div.
     $.getJSON(requestURL, function(result) {
         // get [api_list] div
-        var apiList = $("#api_list");
+        var apiList = $(divName);
 
         for (let index = 0; index < result.data.length; index++) {
             api_id   = result.data[index].id;
@@ -120,59 +136,107 @@ function getAPIList() {
     });
 }
 
-// Invoke a api, show content.
+// Invoke a api, show content. Dynamic create content div area.
 function callAPI(obj) {
-    // 
-    var api_name = obj.innerHTML;
-    document.getElementById("api_name").innerHTML = api_name;
 
-    // 
-    var api_description = obj.getAttribute("description");
-    document.getElementById("api_description").innerHTML = api_description;
+    // First, delete children of 'content' div.
+    deleteContentDiv();
 
-    // id = js_func
-    var js_func = obj.getAttribute("id");
-    document.getElementById("js_func").innerHTML = js_func;
-
-    //
-    var type_id = "type ( " + obj.getAttribute("type_id") + " )";
-    document.getElementById("type_id").innerHTML = type_id;
-
-    // First, delete children of input_para div
-    deleteInputParamDiv();
-
-    // dynamic create input parameters div area.
-    createInputParamDiv(js_func);
+    createApiNameDiv(obj);
+    createRequestDiv(obj);
+    createInputParamDiv(obj, 'json/util_list.json');
+    createInputParamDiv(obj, 'json/api_list.json');
 }
 
-// delete children of input_para div
-function deleteInputParamDiv() {
+// create 
+function createApiNameDiv(obj) {
 
-    var parent = document.getElementById('input_para');
-    var children_amount = parent.children.length;
-    console.log('children = ' + children_amount);
+    // get [content] div
+    var content_div = $("#content");
 
-    if (children_amount != 0) {
-        for (let index = children_amount - 1; index >= 0; index--) {
-            // console.log('index = ' + index);
-            parent.removeChild(parent.children[index]);
-        }
-    }
+    // create [api_name] element
+    var api_name = document.createElement('h2');
+    api_name.innerText = obj.innerHTML;
+    content_div.append(api_name);
+    
+    // create [api_description] element
+    var api_description = document.createElement('text');
+    api_description.innerText = obj.getAttribute("description");
+    content_div.append(api_description);
+}
+
+// create 
+function createRequestDiv(obj) {
+
+    // get [content] div
+    var content_div = $("#content");
+
+    // create [title] element
+    var title = document.createElement('h2');
+    title.innerText = 'Request';
+    content_div.append(title);
+    
+    // create [func_title] element
+    var func_title = document.createElement('text');
+    // func_title.color = '#EEEEEE';
+    func_title.setAttribute('style', 'color:gray');
+    func_title.innerText = 'func: ';
+    content_div.append(func_title);
+    
+    // create [func_name] element
+    var func_name = document.createElement('text');
+    func_name.innerText = obj.getAttribute("id");
+    content_div.append(func_name);
+    
+    // create [type_id] element
+    var value = " type ( " + obj.getAttribute("type_id") + " )";
+    var type_id = document.createElement('text');
+    type_id.setAttribute('style', 'color:gray');
+    type_id.innerText = value;
+    content_div.append(type_id);
+
+    //-------------------------------
+    // TEMP WILL BE DELETED - for GuoJun testing.
+    var p = document.createElement('p');
+    content_div.append(p);
+    
+    var input_title = document.createElement('text');
+    input_title.setAttribute('style', 'color:gray');
+    input_title.innerText = '输入消息编号：';
+    content_div.append(input_title);
+
+    // create [input] element - for GuoJun testing.
+    var input_msgType = document.createElement('input');
+    input_msgType.id = 'msgType';
+    // input_msgType.setAttribute('type', 'text');
+    // input_msgType.setAttribute('name', '');
+    content_div.append(input_msgType);
+    //-------------------------------
+
+    // create [button] element
+    var button = document.createElement('button');
+    button.setAttribute('onclick', 'onClickSend(this)');
+    button.innerText = 'Send';
+    content_div.append(button);
 }
 
 // dynamic create input parameters div area.
-function createInputParamDiv(js_func) {
+function createInputParamDiv(obj, jsonFile) {
 
-    let requestURL = 'json/api_list.json';
+    // let requestURL = 'json/api_list.json';
 
-    $.getJSON(requestURL, function(result) {
-        // get [input_para] div
-        var input_para = $("#input_para");
+    $.getJSON(jsonFile, function(result) {
+        // get [content] div
+        var input_para = $("#content");
+
+        // get JS function name.
+        var js_func = obj.getAttribute("id");
 
         for (let index = 0; index < result.data.length; index++) {
+            // id = js_func, is JS function name.
             if (js_func == result.data[index].id) {
                 var arrParams = result.data[index].parameters;
-                console.info('arrParams = ' + arrParams.length);
+                // console.info('arrParams = ' + arrParams.length);
 
                 // No parameter.
                 if (arrParams.length == 0) {
@@ -196,9 +260,13 @@ function createParamOfAPI(arrParams) {
 
     var param_title, input_box;
 
+    // get [content] div
+    var input_para = $("#content");
+
     for (let index = 0; index < arrParams.length; index++) {
         // create [param_title] element
-        param_title = document.createElement('b');
+        param_title = document.createElement('text');
+        param_title.setAttribute('style', 'color:gray');
         param_title.innerText = arrParams[index].name + ' : ';
         input_para.append(param_title);
 
@@ -217,6 +285,9 @@ function createButtonOfParam(arrParams, index) {
     var innerText, invokeFunc;
     var arrButtons = arrParams[index].buttons;
 
+    // get [content] div
+    var input_para = $("#content");
+    
     for (let index = 0; index < arrButtons.length; index++) {
         innerText = arrButtons[index].innerText;
         invokeFunc = arrButtons[index].onclick;
@@ -228,3 +299,61 @@ function createButtonOfParam(arrParams, index) {
         input_para.append(button);
     }
 }
+
+// create OBD Responses
+function createOBDResponse() {
+
+}
+
+
+//----------------------------------------------------------------
+// For test to show Connect to OBD html page.
+function connectNode() {
+    deleteContentDiv();
+    createConnectNodeDiv();
+}
+
+// delete children of 'content' div
+function deleteContentDiv() {
+    
+    var parent = document.getElementById('content');
+    var children_amount = parent.children.length;
+    // console.log('content div children = ' + children_amount);
+    
+    if (children_amount != 0) {
+        for (let index = children_amount - 1; index >= 0; index--) {
+            // console.log('index = ' + index);
+            parent.removeChild(parent.children[index]);
+        }
+    }
+}
+
+// create ConnectNodeDiv
+function createConnectNodeDiv() {
+
+    // get [content] div
+    var content_div = $("#content");
+
+    // create [title] element
+    var title = document.createElement('h2');
+    title.innerText = 'OBD Node';
+    content_div.append(title);
+
+    // create [input title] element
+    var input_title = document.createElement('text');
+    input_title.setAttribute('style', 'color:gray');
+    input_title.innerText = 'Node URL: ';
+    content_div.append(input_title);
+
+    // create [input] element
+    var node_addr = document.createElement('input');
+    node_addr.id = 'ConnectNode'
+    content_div.append(node_addr);
+
+    // create [button] element
+    var button = document.createElement('button');
+    button.setAttribute('onclick', '');
+    button.innerText = 'Connect';
+    content_div.append(button);
+}
+//----------------------------------------------------------------
