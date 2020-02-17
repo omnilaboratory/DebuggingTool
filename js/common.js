@@ -31,15 +31,12 @@ function onClickSend(param) {
         return;
     }
 
-    message.type = msgType;
     let inputData = {};
-    message.data = inputData;
-
     switch (msgType) {
         case ApiType.MsgType_UserLogin_1:
             if (isLogin == false) {
-                userLogin.mnemonic = "unfold tortoise zoo hand sausage project boring corn test same elevator mansion bargain coffee brick tilt forum purpose hundred embody weapon ripple when narrow"
-                api.logIn(userLogin);
+                userLoginInfo.mnemonic = "unfold tortoise zoo hand sausage project boring corn test same elevator mansion bargain coffee brick tilt forum purpose hundred embody weapon ripple when narrow"
+                api.logIn(userLoginInfo);
                 break;
             } else { return; }
         case ApiType.MsgType_GetMnemonic_101:
@@ -49,13 +46,13 @@ function onClickSend(param) {
             api.getNewAddressFromOmniCore()
             break;
         case ApiType.MsgType_Core_FundingBTC_1009:
-            btcFunding.from_address = "bf88561781fe4f0c066fcc74d218f1bbe4bcc3d1f589adbe07b1fb392873ed56";
-            btcFunding.from_address_private_key = "39e8b1f3e7aec51a368d70eac6d47195099e55c6963d38bcd729b22190dcdae0";
-            btcFunding.to_address = "39e8b1f3e7aec51a368d70eac6d47195099e55c6963d38bcd729b22190dcdae0";
-            btcFunding.amount = 0.0001;
-            btcFunding.miner_fee = 0.00001;
+            btcFundingInfo.from_address = "bf88561781fe4f0c066fcc74d218f1bbe4bcc3d1f589adbe07b1fb392873ed56";
+            btcFundingInfo.from_address_private_key = "39e8b1f3e7aec51a368d70eac6d47195099e55c6963d38bcd729b22190dcdae0";
+            btcFundingInfo.to_address = "39e8b1f3e7aec51a368d70eac6d47195099e55c6963d38bcd729b22190dcdae0";
+            btcFundingInfo.amount = 0.0001;
+            btcFundingInfo.miner_fee = 0.00001;
 
-            api.fundingBTC(btcFunding)
+            api.fundingBTC(btcFundingInfo)
             break;
         case ApiType.MsgType_Core_Omni_ListProperties_1205:
             api.listProperties()
