@@ -1,6 +1,28 @@
 var message = {
     type: 0,
-    data: {}
+    data: {},
+    recipient_peer_id: ''
+}
+
+var userLogin = {
+    mnemonic: ""
+}
+var btcSendRequest = {
+    from_address: "",
+    from_address_private_key: "",
+    to_address: "",
+    amount: 0,
+    miner_fee: 0.00001
+}
+
+var openChannelInfo = {
+    funding_pubkey: "",
+}
+
+var acceptChannelInfo = {
+    temporary_channel_id: "",
+    funding_pubkey: "",
+    approval: false,
 }
 
 var ApiType = {
