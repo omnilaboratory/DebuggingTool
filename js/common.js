@@ -31,17 +31,17 @@ function onClickSend(param) {
         return;
     }
 
-    message.type = msgType;
-    let inputData = {};
-    message.data = inputData;
+    message.type = msgType
+    message.data = {}
+    message.recipient_peer_id = ""
 
     switch (msgType) {
         case ApiType.MsgType_UserLogin_1:
             if (isLogin == false) {
-                userLogin.mnemonic = "unfold tortoise zoo hand sausage project boring corn test same elevator mansion bargain coffee brick tilt forum purpose hundred embody weapon ripple when narrow"
-                api.logIn(userLogin);
+                userLoginInfo.mnemonic = "unfold tortoise zoo hand sausage project boring corn test same elevator mansion bargain coffee brick tilt forum purpose hundred embody weapon ripple when narrow"
+                api.logIn(userLoginInfo);
                 break;
-            } else { return; }
+            }
         case ApiType.MsgType_GetMnemonic_101:
             api.getMnemonic();
             break;
@@ -49,13 +49,13 @@ function onClickSend(param) {
             api.getNewAddressFromOmniCore()
             break;
         case ApiType.MsgType_Core_FundingBTC_1009:
-            btcSendRequest.from_address = "bf88561781fe4f0c066fcc74d218f1bbe4bcc3d1f589adbe07b1fb392873ed56";
-            btcSendRequest.from_address_private_key = "39e8b1f3e7aec51a368d70eac6d47195099e55c6963d38bcd729b22190dcdae0";
-            btcSendRequest.to_address = "39e8b1f3e7aec51a368d70eac6d47195099e55c6963d38bcd729b22190dcdae0";
-            btcSendRequest.amount = 0.0001;
-            btcSendRequest.miner_fee = 0.00001;
+            btcFundingInfo.from_address = "bf88561781fe4f0c066fcc74d218f1bbe4bcc3d1f589adbe07b1fb392873ed56";
+            btcFundingInfo.from_address_private_key = "39e8b1f3e7aec51a368d70eac6d47195099e55c6963d38bcd729b22190dcdae0";
+            btcFundingInfo.to_address = "39e8b1f3e7aec51a368d70eac6d47195099e55c6963d38bcd729b22190dcdae0";
+            btcFundingInfo.amount = 0.0001;
+            btcFundingInfo.miner_fee = 0.00001;
 
-            api.fundingBTC(btcSendRequest)
+            api.fundingBTC(btcFundingInfo)
             break;
         case ApiType.MsgType_Core_Omni_ListProperties_1205:
             api.listProperties()
@@ -71,7 +71,7 @@ function onClickSend(param) {
             openChannelInfo.funding_pubkey = "03f1603966fc3986d7681a7bf7a1e6b8b44c6009939c28da21f065c1b991aeff12";
             recipient_peer_id = "39e8b1f3e7aec51a368d70eac6d47195099e55c6963d38bcd729b22190dcdae0";
 
-            api.channelOpen(openChannelInfo, message)
+            api.openChannel(openChannelInfo, recipient_peer_id)
             break;
         case ApiType.MsgType_ChannelAccept_N33:
             acceptChannelInfo.temporary_channel_id = "bf88561781fe4f0c066fcc74d218f1bbe4bcc3d1f589adbe07b1fb392873ed56";
@@ -81,7 +81,7 @@ function onClickSend(param) {
             api.channelAccept(acceptChannelInfo)
             break;
         default:
-            console.info(apiName, "not exsit");
+            alert(msgType + " type not exsit");
             return;
 
     }
@@ -116,8 +116,9 @@ function createLeftSideMenu(jsonFile, divName) {
         var apiList = $(divName);
 
         for (let index = 0; index < result.data.length; index++) {
-            api_id   = result.data[index].id;
-            type_id  = result.data[index].type_id;
+            api_id = result.data[index].id;
+            type_id = result.data[index].type_id;
+            api_name = result.data[index].id;
             description = result.data[index].description;
 
             // create [a] element
@@ -127,7 +128,7 @@ function createLeftSideMenu(jsonFile, divName) {
             apiItem.setAttribute('type_id', type_id);
             apiItem.setAttribute('description', description);
             apiItem.setAttribute('onclick', 'callAPI(this)');
-            apiItem.innerText = api_id;
+            apiItem.innerText = api_name;
             apiList.append(apiItem);
 
             p = document.createElement('p');
@@ -272,7 +273,7 @@ function createParamOfAPI(arrParams) {
 
         // create [input box of param] element
         input_box = document.createElement('input');
-        input_box.id = arrParams[index].name;
+        input_box.id = arrParams[index].input;
         input_para.append(input_box);
 
         createButtonOfParam(arrParams, index);
