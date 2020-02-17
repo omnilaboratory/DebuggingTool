@@ -7,12 +7,34 @@ var message = {
 var userLogin = {
     mnemonic: ""
 }
-var btcSendRequest = {
+var btcFunding = {
     from_address: "",
     from_address_private_key: "",
     to_address: "",
     amount: 0,
     miner_fee: 0.00001
+}
+
+var omniFundingAsset = {
+    from_address: "",
+    from_address_private_key: "",
+    to_address: "",
+    property_id: 31,
+    amount: 0,
+    miner_fee: 0.00001
+}
+
+var channelFundingCreated = {
+    temporary_channel_id: "",
+    funding_tx_hex: "",
+    temp_address_pub_key: "",
+    temp_address_private_key: "",
+    channel_address_private_key: ""
+}
+var channelFundingSign = {
+    channel_id: "",
+    fundee_channel_address_private_key: "",
+    approval: false
 }
 
 var openChannelInfo = {

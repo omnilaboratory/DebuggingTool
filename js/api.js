@@ -43,6 +43,12 @@ api.connectToOBD = function() {
             case ApiType.MsgType_Core_Omni_ListProperties_1205:
                 api.onListProperties(resultData);
                 break;
+            case ApiType.MsgType_Core_Omni_FundingAsset_2001:
+                api.onFundingAssetOfOmni(resultData);
+                break;
+
+
+
             case ApiType.MsgType_Mnemonic_CreateAddress_N200:
                 api.onCreateAddressByMnemonic(resultData);
                 break;
@@ -50,10 +56,16 @@ api.connectToOBD = function() {
                 api.onGetAddressByIndexByMnemonic(resultData);
                 break;
             case ApiType.MsgType_ChannelOpen_N32:
-                api.onChannelOpen(resultData)
+                api.onOpenChannel(resultData)
                 break;
             case ApiType.MsgType_ChannelAccept_N33:
                 api.onChannelAccept(resultData)
+                break;
+            case ApiType.MsgType_FundingCreate_AssetFundingCreated_N34:
+                api.onChannelFundingCreated(resultData)
+                break;
+            case ApiType.MsgType_FundingSign_AssetFundingSigned_N35:
+                api.onChannelFundingSigned(resultData)
                 break;
             default:
                 break;
@@ -109,6 +121,18 @@ api.listProperties = function() {
 }
 api.onListProperties = function(jsonData) {}
 
+/* MsgType_Core_Omni_FundingAsset_2001 */
+api.fundingAssetOfOmni = function(omniFundingAsset) {
+    message.type = ApiType.MsgType_Core_Omni_FundingAsset_2001
+    message.data = omniFundingAsset
+    ws.sendData(message)
+}
+api.onFundingAssetOfOmni = function(jsonData) {}
+
+
+
+
+
 /* MsgType_Mnemonic_CreateAddress_N200 */
 api.createAddressByMnemonic = function() {
     message.type = ApiType.MsgType_Mnemonic_CreateAddress_N200
@@ -125,18 +149,34 @@ api.getAddressByIndexByMnemonic = function(index) {
 api.onGetAddressByIndexByMnemonic = function(jsonData) {}
 
 /* MsgType_ChannelOpen_N32 */
-api.channelOpen = function(OpenChannelInfo, recipient_peer_id) {
+api.openChannel = function(openChannelInfo, recipient_peer_id) {
     message.type = ApiType.MsgType_ChannelOpen_N32
-    message.data = OpenChannelInfo
+    message.data = openChannelInfo
     message.recipient_peer_id = recipient_peer_id
     ws.sendData(message)
 }
-api.onChannelOpen = function(jsonData) {}
+api.onOpenChannel = function(jsonData) {}
 
 /* MsgType_ChannelAccept_N33 */
-api.channelAccept = function(AcceptChannelInfo) {
+api.channelAccept = function(acceptChannelInfo) {
     message.type = ApiType.MsgType_ChannelAccept_N33
-    message.data = AcceptChannelInfo
+    message.data = acceptChannelInfo
     ws.sendData(message)
 }
 api.onChannelAccept = function(jsonData) {}
+
+/* MsgType_FundingCreate_AssetFundingCreated_N34 */
+api.channelFundingCreated = function(channelFundingCreated) {
+    message.type = ApiType.MsgType_FundingCreate_AssetFundingCreated_N34
+    message.data = channelFundingCreated
+    ws.sendData(message)
+}
+api.onChannelFundingCreated = function(jsonData) {}
+
+/* MsgType_FundingSign_AssetFundingSigned_N35 */
+api.channelFundingSigned = function(channelFundingSign) {
+    message.type = ApiType.MsgType_FundingSign_AssetFundingSigned_N35
+    message.data = channelFundingCreated
+    ws.sendData(message)
+}
+api.onChannelFundingSigned = function(jsonData) {}
