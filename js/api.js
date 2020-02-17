@@ -4,10 +4,13 @@ var ws;
 var isConnectToOBD = false;
 var api = {};
 
-api.connectToOBD = function() {
+api.connectToOBD = function(address) {
     console.info("connectToOBD", isConnectToOBD)
     if (isConnectToOBD) {
         return;
+    }
+    if (length(address) > 0) {
+        wsAddress = address;
     }
     ws = new WebSocket(wsAddress);
     ws.onopen = function() {
