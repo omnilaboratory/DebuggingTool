@@ -31,7 +31,7 @@ function onClickSend(param) {
 // getAPIList
 function getAPIList() {
     
-    var api_id, type_id, api_name, description, apiItem, p;
+    var api_id, type_id, description, apiItem, p;
     let requestURL = 'json/api_list.json';
 
     // dynamic create api_list div.
@@ -42,7 +42,6 @@ function getAPIList() {
         for (let index = 0; index < result.data.length; index++) {
             api_id   = result.data[index].id;
             type_id  = result.data[index].type_id;
-            api_name = result.data[index].name;
             description = result.data[index].description;
 
             // create [a] element
@@ -52,7 +51,7 @@ function getAPIList() {
             apiItem.setAttribute('type_id', type_id);
             apiItem.setAttribute('description', description);
             apiItem.setAttribute('onclick', 'callAPI(this)');
-            apiItem.innerText = api_name;
+            apiItem.innerText = api_id;
             apiList.append(apiItem);
     
             p = document.createElement('p');
@@ -145,7 +144,7 @@ function createParamOfAPI(arrParams) {
 
         // create [input box of param] element
         input_box = document.createElement('input');
-        input_box.id = arrParams[index].input;
+        input_box.id = arrParams[index].name;
         input_para.append(input_box);
 
         createButtonOfParam(arrParams, index);
