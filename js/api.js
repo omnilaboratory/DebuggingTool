@@ -2,16 +2,21 @@ var wsAddress = "ws://127.0.0.1:60020/ws"
 var ws;
 
 var isConnectToOBD = false;
+var isLogin = false;
+
+
 var api = {};
 
 api.connectToOBD = function(address) {
-    console.info("connectToOBD", isConnectToOBD)
+    console.info("connectToOBD", isConnectToOBD, address)
     if (isConnectToOBD) {
         return;
     }
-    if (length(address) > 0) {
+
+    if (address != undefined) {
         wsAddress = address;
     }
+
     ws = new WebSocket(wsAddress);
     ws.onopen = function() {
         //当WebSocket创建成功时，触发onopen事件
@@ -119,6 +124,12 @@ api.connectToOBD = function(address) {
             alert("please try to connect obd again")
             return;
         }
+
+        if (msg.type < 0 && isLogin == false) {
+            alert("please login");
+            return false;
+        }
+
         console.info("send msg: ", msg);
         ws.send(JSON.stringify(msg));
     }
@@ -134,16 +145,23 @@ api.connectToOBD = function(address) {
     }
 }
 
-/* MsgType_UserLogin_1  */
-var isLogin = false;
 
+function resetMsg() {
+    message.data = {}
+    message.recipient_peer_id = ""
+}
+
+/* MsgType_UserLogin_1  */
 var userLoginInfo = {
     mnemonic: ""
 }
 api.logIn = function(userLoginInfo) {
-    message.type = ApiType.MsgType_UserLogin_1
-    message.data = userLoginInfo
-    ws.sendData(message)
+    resetMsg();
+    if (isLogin == false) {
+        message.type = ApiType.MsgType_UserLogin_1
+        message.data = userLoginInfo
+        ws.sendData(message)
+    }
 }
 api.onLogin = function(jsonData) {
     isLogin = true;
@@ -151,6 +169,7 @@ api.onLogin = function(jsonData) {
 
 /* MsgType_GetMnemonic_101 */
 api.getMnemonic = function() {
+    resetMsg();
     message.type = ApiType.MsgType_GetMnemonic_101
     ws.sendData(message)
 }
@@ -158,6 +177,7 @@ api.onGetMnemonic = function(jsonData) {}
 
 /* MsgType_Core_GetNewAddress_1001 */
 api.getNewAddressFromOmniCore = function() {
+    resetMsg();
     message.type = ApiType.MsgType_Core_GetNewAddress_1001
     ws.sendData(message)
 }
@@ -172,6 +192,7 @@ var btcFundingInfo = {
     miner_fee: 0.00001
 }
 api.fundingBTC = function(btcFundingInfo) {
+    resetMsg();
     message.type = ApiType.MsgType_Core_FundingBTC_1009
     message.data = btcFundingInfo
     ws.sendData(message);
@@ -180,6 +201,7 @@ api.onFundingBTC = function(jsonData) {}
 
 /* MsgType_Core_Omni_ListProperties_1205 */
 api.listProperties = function() {
+    resetMsg();
     message.type = ApiType.MsgType_Core_Omni_ListProperties_1205
     ws.sendData(message)
 }
@@ -195,6 +217,7 @@ var omniFundingAssetInfo = {
     miner_fee: 0.00001
 }
 api.fundingAssetOfOmni = function(omniFundingAssetInfo) {
+    resetMsg();
     message.type = ApiType.MsgType_Core_Omni_FundingAsset_2001
     message.data = omniFundingAssetInfo
     ws.sendData(message)
@@ -205,6 +228,7 @@ api.onFundingAssetOfOmni = function(jsonData) {}
 
 /* MsgType_Mnemonic_CreateAddress_N200 */
 api.createAddressByMnemonic = function() {
+    resetMsg();
     message.type = ApiType.MsgType_Mnemonic_CreateAddress_N200
     ws.sendData(message)
 }
@@ -212,6 +236,7 @@ api.onCreateAddressByMnemonic = function(jsonData) {}
 
 /* MsgType_Mnemonic_GetAddressByIndex_201 */
 api.getAddressByIndexByMnemonic = function(index) {
+    resetMsg();
     message.type = ApiType.MsgType_Mnemonic_GetAddressByIndex_201
     message.data = index
     ws.sendData(message)
@@ -223,6 +248,7 @@ var openChannelInfo = {
     funding_pubkey: "",
 }
 api.openChannel = function(openChannelInfo, recipient_peer_id) {
+    resetMsg();
     message.type = ApiType.MsgType_ChannelOpen_N32
     message.data = openChannelInfo
     message.recipient_peer_id = recipient_peer_id
@@ -237,6 +263,7 @@ var acceptChannelInfo = {
     approval: false,
 }
 api.channelAccept = function(acceptChannelInfo) {
+    resetMsg();
     message.type = ApiType.MsgType_ChannelAccept_N33
     message.data = acceptChannelInfo
     ws.sendData(message)
@@ -252,6 +279,7 @@ var channelFundingCreatedInfo = {
     channel_address_private_key: ""
 }
 api.channelFundingCreated = function(channelFundingCreatedInfo) {
+    resetMsg();
     message.type = ApiType.MsgType_FundingCreate_AssetFundingCreated_N34
     message.data = channelFundingCreatedInfo
     ws.sendData(message)
@@ -265,6 +293,7 @@ var channelFundingSignedInfo = {
     approval: false
 }
 api.channelFundingSigned = function(channelFundingSignedInfo) {
+    resetMsg();
     message.type = ApiType.MsgType_FundingSign_AssetFundingSigned_N35
     message.data = channelFundingSignedInfo
     ws.sendData(message)
@@ -281,6 +310,7 @@ var commitmentTx = {
     last_temp_address_private_key: "",
 }
 api.commitmentTransactionCreated = function(commitmentTx) {
+    resetMsg();
     message.type = ApiType.MsgType_CommitmentTx_CommitmentTransactionCreated_N351
     message.data = commitmentTx
     ws.sendData(message)
@@ -298,6 +328,7 @@ var commitmentTxSigned = {
     approval: false,
 }
 api.revokeAndAcknowledgeCommitmentTransaction = function(commitmentTxSigned) {
+    resetMsg();
     message.type = ApiType.MsgType_CommitmentTxSigned_RevokeAndAcknowledgeCommitmentTransaction_N352
     message.data = commitmentTxSigned
     ws.sendData(message)
@@ -311,6 +342,7 @@ var htlcHInfo = {
     recipient_peer_id: "",
 }
 api.invoice = function(htlcHInfo) {
+    resetMsg();
     message.type = ApiType.MsgType_HTLC_Invoice_N4003
     message.data = htlcHInfo
     ws.sendData(message)
@@ -319,6 +351,7 @@ api.onInvoice = function(jsonData) {}
 
 /* MsgType_HTLC_AddHTLC_N40  */
 api.addHtlc = function(htlcHInfo) {
+    resetMsg();
     message.type = ApiType.MsgType_HTLC_AddHTLC_N40
     message.data = htlcHInfo
     ws.sendData(message)
@@ -335,6 +368,7 @@ var htlcHSignInfo = {
     approval: false,
 }
 api.addHtlcSigned = function(htlcHSignInfo) {
+    resetMsg();
     message.type = ApiType.MsgType_HTLC_AddHTLCSigned_N41
     message.data = htlcHSignInfo
     ws.sendData(message)
@@ -346,6 +380,7 @@ var findPathAndSendHInfo = {
     h: "",
 }
 api.htlcFindPathAndSendH = function(findPathAndSendHInfo) {
+    resetMsg();
     message.type = ApiType.MsgType_HTLC_FindPathAndSendH_N42
     message.data = findPathAndSendHInfo
     ws.sendData(message)
@@ -358,6 +393,7 @@ var htlcSendHInfo = {
     h_and_r_info_request_hash: "",
 }
 api.htlcSendH = function(htlcSendHInfo) {
+    resetMsg();
     message.type = ApiType.MsgType_HTLC_SendH_N43
     message.data = htlcSendHInfo
     ws.sendData(message)
@@ -377,6 +413,7 @@ var signGetHInfo = {
     curr_htlc_temp_address_he1b_ofh_pub_key: "",
 }
 api.htlcSignGetH = function(signGetHInfo) {
+    resetMsg();
     message.type = ApiType.MsgType_HTLC_SignGetH_N44
     message.data = signGetHInfo
     ws.sendData(message)
@@ -397,6 +434,7 @@ var htlcRequestOpen = {
     curr_htlc_temp_address_for_hed1a_ofh_pub_key: ""
 }
 api.htlcCreateCommitmentTx = function(htlcRequestOpen) {
+    resetMsg();
     message.type = ApiType.MsgType_HTLC_CreateCommitmentTx_N45
     message.data = htlcRequestOpen
     ws.sendData(message)
@@ -413,6 +451,7 @@ var htlcSendRInfo = {
     curr_htlc_temp_address_for_he1b_private_key: ""
 }
 api.htlcSendR = function(htlcSendRInfo) {
+    resetMsg();
     message.type = ApiType.MsgType_HTLC_SendR_N46
     message.data = htlcSendRInfo
     ws.sendData(message)
@@ -427,6 +466,7 @@ var htlcVerifyRInfo = {
     curr_htlc_temp_address_for_hed1a_ofh_private_key: ""
 }
 api.htlcVerifyR = function(htlcVerifyRInfo) {
+    resetMsg();
     message.type = ApiType.MsgType_HTLC_VerifyR_N47
     message.data = htlcVerifyRInfo
     ws.sendData(message)
@@ -446,6 +486,7 @@ var closeHtlcTxInfo = {
     curr_rsmc_temp_address_private_key: ""
 }
 api.closeHtlcTx = function(closeHtlcTxInfo) {
+    resetMsg();
     message.type = ApiType.MsgType_HTLC_RequestCloseCurrTx_N48
     message.data = closeHtlcTxInfo
     ws.sendData(message)
@@ -463,6 +504,7 @@ var closeHtlcTxInfoSigned = {
     curr_rsmc_temp_address_private_key: ""
 }
 api.closeHtlcTxSigned = function(closeHtlcTxInfoSigned) {
+    resetMsg();
     message.type = ApiType.MsgType_HTLC_CloseSigned_N49
     message.data = closeHtlcTxInfoSigned
     ws.sendData(message)
