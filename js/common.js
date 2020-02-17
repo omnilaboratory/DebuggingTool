@@ -41,7 +41,7 @@ function onClickSend(param) {
                 userLoginInfo.mnemonic = "unfold tortoise zoo hand sausage project boring corn test same elevator mansion bargain coffee brick tilt forum purpose hundred embody weapon ripple when narrow"
                 api.logIn(userLoginInfo);
                 break;
-            } else { return; }
+            }
         case ApiType.MsgType_GetMnemonic_101:
             api.getMnemonic();
             break;
@@ -81,7 +81,7 @@ function onClickSend(param) {
             api.channelAccept(acceptChannelInfo)
             break;
         default:
-            console.info(apiName, "not exsit");
+            alert(msgType + " type not exsit");
             return;
 
     }
