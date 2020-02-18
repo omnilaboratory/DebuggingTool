@@ -18,14 +18,15 @@ function onClickSend(param) {
         case enumMsgType.MsgType_GetMnemonic_101:
             obdApi.getMnemonic();
             break;
+        case enumMsgType.MsgType_Core_FundingBTC_1009:
+            let info = new BtcFundingInfo();
+            obdApi.fundingBTC(info);
+            break;
         case enumMsgType.MsgType_Mnemonic_CreateAddress_N200:
             obdApi.createAddressByMnemonic();
             break;
         case enumMsgType.MsgType_Mnemonic_GetAddressByIndex_201:
             obdApi.getAddressByIndexByMnemonic(1);
-            break;
-        case enumMsgType.MsgType_Core_FundingBTC_1009:
-            obdApi.fundingBTC();
             break;
         default:
             console.info(msgType + " do not exist");
