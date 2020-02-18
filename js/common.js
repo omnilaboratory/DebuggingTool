@@ -12,13 +12,17 @@ function onClickSend(param) {
             });
             break;
         case enumMsgType.MsgType_UserLogin_1:
-            obdApi.login();
+            obdApi.login("", function(e) {
+                console.info(e);
+            });
             break;
         case enumMsgType.MsgType_UserLogout_2:
             obdApi.logout();
             break;
         case enumMsgType.MsgType_GetMnemonic_101:
-            obdApi.getMnemonic();
+            obdApi.getMnemonic(function(e) {
+                console.info(e);
+            });
             break;
         case enumMsgType.MsgType_Core_FundingBTC_1009:
             let info = new BtcFundingInfo();

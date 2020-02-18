@@ -124,26 +124,55 @@ var HtlcRequestOpen = (function () {
 }());
 var HtlcSendRInfo = (function () {
     function HtlcSendRInfo() {
+        this.request_hash = "";
+        this.r = "";
+        this.channel_address_private_key = "";
+        this.curr_htlc_temp_address_he1b_ofh_private_key = "";
+        this.curr_htlc_temp_address_for_he1b_pub_key = "";
+        this.curr_htlc_temp_address_for_he1b_private_key = "";
     }
     return HtlcSendRInfo;
 }());
 var HtlcVerifyRInfo = (function () {
     function HtlcVerifyRInfo() {
+        this.request_hash = "";
+        this.r = "";
+        this.channel_address_private_key = "";
+        this.curr_htlc_temp_address_for_hed1a_ofh_private_key = "";
     }
     return HtlcVerifyRInfo;
 }());
 var CloseHtlcTxInfo = (function () {
     function CloseHtlcTxInfo() {
+        this.channel_id = "";
+        this.channel_address_private_key = "";
+        this.last_rsmc_temp_address_private_key = "";
+        this.last_htlc_temp_address_private_key = "";
+        this.last_htlc_temp_address_for_htnx_private_key = "";
+        this.curr_rsmc_temp_address_pub_key = "";
+        this.curr_rsmc_temp_address_private_key = "";
     }
     return CloseHtlcTxInfo;
 }());
 var CloseHtlcTxInfoSigned = (function () {
     function CloseHtlcTxInfoSigned() {
+        this.request_close_htlc_hash = "";
+        this.channel_address_private_key = "";
+        this.last_rsmc_temp_address_private_key = "";
+        this.last_htlc_temp_address_private_key = "";
+        this.last_htlc_temp_address_for_htnx_private_key = "";
+        this.curr_rsmc_temp_address_pub_key = "";
+        this.curr_rsmc_temp_address_private_key = "";
     }
     return CloseHtlcTxInfoSigned;
 }());
 var OmniPropertyInfo = (function () {
     function OmniPropertyInfo() {
+        this.from_address = "";
+        this.name = "";
+        this.ecosystem = 0;
+        this.divisible_type = 0;
+        this.data = "";
     }
     return OmniPropertyInfo;
 }());
