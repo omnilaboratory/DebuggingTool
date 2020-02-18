@@ -320,12 +320,14 @@ function connectToServer() {
     // get [node_url] input box value.
     var node_url = $("#node_url").val();
     console.info('node url = ' + node_url);
-
+    
     if (node_url.trim().length == 0) {
         alert('Please input Node URL.');
         return;
     }
-
-    obdApi.connectToServer(node_url);
+    
+    var response;
+    obdApi.connectToServer(node_url, response);
+    console.info('response = ' + response);
 }
 //----------------------------------------------------------------
