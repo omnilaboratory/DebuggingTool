@@ -154,7 +154,6 @@ class ObdApi {
 
     /**
      * MsgType_UserLogin_1
-     * params:
      * @param mnemonic:string
      */
     public login(mnemonic: string) {
@@ -217,11 +216,7 @@ class ObdApi {
 
     /**
      * MsgType_Core_FundingBTC_1009
-     * @param  from_address:string = "";
-     * @param  from_address_private_key:string= "";
-     * @param  to_address: string ="";
-     * @param  amount: number = 0.0;
-     * @param  miner_fee: number = 0.00001
+     * @param BtcFundingInfo
      */
     public fundingBTC(info: BtcFundingInfo) {
         let msg = new Message();
@@ -247,12 +242,7 @@ class ObdApi {
 
     /**
     * MsgType_Core_Omni_FundingAsset_2001
-    * @param from_address:string = "";
-    * @param from_address_private_key:string= "";
-    * @param to_address:string = "";
-    * @param property_id:number = 31;
-    * @param amount:number = 0;
-    * @param miner_fee:number = 0.0;
+    * @param OmniFundingAssetInfo
      */
     public fundingAssetOfOmni(info: OmniFundingAssetInfo) {
         let msg = new Message();
@@ -308,9 +298,7 @@ class ObdApi {
 
     /**
      * MsgType_ChannelAccept_N33
-     * @param temporary_channel_id:string = "";
-     * @param funding_pubkey:string = "";
-     * @param approval:boolean = false;
+     * @param AcceptChannelInfo
      */
     public channelAccept(info: AcceptChannelInfo) {
         let msg = new Message();
@@ -324,11 +312,7 @@ class ObdApi {
 
     /**
      * MsgType_FundingCreate_AssetFundingCreated_N34
-     * @param temporary_channel_id:string =  "";
-     * @param funding_tx_hex:string =  "";
-     * @param temp_address_pub_key:string =  "";
-     * @param temp_address_private_key:string =  "";
-     * @param channel_address_private_key:string =  ""
+     * @param ChannelFundingCreatedInfo
      */
     public channelFundingCreated(info: ChannelFundingCreatedInfo) {
         let msg = new Message();
@@ -342,9 +326,7 @@ class ObdApi {
 
     /**
     * MsgType_FundingSign_AssetFundingSigned_N35
-    * @param channel_id:string =  "";
-    * @param fundee_channel_address_private_key:string =  "";
-    * @param approval:boolean =  false;
+    * @param ChannelFundingSignedInfo
     */
     public channelFundingSigned(info: ChannelFundingSignedInfo) {
         let msg = new Message();
@@ -358,12 +340,7 @@ class ObdApi {
 
     /**
      * MsgType_CommitmentTx_CommitmentTransactionCreated_N351
-     * @param  channel_id: "";
-     * @param  amount: 0;
-     * @param  curr_temp_address_pub_key: "";
-     * @param  curr_temp_address_private_key: "";
-     * @param  channel_address_private_key: "";
-     * @param  last_temp_address_private_key: "";
+     * @param CommitmentTx
      */
     public commitmentTransactionCreated(info: CommitmentTx) {
         let msg = new Message();
@@ -377,12 +354,7 @@ class ObdApi {
 
     /**
      * MsgType_CommitmentTxSigned_RevokeAndAcknowledgeCommitmentTransaction_N352
-     * @param  channel_id: "";
-     * @param  amount: 0;
-     * @param  curr_temp_address_pub_key: "";
-     * @param  curr_temp_address_private_key: "";
-     * @param  channel_address_private_key: "";
-     * @param  last_temp_address_private_key: "";
+     * @param CommitmentTxSigned
      */
     public revokeAndAcknowledgeCommitmentTransaction(info: CommitmentTxSigned) {
         let msg = new Message();
@@ -396,13 +368,7 @@ class ObdApi {
 
     /**
     * MsgType_HTLC_Invoice_N4003
-    * @param  channel_id: "";
-    * @param  curr_temp_address_pub_key: "";
-    * @param  curr_temp_address_private_key: "";
-    * @param  last_temp_private_key: "";
-    * @param  request_commitment_hash: "";
-    * @param  channel_address_private_key: "";
-    * @param  approval: false;
+    * @param HtlcHInfo
     */
     public htlcInvoice(info: HtlcHInfo) {
         let msg = new Message();
@@ -417,9 +383,7 @@ class ObdApi {
 
     /**
      * MsgType_HTLC_AddHTLC_N40
-     * @param  property_id: "";
-     * @param  amount: 0;
-     * @param  recipient_peer_id: "";
+     * @param HtlcHInfo
      */
     public addHtlc(info: HtlcHInfo) {
         let msg = new Message();
@@ -433,11 +397,7 @@ class ObdApi {
 
     /**
      * MsgType_HTLC_AddHTLCSigned_N41
-     * @param request_hash: "";
-     * @param property_id: 0;
-     * @param amount: 0;
-     * @param h: "";
-     * @param approval: false;
+     * @param HtlcHSignInfo
      */
     public addHtlcSigned(info: HtlcHSignInfo) {
         let msg = new Message();
@@ -481,15 +441,7 @@ class ObdApi {
 
     /**
      * MsgType_HTLC_SignGetH_N44
-     * @param request_hash: "";
-     * @param approval: false;
-     * @param channel_address_private_key: "";
-     * @param last_temp_address_private_key: "";
-     * @param curr_rsmc_temp_address_pub_key: "";
-     * @param curr_rsmc_temp_address_private_key: "";
-     * @param curr_htlc_temp_address_pub_key: "";
-     * @param curr_htlc_temp_address_private_key: "";
-     * @param curr_htlc_temp_address_he1b_ofh_pub_key: "";
+     * @param SignGetHInfo
      */
     public htlcSignGetH(info: SignGetHInfo) {
         let msg = new Message();
@@ -503,16 +455,7 @@ class ObdApi {
 
     /**
      * MsgType_HTLC_CreateCommitmentTx_N45
-     * @param request_hash: "";
-     * @param channel_address_private_key: "";
-     * @param last_temp_address_private_key: "";
-     * @param curr_rsmc_temp_address_pub_key: "";
-     * @param curr_rsmc_temp_address_private_key: "";
-     * @param curr_htlc_temp_address_pub_key: "";
-     * @param curr_htlc_temp_address_private_key: "";
-     * @param curr_htlc_temp_address_for_ht1a_pub_key: "";
-     * @param curr_htlc_temp_address_for_ht1a_private_key: "";
-     * @param curr_htlc_temp_address_for_hed1a_ofh_pub_key: ""
+     * @param HtlcRequestOpen
      */
     public htlcCreateCommitmentTx(info: HtlcRequestOpen) {
         let msg = new Message();
@@ -527,12 +470,7 @@ class ObdApi {
     /* ***************** backward R begin*****************/
     /**
      * MsgType_HTLC_SendR_N46
-     * @param request_hash: "";
-     * @param r: "";
-     * @param channel_address_private_key: "";
-     * @param curr_htlc_temp_address_he1b_ofh_private_key: "";
-     * @param curr_htlc_temp_address_for_he1b_pub_key: "";
-     * @param curr_htlc_temp_address_for_he1b_private_key: ""
+     * @param HtlcSendRInfo
      */
     public htlcSendR(info: HtlcSendRInfo) {
         let msg = new Message();
@@ -546,10 +484,7 @@ class ObdApi {
 
     /**
      * MsgType_HTLC_VerifyR_N47
-     * @param request_hash: "";
-     * @param r: "";
-     * @param channel_address_private_key: "";
-     * @param curr_htlc_temp_address_for_hed1a_ofh_private_key: ""
+     * @param HtlcVerifyRInfo
      */
     public htlcVerifyR(info: HtlcVerifyRInfo) {
         let msg = new Message();
@@ -565,13 +500,7 @@ class ObdApi {
     /* ***************** close htlc tx begin*****************/
     /**
      * MsgType_HTLC_VerifyR_N47
-     * @param channel_id: "";
-     * @param channel_address_private_key: "";
-     * @param last_rsmc_temp_address_private_key: "";
-     * @param last_htlc_temp_address_private_key: "";
-     * @param last_htlc_temp_address_for_htnx_private_key: "";
-     * @param curr_rsmc_temp_address_pub_key: "";
-     * @param curr_rsmc_temp_address_private_key: ""
+     * @param CloseHtlcTxInfo
      */
     public closeHtlcTx(info: CloseHtlcTxInfo) {
         let msg = new Message();
@@ -585,13 +514,7 @@ class ObdApi {
 
     /**
      * MsgType_HTLC_CloseSigned_N49
-     * @param request_close_htlc_hash: "";
-     * @param channel_address_private_key: "";
-     * @param last_rsmc_temp_address_private_key: "";
-     * @param last_htlc_temp_address_private_key: "";
-     * @param last_htlc_temp_address_for_htnx_private_key: "";
-     * @param curr_rsmc_temp_address_pub_key: "";
-     * @param curr_rsmc_temp_address_private_key: ""
+     * @param CloseHtlcTxInfoSigned
      */
     public closeHtlcTxSigned(info: CloseHtlcTxInfoSigned) {
         let msg = new Message();
