@@ -299,7 +299,7 @@ function createConnectNodeDiv() {
 
     // create [button] element
     var button = document.createElement('button');
-    button.setAttribute('onclick', 'api.connectToOBD()');
+    button.setAttribute('onclick', 'obdApi.connectToServer()');
     button.innerText = 'Connect';
     content_div.append(button);
 }
