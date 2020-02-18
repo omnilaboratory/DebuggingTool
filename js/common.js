@@ -1,88 +1,35 @@
+var obdApi = new ObdApi();
+
 function onClickSend(param) {
-    type_id = '';
-    /* if ($("#type_id") != null) {
-        type_id = $("#type_id").html().toString().replace(' ', '');
-        type_id = type_id.substring(type_id.indexOf('(') + 1, type_id.indexOf(')'));
-    } */
 
-    msgType = 0;
-    if (type_id != '') {
-        msgType = parseInt(type_id);
-    }
-
-
-    //为了测试 begin
-    tempType = parseInt($('#msgType').val());
-    if (isNaN(tempType) == false) {
-        msgType = tempType;
-    }
-    //为了测试 end
-    console.info(msgType)
-    if (msgType == 0) {
-        api.connectToOBD();
-        return;
-    }
-
-    if (isConnectToOBD == false) {
-        alert("not connetToOBD");
-        return;
-    }
-
-
-    if (msgType < 0 && isLogin == false) {
-        alert("please login");
-        return;
-    }
-
+    //为了测试
+    msgType = parseInt($('#msgType').val());
+    let enumMsgType = new MessageType();
     switch (msgType) {
-        case ApiType.MsgType_UserLogin_1:
-            if (isLogin == false) {
-                userLoginInfo.mnemonic = "unfold tortoise zoo hand sausage project boring corn test same elevator mansion bargain coffee brick tilt forum purpose hundred embody weapon ripple when narrow"
-                api.logIn(userLoginInfo);
-                break;
-            }
-        case ApiType.MsgType_GetMnemonic_101:
-            api.getMnemonic();
+        case enumMsgType.MsgType_Error_0:
+            obdApi.connectToServer();
             break;
-        case ApiType.MsgType_Core_GetNewAddress_1001:
-            api.getNewAddressFromOmniCore()
+        case enumMsgType.MsgType_UserLogin_1:
+            obdApi.login();
             break;
-        case ApiType.MsgType_Core_FundingBTC_1009:
-            btcFundingInfo.from_address = "bf88561781fe4f0c066fcc74d218f1bbe4bcc3d1f589adbe07b1fb392873ed56";
-            btcFundingInfo.from_address_private_key = "39e8b1f3e7aec51a368d70eac6d47195099e55c6963d38bcd729b22190dcdae0";
-            btcFundingInfo.to_address = "39e8b1f3e7aec51a368d70eac6d47195099e55c6963d38bcd729b22190dcdae0";
-            btcFundingInfo.amount = 0.0001;
-            btcFundingInfo.miner_fee = 0.00001;
-
-            api.fundingBTC(btcFundingInfo)
+        case enumMsgType.MsgType_UserLogout_2:
+            obdApi.logout();
             break;
-        case ApiType.MsgType_Core_Omni_ListProperties_1205:
-            api.listProperties()
+        case enumMsgType.MsgType_GetMnemonic_101:
+            obdApi.getMnemonic();
             break;
-        case ApiType.MsgType_Mnemonic_CreateAddress_N200:
-            api.createAddressByMnemonic()
+        case enumMsgType.MsgType_Mnemonic_CreateAddress_N200:
+            obdApi.createAddressByMnemonic();
             break;
-        case ApiType.MsgType_Mnemonic_GetAddressByIndex_201:
-            /* 获取index */
-            api.getAddressByIndexByMnemonic(1)
+        case enumMsgType.MsgType_Mnemonic_GetAddressByIndex_201:
+            obdApi.getAddressByIndexByMnemonic(1);
             break;
-        case ApiType.MsgType_ChannelOpen_N32:
-            openChannelInfo.funding_pubkey = "03f1603966fc3986d7681a7bf7a1e6b8b44c6009939c28da21f065c1b991aeff12";
-            recipient_peer_id = "39e8b1f3e7aec51a368d70eac6d47195099e55c6963d38bcd729b22190dcdae0";
-
-            api.openChannel(openChannelInfo, recipient_peer_id)
-            break;
-        case ApiType.MsgType_ChannelAccept_N33:
-            acceptChannelInfo.temporary_channel_id = "bf88561781fe4f0c066fcc74d218f1bbe4bcc3d1f589adbe07b1fb392873ed56";
-            acceptChannelInfo.funding_pubkey = "39e8b1f3e7aec51a368d70eac6d47195099e55c6963d38bcd729b22190dcdae0";
-            acceptChannelInfo.approval = true;
-
-            api.channelAccept(acceptChannelInfo)
+        case enumMsgType.MsgType_Core_FundingBTC_1009:
+            obdApi.fundingBTC();
             break;
         default:
-            alert(msgType + " type not exsit");
-            return;
-
+            console.info(msgType + " do not exist");
+            break;
     }
 
 }
