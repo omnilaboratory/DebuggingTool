@@ -190,11 +190,6 @@ class ObdApi {
         } else {
             msg.data["mnemonic"] = "unfold tortoise zoo hand sausage project boring corn test same elevator mansion bargain coffee brick tilt forum purpose hundred embody weapon ripple when narrow";
         }
-
-        if(callback!=null){
-            this.callbackMap[msg.type]=callback;
-        }
-
         this.sendData(msg,callback);
     }
     public onLogin(resultData: any) {
