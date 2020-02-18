@@ -125,12 +125,11 @@ function createRequestDiv(obj) {
 
     // create [func_title] element
     var func_title = document.createElement('text');
-    // func_title.color = '#EEEEEE';
     func_title.setAttribute('style', 'color:gray');
     func_title.innerText = 'func: ';
     content_div.append(func_title);
 
-    // create [func_name] element
+    // create [func_name] element: id = JS function name.
     var func_name = document.createElement('text');
     func_name.innerText = obj.getAttribute("id");
     content_div.append(func_name);
@@ -160,8 +159,9 @@ function createRequestDiv(obj) {
     content_div.append(input_msgType);
     //-------------------------------
 
-    // create [button] element
+    // create [Send button] element
     var button = document.createElement('button');
+    button.setAttribute('js_func', obj.getAttribute("id"));
     button.setAttribute('onclick', 'onClickSend(this)');
     button.innerText = 'Send';
     content_div.append(button);
@@ -219,7 +219,7 @@ function createParamOfAPI(arrParams) {
 
         // create [input box of param] element
         input_box = document.createElement('input');
-        input_box.id = arrParams[index].input;
+        input_box.id = arrParams[index].name;
         input_para.append(input_box);
 
         createButtonOfParam(arrParams, index);
