@@ -9,22 +9,24 @@ class ObdApi {
 
     public connectToServer(address: string) {
         if(this.isConnectToOBD){
+            console.info("already connect");
             return;
         }
 
         if (address != null && address.length > 0) {
             this.defaultAddress = address;
         }
+
+        console.info("connect to "+this.defaultAddress);
         try {
             this.ws = new WebSocket(this.defaultAddress);
             this.ws.onopen = () => {
-                console.info("send ok");
-                console.info(this.ws);
+                console.info("connect succss");
                 this.isConnectToOBD = true;
             }
             this.ws.onmessage = (e) => {
                 let jsonData = JSON.parse(e.data);
-                console.info("data from server", jsonData);
+                console.info(jsonData);
                 this.getDataFromServer(jsonData)
             }
             this.ws.onclose = (e) => {
@@ -36,7 +38,7 @@ class ObdApi {
                 console.info("ws error", e);
             }
         } catch (error) {
-            console.info(error);
+            console.info("can not connect to server",error);
         }
         
     }
@@ -50,8 +52,9 @@ class ObdApi {
             alert("please login");
             return ;
         }
-
-        console.info("send msg: ", msg);
+        
+        console.info("----------------------------send msg------------------------------");
+        console.info(msg);
         this.ws.send(JSON.stringify(msg))
     }
 
@@ -65,8 +68,7 @@ class ObdApi {
         }
 
         let resultData = jsonData.result;
-        console.info("data:", resultData);
-
+        console.info("----------------------------get msg from server------------------------------");
         switch (jsonData.type) {
             case this.messageType.MsgType_UserLogin_1:
                 this.onLogin(resultData);
@@ -182,7 +184,6 @@ class ObdApi {
             this.sendData(msg);
         }
     }
-
     public onLogout(jsonData: any){
         this.isLogin = false;
     }
