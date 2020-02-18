@@ -4,8 +4,11 @@ function onClickSend(objSelf) {
     var js_func = objSelf.getAttribute('js_func');
     console.info('js_func = ' + js_func);
 
-    type_id = $("#type_id").html().toString().replace(' ', '');
-    type_id = type_id.substring(type_id.indexOf('(') + 1, type_id.indexOf(')'));
+    type_id = '';
+    /* if ($("#type_id") != null) {
+        type_id = $("#type_id").html().toString().replace(' ', '');
+        type_id = type_id.substring(type_id.indexOf('(') + 1, type_id.indexOf(')'));
+    } */
 
     msgType = 0;
     if (type_id != '') {
@@ -35,10 +38,6 @@ function onClickSend(objSelf) {
         alert("please login");
         return;
     }
-
-    message.type = msgType
-    message.data = {}
-    message.recipient_peer_id = ""
 
     switch (msgType) {
         case ApiType.MsgType_UserLogin_1:
@@ -96,7 +95,7 @@ function onClickSend(objSelf) {
 // getUtilList
 function getUtilList() {
     var jsonFile = "json/util_list.json";
-    var divName  = "#util_list";
+    var divName = "#util_list";
 
     createLeftSideMenu(jsonFile, divName);
 }
@@ -104,14 +103,14 @@ function getUtilList() {
 // getAPIList
 function getAPIList() {
     var jsonFile = "json/api_list.json";
-    var divName  = "#api_list";
+    var divName = "#api_list";
 
     createLeftSideMenu(jsonFile, divName);
 }
 
 // createLeftSideMenu
 function createLeftSideMenu(jsonFile, divName) {
-    
+
     var api_id, type_id, description, apiItem, p;
     let requestURL = jsonFile;
 
@@ -164,7 +163,7 @@ function createApiNameDiv(obj) {
     var api_name = document.createElement('h2');
     api_name.innerText = obj.innerHTML;
     content_div.append(api_name);
-    
+
     // create [api_description] element
     var api_description = document.createElement('text');
     api_description.innerText = obj.getAttribute("description");
@@ -181,7 +180,7 @@ function createRequestDiv(obj) {
     var title = document.createElement('h2');
     title.innerText = 'Request';
     content_div.append(title);
-    
+
     // create [func_title] element
     var func_title = document.createElement('text');
     func_title.setAttribute('style', 'color:gray');
@@ -192,7 +191,7 @@ function createRequestDiv(obj) {
     var func_name = document.createElement('text');
     func_name.innerText = obj.getAttribute("id");
     content_div.append(func_name);
-    
+
     // create [type_id] element
     var value = " type ( " + obj.getAttribute("type_id") + " )";
     var type_id = document.createElement('text');
@@ -204,7 +203,7 @@ function createRequestDiv(obj) {
     // TEMP WILL BE DELETED - for GuoJun testing.
     var p = document.createElement('p');
     content_div.append(p);
-    
+
     var input_title = document.createElement('text');
     input_title.setAttribute('style', 'color:gray');
     input_title.innerText = '输入消息编号：';
@@ -293,7 +292,7 @@ function createButtonOfParam(arrParams, index) {
 
     // get [content] div
     var input_para = $("#content");
-    
+
     for (let index = 0; index < arrButtons.length; index++) {
         innerText = arrButtons[index].innerText;
         invokeFunc = arrButtons[index].onclick;
@@ -321,11 +320,11 @@ function connectNode() {
 
 // delete children of 'content' div
 function deleteContentDiv() {
-    
+
     var parent = document.getElementById('content');
     var children_amount = parent.children.length;
     // console.log('content div children = ' + children_amount);
-    
+
     if (children_amount != 0) {
         for (let index = children_amount - 1; index >= 0; index--) {
             // console.log('index = ' + index);
