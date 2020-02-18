@@ -9,13 +9,10 @@ class ObdApi {
 
     private callbackMap :Map<number,Function> = new Map<number,Function>();
 
-    public connectToServer(address: string,callback:Function):string {
+    public connectToServer(address: string,callback:Function) {
         if(this.isConnectToOBD==true){
             console.info("already connect");
-            if(callback!=null){
-                callback("already connect");
-            }
-            return "already connect";
+            return ;
         }
 
         if (address != null && address.length > 0) {
@@ -47,11 +44,8 @@ class ObdApi {
             }
         } catch (error) {
             console.info(error);
-            if(callback!=null){
-                callback("can not connect to server");
-            }
             alert("can not connect to server");
-            return "can not connect to server";
+            return ;
         }
         
     }
@@ -196,11 +190,6 @@ class ObdApi {
         } else {
             msg.data["mnemonic"] = "unfold tortoise zoo hand sausage project boring corn test same elevator mansion bargain coffee brick tilt forum purpose hundred embody weapon ripple when narrow";
         }
-
-        if(callback!=null){
-            this.callbackMap[msg.type]=callback;
-        }
-
         this.sendData(msg,callback);
     }
     public onLogin(resultData: any) {
