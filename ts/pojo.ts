@@ -135,12 +135,26 @@ class CloseHtlcTxInfoSigned {
   curr_rsmc_temp_address_private_key: string = "";
 }
 
-class OmniPropertyInfo {
+class OmniSendIssuanceManaged {
   from_address: string = "";
   name: string = "";
   ecosystem: number = 0;
   divisible_type: number = 0;
   data: string = "";
+}
+
+class OmniSendIssuanceFixed extends OmniSendIssuanceManaged {
+  amount: number = 0;
+}
+
+class OmniSendGrant {
+  from_address: string = "";
+  property_id: number = 31;
+  amount: number = 0;
+  memo: string = "";
+}
+class OmniSendRevoke extends OmniSendGrant{
+  
 }
 
 class MessageType {
