@@ -9,7 +9,7 @@ var ObdApi = (function () {
         var _this = this;
         if (this.isConnectToOBD) {
             console.info("already connect");
-            return;
+            return "already connect";
         }
         if (address != null && address.length > 0) {
             this.defaultAddress = address;
@@ -37,6 +37,7 @@ var ObdApi = (function () {
         }
         catch (error) {
             console.info("can not connect to server", error);
+            return "can not connect to server";
         }
     };
     ObdApi.prototype.sendData = function (msg) {
@@ -60,7 +61,7 @@ var ObdApi = (function () {
             return;
         }
         var resultData = jsonData.result;
-        console.info("----------------------------get msg from server------------------------------");
+        console.info("----------------------------get msg from server--------------------");
         switch (jsonData.type) {
             case this.messageType.MsgType_UserLogin_1:
                 this.onLogin(resultData);
@@ -139,6 +140,12 @@ var ObdApi = (function () {
                 break;
             case this.messageType.MsgType_HTLC_CloseSigned_N49:
                 this.onCloseHtlcTxSigned(resultData);
+                break;
+            case this.messageType.MsgType_Core_Omni_GetTransaction_1206:
+                this.onGetOmniTxByTxid(resultData);
+                break;
+            case this.messageType.MsgType_Core_Omni_CreateNewTokenFixed_1201:
+                this.onCreateNewProperty(resultData);
                 break;
         }
     };
@@ -462,6 +469,35 @@ var ObdApi = (function () {
         this.sendData(msg);
     };
     ObdApi.prototype.onCloseHtlcTxSigned = function (jsonData) {
+    };
+    /* ***************** close htlc tx end*****************/
+    /* ********************* query data *************************** */
+    /**
+     * MsgType_Core_Omni_GetTransaction_1206
+     * @param txid
+     */
+    ObdApi.prototype.getOmniTxByTxid = function (txid) {
+        if (txid == null || txid.length == 0) {
+            alert("empty txid");
+        }
+        var msg = new Message();
+        msg.type = this.messageType.MsgType_Core_Omni_GetTransaction_1206;
+        msg.data["txid"] = txid;
+        this.sendData(msg);
+    };
+    ObdApi.prototype.onGetOmniTxByTxid = function (jsonData) {
+    };
+    /**
+     * MsgType_Core_Omni_CreateNewTokenFixed_1201
+     * @param OmniPropertyInfo
+     */
+    ObdApi.prototype.createNewProperty = function (info) {
+        var msg = new Message();
+        msg.type = this.messageType.MsgType_Core_Omni_CreateNewTokenFixed_1201;
+        msg.data = info;
+        this.sendData(msg);
+    };
+    ObdApi.prototype.onCreateNewProperty = function (jsonData) {
     };
     return ObdApi;
 }());

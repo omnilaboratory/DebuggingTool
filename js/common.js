@@ -28,6 +28,10 @@ function onClickSend(param) {
         case enumMsgType.MsgType_Mnemonic_GetAddressByIndex_201:
             obdApi.getAddressByIndexByMnemonic(1);
             break;
+        case enumMsgType.MsgType_Core_Omni_GetTransaction_1206:
+            txid = "c76710920860456dff2433197db79dd030f9b527e83a2e253f5bc6ab7d197e73";
+            obdApi.getOmniTxByTxid(txid);
+            break;
         default:
             console.info(msgType + " do not exist");
             break;

@@ -137,6 +137,15 @@ class CloseHtlcTxInfoSigned  {
     curr_rsmc_temp_address_private_key: ""
 }
 
+
+class OmniPropertyInfo {
+    from_address:string
+    name:string
+    ecosystem:number;
+    divisible_type:number;
+    data:string
+}
+
 class MessageType {
     MsgType_Error_0 = 0;
     MsgType_UserLogin_1 = 1;

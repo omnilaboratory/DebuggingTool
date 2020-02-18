@@ -7,10 +7,10 @@ class ObdApi {
     private defaultAddress = "ws://127.0.0.1:60020/ws";
     private ws: WebSocket;
 
-    public connectToServer(address: string) {
+    public connectToServer(address: string):string {
         if(this.isConnectToOBD){
             console.info("already connect");
-            return;
+            return "already connect";
         }
 
         if (address != null && address.length > 0) {
@@ -39,6 +39,7 @@ class ObdApi {
             }
         } catch (error) {
             console.info("can not connect to server",error);
+            return "can not connect to server";
         }
         
     }
@@ -68,7 +69,7 @@ class ObdApi {
         }
 
         let resultData = jsonData.result;
-        console.info("----------------------------get msg from server------------------------------");
+        console.info("----------------------------get msg from server--------------------");
         switch (jsonData.type) {
             case this.messageType.MsgType_UserLogin_1:
                 this.onLogin(resultData);
@@ -148,6 +149,13 @@ class ObdApi {
                 break;
             case this.messageType.MsgType_HTLC_CloseSigned_N49:
                 this.onCloseHtlcTxSigned(resultData);
+                break;
+
+            case this.messageType.MsgType_Core_Omni_GetTransaction_1206:
+                this.onGetOmniTxByTxid(resultData);
+                break;
+            case this.messageType.MsgType_Core_Omni_CreateNewTokenFixed_1201:
+                this.onCreateNewProperty(resultData);
                 break;
         }
     }
@@ -526,4 +534,37 @@ class ObdApi {
     }
 
     /* ***************** close htlc tx end*****************/
+
+
+    /* ********************* query data *************************** */
+    /**
+     * MsgType_Core_Omni_GetTransaction_1206
+     * @param txid
+     */
+    public getOmniTxByTxid(txid:string) {
+        if(txid==null||txid.length==0){
+            alert("empty txid");
+        }
+        let msg = new Message();
+        msg.type = this.messageType.MsgType_Core_Omni_GetTransaction_1206;
+        msg.data["txid"] = txid;
+        this.sendData(msg);
+    }
+    public onGetOmniTxByTxid(jsonData: any) {
+
+    }
+
+    /**
+     * MsgType_Core_Omni_CreateNewTokenFixed_1201
+     * @param OmniPropertyInfo
+     */
+    public createNewProperty(info:OmniPropertyInfo) {
+        let msg = new Message();
+        msg.type = this.messageType.MsgType_Core_Omni_CreateNewTokenFixed_1201;
+        msg.data = info;
+        this.sendData(msg);
+    }
+    public onCreateNewProperty(jsonData: any) {
+
+    }
 }

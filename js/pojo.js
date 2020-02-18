@@ -142,6 +142,11 @@ var CloseHtlcTxInfoSigned = (function () {
     }
     return CloseHtlcTxInfoSigned;
 }());
+var OmniPropertyInfo = (function () {
+    function OmniPropertyInfo() {
+    }
+    return OmniPropertyInfo;
+}());
 var MessageType = (function () {
     function MessageType() {
         this.MsgType_Error_0 = 0;
