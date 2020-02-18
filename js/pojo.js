@@ -11,69 +11,114 @@ var BtcFundingInfo = (function () {
         this.from_address_private_key = "";
         this.to_address = "";
         this.amount = 0.0;
-        this.miner_fee = 0.00001;
+        this.miner_fee = 0.0;
     }
     return BtcFundingInfo;
 }());
 var OmniFundingAssetInfo = (function () {
     function OmniFundingAssetInfo() {
+        this.from_address = "";
+        this.from_address_private_key = "";
+        this.to_address = "";
         this.property_id = 31;
         this.amount = 0;
-        this.miner_fee = 0.00001;
+        this.miner_fee = 0.0;
     }
     return OmniFundingAssetInfo;
 }());
 var AcceptChannelInfo = (function () {
     function AcceptChannelInfo() {
+        this.temporary_channel_id = "";
+        this.funding_pubkey = "";
         this.approval = false;
     }
     return AcceptChannelInfo;
 }());
 var ChannelFundingCreatedInfo = (function () {
     function ChannelFundingCreatedInfo() {
+        this.temporary_channel_id = "";
+        this.funding_tx_hex = "";
+        this.temp_address_pub_key = "";
+        this.temp_address_private_key = "";
+        this.channel_address_private_key = "";
     }
     return ChannelFundingCreatedInfo;
 }());
 var ChannelFundingSignedInfo = (function () {
     function ChannelFundingSignedInfo() {
+        this.channel_id = "";
+        this.fundee_channel_address_private_key = "";
         this.approval = false;
     }
     return ChannelFundingSignedInfo;
 }());
 var CommitmentTx = (function () {
     function CommitmentTx() {
+        this.channel_id = "";
         this.amount = 0;
+        this.curr_temp_address_pub_key = "";
+        this.curr_temp_address_private_key = "";
+        this.channel_address_private_key = "";
+        this.last_temp_address_private_key = "";
     }
     return CommitmentTx;
 }());
 var CommitmentTxSigned = (function () {
     function CommitmentTxSigned() {
+        this.channel_id = "";
+        this.curr_temp_address_pub_key = "";
+        this.curr_temp_address_private_key = "";
+        this.last_temp_private_key = "";
+        this.request_commitment_hash = "";
+        this.channel_address_private_key = "";
         this.approval = false;
     }
     return CommitmentTxSigned;
 }());
 var HtlcHInfo = (function () {
     function HtlcHInfo() {
+        this.property_id = "";
         this.amount = 0;
+        this.recipient_peer_id = "";
     }
     return HtlcHInfo;
 }());
 var HtlcHSignInfo = (function () {
     function HtlcHSignInfo() {
+        this.request_hash = "";
         this.property_id = 0;
         this.amount = 0;
+        this.h = "";
         this.approval = false;
     }
     return HtlcHSignInfo;
 }());
 var SignGetHInfo = (function () {
     function SignGetHInfo() {
+        this.request_hash = "";
         this.approval = false;
+        this.channel_address_private_key = "";
+        this.last_temp_address_private_key = "";
+        this.curr_rsmc_temp_address_pub_key = "";
+        this.curr_rsmc_temp_address_private_key = "";
+        this.curr_htlc_temp_address_pub_key = "";
+        this.curr_htlc_temp_address_private_key = "";
+        this.curr_htlc_temp_address_he1b_ofh_pub_key = "";
     }
     return SignGetHInfo;
 }());
 var HtlcRequestOpen = (function () {
     function HtlcRequestOpen() {
+        this.request_hash = "";
+        this.channel_address_private_key = "";
+        this.last_temp_address_private_key = "";
+        this.curr_rsmc_temp_address_pub_key = "";
+        this.curr_rsmc_temp_address_private_key = "";
+        this.curr_htlc_temp_address_pub_key = "";
+        this.curr_htlc_temp_address_private_key = "";
+        this.curr_htlc_temp_address_for_ht1a_pub_key = "";
+        this.curr_htlc_temp_address_for_ht1a_private_key = "";
+        this.curr_htlc_temp_address_for_hed1a_ofh_pub_key = "";
     }
     return HtlcRequestOpen;
 }());
@@ -96,6 +141,11 @@ var CloseHtlcTxInfoSigned = (function () {
     function CloseHtlcTxInfoSigned() {
     }
     return CloseHtlcTxInfoSigned;
+}());
+var OmniPropertyInfo = (function () {
+    function OmniPropertyInfo() {
+    }
+    return OmniPropertyInfo;
 }());
 var MessageType = (function () {
     function MessageType() {

@@ -4,28 +4,35 @@ class ObdApi {
     private isLogin: boolean = false;
 
     private messageType  = new MessageType();
-
     private defaultAddress = "ws://127.0.0.1:60020/ws";
     private ws: WebSocket;
 
-
-    public connectToServer(address: string) {
-        if(this.isConnectToOBD){
-            return;
+    public connectToServer(address: string,callback:Function):string {
+        if(this.isConnectToOBD==true){
+            console.info("already connect");
+            if(callback!=null){
+                callback("already connect");
+            }
+            return "already connect";
         }
 
         if (address != null && address.length > 0) {
             this.defaultAddress = address;
         }
+
+        console.info("connect to "+this.defaultAddress);
         try {
             this.ws = new WebSocket(this.defaultAddress);
             this.ws.onopen = () => {
-                console.info("send ok");
+                console.info("connect succss");
+                if(callback!=null){
+                    callback("connect succss");
+                }
                 this.isConnectToOBD = true;
             }
             this.ws.onmessage = (e) => {
                 let jsonData = JSON.parse(e.data);
-                console.info("data from server", jsonData);
+                console.info(jsonData);
                 this.getDataFromServer(jsonData)
             }
             this.ws.onclose = (e) => {
@@ -38,10 +45,14 @@ class ObdApi {
             }
         } catch (error) {
             console.info(error);
+            if(callback!=null){
+                callback("can not connect to server");
+            }
+            alert("can not connect to server");
+            return "can not connect to server";
         }
         
     }
-
     private sendData(msg: Message) {
         if (this.isConnectToOBD == false) {
             alert("please try to connect obd again")
@@ -52,8 +63,9 @@ class ObdApi {
             alert("please login");
             return ;
         }
-
-        console.info("send msg: ", msg);
+        
+        console.info("----------------------------send msg------------------------------");
+        console.info(msg);
         this.ws.send(JSON.stringify(msg))
     }
 
@@ -67,8 +79,7 @@ class ObdApi {
         }
 
         let resultData = jsonData.result;
-        console.info("data:", resultData);
-
+        console.info("----------------------------get msg from server--------------------");
         switch (jsonData.type) {
             case this.messageType.MsgType_UserLogin_1:
                 this.onLogin(resultData);
@@ -149,6 +160,13 @@ class ObdApi {
             case this.messageType.MsgType_HTLC_CloseSigned_N49:
                 this.onCloseHtlcTxSigned(resultData);
                 break;
+
+            case this.messageType.MsgType_Core_Omni_GetTransaction_1206:
+                this.onGetOmniTxByTxid(resultData);
+                break;
+            case this.messageType.MsgType_Core_Omni_CreateNewTokenFixed_1201:
+                this.onCreateNewProperty(resultData);
+                break;
         }
     }
 
@@ -184,7 +202,6 @@ class ObdApi {
             this.sendData(msg);
         }
     }
-
     public onLogout(jsonData: any){
         this.isLogin = false;
     }
@@ -248,7 +265,7 @@ class ObdApi {
         let msg = new Message();
         msg.type = this.messageType.MsgType_Core_Omni_FundingAsset_2001;
         msg.data = info;
-        this.sendData(msg)
+        this.sendData(msg);
     }
     public onFundingAssetOfOmni(jsonData: any) {
 
@@ -304,7 +321,7 @@ class ObdApi {
         let msg = new Message();
         msg.type = this.messageType.MsgType_ChannelAccept_N33;
         msg.data = info;
-        this.sendData(msg)
+        this.sendData(msg);
     }
     public onChannelAccept(jsonData: any) {
 
@@ -318,7 +335,7 @@ class ObdApi {
         let msg = new Message();
         msg.type = this.messageType.MsgType_FundingCreate_AssetFundingCreated_N34;
         msg.data = info;
-        this.sendData(msg)
+        this.sendData(msg);
     }
     public onChannelFundingCreated(jsonData: any) {
 
@@ -332,7 +349,7 @@ class ObdApi {
         let msg = new Message();
         msg.type = this.messageType.MsgType_FundingSign_AssetFundingSigned_N35;
         msg.data = info;
-        this.sendData(msg)
+        this.sendData(msg);
     }
     public onChannelFundingSigned(jsonData: any) {
 
@@ -346,7 +363,7 @@ class ObdApi {
         let msg = new Message();
         msg.type = this.messageType.MsgType_CommitmentTx_CommitmentTransactionCreated_N351;
         msg.data = info;
-        this.sendData(msg)
+        this.sendData(msg);
     }
     public onCommitmentTransactionCreated(jsonData: any) {
 
@@ -360,7 +377,7 @@ class ObdApi {
         let msg = new Message();
         msg.type = this.messageType.MsgType_CommitmentTxSigned_RevokeAndAcknowledgeCommitmentTransaction_N352;
         msg.data = info;
-        this.sendData(msg)
+        this.sendData(msg);
     }
     public onRevokeAndAcknowledgeCommitmentTransaction(jsonData: any) {
 
@@ -374,7 +391,7 @@ class ObdApi {
         let msg = new Message();
         msg.type = this.messageType.MsgType_HTLC_Invoice_N4003;
         msg.data = info;
-        this.sendData(msg)
+        this.sendData(msg);
     }
     
     public onHtlcInvoice(jsonData: any) {
@@ -403,7 +420,7 @@ class ObdApi {
         let msg = new Message();
         msg.type = this.messageType.MsgType_HTLC_AddHTLCSigned_N41;
         msg.data = info;
-        this.sendData(msg)
+        this.sendData(msg);
     }
     public onAddHtlcSigned(jsonData: any) {
 
@@ -461,7 +478,7 @@ class ObdApi {
         let msg = new Message();
         msg.type = this.messageType.MsgType_HTLC_CreateCommitmentTx_N45;
         msg.data = info;
-        this.sendData(msg)
+        this.sendData(msg);
     }
     public onHtlcCreateCommitmentTx(jsonData: any) {
 
@@ -476,7 +493,7 @@ class ObdApi {
         let msg = new Message();
         msg.type = this.messageType.MsgType_HTLC_SendR_N46;
         msg.data = info;
-        this.sendData(msg)
+        this.sendData(msg);
     }
     public onHtlcSendR(jsonData: any) {
 
@@ -490,7 +507,7 @@ class ObdApi {
         let msg = new Message();
         msg.type = this.messageType.MsgType_HTLC_VerifyR_N47;
         msg.data = info;
-        this.sendData(msg)
+        this.sendData(msg);
     }
     public onHtlcVerifyR(jsonData: any) {
 
@@ -506,7 +523,7 @@ class ObdApi {
         let msg = new Message();
         msg.type = this.messageType.MsgType_HTLC_VerifyR_N47;
         msg.data = info;
-        this.sendData(msg)
+        this.sendData(msg);
     }
     public onCloseHtlcTx(jsonData: any) {
 
@@ -520,11 +537,44 @@ class ObdApi {
         let msg = new Message();
         msg.type = this.messageType.MsgType_HTLC_CloseSigned_N49;
         msg.data = info;
-        this.sendData(msg)
+        this.sendData(msg);
     }
     public onCloseHtlcTxSigned(jsonData: any) {
 
     }
 
     /* ***************** close htlc tx end*****************/
+
+
+    /* ********************* query data *************************** */
+    /**
+     * MsgType_Core_Omni_GetTransaction_1206
+     * @param txid
+     */
+    public getOmniTxByTxid(txid:string) {
+        if(txid==null||txid.length==0){
+            alert("empty txid");
+        }
+        let msg = new Message();
+        msg.type = this.messageType.MsgType_Core_Omni_GetTransaction_1206;
+        msg.data["txid"] = txid;
+        this.sendData(msg);
+    }
+    public onGetOmniTxByTxid(jsonData: any) {
+
+    }
+
+    /**
+     * MsgType_Core_Omni_CreateNewTokenFixed_1201
+     * @param OmniPropertyInfo
+     */
+    public createNewProperty(info:OmniPropertyInfo) {
+        let msg = new Message();
+        msg.type = this.messageType.MsgType_Core_Omni_CreateNewTokenFixed_1201;
+        msg.data = info;
+        this.sendData(msg);
+    }
+    public onCreateNewProperty(jsonData: any) {
+
+    }
 }

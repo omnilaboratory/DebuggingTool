@@ -5,23 +5,31 @@ var ObdApi = (function () {
         this.messageType = new MessageType();
         this.defaultAddress = "ws://127.0.0.1:60020/ws";
     }
-    ObdApi.prototype.connectToServer = function (address) {
+    ObdApi.prototype.connectToServer = function (address, callback) {
         var _this = this;
-        if (this.isConnectToOBD) {
-            return;
+        if (this.isConnectToOBD == true) {
+            console.info("already connect");
+            if (callback != null) {
+                callback("already connect");
+            }
+            return "already connect";
         }
         if (address != null && address.length > 0) {
             this.defaultAddress = address;
         }
+        console.info("connect to " + this.defaultAddress);
         try {
             this.ws = new WebSocket(this.defaultAddress);
             this.ws.onopen = function () {
-                console.info("send ok");
+                console.info("connect succss");
+                if (callback != null) {
+                    callback("connect succss");
+                }
                 _this.isConnectToOBD = true;
             };
             this.ws.onmessage = function (e) {
                 var jsonData = JSON.parse(e.data);
-                console.info("data from server", jsonData);
+                console.info(jsonData);
                 _this.getDataFromServer(jsonData);
             };
             this.ws.onclose = function (e) {
@@ -35,6 +43,11 @@ var ObdApi = (function () {
         }
         catch (error) {
             console.info(error);
+            if (callback != null) {
+                callback("can not connect to server");
+            }
+            alert("can not connect to server");
+            return "can not connect to server";
         }
     };
     ObdApi.prototype.sendData = function (msg) {
@@ -46,7 +59,8 @@ var ObdApi = (function () {
             alert("please login");
             return;
         }
-        console.info("send msg: ", msg);
+        console.info("----------------------------send msg------------------------------");
+        console.info(msg);
         this.ws.send(JSON.stringify(msg));
     };
     ObdApi.prototype.getDataFromServer = function (jsonData) {
@@ -57,7 +71,7 @@ var ObdApi = (function () {
             return;
         }
         var resultData = jsonData.result;
-        console.info("data:", resultData);
+        console.info("----------------------------get msg from server--------------------");
         switch (jsonData.type) {
             case this.messageType.MsgType_UserLogin_1:
                 this.onLogin(resultData);
@@ -136,6 +150,12 @@ var ObdApi = (function () {
                 break;
             case this.messageType.MsgType_HTLC_CloseSigned_N49:
                 this.onCloseHtlcTxSigned(resultData);
+                break;
+            case this.messageType.MsgType_Core_Omni_GetTransaction_1206:
+                this.onGetOmniTxByTxid(resultData);
+                break;
+            case this.messageType.MsgType_Core_Omni_CreateNewTokenFixed_1201:
+                this.onCreateNewProperty(resultData);
                 break;
         }
     };
@@ -459,6 +479,35 @@ var ObdApi = (function () {
         this.sendData(msg);
     };
     ObdApi.prototype.onCloseHtlcTxSigned = function (jsonData) {
+    };
+    /* ***************** close htlc tx end*****************/
+    /* ********************* query data *************************** */
+    /**
+     * MsgType_Core_Omni_GetTransaction_1206
+     * @param txid
+     */
+    ObdApi.prototype.getOmniTxByTxid = function (txid) {
+        if (txid == null || txid.length == 0) {
+            alert("empty txid");
+        }
+        var msg = new Message();
+        msg.type = this.messageType.MsgType_Core_Omni_GetTransaction_1206;
+        msg.data["txid"] = txid;
+        this.sendData(msg);
+    };
+    ObdApi.prototype.onGetOmniTxByTxid = function (jsonData) {
+    };
+    /**
+     * MsgType_Core_Omni_CreateNewTokenFixed_1201
+     * @param OmniPropertyInfo
+     */
+    ObdApi.prototype.createNewProperty = function (info) {
+        var msg = new Message();
+        msg.type = this.messageType.MsgType_Core_Omni_CreateNewTokenFixed_1201;
+        msg.data = info;
+        this.sendData(msg);
+    };
+    ObdApi.prototype.onCreateNewProperty = function (jsonData) {
     };
     return ObdApi;
 }());
