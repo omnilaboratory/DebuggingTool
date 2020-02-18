@@ -300,7 +300,7 @@ function createConnectNodeDiv() {
 
     // create [button] element
     var button = document.createElement('button');
-    button.setAttribute('onclick', '');
+    button.setAttribute('onclick', 'api.connectToOBD()');
     button.innerText = 'Connect';
     content_div.append(button);
 }
