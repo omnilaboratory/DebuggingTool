@@ -1,11 +1,11 @@
-var ObdApi = (function () {
+var ObdApi = (function() {
     function ObdApi() {
         this.isConnectToOBD = false;
         this.isLogin = false;
         this.messageType = new MessageType();
         this.defaultAddress = "ws://127.0.0.1:60020/ws";
     }
-    ObdApi.prototype.connectToServer = function (address) {
+    ObdApi.prototype.connectToServer = function(address) {
         var _this = this;
         if (this.isConnectToOBD) {
             return;
@@ -15,29 +15,29 @@ var ObdApi = (function () {
         }
         try {
             this.ws = new WebSocket(this.defaultAddress);
-            this.ws.onopen = function () {
+            this.ws.onopen = function() {
                 console.info("send ok");
+                console.info(_this.ws);
                 _this.isConnectToOBD = true;
             };
-            this.ws.onmessage = function (e) {
+            this.ws.onmessage = function(e) {
                 var jsonData = JSON.parse(e.data);
                 console.info("data from server", jsonData);
                 _this.getDataFromServer(jsonData);
             };
-            this.ws.onclose = function (e) {
+            this.ws.onclose = function(e) {
                 console.info("ws close", e);
                 _this.isConnectToOBD = false;
                 _this.isLogin = false;
             };
-            this.ws.onerror = function (e) {
+            this.ws.onerror = function(e) {
                 console.info("ws error", e);
             };
-        }
-        catch (error) {
+        } catch (error) {
             console.info(error);
         }
     };
-    ObdApi.prototype.sendData = function (msg) {
+    ObdApi.prototype.sendData = function(msg) {
         if (this.isConnectToOBD == false) {
             alert("please try to connect obd again");
             return;
@@ -49,7 +49,7 @@ var ObdApi = (function () {
         console.info("send msg: ", msg);
         this.ws.send(JSON.stringify(msg));
     };
-    ObdApi.prototype.getDataFromServer = function (jsonData) {
+    ObdApi.prototype.getDataFromServer = function(jsonData) {
         if (jsonData.status == false) {
             if (jsonData.type != this.messageType.MsgType_Error_0) {
                 alert(jsonData.result);
@@ -143,7 +143,7 @@ var ObdApi = (function () {
      * MsgType_UserLogin_1
      * @param mnemonic:string
      */
-    ObdApi.prototype.login = function (mnemonic) {
+    ObdApi.prototype.login = function(mnemonic) {
         if (this.isLogin) {
             return;
         }
@@ -151,314 +151,289 @@ var ObdApi = (function () {
         msg.type = this.messageType.MsgType_UserLogin_1;
         if (mnemonic != null && mnemonic.length > 0) {
             msg.data["mnemonic"] = mnemonic;
-        }
-        else {
+        } else {
             msg.data["mnemonic"] = "unfold tortoise zoo hand sausage project boring corn test same elevator mansion bargain coffee brick tilt forum purpose hundred embody weapon ripple when narrow";
         }
         this.sendData(msg);
     };
-    ObdApi.prototype.onLogin = function (resultData) {
+    ObdApi.prototype.onLogin = function(resultData) {
         this.isLogin = true;
     };
     /**
-    * MsgType_UserLogout_2
-    */
-    ObdApi.prototype.logout = function () {
+     * MsgType_UserLogout_2
+     */
+    ObdApi.prototype.logout = function() {
         if (this.isLogin) {
             var msg = new Message();
             msg.type = this.messageType.MsgType_UserLogout_2;
             this.sendData(msg);
         }
     };
-    ObdApi.prototype.onLogout = function (jsonData) {
+    ObdApi.prototype.onLogout = function(jsonData) {
         this.isLogin = false;
     };
     /**
      * MsgType_GetMnemonic_101
      */
-    ObdApi.prototype.getMnemonic = function () {
+    ObdApi.prototype.getMnemonic = function() {
         var msg = new Message();
         msg.type = this.messageType.MsgType_GetMnemonic_101;
         this.sendData(msg);
     };
-    ObdApi.prototype.onGetMnemonic = function (jsonData) {
-    };
+    ObdApi.prototype.onGetMnemonic = function(jsonData) {};
     /**
      * MsgType_Core_GetNewAddress_1001
      */
-    ObdApi.prototype.getNewAddressFromOmniCore = function () {
+    ObdApi.prototype.getNewAddressFromOmniCore = function() {
         var msg = new Message();
         msg.type = this.messageType.MsgType_Core_GetNewAddress_1001;
         this.sendData(msg);
     };
-    ObdApi.prototype.onGetNewAddressFromOmniCore = function (jsonData) {
-    };
+    ObdApi.prototype.onGetNewAddressFromOmniCore = function(jsonData) {};
     /**
      * MsgType_Core_FundingBTC_1009
      * @param BtcFundingInfo
      */
-    ObdApi.prototype.fundingBTC = function (info) {
+    ObdApi.prototype.fundingBTC = function(info) {
         var msg = new Message();
         msg.type = this.messageType.MsgType_Core_FundingBTC_1009;
         msg.data = info;
         this.sendData(msg);
     };
-    ObdApi.prototype.onFundingBTC = function (jsonData) {
-    };
+    ObdApi.prototype.onFundingBTC = function(jsonData) {};
     /**
      * MsgType_Core_Omni_ListProperties_1205
      */
-    ObdApi.prototype.listProperties = function () {
+    ObdApi.prototype.listProperties = function() {
         var msg = new Message();
         msg.type = this.messageType.MsgType_Core_Omni_ListProperties_1205;
         this.sendData(msg);
     };
-    ObdApi.prototype.onListProperties = function (jsonData) {
-    };
+    ObdApi.prototype.onListProperties = function(jsonData) {};
     /**
-    * MsgType_Core_Omni_FundingAsset_2001
-    * @param OmniFundingAssetInfo
+     * MsgType_Core_Omni_FundingAsset_2001
+     * @param OmniFundingAssetInfo
      */
-    ObdApi.prototype.fundingAssetOfOmni = function (info) {
+    ObdApi.prototype.fundingAssetOfOmni = function(info) {
         var msg = new Message();
         msg.type = this.messageType.MsgType_Core_Omni_FundingAsset_2001;
         msg.data = info;
         this.sendData(msg);
     };
-    ObdApi.prototype.onFundingAssetOfOmni = function (jsonData) {
-    };
+    ObdApi.prototype.onFundingAssetOfOmni = function(jsonData) {};
     /**
      * MsgType_Mnemonic_CreateAddress_N200
      */
-    ObdApi.prototype.createAddressByMnemonic = function () {
+    ObdApi.prototype.createAddressByMnemonic = function() {
         var msg = new Message();
         msg.type = this.messageType.MsgType_Mnemonic_CreateAddress_N200;
         this.sendData(msg);
     };
-    ObdApi.prototype.onCreateAddressByMnemonic = function (jsonData) {
-    };
+    ObdApi.prototype.onCreateAddressByMnemonic = function(jsonData) {};
     /**
      * MsgType_Mnemonic_GetAddressByIndex_201
      * @param index:number
      */
-    ObdApi.prototype.getAddressByIndexByMnemonic = function (index) {
+    ObdApi.prototype.getAddressByIndexByMnemonic = function(index) {
         var msg = new Message();
         msg.type = this.messageType.MsgType_Mnemonic_GetAddressByIndex_201;
         msg.data = index;
         this.sendData(msg);
     };
-    ObdApi.prototype.onGetAddressByIndexByMnemonic = function (jsonData) {
-    };
+    ObdApi.prototype.onGetAddressByIndexByMnemonic = function(jsonData) {};
     /**
      * MsgType_ChannelOpen_N32
      * @param funding_pubkey
      * @param recipient_peer_id
      */
-    ObdApi.prototype.openChannel = function (funding_pubkey, recipient_peer_id) {
+    ObdApi.prototype.openChannel = function(funding_pubkey, recipient_peer_id) {
         var msg = new Message();
         msg.type = this.messageType.MsgType_ChannelOpen_N32;
         msg.data["funding_pubkey"] = funding_pubkey;
         msg.recipient_peer_id = recipient_peer_id;
         this.sendData(msg);
     };
-    ObdApi.prototype.onOpenChannel = function (jsonData) {
-    };
+    ObdApi.prototype.onOpenChannel = function(jsonData) {};
     /**
      * MsgType_ChannelAccept_N33
      * @param AcceptChannelInfo
      */
-    ObdApi.prototype.channelAccept = function (info) {
+    ObdApi.prototype.channelAccept = function(info) {
         var msg = new Message();
         msg.type = this.messageType.MsgType_ChannelAccept_N33;
         msg.data = info;
         this.sendData(msg);
     };
-    ObdApi.prototype.onChannelAccept = function (jsonData) {
-    };
+    ObdApi.prototype.onChannelAccept = function(jsonData) {};
     /**
      * MsgType_FundingCreate_AssetFundingCreated_N34
      * @param ChannelFundingCreatedInfo
      */
-    ObdApi.prototype.channelFundingCreated = function (info) {
+    ObdApi.prototype.channelFundingCreated = function(info) {
         var msg = new Message();
         msg.type = this.messageType.MsgType_FundingCreate_AssetFundingCreated_N34;
         msg.data = info;
         this.sendData(msg);
     };
-    ObdApi.prototype.onChannelFundingCreated = function (jsonData) {
-    };
+    ObdApi.prototype.onChannelFundingCreated = function(jsonData) {};
     /**
-    * MsgType_FundingSign_AssetFundingSigned_N35
-    * @param ChannelFundingSignedInfo
-    */
-    ObdApi.prototype.channelFundingSigned = function (info) {
+     * MsgType_FundingSign_AssetFundingSigned_N35
+     * @param ChannelFundingSignedInfo
+     */
+    ObdApi.prototype.channelFundingSigned = function(info) {
         var msg = new Message();
         msg.type = this.messageType.MsgType_FundingSign_AssetFundingSigned_N35;
         msg.data = info;
         this.sendData(msg);
     };
-    ObdApi.prototype.onChannelFundingSigned = function (jsonData) {
-    };
+    ObdApi.prototype.onChannelFundingSigned = function(jsonData) {};
     /**
      * MsgType_CommitmentTx_CommitmentTransactionCreated_N351
      * @param CommitmentTx
      */
-    ObdApi.prototype.commitmentTransactionCreated = function (info) {
+    ObdApi.prototype.commitmentTransactionCreated = function(info) {
         var msg = new Message();
         msg.type = this.messageType.MsgType_CommitmentTx_CommitmentTransactionCreated_N351;
         msg.data = info;
         this.sendData(msg);
     };
-    ObdApi.prototype.onCommitmentTransactionCreated = function (jsonData) {
-    };
+    ObdApi.prototype.onCommitmentTransactionCreated = function(jsonData) {};
     /**
      * MsgType_CommitmentTxSigned_RevokeAndAcknowledgeCommitmentTransaction_N352
      * @param CommitmentTxSigned
      */
-    ObdApi.prototype.revokeAndAcknowledgeCommitmentTransaction = function (info) {
+    ObdApi.prototype.revokeAndAcknowledgeCommitmentTransaction = function(info) {
         var msg = new Message();
         msg.type = this.messageType.MsgType_CommitmentTxSigned_RevokeAndAcknowledgeCommitmentTransaction_N352;
         msg.data = info;
         this.sendData(msg);
     };
-    ObdApi.prototype.onRevokeAndAcknowledgeCommitmentTransaction = function (jsonData) {
-    };
+    ObdApi.prototype.onRevokeAndAcknowledgeCommitmentTransaction = function(jsonData) {};
     /**
-    * MsgType_HTLC_Invoice_N4003
-    * @param HtlcHInfo
-    */
-    ObdApi.prototype.htlcInvoice = function (info) {
+     * MsgType_HTLC_Invoice_N4003
+     * @param HtlcHInfo
+     */
+    ObdApi.prototype.htlcInvoice = function(info) {
         var msg = new Message();
         msg.type = this.messageType.MsgType_HTLC_Invoice_N4003;
         msg.data = info;
         this.sendData(msg);
     };
-    ObdApi.prototype.onHtlcInvoice = function (jsonData) {
-    };
+    ObdApi.prototype.onHtlcInvoice = function(jsonData) {};
     /**
      * MsgType_HTLC_AddHTLC_N40
      * @param HtlcHInfo
      */
-    ObdApi.prototype.addHtlc = function (info) {
+    ObdApi.prototype.addHtlc = function(info) {
         var msg = new Message();
         msg.type = this.messageType.MsgType_HTLC_AddHTLC_N40;
         msg.data = info;
         this.sendData(msg);
     };
-    ObdApi.prototype.onAddHtlc = function (jsonData) {
-    };
+    ObdApi.prototype.onAddHtlc = function(jsonData) {};
     /**
      * MsgType_HTLC_AddHTLCSigned_N41
      * @param HtlcHSignInfo
      */
-    ObdApi.prototype.addHtlcSigned = function (info) {
+    ObdApi.prototype.addHtlcSigned = function(info) {
         var msg = new Message();
         msg.type = this.messageType.MsgType_HTLC_AddHTLCSigned_N41;
         msg.data = info;
         this.sendData(msg);
     };
-    ObdApi.prototype.onAddHtlcSigned = function (jsonData) {
-    };
+    ObdApi.prototype.onAddHtlcSigned = function(jsonData) {};
     /**
      * MsgType_HTLC_FindPathAndSendH_N42
      * @param h:string
      */
-    ObdApi.prototype.htlcFindPathAndSendH = function (h) {
+    ObdApi.prototype.htlcFindPathAndSendH = function(h) {
         var msg = new Message();
         msg.type = this.messageType.MsgType_HTLC_FindPathAndSendH_N42;
         msg.data["h"] = h;
         this.sendData(msg);
     };
-    ObdApi.prototype.onHtlcFindPathAndSendH = function (jsonData) {
-    };
+    ObdApi.prototype.onHtlcFindPathAndSendH = function(jsonData) {};
     /**
      * MsgType_HTLC_SendH_N43
      * @param h
      * @param request_hash
      */
-    ObdApi.prototype.htlcSendH = function (h, request_hash) {
+    ObdApi.prototype.htlcSendH = function(h, request_hash) {
         var msg = new Message();
         msg.type = this.messageType.MsgType_HTLC_SendH_N43;
         msg.data["h"] = h;
         msg.data["h_and_r_info_request_hash"] = request_hash;
         this.sendData(msg);
     };
-    ObdApi.prototype.onHtlcSendH = function (jsonData) {
-    };
+    ObdApi.prototype.onHtlcSendH = function(jsonData) {};
     /**
      * MsgType_HTLC_SignGetH_N44
      * @param SignGetHInfo
      */
-    ObdApi.prototype.htlcSignGetH = function (info) {
+    ObdApi.prototype.htlcSignGetH = function(info) {
         var msg = new Message();
         msg.type = this.messageType.MsgType_HTLC_SignGetH_N44;
         msg.data = info;
         this.sendData(msg);
     };
-    ObdApi.prototype.onHtlcSignGetH = function (jsonData) {
-    };
+    ObdApi.prototype.onHtlcSignGetH = function(jsonData) {};
     /**
      * MsgType_HTLC_CreateCommitmentTx_N45
      * @param HtlcRequestOpen
      */
-    ObdApi.prototype.htlcCreateCommitmentTx = function (info) {
+    ObdApi.prototype.htlcCreateCommitmentTx = function(info) {
         var msg = new Message();
         msg.type = this.messageType.MsgType_HTLC_CreateCommitmentTx_N45;
         msg.data = info;
         this.sendData(msg);
     };
-    ObdApi.prototype.onHtlcCreateCommitmentTx = function (jsonData) {
-    };
+    ObdApi.prototype.onHtlcCreateCommitmentTx = function(jsonData) {};
     /* ***************** backward R begin*****************/
     /**
      * MsgType_HTLC_SendR_N46
      * @param HtlcSendRInfo
      */
-    ObdApi.prototype.htlcSendR = function (info) {
+    ObdApi.prototype.htlcSendR = function(info) {
         var msg = new Message();
         msg.type = this.messageType.MsgType_HTLC_SendR_N46;
         msg.data = info;
         this.sendData(msg);
     };
-    ObdApi.prototype.onHtlcSendR = function (jsonData) {
-    };
+    ObdApi.prototype.onHtlcSendR = function(jsonData) {};
     /**
      * MsgType_HTLC_VerifyR_N47
      * @param HtlcVerifyRInfo
      */
-    ObdApi.prototype.htlcVerifyR = function (info) {
+    ObdApi.prototype.htlcVerifyR = function(info) {
         var msg = new Message();
         msg.type = this.messageType.MsgType_HTLC_VerifyR_N47;
         msg.data = info;
         this.sendData(msg);
     };
-    ObdApi.prototype.onHtlcVerifyR = function (jsonData) {
-    };
+    ObdApi.prototype.onHtlcVerifyR = function(jsonData) {};
     /* ***************** backward R end*****************/
     /* ***************** close htlc tx begin*****************/
     /**
      * MsgType_HTLC_VerifyR_N47
      * @param CloseHtlcTxInfo
      */
-    ObdApi.prototype.closeHtlcTx = function (info) {
+    ObdApi.prototype.closeHtlcTx = function(info) {
         var msg = new Message();
         msg.type = this.messageType.MsgType_HTLC_VerifyR_N47;
         msg.data = info;
         this.sendData(msg);
     };
-    ObdApi.prototype.onCloseHtlcTx = function (jsonData) {
-    };
+    ObdApi.prototype.onCloseHtlcTx = function(jsonData) {};
     /**
      * MsgType_HTLC_CloseSigned_N49
      * @param CloseHtlcTxInfoSigned
      */
-    ObdApi.prototype.closeHtlcTxSigned = function (info) {
+    ObdApi.prototype.closeHtlcTxSigned = function(info) {
         var msg = new Message();
         msg.type = this.messageType.MsgType_HTLC_CloseSigned_N49;
         msg.data = info;
         this.sendData(msg);
     };
-    ObdApi.prototype.onCloseHtlcTxSigned = function (jsonData) {
-    };
+    ObdApi.prototype.onCloseHtlcTxSigned = function(jsonData) {};
     return ObdApi;
 }());

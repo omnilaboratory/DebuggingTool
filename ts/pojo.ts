@@ -44,61 +44,61 @@ class ChannelFundingSignedInfo  {
 }
 
 class CommitmentTx {
-    channel_id: "";
-    amount: 0;
-    curr_temp_address_pub_key: "";
-    curr_temp_address_private_key: "";
-    channel_address_private_key: "";
-    last_temp_address_private_key: "";
+    channel_id:string = "";
+    amount:number = 0;
+    curr_temp_address_pub_key:string= "";
+    curr_temp_address_private_key:string = "";
+    channel_address_private_key:string= "";
+    last_temp_address_private_key:string= "";
 }
 
 class CommitmentTxSigned  {
-    channel_id: "";
-    curr_temp_address_pub_key: "";
-    curr_temp_address_private_key: "";
-    last_temp_private_key: "";
-    request_commitment_hash: "";
-    channel_address_private_key: "";
-    approval: false;
+    channel_id: string="";
+    curr_temp_address_pub_key: string="";
+    curr_temp_address_private_key: string="";
+    last_temp_private_key: string="";
+    request_commitment_hash: string="";
+    channel_address_private_key: string="";
+    approval:boolean = false;
 }
 
 class HtlcHInfo  {
-    property_id: "";
-    amount: 0;
-    recipient_peer_id: "";
+    property_id: string="";
+    amount:number = 0;
+    recipient_peer_id: string="";
 }
 
 class HtlcHSignInfo  {
-    request_hash: "";
-    property_id: 0;
-    amount: 0;
-    h: "";
-    approval: false;
+    request_hash:string= "";
+    property_id: number= 0;
+    amount: number = 0;
+    h:string= "";
+    approval:boolean = false;
 }
 
 class SignGetHInfo  {
-    request_hash: "";
-    approval: false;
-    channel_address_private_key: "";
-    last_temp_address_private_key: "";
-    curr_rsmc_temp_address_pub_key: "";
-    curr_rsmc_temp_address_private_key: "";
-    curr_htlc_temp_address_pub_key: "";
-    curr_htlc_temp_address_private_key: "";
-    curr_htlc_temp_address_he1b_ofh_pub_key: "";
+    request_hash: string="";
+    approval:boolean = false;
+    channel_address_private_key: string="";
+    last_temp_address_private_key:string= "";
+    curr_rsmc_temp_address_pub_key: string="";
+    curr_rsmc_temp_address_private_key: string="";
+    curr_htlc_temp_address_pub_key: string="";
+    curr_htlc_temp_address_private_key: string="";
+    curr_htlc_temp_address_he1b_ofh_pub_key: string="";
 }
  
 class HtlcRequestOpen  {
-    request_hash: "";
-    channel_address_private_key: "";
-    last_temp_address_private_key: "";
-    curr_rsmc_temp_address_pub_key: "";
-    curr_rsmc_temp_address_private_key: "";
-    curr_htlc_temp_address_pub_key: "";
-    curr_htlc_temp_address_private_key: "";
-    curr_htlc_temp_address_for_ht1a_pub_key: "";
-    curr_htlc_temp_address_for_ht1a_private_key: "";
-    curr_htlc_temp_address_for_hed1a_ofh_pub_key: ""
+    request_hash: string="";
+    channel_address_private_key: string="";
+    last_temp_address_private_key: string="";
+    curr_rsmc_temp_address_pub_key: string="";
+    curr_rsmc_temp_address_private_key: string="";
+    curr_htlc_temp_address_pub_key: string="";
+    curr_htlc_temp_address_private_key: string="";
+    curr_htlc_temp_address_for_ht1a_pub_key: string="";
+    curr_htlc_temp_address_for_ht1a_private_key: string="";
+    curr_htlc_temp_address_for_hed1a_ofh_pub_key: string=""
 }
 
 class HtlcSendRInfo {
