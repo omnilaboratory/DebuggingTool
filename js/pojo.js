@@ -1,22 +1,20 @@
-var Message = (function () {
-    function Message() {
+class Message {
+    constructor() {
         this.data = new Object();
         this.recipient_peer_id = "";
     }
-    return Message;
-}());
-var BtcFundingInfo = (function () {
-    function BtcFundingInfo() {
+}
+class BtcFundingInfo {
+    constructor() {
         this.from_address = "";
         this.from_address_private_key = "";
         this.to_address = "";
         this.amount = 0.0;
         this.miner_fee = 0.0;
     }
-    return BtcFundingInfo;
-}());
-var OmniFundingAssetInfo = (function () {
-    function OmniFundingAssetInfo() {
+}
+class OmniFundingAssetInfo {
+    constructor() {
         this.from_address = "";
         this.from_address_private_key = "";
         this.to_address = "";
@@ -24,36 +22,32 @@ var OmniFundingAssetInfo = (function () {
         this.amount = 0;
         this.miner_fee = 0.0;
     }
-    return OmniFundingAssetInfo;
-}());
-var AcceptChannelInfo = (function () {
-    function AcceptChannelInfo() {
+}
+class AcceptChannelInfo {
+    constructor() {
         this.temporary_channel_id = "";
         this.funding_pubkey = "";
         this.approval = false;
     }
-    return AcceptChannelInfo;
-}());
-var ChannelFundingCreatedInfo = (function () {
-    function ChannelFundingCreatedInfo() {
+}
+class ChannelFundingCreatedInfo {
+    constructor() {
         this.temporary_channel_id = "";
         this.funding_tx_hex = "";
         this.temp_address_pub_key = "";
         this.temp_address_private_key = "";
         this.channel_address_private_key = "";
     }
-    return ChannelFundingCreatedInfo;
-}());
-var ChannelFundingSignedInfo = (function () {
-    function ChannelFundingSignedInfo() {
+}
+class ChannelFundingSignedInfo {
+    constructor() {
         this.channel_id = "";
         this.fundee_channel_address_private_key = "";
         this.approval = false;
     }
-    return ChannelFundingSignedInfo;
-}());
-var CommitmentTx = (function () {
-    function CommitmentTx() {
+}
+class CommitmentTx {
+    constructor() {
         this.channel_id = "";
         this.amount = 0;
         this.curr_temp_address_pub_key = "";
@@ -61,10 +55,9 @@ var CommitmentTx = (function () {
         this.channel_address_private_key = "";
         this.last_temp_address_private_key = "";
     }
-    return CommitmentTx;
-}());
-var CommitmentTxSigned = (function () {
-    function CommitmentTxSigned() {
+}
+class CommitmentTxSigned {
+    constructor() {
         this.channel_id = "";
         this.curr_temp_address_pub_key = "";
         this.curr_temp_address_private_key = "";
@@ -73,28 +66,25 @@ var CommitmentTxSigned = (function () {
         this.channel_address_private_key = "";
         this.approval = false;
     }
-    return CommitmentTxSigned;
-}());
-var HtlcHInfo = (function () {
-    function HtlcHInfo() {
+}
+class HtlcHInfo {
+    constructor() {
         this.property_id = "";
         this.amount = 0;
         this.recipient_peer_id = "";
     }
-    return HtlcHInfo;
-}());
-var HtlcHSignInfo = (function () {
-    function HtlcHSignInfo() {
+}
+class HtlcHSignInfo {
+    constructor() {
         this.request_hash = "";
         this.property_id = 0;
         this.amount = 0;
         this.h = "";
         this.approval = false;
     }
-    return HtlcHSignInfo;
-}());
-var SignGetHInfo = (function () {
-    function SignGetHInfo() {
+}
+class SignGetHInfo {
+    constructor() {
         this.request_hash = "";
         this.approval = false;
         this.channel_address_private_key = "";
@@ -105,10 +95,9 @@ var SignGetHInfo = (function () {
         this.curr_htlc_temp_address_private_key = "";
         this.curr_htlc_temp_address_he1b_ofh_pub_key = "";
     }
-    return SignGetHInfo;
-}());
-var HtlcRequestOpen = (function () {
-    function HtlcRequestOpen() {
+}
+class HtlcRequestOpen {
+    constructor() {
         this.request_hash = "";
         this.channel_address_private_key = "";
         this.last_temp_address_private_key = "";
@@ -120,10 +109,9 @@ var HtlcRequestOpen = (function () {
         this.curr_htlc_temp_address_for_ht1a_private_key = "";
         this.curr_htlc_temp_address_for_hed1a_ofh_pub_key = "";
     }
-    return HtlcRequestOpen;
-}());
-var HtlcSendRInfo = (function () {
-    function HtlcSendRInfo() {
+}
+class HtlcSendRInfo {
+    constructor() {
         this.request_hash = "";
         this.r = "";
         this.channel_address_private_key = "";
@@ -131,19 +119,17 @@ var HtlcSendRInfo = (function () {
         this.curr_htlc_temp_address_for_he1b_pub_key = "";
         this.curr_htlc_temp_address_for_he1b_private_key = "";
     }
-    return HtlcSendRInfo;
-}());
-var HtlcVerifyRInfo = (function () {
-    function HtlcVerifyRInfo() {
+}
+class HtlcVerifyRInfo {
+    constructor() {
         this.request_hash = "";
         this.r = "";
         this.channel_address_private_key = "";
         this.curr_htlc_temp_address_for_hed1a_ofh_private_key = "";
     }
-    return HtlcVerifyRInfo;
-}());
-var CloseHtlcTxInfo = (function () {
-    function CloseHtlcTxInfo() {
+}
+class CloseHtlcTxInfo {
+    constructor() {
         this.channel_id = "";
         this.channel_address_private_key = "";
         this.last_rsmc_temp_address_private_key = "";
@@ -152,10 +138,9 @@ var CloseHtlcTxInfo = (function () {
         this.curr_rsmc_temp_address_pub_key = "";
         this.curr_rsmc_temp_address_private_key = "";
     }
-    return CloseHtlcTxInfo;
-}());
-var CloseHtlcTxInfoSigned = (function () {
-    function CloseHtlcTxInfoSigned() {
+}
+class CloseHtlcTxInfoSigned {
+    constructor() {
         this.request_close_htlc_hash = "";
         this.channel_address_private_key = "";
         this.last_rsmc_temp_address_private_key = "";
@@ -164,20 +149,18 @@ var CloseHtlcTxInfoSigned = (function () {
         this.curr_rsmc_temp_address_pub_key = "";
         this.curr_rsmc_temp_address_private_key = "";
     }
-    return CloseHtlcTxInfoSigned;
-}());
-var OmniPropertyInfo = (function () {
-    function OmniPropertyInfo() {
+}
+class OmniPropertyInfo {
+    constructor() {
         this.from_address = "";
         this.name = "";
         this.ecosystem = 0;
         this.divisible_type = 0;
         this.data = "";
     }
-    return OmniPropertyInfo;
-}());
-var MessageType = (function () {
-    function MessageType() {
+}
+class MessageType {
+    constructor() {
         this.MsgType_Error_0 = 0;
         this.MsgType_UserLogin_1 = 1;
         this.MsgType_UserLogout_2 = 2;
@@ -263,5 +246,4 @@ var MessageType = (function () {
         this.MsgType_HTLC_RequestCloseChannel_N50 = -50;
         this.MsgType_HTLC_CloseChannelSigned_N51 = -51;
     }
-    return MessageType;
-}());
+}

@@ -38,9 +38,11 @@ class ObdApi {
                 console.info("ws close", e);
                 this.isConnectToOBD = false;
                 this.isLogin = false;
+                alert("ws close");
             }
             this.ws.onerror = (e) => {
                 console.info("ws error", e);
+                alert("ws error");
             }
         } catch (error) {
             console.info(error);
