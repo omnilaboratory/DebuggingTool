@@ -10,10 +10,7 @@ var ObdApi = (function () {
         var _this = this;
         if (this.isConnectToOBD == true) {
             console.info("already connect");
-            if (callback != null) {
-                callback("already connect");
-            }
-            return "already connect";
+            return;
         }
         if (address != null && address.length > 0) {
             this.defaultAddress = address;
@@ -44,11 +41,8 @@ var ObdApi = (function () {
         }
         catch (error) {
             console.info(error);
-            if (callback != null) {
-                callback("can not connect to server");
-            }
             alert("can not connect to server");
-            return "can not connect to server";
+            return;
         }
     };
     ObdApi.prototype.sendData = function (msg, callback) {
