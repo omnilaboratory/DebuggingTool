@@ -304,14 +304,32 @@ function createConnectNodeDiv() {
     content_div.append(input_title);
 
     // create [input] element
-    var node_addr = document.createElement('input');
-    node_addr.id = 'ConnectNode'
-    content_div.append(node_addr);
+    var node_url = document.createElement('input');
+    node_url.id = 'node_url';
+    node_url.style = 'width: 50%';
+    // node_url.setAttribute('style', 'color:gray');
+    node_url.placeholder = 'Please input Node URL.';
+    node_url.value = 'ws://127.0.0.1:60020/ws';
+    content_div.append(node_url);
 
     // create [button] element
     var button = document.createElement('button');
-    button.setAttribute('onclick', 'obdApi.connectToServer()');
+    button.setAttribute('onclick', 'connectToServer()');
     button.innerText = 'Connect';
     content_div.append(button);
+}
+
+// 
+function connectToServer() {
+    // get [node_url] input box value.
+    var node_url = $("#node_url").val();
+    console.info('node url = ' + node_url);
+
+    if (node_url.trim().length == 0) {
+        alert('Please input Node URL.');
+        return;
+    }
+
+    obdApi.connectToServer(node_url);
 }
 //----------------------------------------------------------------
