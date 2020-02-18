@@ -5,10 +5,13 @@ var ObdApi = (function () {
         this.messageType = new MessageType();
         this.defaultAddress = "ws://127.0.0.1:60020/ws";
     }
-    ObdApi.prototype.connectToServer = function (address) {
+    ObdApi.prototype.connectToServer = function (address, callback) {
         var _this = this;
-        if (this.isConnectToOBD) {
+        if (this.isConnectToOBD == true) {
             console.info("already connect");
+            if (callback != null) {
+                callback("already connect");
+            }
             return "already connect";
         }
         if (address != null && address.length > 0) {
@@ -19,6 +22,9 @@ var ObdApi = (function () {
             this.ws = new WebSocket(this.defaultAddress);
             this.ws.onopen = function () {
                 console.info("connect succss");
+                if (callback != null) {
+                    callback("connect succss");
+                }
                 _this.isConnectToOBD = true;
             };
             this.ws.onmessage = function (e) {
@@ -36,7 +42,11 @@ var ObdApi = (function () {
             };
         }
         catch (error) {
-            console.info("can not connect to server", error);
+            console.info(error);
+            if (callback != null) {
+                callback("can not connect to server");
+            }
+            alert("can not connect to server");
             return "can not connect to server";
         }
     };

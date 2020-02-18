@@ -7,7 +7,9 @@ function onClickSend(param) {
     let enumMsgType = new MessageType();
     switch (msgType) {
         case enumMsgType.MsgType_Error_0:
-            obdApi.connectToServer();
+            obdApi.connectToServer("1111", function(e) {
+                console.info(e);
+            });
             break;
         case enumMsgType.MsgType_UserLogin_1:
             obdApi.login();

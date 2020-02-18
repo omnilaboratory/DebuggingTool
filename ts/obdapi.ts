@@ -7,9 +7,12 @@ class ObdApi {
     private defaultAddress = "ws://127.0.0.1:60020/ws";
     private ws: WebSocket;
 
-    public connectToServer(address: string):string {
-        if(this.isConnectToOBD){
+    public connectToServer(address: string,callback:Function):string {
+        if(this.isConnectToOBD==true){
             console.info("already connect");
+            if(callback!=null){
+                callback("already connect");
+            }
             return "already connect";
         }
 
@@ -22,6 +25,9 @@ class ObdApi {
             this.ws = new WebSocket(this.defaultAddress);
             this.ws.onopen = () => {
                 console.info("connect succss");
+                if(callback!=null){
+                    callback("connect succss");
+                }
                 this.isConnectToOBD = true;
             }
             this.ws.onmessage = (e) => {
@@ -38,7 +44,11 @@ class ObdApi {
                 console.info("ws error", e);
             }
         } catch (error) {
-            console.info("can not connect to server",error);
+            console.info(error);
+            if(callback!=null){
+                callback("can not connect to server");
+            }
+            alert("can not connect to server");
             return "can not connect to server";
         }
         
