@@ -19,23 +19,34 @@ function onClickSend(objSelf) {
                 console.info(e);
             });
             break;
+
         case enumMsgType.MsgType_UserLogin_1:
+
             var mnemonic = $("#mnemonic").val();
             console.info('mnemonic = ' + mnemonic);
+
+            if (mnemonic === '') {
+                alert('Please input a valid mnemonic.');
+                return;
+            }
+
             obdApi.logIn(mnemonic, function(e) {
                 console.info('OBD Response = ' + e);
-
+                createOBDResponseDiv(e);
             });
             break;
+
         case enumMsgType.MsgType_UserLogout_2:
             obdApi.logout();
             break;
+
         case enumMsgType.MsgType_GetMnemonic_101:
             obdApi.signUp(function(e) {
                 console.info('OBD Response = ' + e);
                 createOBDResponseDiv(e);
             });
             break;
+            
         case enumMsgType.MsgType_Core_FundingBTC_1009:
             let info = new BtcFundingInfo();
             obdApi.fundingBTC(info);
@@ -199,12 +210,12 @@ function createInputParamDiv(obj, jsonFile) {
 
         for (let index = 0; index < result.data.length; index++) {
             // id = js_func, is JS function name.
-            if (js_func == result.data[index].id) {
+            if (js_func === result.data[index].id) {
                 var arrParams = result.data[index].parameters;
                 // console.info('arrParams = ' + arrParams.length);
 
                 // No parameter.
-                if (arrParams.length == 0) {
+                if (arrParams.length === 0) {
                     break;
                 }
 
@@ -345,7 +356,7 @@ function createConnectNodeDiv() {
     content_div.append(button);
 
     // already connected
-    if (isConnectToOBD == true) {
+    if (isConnectToOBD === true) {
         // get [button_connect] div
         var button_connect = $("#button_connect");
         button_connect.text("Disconnect");
@@ -364,7 +375,7 @@ function connectToServer() {
     var node_url = $("#node_url").val();
     console.info('node url = ' + node_url);
 
-    if (node_url.trim().length == 0) {
+    if (node_url.trim().length === 0) {
         alert('Please input Node URL.');
         return;
     }
@@ -397,8 +408,8 @@ function createOBDResponseDiv(response) {
     content_div.append(title);
 
     // create [result] element
-    var result = document.createElement('text');
-    // func_title.setAttribute('style', 'color:gray');
+    var result = document.createElement('p');
+    result.setAttribute('style', 'word-break: break-all;white-space: normal;');
     result.innerText = response;
     content_div.append(result);
     
