@@ -6,8 +6,8 @@ var isConnectToOBD = false;
 
 function onClickSend(objSelf) {
     //为了测试
-    var msgType = parseInt($('#msgType').val());
-    console.info('msgType = ' + msgType);
+    // var msgType = parseInt($('#msgType').val());
+    // console.info('msgType = ' + msgType);
 
     // normal code.
     msgType = Number(objSelf.getAttribute('type_id'));
@@ -20,8 +20,9 @@ function onClickSend(objSelf) {
             });
             break;
         case enumMsgType.MsgType_UserLogin_1:
-            console.info('mnemonic = ' + $("#mnemonic").val());
-            obdApi.logIn("", function(e) {
+            var mnemonic = $("#mnemonic").val();
+            console.info('mnemonic = ' + mnemonic);
+            obdApi.logIn(mnemonic, function(e) {
                 console.info('OBD Response = ' + e);
 
             });
@@ -166,7 +167,7 @@ function createRequestDiv(obj) {
 
     //-------------------------------
     // TEMP WILL BE DELETED - for GuoJun testing.
-    // /*
+    /*
     var p = document.createElement('p');
     content_div.append(p);
 
@@ -181,7 +182,7 @@ function createRequestDiv(obj) {
     // input_msgType.setAttribute('type', 'text');
     // input_msgType.setAttribute('name', '');
     content_div.append(input_msgType);
-    // */
+    */
     //-------------------------------
 
 }
