@@ -249,7 +249,7 @@ class ObdApi {
 
     /**
      * MsgType_Core_FundingBTC_1009
-     * @param BtcFundingInfo
+     * @param info BtcFundingInfo
      * @param callback function
      */
     public fundingBTC(info: BtcFundingInfo, callback: Function) {
@@ -273,7 +273,7 @@ class ObdApi {
 
     /**
      * MsgType_Core_Omni_FundingAsset_2001
-     * @param OmniFundingAssetInfo
+     * @param info OmniFundingAssetInfo
      * @param callback function
      */
     public fundingAssetOfOmni(info: OmniFundingAssetInfo, callback: Function) {
@@ -329,7 +329,7 @@ class ObdApi {
 
     /**
      * MsgType_ChannelAccept_N33
-     * @param AcceptChannelInfo
+     * @param info AcceptChannelInfo
      * @param callback function
      */
     public channelAccept(info: AcceptChannelInfo, callback: Function) {
@@ -342,7 +342,7 @@ class ObdApi {
 
     /**
      * MsgType_FundingCreate_AssetFundingCreated_N34
-     * @param ChannelFundingCreatedInfo
+     * @param info ChannelFundingCreatedInfo
      * @param callback function
      */
     public channelFundingCreated(
@@ -358,7 +358,7 @@ class ObdApi {
 
     /**
      * MsgType_FundingSign_AssetFundingSigned_N35
-     * @param ChannelFundingSignedInfo
+     * @param info ChannelFundingSignedInfo
      * @param callback function
      */
     public channelFundingSigned(
@@ -374,7 +374,7 @@ class ObdApi {
 
     /**
      * MsgType_CommitmentTx_CommitmentTransactionCreated_N351
-     * @param CommitmentTx
+     * @param info CommitmentTx
      * @param callback function
      */
     public commitmentTransactionCreated(info: CommitmentTx, callback: Function) {
@@ -387,7 +387,7 @@ class ObdApi {
 
     /**
      * MsgType_CommitmentTxSigned_RevokeAndAcknowledgeCommitmentTransaction_N352
-     * @param CommitmentTxSigned
+     * @param info CommitmentTxSigned
      * @param callback function
      */
     public revokeAndAcknowledgeCommitmentTransaction(
@@ -403,7 +403,7 @@ class ObdApi {
 
     /**
      * MsgType_HTLC_Invoice_N4003
-     * @param HtlcHInfo 
+     * @param info HtlcHInfo 
      * @param callback function
      */
     public htlcInvoice(info: HtlcHInfo, callback: Function) {
@@ -417,7 +417,7 @@ class ObdApi {
 
     /**
      * MsgType_HTLC_AddHTLC_N40
-     * @param HtlcHInfo
+     * @param info HtlcHInfo
      * @param callback function
      */
     public addHtlc(info: HtlcHInfo, callback: Function) {
@@ -430,7 +430,7 @@ class ObdApi {
 
     /**
      * MsgType_HTLC_AddHTLCSigned_N41
-     * @param HtlcHSignInfo
+     * @param info HtlcHSignInfo
      * @param callback function
      */
     public addHtlcSigned(info: HtlcHSignInfo, callback: Function) {
@@ -471,7 +471,7 @@ class ObdApi {
 
     /**
      * MsgType_HTLC_SignGetH_N44
-     * @param SignGetHInfo
+     * @param info SignGetHInfo
      * @param callback function
      */
     public htlcSignGetH(info: SignGetHInfo, callback: Function) {
@@ -484,7 +484,7 @@ class ObdApi {
 
     /**
      * MsgType_HTLC_CreateCommitmentTx_N45
-     * @param HtlcRequestOpen
+     * @param info HtlcRequestOpen
      * @param callback function
      */
     public htlcCreateCommitmentTx(info: HtlcRequestOpen, callback: Function) {
@@ -498,7 +498,7 @@ class ObdApi {
     /* ***************** backward R begin*****************/
     /**
      * MsgType_HTLC_SendR_N46
-     * @param HtlcSendRInfo
+     * @param info HtlcSendRInfo
      * @param callback function
      */
     public htlcSendR(info: HtlcSendRInfo, callback: Function) {
@@ -511,7 +511,7 @@ class ObdApi {
 
     /**
      * MsgType_HTLC_VerifyR_N47
-     * @param HtlcVerifyRInfo
+     * @param info HtlcVerifyRInfo
      * @param callback function
      */
     public htlcVerifyR(info: HtlcVerifyRInfo, callback: Function) {
@@ -526,7 +526,7 @@ class ObdApi {
     /* ***************** close htlc tx begin*****************/
     /**
      * MsgType_HTLC_VerifyR_N47
-     * @param CloseHtlcTxInfo
+     * @param info CloseHtlcTxInfo
      * @param callback function
      * */
     public closeHtlcTx(info: CloseHtlcTxInfo, callback: Function) {
@@ -539,7 +539,7 @@ class ObdApi {
 
     /**
      * MsgType_HTLC_CloseSigned_N49
-     * @param CloseHtlcTxInfoSigned
+     * @param info CloseHtlcTxInfoSigned
      * @param callback function
      */
     public closeHtlcTxSigned(info: CloseHtlcTxInfoSigned, callback: Function) {
@@ -571,7 +571,7 @@ class ObdApi {
 
     /**
      * MsgType_Core_Omni_CreateNewTokenFixed_1201
-     * @param OmniSendIssuanceFixed
+     * @param info OmniSendIssuanceFixed
      * @param callback function
      */
     public createNewTokenFixed(info: OmniSendIssuanceFixed, callback: Function) {
@@ -584,7 +584,7 @@ class ObdApi {
 
     /**
      * MsgType_Core_Omni_CreateNewTokenManaged_1202
-     * @param OmniSendIssuanceManaged
+     * @param info OmniSendIssuanceManaged
      * @param callback function
      */
     public createNewTokenManaged(
@@ -599,7 +599,7 @@ class ObdApi {
     public onCreateNewTokenManaged(jsonData: any) { }
     /**
      * MsgType_Core_Omni_GrantNewUnitsOfManagedToken_1203
-     * @param OmniSendGrant
+     * @param info OmniSendGrant
      * @param callback function
      */
     public omniSendGrant(info: OmniSendGrant, callback: Function) {
@@ -611,7 +611,7 @@ class ObdApi {
     public onOmniSendGrant(jsonData: any) { }
     /**
      * MsgType_Core_Omni_RevokeUnitsOfManagedToken_1204
-     * @param OmniSendRevoke
+     * @param info OmniSendRevoke
      * @param callback function
      */
     public omniSendRevoke(info: OmniSendRevoke, callback: Function) {
@@ -867,7 +867,7 @@ class ObdApi {
 
     /**
      * MsgType_CloseChannelSign_N39
-     * @param CloseChannelSign 
+     * @param info CloseChannelSign 
      * @param callback function
      */
     public closeChannelSign(info:CloseChannelSign, callback: Function) {
