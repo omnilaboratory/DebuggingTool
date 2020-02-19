@@ -160,8 +160,8 @@ class OmniSendIssuanceManaged {
     }
 }
 class OmniSendIssuanceFixed extends OmniSendIssuanceManaged {
-    constructor() {
-        super(...arguments);
+    constructor(...args) {
+        super(...args);
         this.amount = 0;
     }
 }
