@@ -16,6 +16,9 @@ class ObdApi {
     public connectToServer(address: string, callback: Function) {
         if (this.isConnectToOBD == true) {
             console.info("already connect");
+            if(callback){
+                callback("already connect");
+            }
             return;
         }
 
