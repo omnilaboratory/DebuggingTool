@@ -330,8 +330,30 @@ function connectToServer() {
         return;
     }
     
-    var response;
-    obdApi.connectToServer(node_url, response);
-    console.info('response = ' + response);
+    obdApi.connectToServer(node_url, function(response) {
+        console.info('OBD Response = ' + response);
+        // Create OBD Response div area.
+        createOBDResponseDiv(response);
+    });
 }
+
+
+// createOBDResponseDiv 
+function createOBDResponseDiv(response) {
+
+    // get [content] div
+    var content_div = $("#content");
+
+    // create [title] element
+    var title = document.createElement('h2');
+    title.innerText = 'OBD Response';
+    content_div.append(title);
+
+    // create [result] element
+    var result = document.createElement('text');
+    // func_title.setAttribute('style', 'color:gray');
+    result.innerText = response;
+    content_div.append(result);
+}
+
 //----------------------------------------------------------------
