@@ -192,7 +192,7 @@ class ObdApi {
      * @param mnemonic:string
      * @param callback function
      */
-    public login(mnemonic: string, callback: Function) {
+    public logIn(mnemonic: string, callback: Function) {
         if (this.isLogin) {
             return;
         }

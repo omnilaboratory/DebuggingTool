@@ -4,9 +4,15 @@ var enumMsgType = new MessageType();
 // Save connection status.
 var isConnectToOBD = false;
 
-function onClickSend(param) {
+function onClickSend(objSelf) {
     //为了测试
-    msgType = parseInt($('#msgType').val());
+    var msgType = parseInt($('#msgType').val());
+    console.info('msgType = ' + msgType);
+
+    // normal code.
+    msgType = Number(objSelf.getAttribute('type_id'));
+    console.info('type_id = ' + msgType);
+
     switch (msgType) {
         case enumMsgType.MsgType_UserLogin_1.MsgType_Error_0:
             obdApi.connectToServer("1111", function(e) {
@@ -14,16 +20,19 @@ function onClickSend(param) {
             });
             break;
         case enumMsgType.MsgType_UserLogin_1:
-            obdApi.login("", function(e) {
-                console.info(e);
+            console.info('mnemonic = ' + $("#mnemonic").val());
+            obdApi.logIn("", function(e) {
+                console.info('OBD Response = ' + e);
+
             });
             break;
         case enumMsgType.MsgType_UserLogout_2:
             obdApi.logout();
             break;
         case enumMsgType.MsgType_GetMnemonic_101:
-            obdApi.getMnemonic(function(e) {
-                console.info(e);
+            obdApi.signUp(function(e) {
+                console.info('OBD Response = ' + e);
+                createOBDResponseDiv(e);
             });
             break;
         case enumMsgType.MsgType_Core_FundingBTC_1009:
@@ -106,6 +115,7 @@ function callAPI(obj) {
     createRequestDiv(obj);
     createInputParamDiv(obj, 'json/util_list.json');
     createInputParamDiv(obj, 'json/api_list.json');
+    createInvokeAPIButton(obj);
 }
 
 // create 
@@ -156,12 +166,13 @@ function createRequestDiv(obj) {
 
     //-------------------------------
     // TEMP WILL BE DELETED - for GuoJun testing.
+    // /*
     var p = document.createElement('p');
     content_div.append(p);
 
     var input_title = document.createElement('text');
     input_title.setAttribute('style', 'color:gray');
-    input_title.innerText = '输入消息编号：';
+    input_title.innerText = '测试用：输入消息编号：';
     content_div.append(input_title);
 
     // create [input] element - for GuoJun testing.
@@ -170,24 +181,17 @@ function createRequestDiv(obj) {
     // input_msgType.setAttribute('type', 'text');
     // input_msgType.setAttribute('name', '');
     content_div.append(input_msgType);
+    // */
     //-------------------------------
 
-    // create [Send button] element
-    var button = document.createElement('button');
-    button.setAttribute('js_func', obj.getAttribute("id"));
-    button.setAttribute('onclick', 'onClickSend(this)');
-    button.innerText = 'Send';
-    content_div.append(button);
 }
 
 // dynamic create input parameters div area.
 function createInputParamDiv(obj, jsonFile) {
 
-    // let requestURL = 'json/api_list.json';
-
     $.getJSON(jsonFile, function(result) {
         // get [content] div
-        var input_para = $("#content");
+        var content_div = $("#content");
 
         // get JS function name.
         var js_func = obj.getAttribute("id");
@@ -206,7 +210,7 @@ function createInputParamDiv(obj, jsonFile) {
                 // create [title] element
                 var top_title = document.createElement('p');
                 top_title.innerText = 'Input Parameters:';
-                input_para.append(top_title);
+                content_div.append(top_title);
 
                 // Parameters
                 createParamOfAPI(arrParams);
@@ -215,25 +219,46 @@ function createInputParamDiv(obj, jsonFile) {
     });
 }
 
+// 
+function createInvokeAPIButton(obj) {
+    // get [content] div
+    var content_div = $("#content");
+
+    // console.info('send is = '+$("#send_button").val());
+
+    var p = document.createElement('p');
+    content_div.append(p);
+
+    // create [Send button] element
+    var button = document.createElement('button');
+    // button.id = 'send_button';
+    button.setAttribute('type_id', obj.getAttribute("type_id"));
+    button.setAttribute('onclick', 'onClickSend(this)');
+    button.innerText = 'Invoke API';
+    content_div.append(button);
+    // if ($("#send_button").val() == undefined) {
+    // }
+}
+
 // create parameter of each API.
 function createParamOfAPI(arrParams) {
 
     var param_title, input_box;
 
     // get [content] div
-    var input_para = $("#content");
+    var content_div = $("#content");
 
     for (let index = 0; index < arrParams.length; index++) {
         // create [param_title] element
         param_title = document.createElement('text');
         param_title.setAttribute('style', 'color:gray');
         param_title.innerText = arrParams[index].name + ' : ';
-        input_para.append(param_title);
+        content_div.append(param_title);
 
         // create [input box of param] element
         input_box = document.createElement('input');
         input_box.id = arrParams[index].name;
-        input_para.append(input_box);
+        content_div.append(input_box);
 
         createButtonOfParam(arrParams, index);
     }
@@ -246,7 +271,7 @@ function createButtonOfParam(arrParams, index) {
     var arrButtons = arrParams[index].buttons;
 
     // get [content] div
-    var input_para = $("#content");
+    var content_div = $("#content");
 
     for (let index = 0; index < arrButtons.length; index++) {
         innerText = arrButtons[index].innerText;
@@ -256,7 +281,7 @@ function createButtonOfParam(arrParams, index) {
         var button = document.createElement('button');
         button.setAttribute('onclick', invokeFunc);
         button.innerText = innerText;
-        input_para.append(button);
+        content_div.append(button);
     }
 }
 
@@ -348,6 +373,13 @@ function connectToServer() {
         // Create OBD Response div area.
         createOBDResponseDiv(response);
         isConnectToOBD = true; // already connected.
+        
+        // Change the [button_connect] status.
+        // get [button_connect] div
+        var button_connect = $("#button_connect");
+        // $("#button_connect").text("Disconnect");
+        button_connect.text("Disconnect");
+        button_connect.attr("disabled", "disabled");
     });
 }
 
@@ -369,12 +401,6 @@ function createOBDResponseDiv(response) {
     result.innerText = response;
     content_div.append(result);
     
-    // Change the [button_connect] status.
-    // get [button_connect] div
-    var button_connect = $("#button_connect");
-    // $("#button_connect").text("Disconnect");
-    button_connect.text("Disconnect");
-    button_connect.attr("disabled", "disabled");
 }
 
 //----------------------------------------------------------------
