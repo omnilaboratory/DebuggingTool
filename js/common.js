@@ -1,15 +1,14 @@
 var obdApi = new ObdApi();
+var enumMsgType = new MessageType();
 
 // Save connection status.
 var isConnectToOBD = false;
 
 function onClickSend(param) {
-
     //为了测试
     msgType = parseInt($('#msgType').val());
-    let enumMsgType = new MessageType();
     switch (msgType) {
-        case enumMsgType.MsgType_Error_0:
+        case enumMsgType.MsgType_UserLogin_1.MsgType_Error_0:
             obdApi.connectToServer("1111", function(e) {
                 console.info(e);
             });
@@ -338,12 +337,12 @@ function connectToServer() {
     // get [node_url] input box value.
     var node_url = $("#node_url").val();
     console.info('node url = ' + node_url);
-    
+
     if (node_url.trim().length == 0) {
         alert('Please input Node URL.');
         return;
     }
-    
+
     obdApi.connectToServer(node_url, function(response) {
         console.info('OBD Response = ' + response);
         // Create OBD Response div area.

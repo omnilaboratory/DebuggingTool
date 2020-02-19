@@ -18,7 +18,7 @@ class OmniFundingAssetInfo {
         this.from_address = "";
         this.from_address_private_key = "";
         this.to_address = "";
-        this.property_id = 31;
+        this.property_id = 0;
         this.amount = 0;
         this.miner_fee = 0.0;
     }
@@ -168,12 +168,19 @@ class OmniSendIssuanceFixed extends OmniSendIssuanceManaged {
 class OmniSendGrant {
     constructor() {
         this.from_address = "";
-        this.property_id = 31;
+        this.property_id = 0;
         this.amount = 0;
         this.memo = "";
     }
 }
 class OmniSendRevoke extends OmniSendGrant {
+}
+class CloseChannelSign {
+    constructor() {
+        this.channel_id = "";
+        this.request_close_channel_hash = "";
+        this.approval = false;
+    }
 }
 class MessageType {
     constructor() {

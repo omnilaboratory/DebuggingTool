@@ -16,7 +16,7 @@ class OmniFundingAssetInfo {
   from_address: string = "";
   from_address_private_key: string = "";
   to_address: string = "";
-  property_id: number = 31;
+  property_id: number = 0;
   amount: number = 0;
   miner_fee: number = 0.0;
 }
@@ -149,12 +149,18 @@ class OmniSendIssuanceFixed extends OmniSendIssuanceManaged {
 
 class OmniSendGrant {
   from_address: string = "";
-  property_id: number = 31;
+  property_id: number = 0;
   amount: number = 0;
   memo: string = "";
 }
 class OmniSendRevoke extends OmniSendGrant{
   
+}
+
+class CloseChannelSign {
+  channel_id: string = "";
+  request_close_channel_hash: string = "";
+  approval: boolean = false;
 }
 
 class MessageType {
