@@ -150,7 +150,7 @@ class CloseHtlcTxInfoSigned {
         this.curr_rsmc_temp_address_private_key = "";
     }
 }
-class OmniPropertyInfo {
+class OmniSendIssuanceManaged {
     constructor() {
         this.from_address = "";
         this.name = "";
@@ -158,6 +158,22 @@ class OmniPropertyInfo {
         this.divisible_type = 0;
         this.data = "";
     }
+}
+class OmniSendIssuanceFixed extends OmniSendIssuanceManaged {
+    constructor(...args) {
+        super(...args);
+        this.amount = 0;
+    }
+}
+class OmniSendGrant {
+    constructor() {
+        this.from_address = "";
+        this.property_id = 31;
+        this.amount = 0;
+        this.memo = "";
+    }
+}
+class OmniSendRevoke extends OmniSendGrant {
 }
 class MessageType {
     constructor() {

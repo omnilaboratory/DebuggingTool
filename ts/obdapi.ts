@@ -38,12 +38,14 @@ class ObdApi {
                 console.info(jsonData);
                 this.getDataFromServer(jsonData);
             };
+            
             this.ws.onclose = e => {
                 console.info("ws close", e);
                 this.isConnectToOBD = false;
                 this.isLogin = false;
                 alert("ws close");
             }
+
             this.ws.onerror = (e) => {
                 console.info("ws error", e);
                 alert("ws error");
