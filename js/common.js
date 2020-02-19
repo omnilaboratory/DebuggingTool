@@ -1,38 +1,39 @@
 var obdApi = new ObdApi();
+var enumMsgType = new MessageType();
 
 function onClickSend(param) {
     //为了测试
     msgType = parseInt($('#msgType').val());
     switch (msgType) {
-        case MessageType.MsgType_Error_0:
+        case enumMsgType.MsgType_UserLogin_1.MsgType_Error_0:
             obdApi.connectToServer("1111", function(e) {
                 console.info(e);
             });
             break;
-        case MessageType.MsgType_UserLogin_1:
+        case enumMsgType.MsgType_UserLogin_1:
             obdApi.login("", function(e) {
                 console.info(e);
             });
             break;
-        case MessageType.MsgType_UserLogout_2:
+        case enumMsgType.MsgType_UserLogout_2:
             obdApi.logout();
             break;
-        case MessageType.MsgType_GetMnemonic_101:
+        case enumMsgType.MsgType_GetMnemonic_101:
             obdApi.getMnemonic(function(e) {
                 console.info(e);
             });
             break;
-        case MessageType.MsgType_Core_FundingBTC_1009:
+        case enumMsgType.MsgType_Core_FundingBTC_1009:
             let info = new BtcFundingInfo();
             obdApi.fundingBTC(info);
             break;
-        case MessageType.MsgType_Mnemonic_CreateAddress_N200:
+        case enumMsgType.MsgType_Mnemonic_CreateAddress_N200:
             obdApi.createAddressByMnemonic();
             break;
-        case MessageType.MsgType_Mnemonic_GetAddressByIndex_201:
+        case enumMsgType.MsgType_Mnemonic_GetAddressByIndex_201:
             obdApi.getAddressByIndexByMnemonic(1);
             break;
-        case MessageType.MsgType_Core_Omni_GetTransaction_1206:
+        case enumMsgType.MsgType_Core_Omni_GetTransaction_1206:
             txid = "c76710920860456dff2433197db79dd030f9b527e83a2e253f5bc6ab7d197e73";
             obdApi.getOmniTxByTxid(txid);
             break;
