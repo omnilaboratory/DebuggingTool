@@ -46,7 +46,7 @@ function onClickSend(objSelf) {
                 createOBDResponseDiv(e);
             });
             break;
-            
+
         case enumMsgType.MsgType_Core_FundingBTC_1009:
             let info = new BtcFundingInfo();
             obdApi.fundingBTC(info);
@@ -399,20 +399,42 @@ function connectToServer() {
 // createOBDResponseDiv 
 function createOBDResponseDiv(response) {
 
+    $("#obd_response_div").remove();
+
     // get [content] div
     var content_div = $("#content");
+
+    var obd_response_div = document.createElement('div');
+    obd_response_div.id = "obd_response_div";
+    content_div.append(obd_response_div);
 
     // create [title] element
     var title = document.createElement('h2');
     title.innerText = 'OBD Response';
-    content_div.append(title);
+    obd_response_div.append(title);
 
     // create [result] element
     var result = document.createElement('p');
     result.setAttribute('style', 'word-break: break-all;white-space: normal;');
     result.innerText = response;
-    content_div.append(result);
+    obd_response_div.append(result);
     
 }
 
+//----------------------------------------------------------------
+// Functions of buttons.
+function invokeSignUp() {
+    console.log('invokeSignUp func invoked!');
+    callAPI(signUp);
+}
+
+// Generate new mnemonic words.
+function autoCreateMnemonic() {
+    console.log('getMnemonic func invoked!');
+    obdApi.signUp(function(e) {
+        console.info('OBD Response = ' + e);
+        $("#mnemonic").val(e);
+        // $("#mnemonic").attr("value", e);
+    });
+}
 //----------------------------------------------------------------

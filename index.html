@@ -15,20 +15,6 @@
     // invoked when page refresh.
     getUtilList();
     getAPIList();
-
-    function invokeSignUp() {
-        console.log('invokeSignUp func invoked!');
-        callAPI(signUp);
-    }
-
-    // Generate new mnemonic words.
-    function getMnemonic() {
-        console.log('getMnemonic func invoked!');
-        obdApi.signUp(function(e) {
-            console.info('OBD Response = ' + e);
-            $("#mnemonic").attr("value", e);
-        });
-    }
 </script>
 
 <body>

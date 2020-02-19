@@ -20,7 +20,7 @@
                         },
                         {
                             "innerText": "Auto Create",
-                            "onclick": "getMnemonic()"
+                            "onclick": "autoCreateMnemonic()"
                         }
                     ]
                 }
