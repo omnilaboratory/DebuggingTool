@@ -1,5 +1,8 @@
 var obdApi = new ObdApi();
 
+// Save connection status.
+var isConnectToOBD = false;
+
 function onClickSend(param) {
 
     //为了测试
@@ -258,12 +261,6 @@ function createButtonOfParam(arrParams, index) {
     }
 }
 
-// create OBD Responses
-function createOBDResponse() {
-
-}
-
-
 //----------------------------------------------------------------
 // For test to show Connect to OBD html page.
 function connectNode() {
@@ -284,6 +281,9 @@ function deleteContentDiv() {
             parent.removeChild(parent.children[index]);
         }
     }
+
+    // JQuery method.
+    // $("#content").remove();
 }
 
 // create ConnectNodeDiv
@@ -314,9 +314,23 @@ function createConnectNodeDiv() {
 
     // create [button] element
     var button = document.createElement('button');
+    button.id = 'button_connect';
     button.setAttribute('onclick', 'connectToServer()');
     button.innerText = 'Connect';
     content_div.append(button);
+
+    // already connected
+    if (isConnectToOBD == true) {
+        // get [button_connect] div
+        var button_connect = $("#button_connect");
+        button_connect.text("Disconnect");
+        button_connect.attr("disabled", "disabled");
+
+        // create [status] element
+        var title = document.createElement('h3');
+        title.innerText = 'Already connected.';
+        content_div.append(title);
+    }
 }
 
 // 
@@ -334,6 +348,7 @@ function connectToServer() {
         console.info('OBD Response = ' + response);
         // Create OBD Response div area.
         createOBDResponseDiv(response);
+        isConnectToOBD = true; // already connected.
     });
 }
 
@@ -354,6 +369,13 @@ function createOBDResponseDiv(response) {
     // func_title.setAttribute('style', 'color:gray');
     result.innerText = response;
     content_div.append(result);
+    
+    // Change the [button_connect] status.
+    // get [button_connect] div
+    var button_connect = $("#button_connect");
+    // $("#button_connect").text("Disconnect");
+    button_connect.text("Disconnect");
+    button_connect.attr("disabled", "disabled");
 }
 
 //----------------------------------------------------------------

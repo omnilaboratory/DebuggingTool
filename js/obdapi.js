@@ -210,7 +210,7 @@ class ObdApi {
      * MsgType_GetMnemonic_101
      * @param callback
      */
-    getMnemonic(callback) {
+    signUp(callback) {
         let msg = new Message();
         msg.type = this.messageType.MsgType_GetMnemonic_101;
         this.sendData(msg, callback);
