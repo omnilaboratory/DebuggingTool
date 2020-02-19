@@ -97,7 +97,7 @@ class ObdApi {
 
         switch (jsonData.type) {
             case this.messageType.MsgType_UserLogin_1:
-                this.onLogin(resultData);
+                this.onLogIn(resultData);
                 break;
             case this.messageType.MsgType_UserLogout_2:
                 this.onLogout(resultData);
@@ -201,12 +201,11 @@ class ObdApi {
         if (mnemonic != null && mnemonic.length > 0) {
             msg.data["mnemonic"] = mnemonic;
         } else {
-            msg.data["mnemonic"] =
-                "unfold tortoise zoo hand sausage project boring corn test same elevator mansion bargain coffee brick tilt forum purpose hundred embody weapon ripple when narrow";
+            alert("empty mnemonic");
         }
         this.sendData(msg, callback);
     }
-    public onLogin(resultData: any) {
+    public onLogIn(resultData: any) {
         this.isLogin = true;
     }
 
