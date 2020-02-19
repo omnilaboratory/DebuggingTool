@@ -18,15 +18,16 @@
 
     function invokeSignUp() {
         console.log('invokeSignUp func invoked!');
-        // var api_SignUp = document.getElementById('signUp');
         callAPI(signUp);
     }
 
     // Generate new mnemonic words.
     function getMnemonic() {
         console.log('getMnemonic func invoked!');
-        var mnemonic = document.getElementById('mnemonic');
-        mnemonic.value = 'word-1 word-2 word-3 word-4 word-5';
+        obdApi.signUp(function(e) {
+            console.info('OBD Response = ' + e);
+            $("#mnemonic").attr("value", e);
+        });
     }
 </script>
 
