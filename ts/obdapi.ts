@@ -194,6 +194,9 @@ class ObdApi {
      */
     public logIn(mnemonic: string, callback: Function) {
         if (this.isLogin) {
+            if(callback!=null){
+                callback("already login")
+            }
             return;
         }
         let msg = new Message();
