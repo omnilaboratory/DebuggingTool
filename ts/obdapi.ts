@@ -103,7 +103,7 @@ class ObdApi {
                 this.onLogout(resultData);
                 break;
             case this.messageType.MsgType_GetMnemonic_101:
-                this.onGetMnemonic(resultData);
+                this.onSignUp(resultData);
                 break;
             case this.messageType.MsgType_Core_GetNewAddress_1001:
                 this.onGetNewAddressFromOmniCore(resultData);
@@ -234,7 +234,7 @@ class ObdApi {
         msg.type = this.messageType.MsgType_GetMnemonic_101;
         this.sendData(msg, callback);
     }
-    public onGetMnemonic(jsonData: any) { }
+    public onSignUp(jsonData: any) { }
 
     /**
      * MsgType_Core_GetNewAddress_1001
