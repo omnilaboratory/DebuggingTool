@@ -756,4 +756,40 @@ class ObdApi {
         this.sendData(msg, callback);
     }
     onGetAllRDTx(jsonData) { }
+    /**
+     * MsgType_SendBreachRemedyTransaction_N35107
+     * @param channel_id string
+     * @param callback function
+     */
+    sendBreachRemedyTransaction(channel_id, callback) {
+        let msg = new Message();
+        msg.type = this.messageType.MsgType_SendBreachRemedyTransaction_N35107;
+        msg.data["channel_id"] = channel_id;
+        this.sendData(msg, callback);
+    }
+    onSendBreachRemedyTransaction(jsonData) { }
+    /**
+     * MsgType_CloseChannelRequest_N38
+     * @param channel_id string
+     * @param callback function
+     */
+    closeChannel(channel_id, callback) {
+        let msg = new Message();
+        msg.type = this.messageType.MsgType_CloseChannelRequest_N38;
+        msg.data["channel_id"] = channel_id;
+        this.sendData(msg, callback);
+    }
+    onCloseChannel(jsonData) { }
+    /**
+     * MsgType_CloseChannelSign_N39
+     * @param CloseChannelSign
+     * @param callback function
+     */
+    closeChannelSign(info, callback) {
+        let msg = new Message();
+        msg.type = this.messageType.MsgType_CloseChannelSign_N39;
+        msg.data = info;
+        this.sendData(msg, callback);
+    }
+    onCloseChannelSign(jsonData) { }
 }

@@ -175,6 +175,13 @@ class OmniSendGrant {
 }
 class OmniSendRevoke extends OmniSendGrant {
 }
+class CloseChannelSign {
+    constructor() {
+        this.channel_id = "";
+        this.request_close_channel_hash = "";
+        this.approval = false;
+    }
+}
 class MessageType {
     constructor() {
         this.MsgType_Error_0 = 0;

@@ -157,6 +157,12 @@ class OmniSendRevoke extends OmniSendGrant{
   
 }
 
+class CloseChannelSign {
+  channel_id: string = "";
+  request_close_channel_hash: string = "";
+  approval: boolean = false;
+}
+
 class MessageType {
   MsgType_Error_0 = 0;
   MsgType_UserLogin_1 = 1;
