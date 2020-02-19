@@ -10,8 +10,8 @@ class ObdApi {
 
     /**
      * connectToServer
-     * @param address
-     * @param callback
+     * @param address string
+     * @param callback function
      */
     public connectToServer(address: string, callback: Function) {
         if (this.isConnectToOBD == true) {
@@ -190,7 +190,7 @@ class ObdApi {
     /**
      * MsgType_UserLogin_1
      * @param mnemonic:string
-     * @param callback
+     * @param callback function
      */
     public login(mnemonic: string, callback: Function) {
         if (this.isLogin) {
@@ -212,7 +212,7 @@ class ObdApi {
 
     /**
      * MsgType_UserLogout_2
-     * @param callback
+     * @param callback function
      */
     public logout(callback: Function) {
         if (this.isLogin) {
@@ -227,7 +227,7 @@ class ObdApi {
 
     /**
      * MsgType_GetMnemonic_101
-     * @param callback
+     * @param callback function
      */
     public getMnemonic(callback: Function) {
         let msg = new Message();
@@ -238,7 +238,7 @@ class ObdApi {
 
     /**
      * MsgType_Core_GetNewAddress_1001
-     * @param callback
+     * @param callback function
      */
     public getNewAddressFromOmniCore(callback: Function) {
         let msg = new Message();
@@ -250,7 +250,7 @@ class ObdApi {
     /**
      * MsgType_Core_FundingBTC_1009
      * @param BtcFundingInfo
-     * @param callback
+     * @param callback function
      */
     public fundingBTC(info: BtcFundingInfo, callback: Function) {
         let msg = new Message();
@@ -262,7 +262,7 @@ class ObdApi {
 
     /**
      * MsgType_Core_Omni_ListProperties_1205
-     * @param callback
+     * @param callback function
      */
     public listProperties(callback: Function) {
         let msg = new Message();
@@ -274,7 +274,7 @@ class ObdApi {
     /**
      * MsgType_Core_Omni_FundingAsset_2001
      * @param OmniFundingAssetInfo
-     * @param callback
+     * @param callback function
      */
     public fundingAssetOfOmni(info: OmniFundingAssetInfo, callback: Function) {
         let msg = new Message();
@@ -286,7 +286,7 @@ class ObdApi {
 
     /**
      * MsgType_Mnemonic_CreateAddress_N200
-     * @param callback
+     * @param callback function
      */
     public createAddressByMnemonic(callback: Function) {
         let msg = new Message();
@@ -298,7 +298,7 @@ class ObdApi {
     /**
      * MsgType_Mnemonic_GetAddressByIndex_201
      * @param index:number
-     * @param callback
+     * @param callback function
      */
     public getAddressByIndexByMnemonic(index: number, callback: Function) {
         let msg = new Message();
@@ -310,9 +310,9 @@ class ObdApi {
 
     /**
      * MsgType_ChannelOpen_N32
-     * @param funding_pubkey
-     * @param recipient_peer_id
-     * @param callback
+     * @param funding_pubkey string
+     * @param recipient_peer_id string
+     * @param callback function
      */
     public openChannel(
         funding_pubkey: string,
@@ -330,7 +330,7 @@ class ObdApi {
     /**
      * MsgType_ChannelAccept_N33
      * @param AcceptChannelInfo
-     * @param callback
+     * @param callback function
      */
     public channelAccept(info: AcceptChannelInfo, callback: Function) {
         let msg = new Message();
@@ -343,7 +343,7 @@ class ObdApi {
     /**
      * MsgType_FundingCreate_AssetFundingCreated_N34
      * @param ChannelFundingCreatedInfo
-     * @param callback
+     * @param callback function
      */
     public channelFundingCreated(
         info: ChannelFundingCreatedInfo,
@@ -359,7 +359,7 @@ class ObdApi {
     /**
      * MsgType_FundingSign_AssetFundingSigned_N35
      * @param ChannelFundingSignedInfo
-     * @param callback
+     * @param callback function
      */
     public channelFundingSigned(
         info: ChannelFundingSignedInfo,
@@ -375,7 +375,7 @@ class ObdApi {
     /**
      * MsgType_CommitmentTx_CommitmentTransactionCreated_N351
      * @param CommitmentTx
-     * @param callback
+     * @param callback function
      */
     public commitmentTransactionCreated(info: CommitmentTx, callback: Function) {
         let msg = new Message();
@@ -388,7 +388,7 @@ class ObdApi {
     /**
      * MsgType_CommitmentTxSigned_RevokeAndAcknowledgeCommitmentTransaction_N352
      * @param CommitmentTxSigned
-     * @param callback
+     * @param callback function
      */
     public revokeAndAcknowledgeCommitmentTransaction(
         info: CommitmentTxSigned,
@@ -403,8 +403,8 @@ class ObdApi {
 
     /**
      * MsgType_HTLC_Invoice_N4003
-     * @param HtlcHInfo
-     * @param callback
+     * @param HtlcHInfo 
+     * @param callback function
      */
     public htlcInvoice(info: HtlcHInfo, callback: Function) {
         let msg = new Message();
@@ -418,7 +418,7 @@ class ObdApi {
     /**
      * MsgType_HTLC_AddHTLC_N40
      * @param HtlcHInfo
-     * @param callback
+     * @param callback function
      */
     public addHtlc(info: HtlcHInfo, callback: Function) {
         let msg = new Message();
@@ -431,7 +431,7 @@ class ObdApi {
     /**
      * MsgType_HTLC_AddHTLCSigned_N41
      * @param HtlcHSignInfo
-     * @param callback
+     * @param callback function
      */
     public addHtlcSigned(info: HtlcHSignInfo, callback: Function) {
         let msg = new Message();
@@ -443,8 +443,8 @@ class ObdApi {
 
     /**
      * MsgType_HTLC_FindPathAndSendH_N42
-     * @param h:string
-     * @param callback
+     * @param h string
+     * @param callback function
      */
     public htlcFindPathAndSendH(h: string, callback: Function) {
         let msg = new Message();
@@ -456,9 +456,9 @@ class ObdApi {
 
     /**
      * MsgType_HTLC_SendH_N43
-     * @param h
-     * @param request_hash
-     * @param callback
+     * @param h string
+     * @param request_hash string
+     * @param callback function
      */
     public htlcSendH(h: string, request_hash: string, callback: Function) {
         let msg = new Message();
@@ -472,7 +472,7 @@ class ObdApi {
     /**
      * MsgType_HTLC_SignGetH_N44
      * @param SignGetHInfo
-     * @param callback
+     * @param callback function
      */
     public htlcSignGetH(info: SignGetHInfo, callback: Function) {
         let msg = new Message();
@@ -485,7 +485,7 @@ class ObdApi {
     /**
      * MsgType_HTLC_CreateCommitmentTx_N45
      * @param HtlcRequestOpen
-     * @param callback
+     * @param callback function
      */
     public htlcCreateCommitmentTx(info: HtlcRequestOpen, callback: Function) {
         let msg = new Message();
@@ -499,7 +499,7 @@ class ObdApi {
     /**
      * MsgType_HTLC_SendR_N46
      * @param HtlcSendRInfo
-     * @param callback
+     * @param callback function
      */
     public htlcSendR(info: HtlcSendRInfo, callback: Function) {
         let msg = new Message();
@@ -512,7 +512,7 @@ class ObdApi {
     /**
      * MsgType_HTLC_VerifyR_N47
      * @param HtlcVerifyRInfo
-     * @param callback
+     * @param callback function
      */
     public htlcVerifyR(info: HtlcVerifyRInfo, callback: Function) {
         let msg = new Message();
@@ -527,7 +527,7 @@ class ObdApi {
     /**
      * MsgType_HTLC_VerifyR_N47
      * @param CloseHtlcTxInfo
-     * @param callback
+     * @param callback function
      * */
     public closeHtlcTx(info: CloseHtlcTxInfo, callback: Function) {
         let msg = new Message();
@@ -540,7 +540,7 @@ class ObdApi {
     /**
      * MsgType_HTLC_CloseSigned_N49
      * @param CloseHtlcTxInfoSigned
-     * @param callback
+     * @param callback function
      */
     public closeHtlcTxSigned(info: CloseHtlcTxInfoSigned, callback: Function) {
         let msg = new Message();
@@ -555,8 +555,8 @@ class ObdApi {
     /* ********************* query data *************************** */
     /**
      * MsgType_Core_Omni_GetTransaction_1206
-     * @param txid
-     * @param callback
+     * @param txid string
+     * @param callback function
      */
     public getOmniTxByTxid(txid: string, callback: Function) {
         if (txid == null || txid.length == 0) {
@@ -572,7 +572,7 @@ class ObdApi {
     /**
      * MsgType_Core_Omni_CreateNewTokenFixed_1201
      * @param OmniSendIssuanceFixed
-     * @param callback
+     * @param callback function
      */
     public createNewTokenFixed(info: OmniSendIssuanceFixed, callback: Function) {
         let msg = new Message();
@@ -585,7 +585,7 @@ class ObdApi {
     /**
      * MsgType_Core_Omni_CreateNewTokenManaged_1202
      * @param OmniSendIssuanceManaged
-     * @param callback
+     * @param callback function
      */
     public createNewTokenManaged(
         info: OmniSendIssuanceManaged,
@@ -600,7 +600,7 @@ class ObdApi {
     /**
      * MsgType_Core_Omni_GrantNewUnitsOfManagedToken_1203
      * @param OmniSendGrant
-     * @param callback
+     * @param callback function
      */
     public omniSendGrant(info: OmniSendGrant, callback: Function) {
         let msg = new Message();
@@ -611,8 +611,8 @@ class ObdApi {
     public onOmniSendGrant(jsonData: any) { }
     /**
      * MsgType_Core_Omni_RevokeUnitsOfManagedToken_1204
-     * @param OmniSendGrant
-     * @param callback
+     * @param OmniSendRevoke
+     * @param callback function
      */
     public omniSendRevoke(info: OmniSendRevoke, callback: Function) {
         let msg = new Message();
@@ -624,8 +624,8 @@ class ObdApi {
 
     /**
      * MsgType_Core_Omni_Getbalance_1200
-     * @param address
-     * @param callback
+     * @param address string
+     * @param callback function
      */
     public omniGetAllBalancesForAddress(address: string, callback: Function) {
         let msg = new Message();
@@ -636,9 +636,22 @@ class ObdApi {
     public onOmniGetAllBalancesForAddress(jsonData: any) { }
 
     /**
+     * MsgType_Core_BalanceByAddress_1008
+     * @param address string
+     * @param callback function
+     */
+    public getBtcBalanceByAddress(address: string, callback: Function) {
+        let msg = new Message();
+        msg.type = this.messageType.MsgType_Core_BalanceByAddress_1008;
+        msg.data["address"] = address;
+        this.sendData(msg, callback);
+    }
+    public onGetBtcBalanceByAddress(jsonData: any) { }
+
+    /**
      * MsgType_Core_Btc_ImportPrivKey_1011
-     * @param privkey
-     * @param callback
+     * @param privkey string
+     * @param callback function
      */
     public importPrivKey(privkey: string, callback: Function) {
         let msg = new Message();
@@ -650,7 +663,7 @@ class ObdApi {
 
     /**
      * MsgType_HTLC_CreatedRAndHInfoList_N4001
-     * @param callback
+     * @param callback function
      */
     public getHtlcCreatedRandHInfoList(callback: Function) {
         let msg = new Message();
@@ -661,7 +674,7 @@ class ObdApi {
 
     /**
      * MsgType_HTLC_SignedRAndHInfoList_N4101
-     * @param callback
+     * @param callback function
      */
     public getHtlcSignedRandHInfoList(callback: Function) {
         let msg = new Message();
@@ -672,8 +685,8 @@ class ObdApi {
 
     /**
      * MsgType_HTLC_GetRFromLCommitTx_N4103
-     * @param channel_id
-     * @param callback
+     * @param channel_id string 
+     * @param callback function
      */
     public getRFromCommitmentTx(channel_id: string, callback: Function) {
         let msg = new Message();
@@ -685,8 +698,8 @@ class ObdApi {
 
     /**
      * MsgType_HTLC_GetPathInfoByH_N4104
-     * @param h
-     * @param callback
+     * @param h string
+     * @param callback function
      */
     public getPathInfoByH(h: string, callback: Function) {
         let msg = new Message();
@@ -697,8 +710,8 @@ class ObdApi {
     public onGetPathInfoByH(jsonData: any) { }
     /**
      * MsgType_HTLC_GetRInfoByHOfOwner_N4105
-     * @param h
-     * @param callback
+     * @param h string
+     * @param callback function
      */
     public getRByHOfReceiver(h: string, callback: Function) {
         let msg = new Message();
@@ -710,8 +723,8 @@ class ObdApi {
 
     /**
      * MsgType_CommitmentTx_LatestCommitmentTxByChanId_N35104
-     * @param channel_id
-     * @param callback
+     * @param channel_id string 
+     * @param callback function
      */
     public getLatestCommitmentTxByChannelId(
         channel_id: string,
@@ -726,8 +739,8 @@ class ObdApi {
 
     /**
      * MsgType_CommitmentTx_ItemsByChanId_N35101
-     * @param channel_id
-     * @param callback
+     * @param channel_id string 
+     * @param callback function
      */
     public getItemsByChannelId(channel_id: string, callback: Function) {
         let msg = new Message();
@@ -739,8 +752,7 @@ class ObdApi {
 
     /**
      * MsgType_ChannelOpen_AllItem_N3202
-     * @param channel_id
-     * @param callback
+     * @param callback function
      */
     public getAllChannels(callback: Function) {
         let msg = new Message();
@@ -748,4 +760,82 @@ class ObdApi {
         this.sendData(msg, callback);
     }
     public onGetAllChannels(jsonData: any) { }
+
+    /**
+     * MsgType_GetChannelInfoByChanId_N3207
+     * @param id number
+     * @param callback function
+     */
+    public getChannelById(id:number, callback: Function) {
+        let msg = new Message();
+        msg.type = this.messageType.MsgType_GetChannelInfoByChanId_N3207;
+        msg.data = id;
+        this.sendData(msg, callback);
+    }
+    public onGetChannelById(jsonData: any) { }
+
+    /**
+     * MsgType_CommitmentTx_AllBRByChanId_N35109
+     * @param channel_id string  
+     * @param callback function
+     */
+    public getAllBRTx(channel_id:string, callback: Function) {
+        let msg = new Message();
+        msg.type = this.messageType.MsgType_CommitmentTx_AllBRByChanId_N35109;
+        msg.data["channel_id"] = channel_id;
+        this.sendData(msg, callback);
+    }
+    public onGetAllBrTx(jsonData: any) { }
+
+    /**
+     * MsgType_CommitmentTx_ItemsByChanId_N35101
+     * @param channel_id string  
+     * @param callback function
+     */
+    public getAllCommitmentTx(channel_id:string, callback: Function) {
+        let msg = new Message();
+        msg.type = this.messageType.MsgType_CommitmentTx_ItemsByChanId_N35101;
+        msg.data["channel_id"] = channel_id;
+        this.sendData(msg, callback);
+    }
+    public onGetAllCommitmentTx(jsonData: any) { }
+
+    /**
+     * MsgType_CommitmentTx_LatestRDByChanId_N35105
+     * @param channel_id string  
+     * @param callback function
+     */
+    public getLatestCommitmentTx(channel_id:string, callback: Function) {
+        let msg = new Message();
+        msg.type = this.messageType.MsgType_CommitmentTx_LatestRDByChanId_N35105;
+        msg.data["channel_id"] = channel_id;
+        this.sendData(msg, callback);
+    }
+    public onGetLatestCommitmentTx(jsonData: any) { }
+
+    /**
+     * MsgType_CommitmentTx_LatestBRByChanId_N35106
+     * @param channel_id string  
+     * @param callback function
+     */
+    public getLatestBRTx(channel_id:string, callback: Function) {
+        let msg = new Message();
+        msg.type = this.messageType.MsgType_CommitmentTx_LatestBRByChanId_N35106;
+        msg.data["channel_id"] = channel_id;
+        this.sendData(msg, callback);
+    }
+    public onGetLatestBRTx(jsonData: any) { }
+
+    /**
+     * MsgType_CommitmentTx_AllRDByChanId_N35108
+     * @param channel_id string 
+     * @param callback function
+     */
+    public getAllRDTx(channel_id:string, callback: Function) {
+        let msg = new Message();
+        msg.type = this.messageType.MsgType_CommitmentTx_AllRDByChanId_N35108;
+        msg.data["channel_id"] = channel_id;
+        this.sendData(msg, callback);
+    }
+    public onGetAllRDTx(jsonData: any) { }
 }

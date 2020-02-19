@@ -324,12 +324,12 @@ function connectToServer() {
     // get [node_url] input box value.
     var node_url = $("#node_url").val();
     console.info('node url = ' + node_url);
-    
+
     if (node_url.trim().length == 0) {
         alert('Please input Node URL.');
         return;
     }
-    
+
     obdApi.connectToServer(node_url, function(response) {
         console.info('OBD Response = ' + response);
         // Create OBD Response div area.
