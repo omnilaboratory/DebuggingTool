@@ -10,16 +10,41 @@ function onClickSend(objSelf) {
     // console.info('msgType = ' + msgType);
 
     // normal code.
-    msgType = Number(objSelf.getAttribute('type_id'));
+    var msgType = Number(objSelf.getAttribute('type_id'));
     console.info('type_id = ' + msgType);
 
     switch (msgType) {
-        case enumMsgType.MsgType_UserLogin_1.MsgType_Error_0:
-            obdApi.connectToServer("1111", function(e) {
-                console.info(e);
+        // Util APIs.
+        case enumMsgType.MsgType_Core_GetNewAddress_1001:
+            obdApi.getNewAddress(function(e) {
+                console.info('OBD Response = ' + e);
+                createOBDResponseDiv(e);
+            });
+            break;
+        case enumMsgType.MsgType_Mnemonic_CreateAddress_N200:
+            obdApi.getNewAddressWithMnemonic(function(e) {
+                console.info('OBD Response = ' + e);
+                createOBDResponseDiv(e, msgType);
             });
             break;
 
+        case enumMsgType.MsgType_Mnemonic_GetAddressByIndex_201:
+
+            var index = $("#index").val();
+            console.info('index = ' + index);
+
+            if (index === '') {
+                alert('Please input a valid index of address.');
+                return;
+            }
+
+            obdApi.getAddressInfo(index, function(e) {
+                console.info('OBD Response = ' + e);
+                createOBDResponseDiv(e, enumMsgType.MsgType_Mnemonic_CreateAddress_N200);
+            });
+            break;
+
+        // APIs for debugging.
         case enumMsgType.MsgType_UserLogin_1:
 
             var mnemonic = $("#mnemonic").val();
@@ -51,12 +76,7 @@ function onClickSend(objSelf) {
             let info = new BtcFundingInfo();
             obdApi.fundingBTC(info);
             break;
-        case enumMsgType.MsgType_Mnemonic_CreateAddress_N200:
-            obdApi.createAddressByMnemonic();
-            break;
-        case enumMsgType.MsgType_Mnemonic_GetAddressByIndex_201:
-            obdApi.getAddressByIndexByMnemonic(1);
-            break;
+        
         case enumMsgType.MsgType_Core_Omni_GetTransaction_1206:
             txid = "c76710920860456dff2433197db79dd030f9b527e83a2e253f5bc6ab7d197e73";
             obdApi.getOmniTxByTxid(txid);
@@ -66,6 +86,36 @@ function onClickSend(objSelf) {
             break;
     }
 
+}
+
+// getUserDataList
+function getUserDataList() {
+
+    var api_id, description, apiItem, p;
+    var jsonFile = "json/user_data_list.json";
+
+    // dynamic create api_list div.
+    $.getJSON(jsonFile, function(result) {
+        // get [user_data_list] div
+        var apiList = $("#user_data_list");
+
+        for (let index = 0; index < result.data.length; index++) {
+            api_id = result.data[index].id;
+            description = result.data[index].description;
+
+            // create [a] element
+            apiItem = document.createElement('a');
+            apiItem.id = api_id;
+            apiItem.href = '#';
+            apiItem.setAttribute('description', description);
+            apiItem.setAttribute('onclick', 'callAPI(this)');
+            apiItem.innerText = api_id;
+            apiList.append(apiItem);
+
+            p = document.createElement('p');
+            apiList.append(p);
+        }
+    });
 }
 
 // getUtilList
@@ -88,17 +138,15 @@ function getAPIList() {
 function createLeftSideMenu(jsonFile, divName) {
 
     var api_id, type_id, description, apiItem, p;
-    let requestURL = jsonFile;
 
     // dynamic create api_list div.
-    $.getJSON(requestURL, function(result) {
+    $.getJSON(jsonFile, function(result) {
         // get [api_list] div
         var apiList = $(divName);
 
         for (let index = 0; index < result.data.length; index++) {
             api_id = result.data[index].id;
             type_id = result.data[index].type_id;
-            api_name = result.data[index].id;
             description = result.data[index].description;
 
             // create [a] element
@@ -108,7 +156,7 @@ function createLeftSideMenu(jsonFile, divName) {
             apiItem.setAttribute('type_id', type_id);
             apiItem.setAttribute('description', description);
             apiItem.setAttribute('onclick', 'callAPI(this)');
-            apiItem.innerText = api_name;
+            apiItem.innerText = api_id;
             apiList.append(apiItem);
 
             p = document.createElement('p');
@@ -395,9 +443,8 @@ function connectToServer() {
     });
 }
 
-
 // createOBDResponseDiv 
-function createOBDResponseDiv(response) {
+function createOBDResponseDiv(response, msgType) {
 
     $("#obd_response_div").remove();
 
@@ -413,12 +460,66 @@ function createOBDResponseDiv(response) {
     title.innerText = 'OBD Response';
     obd_response_div.append(title);
 
-    // create [result] element
-    var result = document.createElement('p');
-    result.setAttribute('style', 'word-break: break-all;white-space: normal;');
-    result.innerText = response;
-    obd_response_div.append(result);
+    switch (msgType) {
+        case enumMsgType.MsgType_Core_GetNewAddress_1001:
+            break;
+        case enumMsgType.MsgType_Mnemonic_CreateAddress_N200:
+            parseDataN200(response);
+            break;
+        case enumMsgType.MsgType_Mnemonic_GetAddressByIndex_201:
+            break;
+
+        default:
+            // create [result] element
+            var result = document.createElement('p');
+            result.setAttribute('style', 'word-break: break-all;white-space: normal;');
+            result.innerText = response;
+            obd_response_div.append(result);
+            break;
+    }
+}
+
+//----------------------------------------------------------------
+// Functions of processing each response from invoke APIs.
+// parseDataN200 
+function parseDataN200(response) {
+    // console.log('response wif = ' + response.wif);
     
+    // create [address] element
+    var address = document.createElement('text');
+    address.setAttribute('style', 'word-break: break-all;white-space: normal;');
+    address.innerText = 'ADDRESS : ' + response.address;
+    obd_response_div.append(address);
+    
+    // create [p] element
+    var p = document.createElement('p');
+    obd_response_div.append(p);
+    
+    // create [index] element
+    var index = document.createElement('text');
+    index.setAttribute('style', 'word-break: break-all;white-space: normal;');
+    index.innerText = 'INDEX : ' + response.index;
+    obd_response_div.append(index);
+    
+    // create [p] element
+    var p = document.createElement('p');
+    obd_response_div.append(p);
+    
+    // create [pub_key] element
+    var pub_key = document.createElement('text');
+    pub_key.setAttribute('style', 'word-break: break-all;white-space: normal;');
+    pub_key.innerText = 'PUB_KEY : ' + response.pub_key;
+    obd_response_div.append(pub_key);
+    
+    // create [p] element
+    var p = document.createElement('p');
+    obd_response_div.append(p);
+    
+    // create [wif] element
+    var wif = document.createElement('text');
+    wif.setAttribute('style', 'word-break: break-all;white-space: normal;');
+    wif.innerText = 'WIF : ' + response.wif;
+    obd_response_div.append(wif);
 }
 
 //----------------------------------------------------------------
