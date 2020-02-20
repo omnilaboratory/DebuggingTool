@@ -202,13 +202,16 @@ class ObdApi {
             }
             return;
         }
+
+        if(this.isNotString(mnemonic)){
+            alert("empty mnemonic");
+            return;
+        }
+
+
         let msg = new Message();
         msg.type = this.messageType.MsgType_UserLogin_1;
-        if (mnemonic != null && mnemonic.length > 0) {
-            msg.data["mnemonic"] = mnemonic;
-        } else {
-            alert("empty mnemonic");
-        }
+        msg.data["mnemonic"] = mnemonic;
         this.sendData(msg, callback);
     }
     public onLogIn(resultData: any) {
@@ -224,6 +227,8 @@ class ObdApi {
             let msg = new Message();
             msg.type = this.messageType.MsgType_UserLogout_2;
             this.sendData(msg, callback);
+        }else{
+            alert("you have logout");
         }
     }
     public onLogout(jsonData: any) {
@@ -258,6 +263,26 @@ class ObdApi {
      * @param callback function
      */
     public fundingBTC(info: BtcFundingInfo, callback: Function) {
+        if(this.isNotString(info.from_address)){
+            alert("empty from_address");
+            return;
+        }
+        if(this.isNotString(info.from_address_private_key)){
+            alert("empty from_address_private_key");
+            return;
+        }
+        if(this.isNotString(info.to_address)){
+            alert("empty to_address");
+            return;
+        }
+        if(info.amount==null||info.amount<=0){
+            alert("wrong amount");
+            return;
+        }
+        if(info.miner_fee==null||info.miner_fee<=0){
+            info.miner_fee = 0;
+        }
+
         let msg = new Message();
         msg.type = this.messageType.MsgType_Core_FundingBTC_1009;
         msg.data = info;
@@ -282,6 +307,33 @@ class ObdApi {
      * @param callback function
      */
     public fundingAssetOfOmni(info: OmniFundingAssetInfo, callback: Function) {
+
+        if(this.isNotString(info.from_address)){
+            alert("empty from_address");
+            return;
+        }
+        if(this.isNotString(info.from_address_private_key)){
+            alert("empty from_address_private_key");
+            return;
+        }
+        if(this.isNotString(info.to_address)){
+            alert("empty to_address");
+            return;
+        }
+        if(info.property_id==null||info.property_id<=0){
+            alert("error property_id");
+            return;
+        }
+
+        if(info.amount==null||info.amount<=0){
+            alert("wrong amount");
+            return;
+        }
+        if(info.miner_fee==null||info.miner_fee<=0){
+            info.miner_fee = 0;
+        }
+
+
         let msg = new Message();
         msg.type = this.messageType.MsgType_Core_Omni_FundingAsset_2001;
         msg.data = info;
@@ -306,6 +358,10 @@ class ObdApi {
      * @param callback function
      */
     public getAddressByIndexByMnemonic(index: number, callback: Function) {
+        if(index==null||index<0){
+            alert("error index");
+            return;
+        }
         let msg = new Message();
         msg.type = this.messageType.MsgType_Mnemonic_GetAddressByIndex_201;
         msg.data = index;
@@ -324,6 +380,17 @@ class ObdApi {
         recipient_peer_id: string,
         callback: Function
     ) {
+
+        if(this.isNotString(funding_pubkey)){
+            alert("error funding_pubkey");
+            return;
+        }
+
+        if(this.isNotString(recipient_peer_id)){
+            alert("error recipient_peer_id");
+            return;
+        }
+
         let msg = new Message();
         msg.type = this.messageType.MsgType_ChannelOpen_N32;
         msg.data["funding_pubkey"] = funding_pubkey;
@@ -338,6 +405,21 @@ class ObdApi {
      * @param callback function
      */
     public channelAccept(info: AcceptChannelInfo, callback: Function) {
+
+        if(this.isNotString(info.temporary_channel_id)){
+            alert("empty temporary_channel_id");
+            return;
+        }
+        if(this.isNotString(info.funding_pubkey)){
+            alert("empty funding_pubkey");
+            return;
+        }
+        if(info.approval==null){
+            alert("empty approval");
+            return;
+        }
+
+
         let msg = new Message();
         msg.type = this.messageType.MsgType_ChannelAccept_N33;
         msg.data = info;
@@ -354,6 +436,27 @@ class ObdApi {
         info: ChannelFundingCreatedInfo,
         callback: Function
     ) {
+        if(this.isNotString(info.temporary_channel_id)){
+            alert("empty temporary_channel_id");
+            return;
+        }
+        if(this.isNotString(info.funding_tx_hex)){
+            alert("empty funding_tx_hex");
+            return;
+        }
+        if(this.isNotString(info.temp_address_pub_key)){
+            alert("empty temp_address_pub_key");
+            return;
+        }
+        if(this.isNotString(info.temp_address_private_key)){
+            alert("empty temp_address_private_key");
+            return;
+        }
+        if(this.isNotString(info.channel_address_private_key)){
+            alert("empty channel_address_private_key");
+            return;
+        }
+
         let msg = new Message();
         msg.type = this.messageType.MsgType_FundingCreate_AssetFundingCreated_N34;
         msg.data = info;
@@ -370,6 +473,20 @@ class ObdApi {
         info: ChannelFundingSignedInfo,
         callback: Function
     ) {
+
+        if(this.isNotString(info.channel_id)){
+            alert("empty channel_id");
+            return;
+        }
+        if(this.isNotString(info.fundee_channel_address_private_key)){
+            alert("empty fundee_channel_address_private_key");
+            return;
+        }
+        if(info.approval==null){
+            alert("empty approval");
+            return;
+        }
+
         let msg = new Message();
         msg.type = this.messageType.MsgType_FundingSign_AssetFundingSigned_N35;
         msg.data = info;
@@ -383,6 +500,30 @@ class ObdApi {
      * @param callback function
      */
     public commitmentTransactionCreated(info: CommitmentTx, callback: Function) {
+        if(this.isNotString(info.channel_id)){
+            alert("empty channel_id");
+            return;
+        }
+        if(this.isNotString(info.curr_temp_address_pub_key)){
+            alert("empty curr_temp_address_pub_key");
+            return;
+        }
+        if(this.isNotString(info.curr_temp_address_private_key)){
+            alert("empty curr_temp_address_private_key");
+            return;
+        }
+        if(this.isNotString(info.channel_address_private_key)){
+            alert("empty channel_address_private_key");
+            return;
+        }
+        if(this.isNotString(info.last_temp_address_private_key)){
+            alert("empty last_temp_address_private_key");
+            return;
+        }
+        if(info.amount==null||info.amount<=0){
+            alert("wrong amount");
+            return;
+        }
         let msg = new Message();
         msg.type = this.messageType.MsgType_CommitmentTx_CommitmentTransactionCreated_N351;
         msg.data = info;
@@ -399,6 +540,36 @@ class ObdApi {
         info: CommitmentTxSigned,
         callback: Function
     ) {
+
+        if(this.isNotString(info.channel_id)){
+            alert("empty channel_id");
+            return;
+        }
+        if(this.isNotString(info.curr_temp_address_pub_key)){
+            alert("empty curr_temp_address_pub_key");
+            return;
+        }
+        if(this.isNotString(info.curr_temp_address_private_key)){
+            alert("empty curr_temp_address_private_key");
+            return;
+        }
+        if(this.isNotString(info.last_temp_private_key)){
+            alert("empty last_temp_private_key");
+            return;
+        }
+        if(this.isNotString(info.request_commitment_hash)){
+            alert("empty request_commitment_hash");
+            return;
+        }
+        if(this.isNotString(info.channel_address_private_key)){
+            alert("empty channel_address_private_key");
+            return;
+        }
+        if(info.approval==null){
+            alert("empty approval");
+            return;
+        }
+
         let msg = new Message();
         msg.type = this.messageType.MsgType_CommitmentTxSigned_RevokeAndAcknowledgeCommitmentTransaction_N352;
         msg.data = info;
@@ -412,6 +583,18 @@ class ObdApi {
      * @param callback function
      */
     public htlcInvoice(info: HtlcHInfo, callback: Function) {
+        if(this.isNotString(info.recipient_peer_id)){
+            alert("empty recipient_peer_id");
+            return;
+        }
+        if(info.property_id==null||info.property_id<=0){
+            alert("empty property_id");
+            return;
+        }
+        if(info.amount==null||info.amount<=0){
+            alert("wrong amount");
+            return;
+        }
         let msg = new Message();
         msg.type = this.messageType.MsgType_HTLC_Invoice_N4003;
         msg.data = info;
@@ -426,6 +609,18 @@ class ObdApi {
      * @param callback function
      */
     public addHtlc(info: HtlcHInfo, callback: Function) {
+        if(this.isNotString(info.recipient_peer_id)){
+            alert("empty recipient_peer_id");
+            return;
+        }
+        if(info.property_id==null||info.property_id<=0){
+            alert("empty property_id");
+            return;
+        }
+        if(info.amount==null||info.amount<=0){
+            alert("wrong amount");
+            return;
+        }
         let msg = new Message();
         msg.type = this.messageType.MsgType_HTLC_AddHTLC_N40;
         msg.data = info;
@@ -439,6 +634,26 @@ class ObdApi {
      * @param callback function
      */
     public addHtlcSigned(info: HtlcHSignInfo, callback: Function) {
+        if(this.isNotString(info.request_hash)){
+            alert("empty request_hash");
+            return;
+        }
+        if(this.isNotString(info.h)){
+            alert("empty h");
+            return;
+        }
+        if(info.property_id==null||info.property_id<=0){
+            alert("empty property_id");
+            return;
+        }
+        if(info.amount==null||info.amount<=0){
+            alert("wrong amount");
+            return;
+        }
+        if(info.approval==null){
+            alert("wrong approval");
+            return;
+        }
         let msg = new Message();
         msg.type = this.messageType.MsgType_HTLC_AddHTLCSigned_N41;
         msg.data = info;
@@ -452,6 +667,10 @@ class ObdApi {
      * @param callback function
      */
     public htlcFindPathAndSendH(h: string, callback: Function) {
+        if(this.isNotString(h)){
+            alert("empty h");
+            return;
+        }
         let msg = new Message();
         msg.type = this.messageType.MsgType_HTLC_FindPathAndSendH_N42;
         msg.data["h"] = h;
@@ -466,6 +685,14 @@ class ObdApi {
      * @param callback function
      */
     public htlcSendH(h: string, request_hash: string, callback: Function) {
+        if(this.isNotString(h)){
+            alert("empty h");
+            return;
+        }
+        if(this.isNotString(request_hash)){
+            alert("empty request_hash");
+            return;
+        }
         let msg = new Message();
         msg.type = this.messageType.MsgType_HTLC_SendH_N43;
         msg.data["h"] = h;
@@ -480,6 +707,42 @@ class ObdApi {
      * @param callback function
      */
     public htlcSignGetH(info: SignGetHInfo, callback: Function) {
+        if(this.isNotString(info.request_hash)){
+            alert("empty request_hash");
+            return;
+        }
+        if(this.isNotString(info.channel_address_private_key)){
+            alert("empty channel_address_private_key");
+            return;
+        }
+        if(this.isNotString(info.last_temp_address_private_key)){
+            alert("empty last_temp_address_private_key");
+            return;
+        }
+        if(this.isNotString(info.curr_rsmc_temp_address_pub_key)){
+            alert("empty curr_rsmc_temp_address_pub_key");
+            return;
+        }
+        if(this.isNotString(info.curr_rsmc_temp_address_private_key)){
+            alert("empty curr_rsmc_temp_address_private_key");
+            return;
+        }
+        if(this.isNotString(info.curr_htlc_temp_address_pub_key)){
+            alert("empty curr_htlc_temp_address_pub_key");
+            return;
+        }
+        if(this.isNotString(info.curr_htlc_temp_address_private_key)){
+            alert("empty curr_htlc_temp_address_private_key");
+            return;
+        }
+        if(this.isNotString(info.curr_htlc_temp_address_he1b_ofh_pub_key)){
+            alert("empty curr_htlc_temp_address_he1b_ofh_pub_key");
+            return;
+        }
+        if(info.approval==null){
+            alert("empty approval");
+            return;
+        }
         let msg = new Message();
         msg.type = this.messageType.MsgType_HTLC_SignGetH_N44;
         msg.data = info;
@@ -493,6 +756,49 @@ class ObdApi {
      * @param callback function
      */
     public htlcCreateCommitmentTx(info: HtlcRequestOpen, callback: Function) {
+
+        if(this.isNotString(info.request_hash)){
+            alert("empty request_hash");
+            return;
+        }
+        if(this.isNotString(info.channel_address_private_key)){
+            alert("empty channel_address_private_key");
+            return;
+        }
+        if(this.isNotString(info.last_temp_address_private_key)){
+            alert("empty last_temp_address_private_key");
+            return;
+        }
+        if(this.isNotString(info.curr_rsmc_temp_address_pub_key)){
+            alert("empty curr_rsmc_temp_address_pub_key");
+            return;
+        }
+        if(this.isNotString(info.curr_rsmc_temp_address_private_key)){
+            alert("empty curr_rsmc_temp_address_private_key");
+            return;
+        }
+        if(this.isNotString(info.curr_htlc_temp_address_pub_key)){
+            alert("empty curr_htlc_temp_address_pub_key");
+            return;
+        }
+        if(this.isNotString(info.curr_htlc_temp_address_private_key)){
+            alert("empty curr_htlc_temp_address_private_key");
+            return;
+        }
+        if(this.isNotString(info.curr_htlc_temp_address_for_ht1a_pub_key)){
+            alert("empty curr_htlc_temp_address_for_ht1a_pub_key");
+            return;
+        }
+        if(this.isNotString(info.curr_htlc_temp_address_for_ht1a_private_key)){
+            alert("empty curr_htlc_temp_address_for_ht1a_private_key");
+            return;
+        }
+        if(this.isNotString(info.curr_htlc_temp_address_for_hed1a_ofh_pub_key)){
+            alert("empty curr_htlc_temp_address_for_hed1a_ofh_pub_key");
+            return;
+        }
+
+
         let msg = new Message();
         msg.type = this.messageType.MsgType_HTLC_CreateCommitmentTx_N45;
         msg.data = info;
@@ -507,6 +813,30 @@ class ObdApi {
      * @param callback function
      */
     public htlcSendR(info: HtlcSendRInfo, callback: Function) {
+        if(this.isNotString(info.request_hash)){
+            alert("empty request_hash");
+            return;
+        }
+        if(this.isNotString(info.r)){
+            alert("empty r");
+            return;
+        }
+        if(this.isNotString(info.channel_address_private_key)){
+            alert("empty channel_address_private_keycurr_htlc_temp_address_he1b_ofh_private_key");
+            return;
+        }
+        if(this.isNotString(info.curr_htlc_temp_address_he1b_ofh_private_key)){
+            alert("empty curr_htlc_temp_address_he1b_ofh_private_key");
+            return;
+        }
+        if(this.isNotString(info.curr_htlc_temp_address_for_he1b_pub_key)){
+            alert("empty curr_htlc_temp_address_for_he1b_pub_key");
+            return;
+        }
+        if(this.isNotString(info.curr_htlc_temp_address_for_he1b_private_key)){
+            alert("empty curr_htlc_temp_address_for_he1b_private_key");
+            return;
+        }
         let msg = new Message();
         msg.type = this.messageType.MsgType_HTLC_SendR_N46;
         msg.data = info;
@@ -520,6 +850,23 @@ class ObdApi {
      * @param callback function
      */
     public htlcVerifyR(info: HtlcVerifyRInfo, callback: Function) {
+        if(this.isNotString(info.request_hash)){
+            alert("empty request_hash");
+            return;
+        }
+        if(this.isNotString(info.r)){
+            alert("empty r");
+            return;
+        }
+        if(this.isNotString(info.channel_address_private_key)){
+            alert("empty channel_address_private_key");
+            return;
+        }
+        if(this.isNotString(info.curr_htlc_temp_address_for_hed1a_ofh_private_key)){
+            alert("empty curr_htlc_temp_address_for_hed1a_ofh_private_key");
+            return;
+        }
+
         let msg = new Message();
         msg.type = this.messageType.MsgType_HTLC_VerifyR_N47;
         msg.data = info;
@@ -535,6 +882,32 @@ class ObdApi {
      * @param callback function
      * */
     public closeHtlcTx(info: CloseHtlcTxInfo, callback: Function) {
+
+        if(this.isNotString(info.channel_id)){
+            alert("empty channel_id");
+            return;
+        }
+        if(this.isNotString(info.channel_address_private_key)){
+            alert("empty channel_address_private_key");
+            return;
+        }
+        if(this.isNotString(info.last_rsmc_temp_address_private_key)){
+            alert("empty last_rsmc_temp_address_private_key");
+            return;
+        }
+        if(this.isNotString(info.last_htlc_temp_address_private_key)){
+            alert("empty last_htlc_temp_address_private_key");
+            return;
+        }
+        if(this.isNotString(info.curr_rsmc_temp_address_pub_key)){
+            alert("empty curr_rsmc_temp_address_pub_key");
+            return;
+        }
+        if(this.isNotString(info.curr_rsmc_temp_address_private_key)){
+            alert("empty curr_rsmc_temp_address_private_key");
+            return;
+        }
+
         let msg = new Message();
         msg.type = this.messageType.MsgType_HTLC_VerifyR_N47;
         msg.data = info;
@@ -548,6 +921,34 @@ class ObdApi {
      * @param callback function
      */
     public closeHtlcTxSigned(info: CloseHtlcTxInfoSigned, callback: Function) {
+        if(this.isNotString(info.request_close_htlc_hash)){
+            alert("empty request_close_htlc_hash");
+            return;
+        }
+        if(this.isNotString(info.channel_address_private_key)){
+            alert("empty channel_address_private_key");
+            return;
+        }
+        if(this.isNotString(info.last_rsmc_temp_address_private_key)){
+            alert("empty last_rsmc_temp_address_private_key");
+            return;
+        }
+        if(this.isNotString(info.last_htlc_temp_address_private_key)){
+            alert("empty last_htlc_temp_address_private_key");
+            return;
+        }
+        if(this.isNotString(info.last_htlc_temp_address_for_htnx_private_key)){
+            alert("empty last_htlc_temp_address_for_htnx_private_key");
+            return;
+        }
+        if(this.isNotString(info.curr_rsmc_temp_address_pub_key)){
+            alert("empty curr_rsmc_temp_address_pub_key");
+            return;
+        }
+        if(this.isNotString(info.curr_rsmc_temp_address_private_key)){
+            alert("empty curr_rsmc_temp_address_private_key");
+            return;
+        }
         let msg = new Message();
         msg.type = this.messageType.MsgType_HTLC_CloseSigned_N49;
         msg.data = info;
@@ -564,7 +965,7 @@ class ObdApi {
      * @param callback function
      */
     public getOmniTxByTxid(txid: string, callback: Function) {
-        if (txid == null || txid.length == 0) {
+        if (this.isNotString(txid)) {
             alert("empty txid");
         }
         let msg = new Message();
@@ -580,6 +981,30 @@ class ObdApi {
      * @param callback function
      */
     public createNewTokenFixed(info: OmniSendIssuanceFixed, callback: Function) {
+        if(this.isNotString(info.from_address)){
+            alert("empty from_address");
+            return;
+        }
+        if(this.isNotString(info.name)){
+            alert("empty name");
+            return;
+        }
+        if(info.ecosystem==null){
+            alert("empty ecosystem");
+            return;
+        }
+        if(info.divisible_type==null){
+            alert("empty divisible_type");
+            return;
+        }
+        if(info.amount==null||info.amount<=1){
+            alert("wrong amount");
+            return;
+        }
+        if(this.isNotString(info.data)){
+            info.data = "";
+        }
+
         let msg = new Message();
         msg.type = this.messageType.MsgType_Core_Omni_CreateNewTokenFixed_1201;
         msg.data = info;
@@ -596,6 +1021,26 @@ class ObdApi {
         info: OmniSendIssuanceManaged,
         callback: Function
     ) {
+
+        if(this.isNotString(info.from_address)){
+            alert("empty from_address");
+            return;
+        }
+        if(this.isNotString(info.name)){
+            alert("empty name");
+            return;
+        }
+        if(info.ecosystem==null){
+            alert("empty ecosystem");
+            return;
+        }
+        if(info.divisible_type==null){
+            alert("empty divisible_type");
+            return;
+        }
+        if(this.isNotString(info.data)){
+            info.data = "";
+        }
         let msg = new Message();
         msg.type = this.messageType.MsgType_Core_Omni_CreateNewTokenManaged_1202;
         msg.data = info;
@@ -608,6 +1053,23 @@ class ObdApi {
      * @param callback function
      */
     public omniSendGrant(info: OmniSendGrant, callback: Function) {
+
+        if(this.isNotString(info.from_address)){
+            alert("empty from_address");
+            return;
+        }
+        if(info.property_id==null||info.property_id<1){
+            alert("empty property_id");
+            return;
+        }
+        if(info.amount==null||info.amount<=1){
+            alert("wrong amount");
+            return;
+        }
+        if(this.isNotString(info.memo)){
+            info.memo = "";
+        }
+
         let msg = new Message();
         msg.type = this.messageType.MsgType_Core_Omni_GrantNewUnitsOfManagedToken_1203;
         msg.data = info;
@@ -620,6 +1082,21 @@ class ObdApi {
      * @param callback function
      */
     public omniSendRevoke(info: OmniSendRevoke, callback: Function) {
+        if(this.isNotString(info.from_address)){
+            alert("empty from_address");
+            return;
+        }
+        if(info.property_id==null||info.property_id<1){
+            alert("empty property_id");
+            return;
+        }
+        if(info.amount==null||info.amount<=1){
+            alert("wrong amount");
+            return;
+        }
+        if(this.isNotString(info.memo)){
+            info.memo = "";
+        }
         let msg = new Message();
         msg.type = this.messageType.MsgType_Core_Omni_RevokeUnitsOfManagedToken_1204;
         msg.data = info;
@@ -633,6 +1110,10 @@ class ObdApi {
      * @param callback function
      */
     public omniGetAllBalancesForAddress(address: string, callback: Function) {
+        if(this.isNotString(address)){
+            alert("empty address");
+            return;
+        }
         let msg = new Message();
         msg.type = this.messageType.MsgType_Core_Omni_Getbalance_1200;
         msg.data["address"] = address;
@@ -646,6 +1127,10 @@ class ObdApi {
      * @param callback function
      */
     public getBtcBalanceByAddress(address: string, callback: Function) {
+        if(this.isNotString(address)){
+            alert("empty address");
+            return;
+        }
         let msg = new Message();
         msg.type = this.messageType.MsgType_Core_BalanceByAddress_1008;
         msg.data["address"] = address;
@@ -659,6 +1144,10 @@ class ObdApi {
      * @param callback function
      */
     public importPrivKey(privkey: string, callback: Function) {
+        if(this.isNotString(privkey)){
+            alert("empty privkey");
+            return;
+        }
         let msg = new Message();
         msg.type = this.messageType.MsgType_Core_Btc_ImportPrivKey_1011;
         msg.data["privkey"] = privkey;
@@ -694,6 +1183,10 @@ class ObdApi {
      * @param callback function
      */
     public getRFromCommitmentTx(channel_id: string, callback: Function) {
+        if(this.isNotString(channel_id)){
+            alert("empty channel_id");
+            return;
+        }
         let msg = new Message();
         msg.type = this.messageType.MsgType_HTLC_GetRFromLCommitTx_N4103;
         msg.data["channel_id"] = channel_id;
@@ -707,6 +1200,10 @@ class ObdApi {
      * @param callback function
      */
     public getPathInfoByH(h: string, callback: Function) {
+        if(this.isNotString(h)){
+            alert("empty h");
+            return;
+        }
         let msg = new Message();
         msg.type = this.messageType.MsgType_HTLC_GetPathInfoByH_N4104;
         msg.data = h;
@@ -719,6 +1216,10 @@ class ObdApi {
      * @param callback function
      */
     public getRByHOfReceiver(h: string, callback: Function) {
+        if(this.isNotString(h)){
+            alert("empty h");
+            return;
+        }
         let msg = new Message();
         msg.type = this.messageType.MsgType_HTLC_GetRInfoByHOfOwner_N4105;
         msg.data = h;
@@ -735,6 +1236,10 @@ class ObdApi {
         channel_id: string,
         callback: Function
     ) {
+        if(this.isNotString(channel_id)){
+            alert("empty channel_id");
+            return;
+        }
         let msg = new Message();
         msg.type = this.messageType.MsgType_CommitmentTx_LatestCommitmentTxByChanId_N35104;
         msg.data["channel_id"] = channel_id;
@@ -748,6 +1253,10 @@ class ObdApi {
      * @param callback function
      */
     public getItemsByChannelId(channel_id: string, callback: Function) {
+        if(this.isNotString(channel_id)){
+            alert("empty channel_id");
+            return;
+        }
         let msg = new Message();
         msg.type = this.messageType.MsgType_CommitmentTx_ItemsByChanId_N35101;
         msg.data["channel_id"] = channel_id;
@@ -772,6 +1281,10 @@ class ObdApi {
      * @param callback function
      */
     public getChannelById(id:number, callback: Function) {
+        if(id==null||id<=0){
+            alert('error id');
+            return;
+        }
         let msg = new Message();
         msg.type = this.messageType.MsgType_GetChannelInfoByChanId_N3207;
         msg.data = id;
@@ -785,6 +1298,10 @@ class ObdApi {
      * @param callback function
      */
     public getAllBRTx(channel_id:string, callback: Function) {
+        if(this.isNotString(channel_id)){
+            alert('empty channel_id');
+            return;
+        }
         let msg = new Message();
         msg.type = this.messageType.MsgType_CommitmentTx_AllBRByChanId_N35109;
         msg.data["channel_id"] = channel_id;
@@ -798,6 +1315,10 @@ class ObdApi {
      * @param callback function
      */
     public getAllCommitmentTx(channel_id:string, callback: Function) {
+        if(this.isNotString(channel_id)){
+            alert('empty channel_id');
+            return;
+        }
         let msg = new Message();
         msg.type = this.messageType.MsgType_CommitmentTx_ItemsByChanId_N35101;
         msg.data["channel_id"] = channel_id;
@@ -811,6 +1332,10 @@ class ObdApi {
      * @param callback function
      */
     public getLatestCommitmentTx(channel_id:string, callback: Function) {
+        if(this.isNotString(channel_id)){
+            alert('empty channel_id');
+            return;
+        }
         let msg = new Message();
         msg.type = this.messageType.MsgType_CommitmentTx_LatestRDByChanId_N35105;
         msg.data["channel_id"] = channel_id;
@@ -824,6 +1349,10 @@ class ObdApi {
      * @param callback function
      */
     public getLatestBRTx(channel_id:string, callback: Function) {
+        if(this.isNotString(channel_id)){
+            alert('empty channel_id');
+            return;
+        }
         let msg = new Message();
         msg.type = this.messageType.MsgType_CommitmentTx_LatestBRByChanId_N35106;
         msg.data["channel_id"] = channel_id;
@@ -837,6 +1366,10 @@ class ObdApi {
      * @param callback function
      */
     public getAllRDTx(channel_id:string, callback: Function) {
+        if(this.isNotString(channel_id)){
+            alert('empty channel_id');
+            return;
+        }
         let msg = new Message();
         msg.type = this.messageType.MsgType_CommitmentTx_AllRDByChanId_N35108;
         msg.data["channel_id"] = channel_id;
@@ -850,6 +1383,10 @@ class ObdApi {
      * @param callback function
      */
     public sendBreachRemedyTransaction(channel_id:string, callback: Function) {
+        if(this.isNotString(channel_id)){
+            alert('empty channel_id');
+            return;
+        }
         let msg = new Message();
         msg.type = this.messageType.MsgType_SendBreachRemedyTransaction_N35107;
         msg.data["channel_id"] = channel_id;
@@ -863,6 +1400,10 @@ class ObdApi {
      * @param callback function
      */
     public closeChannel(channel_id:string, callback: Function) {
+        if(this.isNotString(channel_id)){
+            alert('empty channel_id');
+            return;
+        }
         let msg = new Message();
         msg.type = this.messageType.MsgType_CloseChannelRequest_N38;
         msg.data["channel_id"] = channel_id;
@@ -876,10 +1417,42 @@ class ObdApi {
      * @param callback function
      */
     public closeChannelSign(info:CloseChannelSign, callback: Function) {
+        if(this.isNotString(info.channel_id)){
+            alert('empty channel_id');
+            return;
+        }
+        if(this.isNotString(info.request_close_channel_hash)){
+            alert('empty request_close_channel_hash');
+            return;
+        }
+        if(info.approval==null){
+            alert('empty approval');
+            return;
+        }
         let msg = new Message();
         msg.type = this.messageType.MsgType_CloseChannelSign_N39;
         msg.data = info;
         this.sendData(msg, callback);
     }
     public onCloseChannelSign(jsonData: any) { }
+
+
+    private isString(str:String):boolean{
+        if(str==null){
+            return false;
+        }
+        if(str.trim().length==0){
+            return false;
+        }
+        return true;
+    }
+    private isNotString(str:String):boolean{
+        if(str==null){
+            return true;
+        }
+        if(str.trim().length==0){
+            return true;
+        }
+        return false;
+    }
 }

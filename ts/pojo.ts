@@ -61,7 +61,7 @@ class CommitmentTxSigned {
 }
 
 class HtlcHInfo {
-  property_id: string = "";
+  property_id: number = 0;
   amount: number = 0;
   recipient_peer_id: string = "";
 }
@@ -76,7 +76,6 @@ class HtlcHSignInfo {
 
 class SignGetHInfo {
   request_hash: string = "";
-  approval: boolean = false;
   channel_address_private_key: string = "";
   last_temp_address_private_key: string = "";
   curr_rsmc_temp_address_pub_key: string = "";
@@ -84,6 +83,7 @@ class SignGetHInfo {
   curr_htlc_temp_address_pub_key: string = "";
   curr_htlc_temp_address_private_key: string = "";
   curr_htlc_temp_address_he1b_ofh_pub_key: string = "";
+  approval: boolean = false;
 }
 
 class HtlcRequestOpen {

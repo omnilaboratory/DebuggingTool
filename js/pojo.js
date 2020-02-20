@@ -69,7 +69,7 @@ class CommitmentTxSigned {
 }
 class HtlcHInfo {
     constructor() {
-        this.property_id = "";
+        this.property_id = 0;
         this.amount = 0;
         this.recipient_peer_id = "";
     }
@@ -86,7 +86,6 @@ class HtlcHSignInfo {
 class SignGetHInfo {
     constructor() {
         this.request_hash = "";
-        this.approval = false;
         this.channel_address_private_key = "";
         this.last_temp_address_private_key = "";
         this.curr_rsmc_temp_address_pub_key = "";
@@ -94,6 +93,7 @@ class SignGetHInfo {
         this.curr_htlc_temp_address_pub_key = "";
         this.curr_htlc_temp_address_private_key = "";
         this.curr_htlc_temp_address_he1b_ofh_pub_key = "";
+        this.approval = false;
     }
 }
 class HtlcRequestOpen {
@@ -160,8 +160,8 @@ class OmniSendIssuanceManaged {
     }
 }
 class OmniSendIssuanceFixed extends OmniSendIssuanceManaged {
-    constructor() {
-        super(...arguments);
+    constructor(...args) {
+        super(...args);
         this.amount = 0;
     }
 }
