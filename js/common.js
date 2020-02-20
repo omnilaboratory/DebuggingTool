@@ -4,6 +4,10 @@ var enumMsgType = new MessageType();
 // Save connection status.
 var isConnectToOBD = false;
 
+// Save userID already logined.
+var userID;
+
+//
 function onClickSend(objSelf) {
     //为了测试
     // var msgType = parseInt($('#msgType').val());
@@ -40,7 +44,7 @@ function onClickSend(objSelf) {
 
             obdApi.getAddressInfo(index, function(e) {
                 console.info('OBD Response = ' + e);
-                createOBDResponseDiv(e, enumMsgType.MsgType_Mnemonic_CreateAddress_N200);
+                createOBDResponseDiv(e, msgType);
             });
             break;
 
@@ -57,7 +61,7 @@ function onClickSend(objSelf) {
 
             obdApi.logIn(mnemonic, function(e) {
                 console.info('OBD Response = ' + e);
-                createOBDResponseDiv(e);
+                createOBDResponseDiv(e, msgType);
             });
             break;
 
@@ -182,7 +186,7 @@ function callAPI(obj) {
 function createApiNameDiv(obj) {
 
     // get [content] div
-    var content_div = $("#content");
+    var content_div = $("#name_req_div");
 
     // create [api_name] element
     var api_name = document.createElement('h2');
@@ -199,7 +203,7 @@ function createApiNameDiv(obj) {
 function createRequestDiv(obj) {
 
     // get [content] div
-    var content_div = $("#content");
+    var content_div = $("#name_req_div");
 
     // create [title] element
     var title = document.createElement('h2');
@@ -251,7 +255,7 @@ function createInputParamDiv(obj, jsonFile) {
 
     $.getJSON(jsonFile, function(result) {
         // get [content] div
-        var content_div = $("#content");
+        var content_div = $("#name_req_div");
 
         // get JS function name.
         var js_func = obj.getAttribute("id");
@@ -273,16 +277,61 @@ function createInputParamDiv(obj, jsonFile) {
                 content_div.append(top_title);
 
                 // Parameters
-                createParamOfAPI(arrParams);
+                createParamOfAPI(arrParams, content_div);
             }
         }
     });
 }
 
+// create parameter of each API.
+function createParamOfAPI(arrParams, content_div) {
+
+    var param_title, input_box;
+
+    // get [content] div
+    // var content_div = $("#content");
+
+    for (let index = 0; index < arrParams.length; index++) {
+        // create [param_title] element
+        param_title = document.createElement('text');
+        param_title.setAttribute('style', 'color:gray');
+        param_title.innerText = arrParams[index].name + ' : ';
+        content_div.append(param_title);
+
+        // create [input box of param] element
+        input_box = document.createElement('input');
+        input_box.id = arrParams[index].name;
+        content_div.append(input_box);
+
+        createButtonOfParam(arrParams, index, content_div);
+    }
+}
+
+// create button of parameter
+function createButtonOfParam(arrParams, index, content_div) {
+
+    var innerText, invokeFunc;
+    var arrButtons = arrParams[index].buttons;
+
+    // get [content] div
+    // var content_div = $("#content");
+
+    for (let index = 0; index < arrButtons.length; index++) {
+        innerText = arrButtons[index].innerText;
+        invokeFunc = arrButtons[index].onclick;
+
+        // create [button] element
+        var button = document.createElement('button');
+        button.setAttribute('onclick', invokeFunc);
+        button.innerText = innerText;
+        content_div.append(button);
+    }
+}
+
 // 
 function createInvokeAPIButton(obj) {
     // get [content] div
-    var content_div = $("#content");
+    var content_div = $("#name_req_div");
 
     // console.info('send is = '+$("#send_button").val());
 
@@ -300,51 +349,6 @@ function createInvokeAPIButton(obj) {
     // }
 }
 
-// create parameter of each API.
-function createParamOfAPI(arrParams) {
-
-    var param_title, input_box;
-
-    // get [content] div
-    var content_div = $("#content");
-
-    for (let index = 0; index < arrParams.length; index++) {
-        // create [param_title] element
-        param_title = document.createElement('text');
-        param_title.setAttribute('style', 'color:gray');
-        param_title.innerText = arrParams[index].name + ' : ';
-        content_div.append(param_title);
-
-        // create [input box of param] element
-        input_box = document.createElement('input');
-        input_box.id = arrParams[index].name;
-        content_div.append(input_box);
-
-        createButtonOfParam(arrParams, index);
-    }
-}
-
-// create button of parameter
-function createButtonOfParam(arrParams, index) {
-
-    var innerText, invokeFunc;
-    var arrButtons = arrParams[index].buttons;
-
-    // get [content] div
-    var content_div = $("#content");
-
-    for (let index = 0; index < arrButtons.length; index++) {
-        innerText = arrButtons[index].innerText;
-        invokeFunc = arrButtons[index].onclick;
-
-        // create [button] element
-        var button = document.createElement('button');
-        button.setAttribute('onclick', invokeFunc);
-        button.innerText = innerText;
-        content_div.append(button);
-    }
-}
-
 //----------------------------------------------------------------
 // For test to show Connect to OBD html page.
 function connectNode() {
@@ -355,26 +359,32 @@ function connectNode() {
 // delete children of 'content' div
 function deleteContentDiv() {
 
-    var parent = document.getElementById('content');
-    var children_amount = parent.children.length;
-    // console.log('content div children = ' + children_amount);
+    // var parent = document.getElementById('content');
+    // var children_amount = parent.children.length;
+    // // console.log('content div children = ' + children_amount);
 
-    if (children_amount != 0) {
-        for (let index = children_amount - 1; index >= 0; index--) {
-            // console.log('index = ' + index);
-            parent.removeChild(parent.children[index]);
-        }
-    }
+    // if (children_amount != 0) {
+    //     for (let index = children_amount - 1; index >= 0; index--) {
+    //         // console.log('index = ' + index);
+    //         parent.removeChild(parent.children[index]);
+    //     }
+    // }
 
-    // JQuery method.
-    // $("#content").remove();
+    $("#name_req_div").remove();
+
+    // get [content] div
+    var content_div = $("#content");
+
+    var name_req_div = document.createElement('div');
+    name_req_div.id = "name_req_div";
+    content_div.append(name_req_div);
 }
 
 // create ConnectNodeDiv
 function createConnectNodeDiv() {
 
     // get [content] div
-    var content_div = $("#content");
+    var content_div = $("#name_req_div");
 
     // create [title] element
     var title = document.createElement('h2');
@@ -449,7 +459,7 @@ function createOBDResponseDiv(response, msgType) {
     $("#obd_response_div").remove();
 
     // get [content] div
-    var content_div = $("#content");
+    var content_div = $("#name_req_div");
 
     var obd_response_div = document.createElement('div');
     obd_response_div.id = "obd_response_div";
@@ -465,23 +475,32 @@ function createOBDResponseDiv(response, msgType) {
             break;
         case enumMsgType.MsgType_Mnemonic_CreateAddress_N200:
             parseDataN200(response);
+            saveData(response);
             break;
         case enumMsgType.MsgType_Mnemonic_GetAddressByIndex_201:
+            parseDataN200(response);
             break;
-
+        case enumMsgType.MsgType_UserLogin_1:
+            userID = response.substring(0, response.indexOf(' '));
+            showDefault(response);
+            break;
         default:
-            // create [result] element
-            var result = document.createElement('p');
-            result.setAttribute('style', 'word-break: break-all;white-space: normal;');
-            result.innerText = response;
-            obd_response_div.append(result);
+            showDefault(response);
             break;
     }
 }
 
+function showDefault(response) {
+    // create [result] element
+    var result = document.createElement('p');
+    result.setAttribute('style', 'word-break: break-all;white-space: normal;');
+    result.innerText = response;
+    obd_response_div.append(result);
+}
+
 //----------------------------------------------------------------
 // Functions of processing each response from invoke APIs.
-// parseDataN200 
+// parseDataN200 - getNewAddressWithMnemonic
 function parseDataN200(response) {
     // console.log('response wif = ' + response.wif);
     
@@ -520,6 +539,41 @@ function parseDataN200(response) {
     wif.setAttribute('style', 'word-break: break-all;white-space: normal;');
     wif.innerText = 'WIF : ' + response.wif;
     obd_response_div.append(wif);
+}
+
+// Address data generated with mnemonic save to local storage.
+function saveData(response) {
+
+    var addr = JSON.parse(localStorage.getItem('addr'));
+    // console.info('localStorage KEY  = ' + addr);
+
+    // Add new
+    if (addr) {
+        // console.info('HAS DATA');
+        let new_data = {
+            address: response.address,
+            index: response.index,
+            pub_key: response.pub_key,
+            wif: response.wif
+        }
+        addr.data.push(new_data);
+        window.localStorage.setItem('addr', JSON.stringify(addr));
+
+    } else {
+        // console.info('FIRST DATA');
+        let data = {
+            userID: userID,
+            data: [
+                {
+                    address: response.address,
+                    index: response.index,
+                    pub_key: response.pub_key,
+                    wif: response.wif
+                }
+            ]
+        }
+        window.localStorage.setItem('addr', JSON.stringify(data));
+    }
 }
 
 //----------------------------------------------------------------
