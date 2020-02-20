@@ -125,7 +125,7 @@ class ObdApi {
                 this.onCreateAddressByMnemonic(resultData);
                 break;
             case this.messageType.MsgType_Mnemonic_GetAddressByIndex_201:
-                this.onGetAddressByIndexByMnemonic(resultData);
+                this.onGetAddressInfo(resultData);
                 break;
             case this.messageType.MsgType_ChannelOpen_N32:
                 this.onOpenChannel(resultData);
@@ -357,7 +357,7 @@ class ObdApi {
      * @param index:number
      * @param callback function
      */
-    public getAddressByIndexByMnemonic(index: number, callback: Function) {
+    public getAddressInfo(index: number, callback: Function) {
         if(index==null||index<0){
             alert("error index");
             return;
@@ -368,7 +368,7 @@ class ObdApi {
         msg.data = index;
         this.sendData(msg, callback);
     }
-    public onGetAddressByIndexByMnemonic(jsonData: any) { }
+    public onGetAddressInfo(jsonData: any) { }
 
     /**
      * MsgType_ChannelOpen_N32
