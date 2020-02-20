@@ -1,0 +1,12 @@
+﻿{
+    "data": [
+        {
+            "id": " Mnemonic Words",
+            "description": "Mnemonic Words is used to login to OBD."
+        },
+        {
+            "id": "Addresses",
+            "description": "Addresses created with mnemonic from <User ID>."
+        }
+    ]
+}

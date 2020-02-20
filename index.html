@@ -15,10 +15,10 @@
     // invoked when page refresh.
     getUtilList();
     getAPIList();
+    getUserDataList();
 </script>
 
 <body>
-
     <!-- <div id="container" style="width:1440px"> -->
     <div id="container" style="width:device-width">
 
@@ -31,7 +31,7 @@
 
         <!-- Left Side Menu -->
         <div id="menu" style="background-color:#FFD700;
-            height:500px;width:220px;float:left;">
+            height:600px;width:220px;float:left;">
 
             <p style="font-family: Arial, Helvetica, sans-serif;
                 color: gray;">Start</p>
@@ -40,6 +40,14 @@
             <a href="#" onclick="connectNode()">Connect to OBD node</a>
 
             <br><br><br>
+
+            <!-- USER DATA LIST - Dynamic create -->
+            <p style="font-family: Arial, Helvetica, sans-serif;
+                color: gray;">User Data</p>
+
+            <div id="user_data_list"></div>
+
+            <br>
 
             <!-- APIs for Util - Dynamic create -->
             <p style="font-family: Arial, Helvetica, sans-serif;
@@ -58,7 +66,7 @@
 
         <!-- API invoked area, click left side menu to display. -->
         <div id="content" style="background-color:#EEEEEE;
-            height:500px;width:360px;float:left;">
+            height:600px;width:360px;float:left;">
 
             <!-- Dynamic create in 'common.js' -->
         </div>
@@ -71,5 +79,4 @@
         </div>
     </div>
 </body>
-
 </html>

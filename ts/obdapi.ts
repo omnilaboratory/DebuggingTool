@@ -245,7 +245,7 @@ class ObdApi {
      * MsgType_Core_GetNewAddress_1001
      * @param callback function
      */
-    public getNewAddressFromOmniCore(callback: Function) {
+    public getNewAddress(callback: Function) {
         let msg = new Message();
         msg.type = this.messageType.MsgType_Core_GetNewAddress_1001;
         this.sendData(msg, callback);
@@ -293,7 +293,7 @@ class ObdApi {
      * MsgType_Mnemonic_CreateAddress_N200
      * @param callback function
      */
-    public createAddressByMnemonic(callback: Function) {
+    public getNewAddressWithMnemonic(callback: Function) {
         let msg = new Message();
         msg.type = this.messageType.MsgType_Mnemonic_CreateAddress_N200;
         this.sendData(msg, callback);
@@ -305,7 +305,7 @@ class ObdApi {
      * @param index:number
      * @param callback function
      */
-    public getAddressByIndexByMnemonic(index: number, callback: Function) {
+    public getAddressInfo(index: number, callback: Function) {
         let msg = new Message();
         msg.type = this.messageType.MsgType_Mnemonic_GetAddressByIndex_201;
         msg.data = index;
