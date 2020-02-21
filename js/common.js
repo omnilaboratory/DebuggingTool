@@ -112,7 +112,7 @@ function getUserDataList() {
             apiItem.id = api_id;
             apiItem.href = '#';
             apiItem.setAttribute('description', description);
-            apiItem.setAttribute('onclick', 'callAPI(this)');
+            apiItem.setAttribute('onclick', 'displayUserData(this)');
             apiItem.innerText = api_id;
             apiList.append(apiItem);
 
@@ -171,10 +171,7 @@ function createLeftSideMenu(jsonFile, divName) {
 
 // Invoke a api, show content. Dynamic create content div area.
 function callAPI(obj) {
-
-    // First, delete children of 'content' div.
-    deleteContentDiv();
-
+    removeNameReqDiv();
     createApiNameDiv(obj);
     createRequestDiv(obj);
     createInputParamDiv(obj, 'json/util_list.json');
@@ -352,12 +349,12 @@ function createInvokeAPIButton(obj) {
 //----------------------------------------------------------------
 // For test to show Connect to OBD html page.
 function connectNode() {
-    deleteContentDiv();
+    removeNameReqDiv();
     createConnectNodeDiv();
 }
 
-// delete children of 'content' div
-function deleteContentDiv() {
+// remove name and request Div
+function removeNameReqDiv() {
 
     // var parent = document.getElementById('content');
     // var children_amount = parent.children.length;
@@ -475,7 +472,7 @@ function createOBDResponseDiv(response, msgType) {
             break;
         case enumMsgType.MsgType_Mnemonic_CreateAddress_N200:
             parseDataN200(response);
-            saveData(response);
+            saveAddrData(response);
             break;
         case enumMsgType.MsgType_Mnemonic_GetAddressByIndex_201:
             parseDataN200(response);
@@ -493,56 +490,63 @@ function createOBDResponseDiv(response, msgType) {
 function showDefault(response) {
     // create [result] element
     var result = document.createElement('p');
-    result.setAttribute('style', 'word-break: break-all;white-space: normal;');
     result.innerText = response;
     obd_response_div.append(result);
 }
 
 //----------------------------------------------------------------
 // Functions of processing each response from invoke APIs.
+
 // parseDataN200 - getNewAddressWithMnemonic
 function parseDataN200(response) {
     // console.log('response wif = ' + response.wif);
     
+    var arrData = [
+        'ADDRESS : ' + response.address,
+        'INDEX : '   + response.index,
+        'PUB_KEY : ' + response.pub_key,
+        'WIF : '     + response.wif
+    ];
+
+    var item;
+    for (let index = 0; index < arrData.length; index++) {
+        item = document.createElement('text');
+        item.innerText = arrData[index];
+        obd_response_div.append(item);
+        createHtmlElement(obd_response_div, 'p');
+    }
+
+    /*
     // create [address] element
     var address = document.createElement('text');
-    address.setAttribute('style', 'word-break: break-all;white-space: normal;');
     address.innerText = 'ADDRESS : ' + response.address;
     obd_response_div.append(address);
     
-    // create [p] element
-    var p = document.createElement('p');
-    obd_response_div.append(p);
+    createPElement();
     
     // create [index] element
     var index = document.createElement('text');
-    index.setAttribute('style', 'word-break: break-all;white-space: normal;');
     index.innerText = 'INDEX : ' + response.index;
     obd_response_div.append(index);
     
-    // create [p] element
-    var p = document.createElement('p');
-    obd_response_div.append(p);
+    createPElement();
     
     // create [pub_key] element
     var pub_key = document.createElement('text');
-    pub_key.setAttribute('style', 'word-break: break-all;white-space: normal;');
     pub_key.innerText = 'PUB_KEY : ' + response.pub_key;
     obd_response_div.append(pub_key);
     
-    // create [p] element
-    var p = document.createElement('p');
-    obd_response_div.append(p);
+    createPElement();
     
     // create [wif] element
     var wif = document.createElement('text');
-    wif.setAttribute('style', 'word-break: break-all;white-space: normal;');
     wif.innerText = 'WIF : ' + response.wif;
     obd_response_div.append(wif);
+    */
 }
 
 // Address data generated with mnemonic save to local storage.
-function saveData(response) {
+function saveAddrData(response) {
 
     var addr = JSON.parse(localStorage.getItem('addr'));
     // console.info('localStorage KEY  = ' + addr);
@@ -552,9 +556,9 @@ function saveData(response) {
         // console.info('HAS DATA');
         let new_data = {
             address: response.address,
-            index: response.index,
+            index:   response.index,
             pub_key: response.pub_key,
-            wif: response.wif
+            wif:     response.wif
         }
         addr.data.push(new_data);
         window.localStorage.setItem('addr', JSON.stringify(addr));
@@ -566,9 +570,9 @@ function saveData(response) {
             data: [
                 {
                     address: response.address,
-                    index: response.index,
+                    index:   response.index,
                     pub_key: response.pub_key,
-                    wif: response.wif
+                    wif:     response.wif
                 }
             ]
         }
@@ -592,4 +596,63 @@ function autoCreateMnemonic() {
         // $("#mnemonic").attr("value", e);
     });
 }
+
 //----------------------------------------------------------------
+// Functions of displayUserData.
+function displayUserData(obj) {
+    removeNameReqDiv();
+    createApiNameDiv(obj);
+    addrData();
+}
+
+//
+function addrData() {
+
+    var arrData, item;
+    var addr = JSON.parse(localStorage.getItem('addr'));
+    // console.info('localStorage KEY  = ' + addr);
+
+    // get [name_req_div] div
+    var parent = $("#name_req_div");
+
+    // If has data
+    if (addr) {
+        // userID
+        createHtmlElement(parent, 'text', addr.userID);
+        createHtmlElement(parent, 'p');
+
+        // title
+        createHtmlElement(parent, 'h2', 'Address List');
+        createHtmlElement(parent, 'p');
+
+        for (let index = 0; index < addr.data.length; index++) {
+            arrData = [
+                'ADDRESS : ' + addr.data[index].address,
+                'INDEX : '   + addr.data[index].index,
+                'PUB_KEY : ' + addr.data[index].pub_key,
+                'WIF : '     + addr.data[index].wif
+            ];
+        
+            // Display list NO.
+            createHtmlElement(parent, 'h4', 'NO. ' + (index + 1));
+            createHtmlElement(parent, 'p');
+
+            for (let index = 0; index < arrData.length; index++) {
+                createHtmlElement(parent, 'text', arrData[index]);
+                createHtmlElement(parent, 'br');
+            }
+        }
+    }
+}
+
+//----------------------------------------------------------------
+// Functions of Common Util.
+
+// create html elements
+function createHtmlElement(parent, elementName, myInnerText) {
+    var element = document.createElement(elementName);
+    if (myInnerText) {
+        element.innerText = myInnerText;
+    }
+    parent.append(element);
+}
