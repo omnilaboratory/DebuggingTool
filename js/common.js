@@ -68,7 +68,9 @@ function invokeAPIs(objSelf) {
             obdApi.logIn(mnemonic, function(e) {
                 console.info('OBD Response = ' + e);
                 isLogined = true;
-                userID    = e.substring(0, e.indexOf(' '));
+                if (e != 'already login') {
+                    userID = e.substring(0, e.indexOf(' '));
+                }
                 createOBDResponseDiv(e, msgType);
             });
             break;
@@ -610,16 +612,26 @@ function displayAddresses() {
                         createHtmlElement(parent, 'br');
                     }
                 }
-            }
+
+                return;
+            } 
         }
 
-    } else {  // NO DATA YET.
-        // userID
-        createHtmlElement(parent, 'text', userID);
-        createHtmlElement(parent, 'p');
-        // title
-        createHtmlElement(parent, 'h3', 'NO DATA YET.');
+        // The user has not create address yet.
+        displayNoData(parent);
+
+    } else {  // NO LOCAL STORAGE DATA YET.
+        displayNoData(parent);
     }
+}
+
+// 
+function displayNoData(parent) {
+    // userID
+    createHtmlElement(parent, 'text', userID);
+    createHtmlElement(parent, 'p');
+    // title
+    createHtmlElement(parent, 'h3', 'NO DATA YET.');
 }
 
 //----------------------------------------------------------------
