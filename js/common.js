@@ -4,11 +4,17 @@ var enumMsgType = new MessageType();
 // Save connection status.
 var isConnectToOBD = false;
 
+// Save login status.
+var isLogined = false;
+
 // Save userID already logined.
 var userID;
 
-//
-function onClickSend(objSelf) {
+// cssStyle
+var cssStyle = 'color:gray';
+
+// Invoke each APIs.
+function invokeAPIs(objSelf) {
     //为了测试
     // var msgType = parseInt($('#msgType').val());
     // console.info('msgType = ' + msgType);
@@ -61,6 +67,8 @@ function onClickSend(objSelf) {
 
             obdApi.logIn(mnemonic, function(e) {
                 console.info('OBD Response = ' + e);
+                isLogined = true;
+                userID    = e.substring(0, e.indexOf(' '));
                 createOBDResponseDiv(e, msgType);
             });
             break;
@@ -95,7 +103,7 @@ function onClickSend(objSelf) {
 // getUserDataList
 function getUserDataList() {
 
-    var api_id, description, apiItem, p;
+    var api_id, description, apiItem;
     var jsonFile = "json/user_data_list.json";
 
     // dynamic create api_list div.
@@ -104,7 +112,7 @@ function getUserDataList() {
         var apiList = $("#user_data_list");
 
         for (let index = 0; index < result.data.length; index++) {
-            api_id = result.data[index].id;
+            api_id      = result.data[index].id;
             description = result.data[index].description;
 
             // create [a] element
@@ -116,8 +124,7 @@ function getUserDataList() {
             apiItem.innerText = api_id;
             apiList.append(apiItem);
 
-            p = document.createElement('p');
-            apiList.append(p);
+            createHtmlElement(apiList, 'p');
         }
     });
 }
@@ -141,7 +148,7 @@ function getAPIList() {
 // createLeftSideMenu
 function createLeftSideMenu(jsonFile, divName) {
 
-    var api_id, type_id, description, apiItem, p;
+    var api_id, type_id, description, apiItem;
 
     // dynamic create api_list div.
     $.getJSON(jsonFile, function(result) {
@@ -149,8 +156,8 @@ function createLeftSideMenu(jsonFile, divName) {
         var apiList = $(divName);
 
         for (let index = 0; index < result.data.length; index++) {
-            api_id = result.data[index].id;
-            type_id = result.data[index].type_id;
+            api_id      = result.data[index].id;
+            type_id     = result.data[index].type_id;
             description = result.data[index].description;
 
             // create [a] element
@@ -163,8 +170,7 @@ function createLeftSideMenu(jsonFile, divName) {
             apiItem.innerText = api_id;
             apiList.append(apiItem);
 
-            p = document.createElement('p');
-            apiList.append(p);
+            createHtmlElement(apiList, 'p');
         }
     });
 }
@@ -186,14 +192,10 @@ function createApiNameDiv(obj) {
     var content_div = $("#name_req_div");
 
     // create [api_name] element
-    var api_name = document.createElement('h2');
-    api_name.innerText = obj.innerHTML;
-    content_div.append(api_name);
+    createHtmlElement(content_div, 'h2', obj.innerHTML);
 
     // create [api_description] element
-    var api_description = document.createElement('text');
-    api_description.innerText = obj.getAttribute("description");
-    content_div.append(api_description);
+    createHtmlElement(content_div, 'text', obj.getAttribute("description"));
 }
 
 // create 
@@ -203,27 +205,17 @@ function createRequestDiv(obj) {
     var content_div = $("#name_req_div");
 
     // create [title] element
-    var title = document.createElement('h2');
-    title.innerText = 'Request';
-    content_div.append(title);
-
+    createHtmlElement(content_div, 'h2', 'Request');
+    
     // create [func_title] element
-    var func_title = document.createElement('text');
-    func_title.setAttribute('style', 'color:gray');
-    func_title.innerText = 'func: ';
-    content_div.append(func_title);
-
+    createHtmlElement(content_div, 'text', 'func: ', cssStyle);
+    
     // create [func_name] element: id = JS function name.
-    var func_name = document.createElement('text');
-    func_name.innerText = obj.getAttribute("id");
-    content_div.append(func_name);
-
+    createHtmlElement(content_div, 'text', obj.getAttribute("id"));
+    
     // create [type_id] element
     var value = " type ( " + obj.getAttribute("type_id") + " )";
-    var type_id = document.createElement('text');
-    type_id.setAttribute('style', 'color:gray');
-    type_id.innerText = value;
-    content_div.append(type_id);
+    createHtmlElement(content_div, 'text', value, cssStyle);
 
     //-------------------------------
     // TEMP WILL BE DELETED - for GuoJun testing.
@@ -269,9 +261,7 @@ function createInputParamDiv(obj, jsonFile) {
                 }
 
                 // create [title] element
-                var top_title = document.createElement('p');
-                top_title.innerText = 'Input Parameters:';
-                content_div.append(top_title);
+                createHtmlElement(content_div, 'p', 'Input Parameters:');
 
                 // Parameters
                 createParamOfAPI(arrParams, content_div);
@@ -283,17 +273,11 @@ function createInputParamDiv(obj, jsonFile) {
 // create parameter of each API.
 function createParamOfAPI(arrParams, content_div) {
 
-    var param_title, input_box;
-
-    // get [content] div
-    // var content_div = $("#content");
+    var input_box;
 
     for (let index = 0; index < arrParams.length; index++) {
         // create [param_title] element
-        param_title = document.createElement('text');
-        param_title.setAttribute('style', 'color:gray');
-        param_title.innerText = arrParams[index].name + ' : ';
-        content_div.append(param_title);
+        createHtmlElement(content_div, 'text', arrParams[index].name + ' : ', cssStyle);
 
         // create [input box of param] element
         input_box = document.createElement('input');
@@ -310,11 +294,8 @@ function createButtonOfParam(arrParams, index, content_div) {
     var innerText, invokeFunc;
     var arrButtons = arrParams[index].buttons;
 
-    // get [content] div
-    // var content_div = $("#content");
-
     for (let index = 0; index < arrButtons.length; index++) {
-        innerText = arrButtons[index].innerText;
+        innerText  = arrButtons[index].innerText;
         invokeFunc = arrButtons[index].onclick;
 
         // create [button] element
@@ -330,20 +311,15 @@ function createInvokeAPIButton(obj) {
     // get [content] div
     var content_div = $("#name_req_div");
 
-    // console.info('send is = '+$("#send_button").val());
-
-    var p = document.createElement('p');
-    content_div.append(p);
+    createHtmlElement(content_div, 'p');
 
     // create [Send button] element
     var button = document.createElement('button');
     // button.id = 'send_button';
     button.setAttribute('type_id', obj.getAttribute("type_id"));
-    button.setAttribute('onclick', 'onClickSend(this)');
+    button.setAttribute('onclick', 'invokeAPIs(this)');
     button.innerText = 'Invoke API';
     content_div.append(button);
-    // if ($("#send_button").val() == undefined) {
-    // }
 }
 
 //----------------------------------------------------------------
@@ -384,21 +360,15 @@ function createConnectNodeDiv() {
     var content_div = $("#name_req_div");
 
     // create [title] element
-    var title = document.createElement('h2');
-    title.innerText = 'OBD Node';
-    content_div.append(title);
-
+    createHtmlElement(content_div, 'h2', 'OBD Node');
+    
     // create [input title] element
-    var input_title = document.createElement('text');
-    input_title.setAttribute('style', 'color:gray');
-    input_title.innerText = 'Node URL: ';
-    content_div.append(input_title);
+    createHtmlElement(content_div, 'text', 'Node URL: ', cssStyle);
 
     // create [input] element
     var node_url = document.createElement('input');
     node_url.id = 'node_url';
     node_url.style = 'width: 50%';
-    // node_url.setAttribute('style', 'color:gray');
     node_url.placeholder = 'Please input Node URL.';
     node_url.value = 'ws://127.0.0.1:60020/ws';
     content_div.append(node_url);
@@ -418,9 +388,7 @@ function createConnectNodeDiv() {
         button_connect.attr("disabled", "disabled");
 
         // create [status] element
-        var title = document.createElement('h3');
-        title.innerText = 'Already connected.';
-        content_div.append(title);
+        createHtmlElement(content_div, 'h3', 'Already connected.');
     }
 }
 
@@ -463,9 +431,7 @@ function createOBDResponseDiv(response, msgType) {
     content_div.append(obd_response_div);
 
     // create [title] element
-    var title = document.createElement('h2');
-    title.innerText = 'OBD Response';
-    obd_response_div.append(title);
+    createHtmlElement(obd_response_div, 'h2', 'OBD Response');
 
     switch (msgType) {
         case enumMsgType.MsgType_Core_GetNewAddress_1001:
@@ -478,20 +444,12 @@ function createOBDResponseDiv(response, msgType) {
             parseDataN200(response);
             break;
         case enumMsgType.MsgType_UserLogin_1:
-            userID = response.substring(0, response.indexOf(' '));
-            showDefault(response);
+            createHtmlElement(obd_response_div, 'p', response);
             break;
         default:
-            showDefault(response);
+            createHtmlElement(obd_response_div, 'p', response);
             break;
     }
-}
-
-function showDefault(response) {
-    // create [result] element
-    var result = document.createElement('p');
-    result.innerText = response;
-    obd_response_div.append(result);
 }
 
 //----------------------------------------------------------------
@@ -508,41 +466,10 @@ function parseDataN200(response) {
         'WIF : '     + response.wif
     ];
 
-    var item;
     for (let index = 0; index < arrData.length; index++) {
-        item = document.createElement('text');
-        item.innerText = arrData[index];
-        obd_response_div.append(item);
+        createHtmlElement(obd_response_div, 'text', arrData[index]);
         createHtmlElement(obd_response_div, 'p');
     }
-
-    /*
-    // create [address] element
-    var address = document.createElement('text');
-    address.innerText = 'ADDRESS : ' + response.address;
-    obd_response_div.append(address);
-    
-    createPElement();
-    
-    // create [index] element
-    var index = document.createElement('text');
-    index.innerText = 'INDEX : ' + response.index;
-    obd_response_div.append(index);
-    
-    createPElement();
-    
-    // create [pub_key] element
-    var pub_key = document.createElement('text');
-    pub_key.innerText = 'PUB_KEY : ' + response.pub_key;
-    obd_response_div.append(pub_key);
-    
-    createPElement();
-    
-    // create [wif] element
-    var wif = document.createElement('text');
-    wif.innerText = 'WIF : ' + response.wif;
-    obd_response_div.append(wif);
-    */
 }
 
 // Address data generated with mnemonic save to local storage.
@@ -551,21 +478,26 @@ function saveAddrData(response) {
     var addr = JSON.parse(localStorage.getItem('addr'));
     // console.info('localStorage KEY  = ' + addr);
 
-    // Add new
+    // If has data.
     if (addr) {
         // console.info('HAS DATA');
-        let new_data = {
-            address: response.address,
-            index:   response.index,
-            pub_key: response.pub_key,
-            wif:     response.wif
+        for (let i = 0; i < addr.result.length; i++) {
+            if (userID === addr.result[i].userID) {
+                // Add new dato to 
+                let new_data = {
+                    address: response.address,
+                    index:   response.index,
+                    pub_key: response.pub_key,
+                    wif:     response.wif
+                }
+                addr.result[i].data.push(new_data);
+                window.localStorage.setItem('addr', JSON.stringify(addr));
+                return;
+            }
         }
-        addr.data.push(new_data);
-        window.localStorage.setItem('addr', JSON.stringify(addr));
 
-    } else {
-        // console.info('FIRST DATA');
-        let data = {
+        // A new User ID.
+        let new_data = {
             userID: userID,
             data: [
                 {
@@ -573,6 +505,26 @@ function saveAddrData(response) {
                     index:   response.index,
                     pub_key: response.pub_key,
                     wif:     response.wif
+                }
+            ]
+        }
+        addr.result.push(new_data);
+        window.localStorage.setItem('addr', JSON.stringify(addr));
+
+    } else {
+        // console.info('FIRST DATA');
+        let data = {
+            result: [
+                {
+                    userID: userID,
+                    data: [
+                        {
+                            address: response.address,
+                            index:   response.index,
+                            pub_key: response.pub_key,
+                            wif:     response.wif
+                        }
+                    ]
                 }
             ]
         }
@@ -602,46 +554,71 @@ function autoCreateMnemonic() {
 function displayUserData(obj) {
     removeNameReqDiv();
     createApiNameDiv(obj);
-    addrData();
+
+    switch (obj.id) {
+        case 'Mnemonic Words':
+            console.info('Mnemonic Words');
+            break;
+        case 'Addresses':
+            displayAddresses();
+            break;
+        default:
+            break;
+    }
 }
 
 //
-function addrData() {
+function displayAddresses() {
+    // get [name_req_div] div
+    var parent = $("#name_req_div");
+    
+    if (!isLogined) { // Not login.
+        createHtmlElement(parent, 'text', 'NO USER LOGINED.');
+        return;
+    }
 
-    var arrData, item;
+    var arrData;
     var addr = JSON.parse(localStorage.getItem('addr'));
     // console.info('localStorage KEY  = ' + addr);
 
-    // get [name_req_div] div
-    var parent = $("#name_req_div");
-
     // If has data
     if (addr) {
-        // userID
-        createHtmlElement(parent, 'text', addr.userID);
-        createHtmlElement(parent, 'p');
-
-        // title
-        createHtmlElement(parent, 'h2', 'Address List');
-        createHtmlElement(parent, 'p');
-
-        for (let index = 0; index < addr.data.length; index++) {
-            arrData = [
-                'ADDRESS : ' + addr.data[index].address,
-                'INDEX : '   + addr.data[index].index,
-                'PUB_KEY : ' + addr.data[index].pub_key,
-                'WIF : '     + addr.data[index].wif
-            ];
+        for (let i = 0; i < addr.result.length; i++) {
+            if (userID === addr.result[i].userID) {
+                // userID
+                createHtmlElement(parent, 'text', addr.result[i].userID);
+                createHtmlElement(parent, 'p');
         
-            // Display list NO.
-            createHtmlElement(parent, 'h4', 'NO. ' + (index + 1));
-            createHtmlElement(parent, 'p');
-
-            for (let index = 0; index < arrData.length; index++) {
-                createHtmlElement(parent, 'text', arrData[index]);
-                createHtmlElement(parent, 'br');
+                // title
+                createHtmlElement(parent, 'h2', 'Address List');
+                createHtmlElement(parent, 'p');
+        
+                for (let i2 = 0; i2 < addr.result[i].data.length; i2++) {
+                    arrData = [
+                        'ADDRESS : ' + addr.result[i].data[i2].address,
+                        'INDEX : '   + addr.result[i].data[i2].index,
+                        'PUB_KEY : ' + addr.result[i].data[i2].pub_key,
+                        'WIF : '     + addr.result[i].data[i2].wif
+                    ];
+                
+                    // Display list NO.
+                    createHtmlElement(parent, 'h4', 'NO. ' + (i2 + 1));
+                    createHtmlElement(parent, 'p');
+        
+                    for (let i3 = 0; i3 < arrData.length; i3++) {
+                        createHtmlElement(parent, 'text', arrData[i3]);
+                        createHtmlElement(parent, 'br');
+                    }
+                }
             }
         }
+
+    } else {  // NO DATA YET.
+        // userID
+        createHtmlElement(parent, 'text', userID);
+        createHtmlElement(parent, 'p');
+        // title
+        createHtmlElement(parent, 'h3', 'NO DATA YET.');
     }
 }
 
@@ -649,10 +626,17 @@ function addrData() {
 // Functions of Common Util.
 
 // create html elements
-function createHtmlElement(parent, elementName, myInnerText) {
+function createHtmlElement(parent, elementName, myInnerText, cssStyle) {
+
     var element = document.createElement(elementName);
+
     if (myInnerText) {
         element.innerText = myInnerText;
     }
+
+    if (cssStyle) {
+        element.setAttribute('style', cssStyle);
+    }
+
     parent.append(element);
 }
