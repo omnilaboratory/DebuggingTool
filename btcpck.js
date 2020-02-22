@@ -7,6 +7,10 @@ function generateMnemonic(size = 128) {
     return bip39.generateMnemonic(size);
 }
 
+function validateMnemonic(mnemonic) {
+    return bip39.validateMnemonic(mnemonic);
+}
+
 function generateWalletInfo(mnemonic, index, isTestNet = false) {
     let seedHex = btctool.bip39.mnemonicToSeedSync(mnemonic, "");
     let root = btctool.bip32.fromSeed(seedHex);
@@ -35,5 +39,6 @@ module.exports = {
     bip39,
     bip32,
     generateMnemonic,
+    validateMnemonic,
     generateWalletInfo
 }

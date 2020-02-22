@@ -1,13 +1,14 @@
  http://fibjs.org/docs/awesome/module/bitcoinjs-lib.md.html
  npm install bitcoinjs-lib
-https://www.npmjs.com/package/bip39
-npm install bip39
+ https://www.npmjs.com/package/bip39
+ npm install bip39
 
-bip39 助记词列表E:\webpro\DebuggingTool\node_modules\bip39\src\_wordlists.js 删除除了英语的助记词，中文支付转码报错
+ bip39 助记词列表E:\webpro\DebuggingTool\node_modules\bip39\src\_wordlists.js 删除除了英语的助记词，中文字符转码报错
+
  步骤：
  1、在 btcpck.js里面写文件
  2、browserify成btctool.js 给html用，我的理解是，把nodejs的语法转换为纯js的语法
- browserify btcpck.js --standalone btctool > ./js/btctool.js
+    browserify btcpck.js --standalone btctool > ./js/btctool.js
  3、在html里面调用 btctool.js的方法， btctool 作为模块名称
 
  验证
