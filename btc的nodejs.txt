@@ -1,0 +1,10 @@
+ http://fibjs.org/docs/awesome/module/bitcoinjs-lib.md.html
+ 
+ 步骤：
+ 1、在 btcpck.js里面写文件
+ 2、browserify成btctool.js 给html用，我的理解是，把nodejs的语法转换为纯js的语法
+ browserify btcpck.js --standalone btctool > btctool.js
+ 3、在html里面调用 btctool.js的方法， btctool 作为模块名称
+
+ 验证
+ https://iancoleman.io/bip39/

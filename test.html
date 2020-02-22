@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Test</title>
+    <script src="https://lib.sinaapp.com/js/jquery/2.0.2/jquery-2.0.2.min.js"></script>
+    <script src="js/btctool.js"></script>
+    <style>
+        #testBtn {
+            width: 120px;
+            height: 60px;
+            margin-top: 300px;
+            margin-left: 300px;
+        }
+    </style>
+
+</head>
+
+<body>
+    <div>
+        <button id="testBtn">点击</button>
+    </div>
+    <script>
+        $(function() {
+            btnNode = $("#testBtn");
+            btnNode.on("click", clickTestBtn);
+        });
+
+        function clickTestBtn() {
+            console.info("click");
+            var mnemonic = btctool.generateMnemonic(256);
+            console.info(mnemonic);
+            mnemonic = "shrug interest tiny social benefit better drink movie negative loud crime cattle undo fan toss inmate sock tree february picnic rescue flower tuition forum";
+            var info = btctool.generateWalletInfo(mnemonic, 100, false);
+            console.info(info);
+        }
+    </script>
+</body>
+
+</html>
