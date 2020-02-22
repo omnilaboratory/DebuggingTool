@@ -9,9 +9,7 @@ function generateMnemonic(size = 128) {
 
 function generateWalletInfo(mnemonic, index, isTestNet = false) {
     let seedHex = btctool.bip39.mnemonicToSeedSync(mnemonic, "");
-    console.info('seed: ', seedHex);
     let root = btctool.bip32.fromSeed(seedHex);
-    console.info(root);
     let child0 = root.derivePath("m/44'/0'/0'/0/" + index);
     let network = btctool.bitcoin.networks.bitcoin;
     networkName = "bitcoin"
