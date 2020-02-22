@@ -12,22 +12,26 @@ function validateMnemonic(mnemonic) {
 }
 
 function generateWalletInfo(mnemonic, index, isTestNet = false) {
-    let seedHex = btctool.bip39.mnemonicToSeedSync(mnemonic, "");
-    let root = btctool.bip32.fromSeed(seedHex);
+    if (validateMnemonic(mnemonic) == false) {
+        console.info("error mnemonic:", JSON.stringify(mnemonic));
+        return null;
+    }
+    let seedHex = bip39.mnemonicToSeedSync(mnemonic, "");
+    let root = bip32.fromSeed(seedHex);
     let child0 = root.derivePath("m/44'/0'/0'/0/" + index);
-    let network = btctool.bitcoin.networks.bitcoin;
+    let network = bitcoin.networks.bitcoin;
     networkName = "bitcoin"
     if (isTestNet) {
         child0 = root.derivePath("m/44'/1'/0'/0/" + index);
-        network = btctool.bitcoin.networks.testnet;
+        network = bitcoin.networks.testnet;
         networkName = "testnet"
     }
-    let keyPair = btctool.bitcoin.ECPair.fromPrivateKey(child0.privateKey, {
+    let keyPair = bitcoin.ECPair.fromPrivateKey(child0.privateKey, {
         compressed: true,
         network: network
     });
 
-    let walletAddress = btctool.bitcoin.payments.p2pkh({
+    let walletAddress = bitcoin.payments.p2pkh({
         pubkey: child0.publicKey,
         network
     }).address;
