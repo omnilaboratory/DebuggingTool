@@ -30,10 +30,6 @@ function generateWalletInfo(mnemonic, index, isTestNet = false) {
     return { "index": index, "address": walletAddress, "pubkey": child0.publicKey.toString("hex"), "wif": keyPair.toWIF(), "network": networkName };
 }
 
-function generateMnemonic() {
-    return bip39.generateMnemonic(256);
-}
-
 module.exports = {
     bitcoin,
     bip39,

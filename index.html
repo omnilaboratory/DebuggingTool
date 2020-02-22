@@ -14,10 +14,11 @@
 
 <script>
     /* test mnemonic */
+
     var mnemonic = btctool.generateMnemonic(256);
     console.info(mnemonic);
     mnemonic = "shrug interest tiny social benefit better drink movie negative loud crime cattle undo fan toss inmate sock tree february picnic rescue flower tuition forum";
-    var info = btctool.generateWalletInfo(mnemonic, 100, false);
+    var info = btctool.generateWalletInfo(mnemonic, 1, false);
     console.info(info);
 
 
