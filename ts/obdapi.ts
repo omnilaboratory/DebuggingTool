@@ -74,7 +74,7 @@ class ObdApi {
             return;
         }
 
-        console.info(
+        console.info(new Date(),
             "----------------------------send msg------------------------------"
         );
         console.info(msg);
@@ -97,12 +97,20 @@ class ObdApi {
             this.globalCallback(resultData);
         }
 
-        console.info(
+        console.info(new Date(),
             "----------------------------get msg from server--------------------"
         );
 
         let callback = this.callbackMap[jsonData.type];
         if (callback != null) {
+            if(jsonData.type==this.messageType.MsgType_UserLogin_1){
+                if(jsonData.to=="all"){
+                    return;
+                }
+                if(jsonData.to!="all"){
+                    resultData = jsonData.to;
+                }
+            }
             callback(resultData);
             this.callbackMap.delete(jsonData.type);
         }
