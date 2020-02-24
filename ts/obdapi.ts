@@ -6,6 +6,8 @@ class ObdApi {
     private defaultAddress = "ws://127.0.0.1:60020/ws";
     private ws: WebSocket;
 
+    private globalCallback: Function;
+
     private callbackMap: Map<number, Function> = new Map<number, Function>();
 
     /**
@@ -13,7 +15,7 @@ class ObdApi {
      * @param address string
      * @param callback function
      */
-    public connectToServer(address: string, callback: Function) {
+    public connectToServer(address: string, callback: Function, globalCallback: Function) {
         if (this.isConnectToOBD == true) {
             console.info("already connect");
             if(callback){
@@ -21,6 +23,8 @@ class ObdApi {
             }
             return;
         }
+
+        this.globalCallback = globalCallback;
 
         if (address != null && address.length > 0) {
             this.defaultAddress = address;
@@ -89,6 +93,10 @@ class ObdApi {
         }
 
         let resultData = jsonData.result;
+        if(this.globalCallback){
+            this.globalCallback(resultData);
+        }
+
         console.info(
             "----------------------------get msg from server--------------------"
         );
