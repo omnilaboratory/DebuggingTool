@@ -93,6 +93,9 @@ class ObdApi {
         }
 
         let resultData = jsonData.result;
+        if (jsonData.type == this.messageType.MsgType_Error_0) {
+            resultData =jsonData.data ;
+        }
         if(this.globalCallback){
             this.globalCallback(resultData);
         }
@@ -101,25 +104,22 @@ class ObdApi {
             "----------------------------get msg from server--------------------"
         );
 
+        if(jsonData.from!=jsonData.to){
+            return;
+        }
+
         let callback = this.callbackMap[jsonData.type];
         if (callback != null) {
             this.callbackMap.delete(jsonData.type);
             if(jsonData.type==this.messageType.MsgType_UserLogin_1){
                 resultData = jsonData.from+" "+jsonData.result;
-                if(jsonData.from==jsonData.to){
-                    callback(resultData);
-                }
-            }else{
-                callback(resultData);
             }
-            
+            callback(resultData);
         }
 
         switch (jsonData.type) {
             case this.messageType.MsgType_UserLogin_1:
-                if(jsonData.from==jsonData.to){
-                    this.onLogIn(resultData);
-                }
+                this.onLogIn(resultData);
                 break;
             case this.messageType.MsgType_UserLogout_2:
                 this.onLogout(resultData);
