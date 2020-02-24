@@ -88,9 +88,11 @@ class ObdApi {
             this.callbackMap.delete(jsonData.type);
             if (jsonData.type == this.messageType.MsgType_UserLogin_1) {
                 if (jsonData.to == "all") {
-                    return;
+                    resultData = jsonData.to + " login";
                 }
-                resultData = jsonData.to;
+                else {
+                    resultData = jsonData.to + " login success";
+                }
             }
             callback(resultData);
         }
