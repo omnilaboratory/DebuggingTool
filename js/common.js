@@ -7,11 +7,14 @@ var isConnectToOBD = false;
 // Save login status.
 var isLogined = false;
 
-// Save userID already logined.
-var userID;
+// Save userID of a user already logined.
+let userID;
 
 // cssStyle
 var cssStyle = 'color:gray';
+
+// save OBD messages
+var obdMessages = '';
 
 // Invoke each APIs.
 function invokeAPIs(objSelf) {
@@ -34,6 +37,7 @@ function invokeAPIs(objSelf) {
         case enumMsgType.MsgType_Mnemonic_CreateAddress_N200:
             obdApi.getNewAddressWithMnemonic(function(e) {
                 console.info('OBD Response = ' + e);
+                saveAddrData(e);
                 createOBDResponseDiv(e, msgType);
             });
             break;
@@ -58,7 +62,7 @@ function invokeAPIs(objSelf) {
         case enumMsgType.MsgType_UserLogin_1:
 
             var mnemonic = $("#mnemonic").val();
-            console.info('mnemonic = ' + mnemonic);
+            // console.info('mnemonic = ' + mnemonic);
 
             if (mnemonic === '') {
                 alert('Please input a valid mnemonic.');
@@ -67,10 +71,21 @@ function invokeAPIs(objSelf) {
 
             obdApi.logIn(mnemonic, function(e) {
                 console.info('OBD Response = ' + e);
-                isLogined = true;
-                if (e != 'already login') {
-                    userID = e.substring(0, e.indexOf(' '));
+                displayOBDMessages(e);
+
+                // If already logined, then stop listening to OBD Response,
+                // DO NOT update the userID.
+                if (isLogined) {
+                    createOBDResponseDiv(e, msgType);
+                    return;
                 }
+
+                // Otherwise, a new loginning, update the userID.
+                isLogined = true;
+                // if (e != 'already login') {
+                //     userID = e.substring(0, e.indexOf(' '));
+                // }
+                userID = e.substring(0, e.indexOf(' '));
                 createOBDResponseDiv(e, msgType);
             });
             break;
@@ -82,6 +97,7 @@ function invokeAPIs(objSelf) {
         case enumMsgType.MsgType_GetMnemonic_101:
             obdApi.signUp(function(e) {
                 console.info('OBD Response = ' + e);
+                saveMnemonicData(e);
                 createOBDResponseDiv(e);
             });
             break;
@@ -100,6 +116,16 @@ function invokeAPIs(objSelf) {
             break;
     }
 
+}
+
+// 
+function displayOBDMessages(content) {
+    // Some case do not need displayed.
+    if (content === 'already login') return;
+
+    obdMessages += content + '\n\n';
+    // var obd_messages = $("#obd_messages");
+    $("#obd_messages").val(obdMessages);
 }
 
 // getUserDataList
@@ -384,12 +410,7 @@ function createConnectNodeDiv() {
 
     // already connected
     if (isConnectToOBD === true) {
-        // get [button_connect] div
-        var button_connect = $("#button_connect");
-        button_connect.text("Disconnect");
-        button_connect.attr("disabled", "disabled");
-
-        // create [status] element
+        changeConnectButtonStatus();
         createHtmlElement(content_div, 'h3', 'Already connected.');
     }
 }
@@ -407,17 +428,17 @@ function connectToServer() {
 
     obdApi.connectToServer(node_url, function(response) {
         console.info('OBD Response = ' + response);
-        // Create OBD Response div area.
         createOBDResponseDiv(response);
         isConnectToOBD = true; // already connected.
-        
-        // Change the [button_connect] status.
-        // get [button_connect] div
-        var button_connect = $("#button_connect");
-        // $("#button_connect").text("Disconnect");
-        button_connect.text("Disconnect");
-        button_connect.attr("disabled", "disabled");
+        changeConnectButtonStatus();
     });
+}
+
+//
+function changeConnectButtonStatus() {
+    var button_connect = $("#button_connect");
+    button_connect.text("Disconnect");
+    button_connect.attr("disabled", "disabled");
 }
 
 // createOBDResponseDiv 
@@ -436,17 +457,9 @@ function createOBDResponseDiv(response, msgType) {
     createHtmlElement(obd_response_div, 'h2', 'OBD Response');
 
     switch (msgType) {
-        case enumMsgType.MsgType_Core_GetNewAddress_1001:
-            break;
         case enumMsgType.MsgType_Mnemonic_CreateAddress_N200:
-            parseDataN200(response);
-            saveAddrData(response);
-            break;
         case enumMsgType.MsgType_Mnemonic_GetAddressByIndex_201:
             parseDataN200(response);
-            break;
-        case enumMsgType.MsgType_UserLogin_1:
-            createHtmlElement(obd_response_div, 'p', response);
             break;
         default:
             createHtmlElement(obd_response_div, 'p', response);
@@ -534,6 +547,34 @@ function saveAddrData(response) {
     }
 }
 
+// mnemonic words generated with signUp api save to local storage.
+function saveMnemonicData(response) {
+
+    var mnemonic = JSON.parse(localStorage.getItem('mnemonic'));
+    // console.info('localStorage KEY  = ' + addr);
+
+    // If has data.
+    if (mnemonic) {
+        // console.info('HAS DATA');
+        let new_data = {
+            mnemonic: response,
+        }
+        mnemonic.result.push(new_data);
+        window.localStorage.setItem('mnemonic', JSON.stringify(mnemonic));
+
+    } else {
+        // console.info('FIRST DATA');
+        let data = {
+            result: [
+                {
+                    mnemonic: response
+                }
+            ]
+        }
+        window.localStorage.setItem('mnemonic', JSON.stringify(data));
+    }
+}
+
 //----------------------------------------------------------------
 // Functions of buttons.
 function invokeSignUp() {
@@ -559,13 +600,35 @@ function displayUserData(obj) {
 
     switch (obj.id) {
         case 'Mnemonic Words':
-            console.info('Mnemonic Words');
+            // console.info('Mnemonic Words');
+            displayMnemonic();
             break;
         case 'Addresses':
             displayAddresses();
             break;
         default:
             break;
+    }
+}
+
+//
+function displayMnemonic() {
+    // get [name_req_div] div
+    var parent = $("#name_req_div");
+    var mnemonic = JSON.parse(localStorage.getItem('mnemonic'));
+    // console.info('localStorage KEY  = ' + addr);
+
+    // If has data
+    if (mnemonic) {
+        for (let i = 0; i < mnemonic.result.length; i++) {
+            // Display list NO.
+            createHtmlElement(parent, 'h4', 'NO. ' + (i + 1));
+            // createHtmlElement(parent, 'p');
+            createHtmlElement(parent, 'text', mnemonic.result[i].mnemonic);
+            // createHtmlElement(parent, 'p');
+        }
+    } else {  // NO LOCAL STORAGE DATA YET.
+        createHtmlElement(parent, 'h3', 'NO DATA YET.');
     }
 }
 
@@ -589,11 +652,11 @@ function displayAddresses() {
             if (userID === addr.result[i].userID) {
                 // userID
                 createHtmlElement(parent, 'text', addr.result[i].userID);
-                createHtmlElement(parent, 'p');
+                // createHtmlElement(parent, 'p');
         
                 // title
                 createHtmlElement(parent, 'h2', 'Address List');
-                createHtmlElement(parent, 'p');
+                // createHtmlElement(parent, 'p');
         
                 for (let i2 = 0; i2 < addr.result[i].data.length; i2++) {
                     arrData = [
@@ -605,7 +668,7 @@ function displayAddresses() {
                 
                     // Display list NO.
                     createHtmlElement(parent, 'h4', 'NO. ' + (i2 + 1));
-                    createHtmlElement(parent, 'p');
+                    // createHtmlElement(parent, 'p');
         
                     for (let i3 = 0; i3 < arrData.length; i3++) {
                         createHtmlElement(parent, 'text', arrData[i3]);
@@ -629,7 +692,7 @@ function displayAddresses() {
 function displayNoData(parent) {
     // userID
     createHtmlElement(parent, 'text', userID);
-    createHtmlElement(parent, 'p');
+    // createHtmlElement(parent, 'p');
     // title
     createHtmlElement(parent, 'h3', 'NO DATA YET.');
 }
