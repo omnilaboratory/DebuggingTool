@@ -86,6 +86,7 @@ class ObdApi {
         let callback = this.callbackMap[jsonData.type];
         if (callback != null) {
             callback(resultData);
+            this.callbackMap.delete(jsonData.type);
         }
         switch (jsonData.type) {
             case this.messageType.MsgType_UserLogin_1:
