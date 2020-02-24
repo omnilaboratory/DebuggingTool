@@ -105,19 +105,21 @@ class ObdApi {
         if (callback != null) {
             this.callbackMap.delete(jsonData.type);
             if(jsonData.type==this.messageType.MsgType_UserLogin_1){
-                if(jsonData.to=="all"){
-                    resultData = jsonData.from+" login";
-                }else{
-                    resultData = jsonData.from+" login success";
+                resultData = jsonData.from+" "+jsonData.result;
+                if(jsonData.from==jsonData.to){
+                    callback(resultData);
                 }
+            }else{
+                callback(resultData);
             }
             
-            callback(resultData);
         }
 
         switch (jsonData.type) {
             case this.messageType.MsgType_UserLogin_1:
-                this.onLogIn(resultData);
+                if(jsonData.from==jsonData.to){
+                    this.onLogIn(resultData);
+                }
                 break;
             case this.messageType.MsgType_UserLogout_2:
                 this.onLogout(resultData);
@@ -232,7 +234,9 @@ class ObdApi {
         this.sendData(msg, callback);
     }
     public onLogIn(resultData: any) {
-        this.isLogin = true;
+        if (this.isLogin==false) {
+            this.isLogin = true;
+        }
     }
 
     /**
