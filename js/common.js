@@ -121,7 +121,7 @@ function invokeAPIs(objSelf) {
 // 
 function displayOBDMessages(content) {
     // Some case do not need displayed.
-    if (content === 'already login') return;
+    if (content === 'already login' || 'undefined') return;
 
     obdMessages += content + '\n\n';
     // var obd_messages = $("#obd_messages");
