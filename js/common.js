@@ -71,7 +71,7 @@ function invokeAPIs(objSelf) {
 
             obdApi.logIn(mnemonic, function(e) {
                 console.info('OBD Response = ' + e);
-                displayOBDMessages(e);
+                // displayOBDMessages(e);
 
                 // If already logined, then stop listening to OBD Response,
                 // DO NOT update the userID.
@@ -404,7 +404,7 @@ function createConnectNodeDiv() {
     // create [button] element
     var button = document.createElement('button');
     button.id = 'button_connect';
-    button.setAttribute('onclick', 'connectToServer()');
+    button.setAttribute('onclick', 'clickConnectButton()');
     button.innerText = 'Connect';
     content_div.append(button);
 
@@ -416,7 +416,7 @@ function createConnectNodeDiv() {
 }
 
 // 
-function connectToServer() {
+function clickConnectButton() {
     // get [node_url] input box value.
     var node_url = $("#node_url").val();
     console.info('node url = ' + node_url);
@@ -431,6 +431,9 @@ function connectToServer() {
         createOBDResponseDiv(response);
         isConnectToOBD = true; // already connected.
         changeConnectButtonStatus();
+
+    }, function(globalResponse) {
+        displayOBDMessages(globalResponse);
     });
 }
 
