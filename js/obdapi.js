@@ -85,6 +85,7 @@ class ObdApi {
         console.info(new Date(), "----------------------------get msg from server--------------------");
         let callback = this.callbackMap[jsonData.type];
         if (callback != null) {
+            this.callbackMap.delete(jsonData.type);
             if (jsonData.type == this.messageType.MsgType_UserLogin_1) {
                 if (jsonData.to == "all") {
                     return;
@@ -92,7 +93,6 @@ class ObdApi {
                 resultData = jsonData.to;
             }
             callback(resultData);
-            this.callbackMap.delete(jsonData.type);
         }
         switch (jsonData.type) {
             case this.messageType.MsgType_UserLogin_1:
