@@ -34,9 +34,9 @@ class ObdApi {
         try {
             this.ws = new WebSocket(this.defaultAddress);
             this.ws.onopen = () => {
-                console.info("connect succss");
+                console.info("connect success");
                 if (callback != null) {
-                    callback("connect succss");
+                    callback("connect success");
                 }
                 this.isConnectToOBD = true;
             };
@@ -105,11 +105,9 @@ class ObdApi {
         if (callback != null) {
             if(jsonData.type==this.messageType.MsgType_UserLogin_1){
                 if(jsonData.to=="all"){
-                    return;
+                    return
                 }
-                if(jsonData.to!="all"){
-                    resultData = jsonData.to;
-                }
+                resultData = jsonData.to;
             }
             callback(resultData);
             this.callbackMap.delete(jsonData.type);
