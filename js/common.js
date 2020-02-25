@@ -27,8 +27,8 @@ function getNewAddressWithMnemonic() {
     }
 
     var newIndex = getNewAddrIndex();
-    console.info('mnemonicWithLogined = ' + mnemonicWithLogined);
-    console.info('addr index = ' + newIndex);
+    // console.info('mnemonicWithLogined = ' + mnemonicWithLogined);
+    // console.info('addr index = ' + newIndex);
     
     // True: testnet  False: mainnet
     var result = btctool.generateWalletInfo(mnemonicWithLogined, newIndex, true);
@@ -38,7 +38,7 @@ function getNewAddressWithMnemonic() {
 }
 
 // getAddressInfo by local js library
-function getAddressInfo(msgType) {
+function getAddressInfo() {
     if (!isLogined) { // Not logined
         alert('Please login first.');
         return '';
@@ -518,13 +518,11 @@ function createOBDResponseDiv(response, msgType) {
 
 // parseDataN200 - getNewAddressWithMnemonic
 function parseDataN200(response) {
-    // console.log('response wif = ' + response.wif);
-
     var arrData = [
-        'ADDRESS : ' + response.address,
-        'INDEX : ' + response.index,
-        'PUB_KEY : ' + response.pubkey,
-        'WIF : ' + response.wif
+        'ADDRESS : ' + response.result.address,
+        'INDEX : '   + response.result.index,
+        'PUB_KEY : ' + response.result.pubkey,
+        'WIF : '     + response.result.wif
     ];
 
     for (let index = 0; index < arrData.length; index++) {
@@ -572,10 +570,10 @@ function saveAddrData(response) {
             if (userID === addr.result[i].userID) {
                 // Add new dato to 
                 let new_data = {
-                    address: response.address,
-                    index: response.index,
-                    pubkey: response.pubkey,
-                    wif: response.wif
+                    address: response.result.address,
+                    index:   response.result.index,
+                    pubkey:  response.result.pubkey,
+                    wif:     response.result.wif
                 }
                 addr.result[i].data.push(new_data);
                 window.localStorage.setItem('addr', JSON.stringify(addr));
@@ -587,10 +585,10 @@ function saveAddrData(response) {
         let new_data = {
             userID: userID,
             data: [{
-                address: response.address,
-                index: response.index,
-                pubkey: response.pubkey,
-                wif: response.wif
+                address: response.result.address,
+                index:   response.result.index,
+                pubkey:  response.result.pubkey,
+                wif:     response.result.wif
             }]
         }
         addr.result.push(new_data);
@@ -602,10 +600,10 @@ function saveAddrData(response) {
             result: [{
                 userID: userID,
                 data: [{
-                    address: response.address,
-                    index: response.index,
-                    pubkey: response.pubkey,
-                    wif: response.wif
+                    address: response.result.address,
+                    index:   response.result.index,
+                    pubkey:  response.result.pubkey,
+                    wif:     response.result.wif
                 }]
             }]
         }
@@ -680,7 +678,7 @@ function autoCreateMnemonic() {
 function autoCreateFundingPubkey() {
     var result = getNewAddressWithMnemonic();
     if (result === '') return;
-    $("#funding_pubkey").val(result.pubkey);
+    $("#funding_pubkey").val(result.result.pubkey);
     saveAddrData(result);
 
     // obdApi.getNewAddressWithMnemonic(function(e) {
@@ -762,9 +760,9 @@ function displayAddresses() {
                 for (let i2 = 0; i2 < addr.result[i].data.length; i2++) {
                     arrData = [
                         'ADDRESS : ' + addr.result[i].data[i2].address,
-                        'INDEX : ' + addr.result[i].data[i2].index,
+                        'INDEX : '   + addr.result[i].data[i2].index,
                         'PUB_KEY : ' + addr.result[i].data[i2].pubkey,
-                        'WIF : ' + addr.result[i].data[i2].wif
+                        'WIF : '     + addr.result[i].data[i2].wif
                     ];
 
                     // Display list NO.
