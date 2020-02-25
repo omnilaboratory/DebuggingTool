@@ -16,13 +16,52 @@ var cssStyle = 'color:gray';
 // save OBD messages
 var obdMessages = '';
 
+// mnemonic using for login
+var mnemonicWithLogined = '';
+
+// getNewAddressWithMnemonic by local js library
+function getNewAddressWithMnemonic() {
+    if (!isLogined) { // Not logined
+        alert('Please login first.');
+        return '';
+    }
+
+    var newIndex = getNewAddrIndex();
+    console.info('mnemonicWithLogined = ' + mnemonicWithLogined);
+    console.info('addr index = ' + newIndex);
+    
+    // True: testnet  False: mainnet
+    var result = btctool.generateWalletInfo(mnemonicWithLogined, newIndex, true);
+    console.info('local addr data = ' + JSON.stringify(result));
+
+    return result;
+}
+
+// getAddressInfo by local js library
+function getAddressInfo(msgType) {
+    if (!isLogined) { // Not logined
+        alert('Please login first.');
+        return '';
+    }
+
+    var index = $("#index").val();
+    console.info('index = ' + index);
+
+    if (index.trim() === '') {
+        alert('Please input a valid index of address.');
+        return '';
+    }
+
+    // True: testnet  False: mainnet
+    var result = btctool.generateWalletInfo(mnemonicWithLogined, index, true);
+    console.info('local addr data = ' + JSON.stringify(result));
+
+    return result;
+}
+
 // Invoke each APIs.
 function invokeAPIs(objSelf) {
-    //为了测试
-    // var msgType = parseInt($('#msgType').val());
-    // console.info('msgType = ' + msgType);
 
-    // normal code.
     var msgType = Number(objSelf.getAttribute('type_id'));
     console.info('type_id = ' + msgType);
 
@@ -35,30 +74,18 @@ function invokeAPIs(objSelf) {
             });
             break;
         case enumMsgType.MsgType_Mnemonic_CreateAddress_N200:
-            obdApi.getNewAddressWithMnemonic(function(e) {
-                console.info('OBD Response = ' + e);
-                saveAddrData(e);
-                createOBDResponseDiv(e, msgType);
-            });
+            var result = getNewAddressWithMnemonic();
+            if (result === '') return;
+            saveAddrData(result);
+            createOBDResponseDiv(result, msgType);
             break;
-
         case enumMsgType.MsgType_Mnemonic_GetAddressByIndex_201:
-
-            var index = $("#index").val();
-            console.info('index = ' + index);
-
-            if (index === '') {
-                alert('Please input a valid index of address.');
-                return;
-            }
-
-            obdApi.getAddressInfo(index, function(e) {
-                console.info('OBD Response = ' + e);
-                createOBDResponseDiv(e, msgType);
-            });
+            var result = getAddressInfo();
+            if (result === '') return;
+            createOBDResponseDiv(result, msgType);
             break;
 
-            // APIs for debugging.
+        // APIs for debugging.
         case enumMsgType.MsgType_UserLogin_1:
 
             var mnemonic = $("#mnemonic").val();
@@ -70,9 +97,7 @@ function invokeAPIs(objSelf) {
             }
 
             obdApi.logIn(mnemonic, function(e) {
-                console.info('OBD Response = ' + e);
-                // displayOBDMessages(e);
-
+                console.info('logIn - OBD Response = ' + e);
                 // If already logined, then stop listening to OBD Response,
                 // DO NOT update the userID.
                 if (isLogined) {
@@ -82,9 +107,7 @@ function invokeAPIs(objSelf) {
 
                 // Otherwise, a new loginning, update the userID.
                 isLogined = true;
-                // if (e != 'already login') {
-                //     userID = e.substring(0, e.indexOf(' '));
-                // }
+                mnemonicWithLogined = mnemonic;
                 userID = e.substring(0, e.indexOf(' '));
                 createOBDResponseDiv(e, msgType);
             });
@@ -95,11 +118,16 @@ function invokeAPIs(objSelf) {
             break;
 
         case enumMsgType.MsgType_GetMnemonic_101:
-            obdApi.signUp(function(e) {
-                console.info('OBD Response = ' + e);
-                saveMnemonicData(e);
-                createOBDResponseDiv(e);
-            });
+            // Generate mnemonic by local js library.
+            var mnemonic = btctool.generateMnemonic(128);
+            saveMnemonicData(mnemonic);
+            createOBDResponseDiv(mnemonic);
+
+            // obdApi.signUp(function(e) {
+            //     console.info('OBD Response = ' + e);
+            //     saveMnemonicData(e);
+            //     createOBDResponseDiv(e);
+            // });
             break;
 
         case enumMsgType.MsgType_Core_FundingBTC_1009:
@@ -120,12 +148,29 @@ function invokeAPIs(objSelf) {
 
 // 
 function displayOBDMessages(content) {
-    console.info("broadcast info:", content);
+    // console.info("broadcast info:", content);
+    console.info("broadcast info:", JSON.stringify(content));
+
+    switch (Number(content.type)) {
+        case enumMsgType.MsgType_Error_0:
+        case enumMsgType.MsgType_Core_GetNewAddress_1001:
+        case enumMsgType.MsgType_Mnemonic_CreateAddress_N200:
+        case enumMsgType.MsgType_Mnemonic_GetAddressByIndex_201:
+        case enumMsgType.MsgType_GetMnemonic_101:
+            return;
+        case enumMsgType.MsgType_UserLogin_1:
+            saveUserIDLogined(content.from);
+            break;
+    }
+
+    content = JSON.stringify(content.result);
+    content = content.replace("\"","").replace("\"","");
+    console.info("content = ", content);
+
     // Some case do not need displayed.
     if (content === 'already login' || content === 'undefined') return;
 
     obdMessages += content + '\n\n';
-    // var obd_messages = $("#obd_messages");
     $("#obd_messages").val(obdMessages);
 }
 
@@ -195,7 +240,7 @@ function createLeftSideMenu(jsonFile, divName) {
             apiItem.href = '#';
             apiItem.setAttribute('type_id', type_id);
             apiItem.setAttribute('description', description);
-            apiItem.setAttribute('onclick', 'callAPI(this)');
+            apiItem.setAttribute('onclick', 'displayAPIContent(this)');
             apiItem.innerText = api_id;
             apiList.append(apiItem);
 
@@ -205,7 +250,7 @@ function createLeftSideMenu(jsonFile, divName) {
 }
 
 // Invoke a api, show content. Dynamic create content div area.
-function callAPI(obj) {
+function displayAPIContent(obj) {
     removeNameReqDiv();
     createApiNameDiv(obj);
     createRequestDiv(obj);
@@ -445,17 +490,14 @@ function changeConnectButtonStatus() {
     button_connect.attr("disabled", "disabled");
 }
 
-// createOBDResponseDiv 
+// create OBD Response Div 
 function createOBDResponseDiv(response, msgType) {
 
     $("#obd_response_div").remove();
 
-    // get [content] div
-    var content_div = $("#name_req_div");
-
     var obd_response_div = document.createElement('div');
     obd_response_div.id = "obd_response_div";
-    content_div.append(obd_response_div);
+    $("#name_req_div").append(obd_response_div);
 
     // create [title] element
     createHtmlElement(obd_response_div, 'h2', 'OBD Response');
@@ -481,7 +523,7 @@ function parseDataN200(response) {
     var arrData = [
         'ADDRESS : ' + response.address,
         'INDEX : ' + response.index,
-        'PUB_KEY : ' + response.pub_key,
+        'PUB_KEY : ' + response.pubkey,
         'WIF : ' + response.wif
     ];
 
@@ -491,9 +533,35 @@ function parseDataN200(response) {
     }
 }
 
+// get a new index of address
+function getNewAddrIndex() {
+
+    var addr = JSON.parse(localStorage.getItem('addr'));
+    // console.info('localStorage KEY  = ' + addr);
+
+    // If has data.
+    if (addr) {
+        // console.info('HAS DATA');
+        for (let i = 0; i < addr.result.length; i++) {
+            if (userID === addr.result[i].userID) {
+                maxIndex = addr.result[i].data.length - 1;
+                newIndex = addr.result[i].data[maxIndex].index + 1;
+                return newIndex;
+            }
+        }
+
+        // A new User ID.
+        return 1;
+
+    } else {
+        // console.info('FIRST DATA');
+        return 1;
+    }
+}
+
 // Address data generated with mnemonic save to local storage.
 function saveAddrData(response) {
-
+    
     var addr = JSON.parse(localStorage.getItem('addr'));
     // console.info('localStorage KEY  = ' + addr);
 
@@ -506,7 +574,7 @@ function saveAddrData(response) {
                 let new_data = {
                     address: response.address,
                     index: response.index,
-                    pub_key: response.pub_key,
+                    pubkey: response.pubkey,
                     wif: response.wif
                 }
                 addr.result[i].data.push(new_data);
@@ -521,7 +589,7 @@ function saveAddrData(response) {
             data: [{
                 address: response.address,
                 index: response.index,
-                pub_key: response.pub_key,
+                pubkey: response.pubkey,
                 wif: response.wif
             }]
         }
@@ -536,7 +604,7 @@ function saveAddrData(response) {
                 data: [{
                     address: response.address,
                     index: response.index,
-                    pub_key: response.pub_key,
+                    pubkey: response.pubkey,
                     wif: response.wif
                 }]
             }]
@@ -571,36 +639,73 @@ function saveMnemonicData(response) {
     }
 }
 
+// save User ID already Logined 
+function saveUserIDLogined(response) {
+
+    var userIDs = JSON.parse(localStorage.getItem('user_id_logined'));
+    // console.info('localStorage KEY  = ' + addr);
+
+    // If has data.
+    if (userIDs) {
+        // console.info('HAS DATA');
+        let new_data = {
+            userID: response,
+        }
+        userIDs.result.push(new_data);
+        window.localStorage.setItem('user_id_logined', JSON.stringify(userIDs));
+
+    } else {
+        // console.info('FIRST DATA');
+        let data = {
+            result: [{
+                userID: response
+            }]
+        }
+        window.localStorage.setItem('user_id_logined', JSON.stringify(data));
+    }
+}
+
 //----------------------------------------------------------------
 // Functions of buttons.
-function invokeSignUp() {
-    console.log('invokeSignUp func invoked!');
-    callAPI(signUp);
-}
 
 // Generate new mnemonic words.
 function autoCreateMnemonic() {
-    console.log('getMnemonic func invoked!');
-    obdApi.signUp(function(e) {
-        console.info('OBD Response = ' + e);
-        $("#mnemonic").val(e);
-        // $("#mnemonic").attr("value", e);
-    });
+    // Generate mnemonic by local js library.
+    var mnemonic = btctool.generateMnemonic(128);
+    $("#mnemonic").val(mnemonic);
+    saveMnemonicData(mnemonic);
+}
+
+// Generate a new pub key of an address.
+function autoCreateFundingPubkey() {
+    var result = getNewAddressWithMnemonic();
+    if (result === '') return;
+    $("#funding_pubkey").val(result.pubkey);
+    saveAddrData(result);
+
+    // obdApi.getNewAddressWithMnemonic(function(e) {
+    //     console.info('OBD Response pubkey = ' + e.pubkey);
+    //     $("#funding_pubkey").val(e.pubkey);
+    //     saveAddrData(e);
+    // });
 }
 
 //----------------------------------------------------------------
-// Functions of displayUserData.
+// Functions of display User Data.
 function displayUserData(obj) {
     removeNameReqDiv();
     createApiNameDiv(obj);
 
     switch (obj.id) {
-        case 'Mnemonic Words':
+        case 'MnemonicWords':
             // console.info('Mnemonic Words');
             displayMnemonic();
             break;
         case 'Addresses':
             displayAddresses();
+            break;
+        case 'User IDs':
+            displayUserIDs();
             break;
         default:
             break;
@@ -624,7 +729,7 @@ function displayMnemonic() {
             // createHtmlElement(parent, 'p');
         }
     } else { // NO LOCAL STORAGE DATA YET.
-        createHtmlElement(parent, 'h3', 'NO DATA YET.');
+        createHtmlElement(parent, 'h3', 'NO DATA YET. YOU CAN CREATE ONE WITH [signUp].');
     }
 }
 
@@ -658,7 +763,7 @@ function displayAddresses() {
                     arrData = [
                         'ADDRESS : ' + addr.result[i].data[i2].address,
                         'INDEX : ' + addr.result[i].data[i2].index,
-                        'PUB_KEY : ' + addr.result[i].data[i2].pub_key,
+                        'PUB_KEY : ' + addr.result[i].data[i2].pubkey,
                         'WIF : ' + addr.result[i].data[i2].wif
                     ];
 
@@ -681,6 +786,23 @@ function displayAddresses() {
 
     } else { // NO LOCAL STORAGE DATA YET.
         displayNoData(parent);
+    }
+}
+
+//
+function displayUserIDs() {
+    // get [name_req_div] div
+    var parent = $("#name_req_div");
+
+    if (!isLogined) { // Not login.
+        createHtmlElement(parent, 'h4', 'NO USER LOGINED.');
+        return;
+    }
+
+    for (let i = 0; i < userIDLogined.length; i++) {
+        createHtmlElement(parent, 'h4', 'NO. ' + (i + 1));
+        // createHtmlElement(parent, 'text', 'User ID : ', cssStyle);
+        createHtmlElement(parent, 'text', userIDLogined[i]);
     }
 }
 

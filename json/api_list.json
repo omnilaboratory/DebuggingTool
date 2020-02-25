@@ -16,7 +16,7 @@
                     "buttons": [
                         {
                             "innerText": "Get It",
-                            "onclick": "invokeSignUp()"
+                            "onclick": "displayUserData(MnemonicWords)"
                         },
                         {
                             "innerText": "Auto Create",
@@ -36,11 +36,11 @@
                     "buttons": [
                         {
                             "innerText": "Get It",
-                            "onclick": "openUserData()"
+                            "onclick": "displayUserData(Addresses)"
                         },
                         {
                             "innerText": "Auto Create",
-                            "onclick": "getFundingPubkey()"
+                            "onclick": "autoCreateFundingPubkey()"
                         }
                     ]
                 },
