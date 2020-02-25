@@ -12,9 +12,17 @@ function validateMnemonic(mnemonic) {
 }
 
 function generateWalletInfo(mnemonic, index, isTestNet = false) {
+    let retNode = new Object();
+
     if (validateMnemonic(mnemonic) == false) {
-        console.info("error mnemonic:", JSON.stringify(mnemonic));
-        return null;
+        retNode.status = false;
+        retNode.msg = "error mnemonic: " + mnemonic;
+        return retNode;
+    }
+    if (index == null || index < 0) {
+        retNode.status = false;
+        retNode.msg = "error index " + index;
+        return retNode;
     }
     let seedHex = bip39.mnemonicToSeedSync(mnemonic, "");
     let root = bip32.fromSeed(seedHex);
@@ -35,7 +43,10 @@ function generateWalletInfo(mnemonic, index, isTestNet = false) {
         pubkey: child0.publicKey,
         network
     }).address;
-    return { "index": index, "address": walletAddress, "pubkey": child0.publicKey.toString("hex"), "wif": keyPair.toWIF(), "network": networkName };
+    retNode.status = true;
+    retNode.msg = "success";
+    retNode.result = { "index": index, "address": walletAddress, "pubkey": child0.publicKey.toString("hex"), "wif": keyPair.toWIF(), "network": networkName }
+    return retNode
 }
 
 module.exports = {
