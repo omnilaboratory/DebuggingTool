@@ -7,6 +7,22 @@ class ObdApi {
         this.callbackMap = new Map();
     }
     /**
+     * register event
+     * @param msgType
+     * @param callback
+     */
+    registerEvent(msgType, callback) {
+        if (callback == null) {
+            console.info("callback function is null");
+            return;
+        }
+        if (msgType == null) {
+            callback("msgType is null");
+            return;
+        }
+        this.callbackMap[msgType] = callback;
+    }
+    /**
      * connectToServer
      * @param address string
      * @param callback function
@@ -80,10 +96,15 @@ class ObdApi {
         }
         let resultData = jsonData.result;
         if (jsonData.type == this.messageType.MsgType_Error_0) {
-            resultData = jsonData.data;
+            let tempData = new Object();
+            tempData.type = jsonData.type;
+            tempData.result = jsonData.data;
+            tempData.sender_peer_id = jsonData.sender_peer_id;
+            tempData.recipient_peer_id = jsonData.recipient_peer_id;
+            jsonData = tempData;
         }
         if (this.globalCallback) {
-            this.globalCallback(resultData);
+            this.globalCallback(jsonData);
         }
         console.info(new Date(), "----------------------------get msg from server--------------------");
         if (jsonData.from != jsonData.to) {
@@ -91,7 +112,6 @@ class ObdApi {
         }
         let callback = this.callbackMap[jsonData.type];
         if (callback != null) {
-            this.callbackMap.delete(jsonData.type);
             if (jsonData.type == this.messageType.MsgType_UserLogin_1) {
                 resultData = jsonData.from + " " + jsonData.result;
             }

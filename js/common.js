@@ -58,7 +58,7 @@ function invokeAPIs(objSelf) {
             });
             break;
 
-        // APIs for debugging.
+            // APIs for debugging.
         case enumMsgType.MsgType_UserLogin_1:
 
             var mnemonic = $("#mnemonic").val();
@@ -106,7 +106,7 @@ function invokeAPIs(objSelf) {
             let info = new BtcFundingInfo();
             obdApi.fundingBTC(info);
             break;
-        
+
         case enumMsgType.MsgType_Core_Omni_GetTransaction_1206:
             txid = "c76710920860456dff2433197db79dd030f9b527e83a2e253f5bc6ab7d197e73";
             obdApi.getOmniTxByTxid(txid);
@@ -120,8 +120,9 @@ function invokeAPIs(objSelf) {
 
 // 
 function displayOBDMessages(content) {
+    console.info("broadcast info:", content);
     // Some case do not need displayed.
-    if (content === 'already login' || 'undefined') return;
+    if (content === 'already login' || content === 'undefined') return;
 
     obdMessages += content + '\n\n';
     // var obd_messages = $("#obd_messages");
@@ -140,7 +141,7 @@ function getUserDataList() {
         var apiList = $("#user_data_list");
 
         for (let index = 0; index < result.data.length; index++) {
-            api_id      = result.data[index].id;
+            api_id = result.data[index].id;
             description = result.data[index].description;
 
             // create [a] element
@@ -184,8 +185,8 @@ function createLeftSideMenu(jsonFile, divName) {
         var apiList = $(divName);
 
         for (let index = 0; index < result.data.length; index++) {
-            api_id      = result.data[index].id;
-            type_id     = result.data[index].type_id;
+            api_id = result.data[index].id;
+            type_id = result.data[index].type_id;
             description = result.data[index].description;
 
             // create [a] element
@@ -234,13 +235,13 @@ function createRequestDiv(obj) {
 
     // create [title] element
     createHtmlElement(content_div, 'h2', 'Request');
-    
+
     // create [func_title] element
     createHtmlElement(content_div, 'text', 'func: ', cssStyle);
-    
+
     // create [func_name] element: id = JS function name.
     createHtmlElement(content_div, 'text', obj.getAttribute("id"));
-    
+
     // create [type_id] element
     var value = " type ( " + obj.getAttribute("type_id") + " )";
     createHtmlElement(content_div, 'text', value, cssStyle);
@@ -323,7 +324,7 @@ function createButtonOfParam(arrParams, index, content_div) {
     var arrButtons = arrParams[index].buttons;
 
     for (let index = 0; index < arrButtons.length; index++) {
-        innerText  = arrButtons[index].innerText;
+        innerText = arrButtons[index].innerText;
         invokeFunc = arrButtons[index].onclick;
 
         // create [button] element
@@ -389,7 +390,7 @@ function createConnectNodeDiv() {
 
     // create [title] element
     createHtmlElement(content_div, 'h2', 'OBD Node');
-    
+
     // create [input title] element
     createHtmlElement(content_div, 'text', 'Node URL: ', cssStyle);
 
@@ -476,12 +477,12 @@ function createOBDResponseDiv(response, msgType) {
 // parseDataN200 - getNewAddressWithMnemonic
 function parseDataN200(response) {
     // console.log('response wif = ' + response.wif);
-    
+
     var arrData = [
         'ADDRESS : ' + response.address,
-        'INDEX : '   + response.index,
+        'INDEX : ' + response.index,
         'PUB_KEY : ' + response.pub_key,
-        'WIF : '     + response.wif
+        'WIF : ' + response.wif
     ];
 
     for (let index = 0; index < arrData.length; index++) {
@@ -504,9 +505,9 @@ function saveAddrData(response) {
                 // Add new dato to 
                 let new_data = {
                     address: response.address,
-                    index:   response.index,
+                    index: response.index,
                     pub_key: response.pub_key,
-                    wif:     response.wif
+                    wif: response.wif
                 }
                 addr.result[i].data.push(new_data);
                 window.localStorage.setItem('addr', JSON.stringify(addr));
@@ -517,14 +518,12 @@ function saveAddrData(response) {
         // A new User ID.
         let new_data = {
             userID: userID,
-            data: [
-                {
-                    address: response.address,
-                    index:   response.index,
-                    pub_key: response.pub_key,
-                    wif:     response.wif
-                }
-            ]
+            data: [{
+                address: response.address,
+                index: response.index,
+                pub_key: response.pub_key,
+                wif: response.wif
+            }]
         }
         addr.result.push(new_data);
         window.localStorage.setItem('addr', JSON.stringify(addr));
@@ -532,19 +531,15 @@ function saveAddrData(response) {
     } else {
         // console.info('FIRST DATA');
         let data = {
-            result: [
-                {
-                    userID: userID,
-                    data: [
-                        {
-                            address: response.address,
-                            index:   response.index,
-                            pub_key: response.pub_key,
-                            wif:     response.wif
-                        }
-                    ]
-                }
-            ]
+            result: [{
+                userID: userID,
+                data: [{
+                    address: response.address,
+                    index: response.index,
+                    pub_key: response.pub_key,
+                    wif: response.wif
+                }]
+            }]
         }
         window.localStorage.setItem('addr', JSON.stringify(data));
     }
@@ -568,11 +563,9 @@ function saveMnemonicData(response) {
     } else {
         // console.info('FIRST DATA');
         let data = {
-            result: [
-                {
-                    mnemonic: response
-                }
-            ]
+            result: [{
+                mnemonic: response
+            }]
         }
         window.localStorage.setItem('mnemonic', JSON.stringify(data));
     }
@@ -630,7 +623,7 @@ function displayMnemonic() {
             createHtmlElement(parent, 'text', mnemonic.result[i].mnemonic);
             // createHtmlElement(parent, 'p');
         }
-    } else {  // NO LOCAL STORAGE DATA YET.
+    } else { // NO LOCAL STORAGE DATA YET.
         createHtmlElement(parent, 'h3', 'NO DATA YET.');
     }
 }
@@ -639,7 +632,7 @@ function displayMnemonic() {
 function displayAddresses() {
     // get [name_req_div] div
     var parent = $("#name_req_div");
-    
+
     if (!isLogined) { // Not login.
         createHtmlElement(parent, 'text', 'NO USER LOGINED.');
         return;
@@ -656,23 +649,23 @@ function displayAddresses() {
                 // userID
                 createHtmlElement(parent, 'text', addr.result[i].userID);
                 // createHtmlElement(parent, 'p');
-        
+
                 // title
                 createHtmlElement(parent, 'h2', 'Address List');
                 // createHtmlElement(parent, 'p');
-        
+
                 for (let i2 = 0; i2 < addr.result[i].data.length; i2++) {
                     arrData = [
                         'ADDRESS : ' + addr.result[i].data[i2].address,
-                        'INDEX : '   + addr.result[i].data[i2].index,
+                        'INDEX : ' + addr.result[i].data[i2].index,
                         'PUB_KEY : ' + addr.result[i].data[i2].pub_key,
-                        'WIF : '     + addr.result[i].data[i2].wif
+                        'WIF : ' + addr.result[i].data[i2].wif
                     ];
-                
+
                     // Display list NO.
                     createHtmlElement(parent, 'h4', 'NO. ' + (i2 + 1));
                     // createHtmlElement(parent, 'p');
-        
+
                     for (let i3 = 0; i3 < arrData.length; i3++) {
                         createHtmlElement(parent, 'text', arrData[i3]);
                         createHtmlElement(parent, 'br');
@@ -680,13 +673,13 @@ function displayAddresses() {
                 }
 
                 return;
-            } 
+            }
         }
 
         // The user has not create address yet.
         displayNoData(parent);
 
-    } else {  // NO LOCAL STORAGE DATA YET.
+    } else { // NO LOCAL STORAGE DATA YET.
         displayNoData(parent);
     }
 }
