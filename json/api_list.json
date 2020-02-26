@@ -48,8 +48,8 @@
                     "name": "recipient_peer_id",
                     "buttons": [
                         {
-                            "innerText": "Select",
-                            "onclick": "Select()"
+                            "innerText": "Friends",
+                            "onclick": "displayUserData(Friends)"
                         }
                     ]
                 }

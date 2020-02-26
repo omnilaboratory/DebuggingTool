@@ -9,8 +9,8 @@
             "description": "Addresses created with mnemonic from USER: "
         },
         {
-            "id": "User IDs",
-            "description": "User IDs already logined."
+            "id": "Friends",
+            "description": "List of friends who have interacted."
         }
     ]
 }
