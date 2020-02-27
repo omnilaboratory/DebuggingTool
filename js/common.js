@@ -92,6 +92,7 @@ function logIn(msgType) {
         isLogined = true;
         mnemonicWithLogined = mnemonic;
         userID = e.substring(0, e.indexOf(' '));
+        $("#logined").text(userID.substring(0, 10) + '...');
         createOBDResponseDiv(e, msgType);
     });
 }
@@ -109,8 +110,7 @@ function openChannel(msgType) {
 
     // OBD API
     obdApi.openChannel(pubkey, name, function(e) {
-        e = JSON.stringify(e);
-        console.info('openChannel - OBD Response = ' + e);
+        console.info('openChannel - OBD Response = ' + JSON.stringify(e));
 
         // Save List of friends who have interacted.
         saveFriends(name);
@@ -504,8 +504,10 @@ function clickConnectButton() {
 
     obdApi.connectToServer(node_url, function(response) {
         console.info('OBD Response = ' + response);
-        createOBDResponseDiv(response);
+
+        $("#status").text("Connected");
         isConnectToOBD = true; // already connected.
+        createOBDResponseDiv(response);
         changeConnectButtonStatus();
 
     }, function(globalResponse) {
@@ -538,11 +540,7 @@ function createOBDResponseDiv(response, msgType) {
             parseDataN200(response);
             break;
         case enumMsgType.MsgType_ChannelOpen_N32:
-            // TEMP code, will be updated.
-            var element = document.createElement('p');
-            element.innerText = response;
-            element.setAttribute('style', 'word-break: break-all;white-space: normal;');
-            obd_response_div.append(element);
+            parseDataN32(response);
             break;
         default:
             createHtmlElement(obd_response_div, 'p', response);
@@ -562,8 +560,25 @@ function parseDataN200(response) {
         'WIF : '     + response.result.wif
     ];
 
-    for (let index = 0; index < arrData.length; index++) {
-        createHtmlElement(obd_response_div, 'text', arrData[index]);
+    for (let i = 0; i < arrData.length; i++) {
+        createHtmlElement(obd_response_div, 'text', arrData[i]);
+        createHtmlElement(obd_response_div, 'p');
+    }
+}
+
+// processing -32 openChannel data.
+function parseDataN32(response) {
+    var arrData = [
+        'chain_hash : ' + response.chain_hash,
+        'channel_reserve_satoshis : ' + response.channel_reserve_satoshis,
+        'funding_address : ' + response.funding_address,
+        'funding_pubkey : ' + response.funding_pubkey,
+        'funding_satoshis : ' + response.funding_satoshis,
+        'temporary_channel_id : ' + response.temporary_channel_id,
+    ];
+
+    for (let i = 0; i < arrData.length; i++) {
+        createHtmlElement(obd_response_div, 'text', arrData[i]);
         createHtmlElement(obd_response_div, 'p');
     }
 }
@@ -683,6 +698,10 @@ function saveFriends(name) {
     // If has data.
     if (list) {
         // console.info('HAS DATA');
+        for (let i = 0; i < list.result.length; i++) {
+            if (list.result[i].name === name) return;
+        }
+
         let new_data = {
             name: name,
         }
