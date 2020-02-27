@@ -54,6 +54,35 @@
                     ]
                 }
             ]
+        },
+        {
+            "id": "acceptChannel",
+            "type_id": -33,
+            "description": "AcceptChannel is used to response to request of creating channel. Bob replies to accept, his OBD completes his message and routes it to Alice's OBD. Then Alice sees the response of acceptance.",
+            "parameters": [
+                {
+                    "name": "temporary_channel_id",
+                    "buttons": [
+                        {
+                            "innerText": "Get It",
+                            "onclick": ""
+                        }
+                    ]
+                },
+                {
+                    "name": "funding_pubkey",
+                    "buttons": [
+                        {
+                            "innerText": "Get It",
+                            "onclick": "displayUserData(Addresses)"
+                        },
+                        {
+                            "innerText": "Auto Create",
+                            "onclick": "autoCreateFundingPubkey()"
+                        }
+                    ]
+                }
+            ]
         }
     ]
 }

@@ -388,6 +388,7 @@ function createParamOfAPI(arrParams, content_div) {
         content_div.append(input_box);
 
         createButtonOfParam(arrParams, index, content_div);
+        createHtmlElement(content_div, 'p');
     }
 }
 
