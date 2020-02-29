@@ -136,9 +136,11 @@ function acceptChannel(msgType) {
 
     var info = {
         temporary_channel_id: temp_cid,
-        funding_pubkey: pubkey,
-        approval: approval
+        funding_pubkey:       pubkey,
+        approval:             approval
     }
+
+    console.info('INFO = ' + JSON.stringify(info));
 
     // OBD API
     obdApi.acceptChannel(info, function(e) {
@@ -405,14 +407,10 @@ function createInputParamDiv(obj, jsonFile) {
 function clickApproval(obj) {
     // console.info('clickApproval checked = ' + obj.checked);
     if (obj.checked) {
-        $("#temporary_channel_id").show();
-        $("#temporary_channel_idGet").show();
         $("#funding_pubkey").show();
         $("#funding_pubkeyGet").show();
         $("#funding_pubkeyAut").show();
     } else {
-        $("#temporary_channel_id").hide();
-        $("#temporary_channel_idGet").hide();
         $("#funding_pubkey").hide();
         $("#funding_pubkeyGet").hide();
         $("#funding_pubkeyAut").hide();
