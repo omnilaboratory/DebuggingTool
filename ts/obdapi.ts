@@ -449,16 +449,18 @@ class ObdApi {
      * @param callback function
      */
     public acceptChannel(info: AcceptChannelInfo, callback: Function) {
+        
+        if(this.isNotString(info.temporary_channel_id)){
+            alert("empty temporary_channel_id");
+            return;
+        }
 
         if(info.approval==null){
             alert("empty approval");
             return;
         }
+        
         if(info.approval==true){
-            if(this.isNotString(info.temporary_channel_id)){
-                alert("empty temporary_channel_id");
-                return;
-            }
             if(this.isNotString(info.funding_pubkey)){
                 alert("empty funding_pubkey");
                 return;
