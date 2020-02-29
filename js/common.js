@@ -125,7 +125,7 @@ function acceptChannel(msgType) {
     var pubkey   = $("#funding_pubkey").val();
     var approval = $("#checkbox_n33").prop("checked");
 
-    console.info('VALUE = ' + temp_cid + ' | ' + pubkey + ' | ' + approval);
+    // console.info('VALUE = ' + temp_cid + ' | ' + pubkey + ' | ' + approval);
 
     if (approval) {
         if (temp_cid.trim() === '' || pubkey.trim() === '') {
@@ -140,7 +140,7 @@ function acceptChannel(msgType) {
         approval:             approval
     }
 
-    console.info('INFO = ' + JSON.stringify(info));
+    // console.info('INFO = ' + JSON.stringify(info));
 
     // OBD API
     obdApi.acceptChannel(info, function(e) {
@@ -224,6 +224,13 @@ function displayOBDMessages(content) {
             return;
         case enumMsgType.MsgType_ChannelOpen_N32:
             content.result = 'USER : ' + content.from + ' launch an Open Channel request.';
+            break;
+        case enumMsgType.MsgType_ChannelAccept_N33:
+            if (content.result.curr_state === 20) {  // Accept
+                content.result = 'USER : ' + content.from + ' Accept Open Channel request.';
+            } else if (content.result.curr_state === 30) { // Not Accept
+                content.result = 'USER : ' + content.from + ' Not Accept Open Channel request.';
+            }
             break;
     }
 
@@ -588,6 +595,9 @@ function createOBDResponseDiv(response, msgType) {
         case enumMsgType.MsgType_ChannelOpen_N32:
             parseDataN32(response);
             break;
+        case enumMsgType.MsgType_ChannelAccept_N33:
+            parseDataN33(response);
+            break;
         default:
             createHtmlElement(obd_response_div, 'p', response);
             break;
@@ -624,8 +634,28 @@ function parseDataN32(response) {
     ];
 
     for (let i = 0; i < arrData.length; i++) {
-        createHtmlElement(obd_response_div, 'text', arrData[i]);
-        createHtmlElement(obd_response_div, 'p');
+        createHtmlElement(obd_response_div, 'p', arrData[i]);
+        // createHtmlElement(obd_response_div, 'p');
+    }
+}
+
+// processing -33 Accept Channel data.
+function parseDataN33(response) {
+    // curr_state = 20 is accept open channel request.
+    // curr_state = 30 is NOT accept open channel request.
+    var arrData = [
+        'address_a : ' + response.address_a,
+        'chain_hash : ' + response.chain_hash,
+        'channel_address : ' + response.channel_address,
+        'create_by : ' + response.create_by,
+        'curr_state : ' + response.curr_state,
+        'peer_id_a : ' + response.peer_id_a,
+        'peer_id_b : ' + response.peer_id_b,
+    ];
+
+    for (let i = 0; i < arrData.length; i++) {
+        createHtmlElement(obd_response_div, 'p', arrData[i]);
+        // createHtmlElement(obd_response_div, 'p');
     }
 }
 
