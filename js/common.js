@@ -102,7 +102,7 @@ function openChannel(msgType) {
 
     var pubkey = $("#funding_pubkey").val();
     var name   = $("#recipient_peer_id").val();
-
+    
     if (name.trim() === '' || pubkey.trim() === '') {
         alert('Please input complete data.');
         return;
@@ -114,6 +114,29 @@ function openChannel(msgType) {
 
         // Save List of friends who have interacted.
         saveFriends(name);
+        createOBDResponseDiv(e, msgType);
+    });
+}
+
+// accept Channel API at local.
+function acceptChannel(msgType) {
+
+    var temp_cid = $("#temporary_channel_id").val();
+    var pubkey   = $("#funding_pubkey").val();
+
+    if ($("#checkbox_n33").prop("checked")) {
+        if (temp_cid.trim() === '' || pubkey.trim() === '') {
+            alert('Please input complete data.');
+            return;
+        }
+    }
+
+    // OBD API
+    obdApi.openChannel(pubkey, temp_cid, function(e) {
+        console.info('openChannel - OBD Response = ' + JSON.stringify(e));
+
+        // Save List of friends who have interacted.
+        saveFriends(temp_cid);
         createOBDResponseDiv(e, msgType);
     });
 }
@@ -169,6 +192,10 @@ function invokeAPIs(objSelf) {
         // Open Channel request.
         case enumMsgType.MsgType_ChannelOpen_N32:
             openChannel(msgType);
+            break;
+        // Accept Channel request.
+        case enumMsgType.MsgType_ChannelAccept_N33:
+            acceptChannel(msgType);
             break;
         default:
             console.info(msgType + " do not exist");
@@ -319,27 +346,6 @@ function createRequestDiv(obj) {
     // create [type_id] element
     var value = " type ( " + obj.getAttribute("type_id") + " )";
     createHtmlElement(content_div, 'text', value, cssStyle);
-
-    //-------------------------------
-    // TEMP WILL BE DELETED - for GuoJun testing.
-    /*
-    var p = document.createElement('p');
-    content_div.append(p);
-
-    var input_title = document.createElement('text');
-    input_title.setAttribute('style', 'color:gray');
-    input_title.innerText = '测试用：输入消息编号：';
-    content_div.append(input_title);
-
-    // create [input] element - for GuoJun testing.
-    var input_msgType = document.createElement('input');
-    input_msgType.id = 'msgType';
-    // input_msgType.setAttribute('type', 'text');
-    // input_msgType.setAttribute('name', '');
-    content_div.append(input_msgType);
-    */
-    //-------------------------------
-
 }
 
 // dynamic create input parameters div area.
@@ -352,10 +358,10 @@ function createInputParamDiv(obj, jsonFile) {
         // get JS function name.
         var js_func = obj.getAttribute("id");
 
-        for (let index = 0; index < result.data.length; index++) {
+        for (let i = 0; i < result.data.length; i++) {
             // id = js_func, is JS function name.
-            if (js_func === result.data[index].id) {
-                var arrParams = result.data[index].parameters;
+            if (js_func === result.data[i].id) {
+                var arrParams = result.data[i].parameters;
                 // console.info('arrParams = ' + arrParams.length);
 
                 // No parameter.
@@ -365,12 +371,46 @@ function createInputParamDiv(obj, jsonFile) {
 
                 // create [title] element
                 createHtmlElement(content_div, 'p', 'Input Parameters:');
-
+                
                 // Parameters
                 createParamOfAPI(arrParams, content_div);
             }
         }
+        
+        // For AcceptChannel api.
+        if (jsonFile === 'json/api_list.json') {
+            var type_id = Number(obj.getAttribute("type_id"));
+            if (type_id === enumMsgType.MsgType_ChannelAccept_N33) {
+                // console.info('CHECKBOX');
+                createHtmlElement(content_div, 'text', 'Approval ');
+    
+                var element = document.createElement('input');
+                element.id   = 'checkbox_n33';
+                element.type = 'checkbox';
+                element.defaultChecked = true;
+                element.setAttribute('onclick', 'clickApproval(this)');
+                content_div.append(element);
+            }
+        }
     });
+}
+
+// 
+function clickApproval(obj) {
+    // console.info('clickApproval checked = ' + obj.checked);
+    if (obj.checked) {
+        $("#temporary_channel_id").show();
+        $("#temporary_channel_idGet").show();
+        $("#funding_pubkey").show();
+        $("#funding_pubkeyGet").show();
+        $("#funding_pubkeyAut").show();
+    } else {
+        $("#temporary_channel_id").hide();
+        $("#temporary_channel_idGet").hide();
+        $("#funding_pubkey").hide();
+        $("#funding_pubkeyGet").hide();
+        $("#funding_pubkeyAut").hide();
+    }
 }
 
 // create parameter of each API.
@@ -378,16 +418,16 @@ function createParamOfAPI(arrParams, content_div) {
 
     var input_box;
 
-    for (let index = 0; index < arrParams.length; index++) {
+    for (let i = 0; i < arrParams.length; i++) {
         // create [param_title] element
-        createHtmlElement(content_div, 'text', arrParams[index].name + ' : ', cssStyle);
+        createHtmlElement(content_div, 'text', arrParams[i].name + ' : ', cssStyle);
 
         // create [input box of param] element
         input_box = document.createElement('input');
-        input_box.id = arrParams[index].name;
+        input_box.id = arrParams[i].name;
         content_div.append(input_box);
 
-        createButtonOfParam(arrParams, index, content_div);
+        createButtonOfParam(arrParams, i, content_div);
         createHtmlElement(content_div, 'p');
     }
 }
@@ -398,14 +438,16 @@ function createButtonOfParam(arrParams, index, content_div) {
     var innerText, invokeFunc;
     var arrButtons = arrParams[index].buttons;
 
-    for (let index = 0; index < arrButtons.length; index++) {
-        innerText = arrButtons[index].innerText;
-        invokeFunc = arrButtons[index].onclick;
+    for (let i = 0; i < arrButtons.length; i++) {
+        innerText = arrButtons[i].innerText;
+        invokeFunc = arrButtons[i].onclick;
 
         // create [button] element
         var button = document.createElement('button');
-        button.setAttribute('onclick', invokeFunc);
+        button.id = arrParams[index].name + innerText.substring(0, 3);
+        // console.info('button.id = ' + button.id);
         button.innerText = innerText;
+        button.setAttribute('onclick', invokeFunc);
         content_div.append(button);
     }
 }

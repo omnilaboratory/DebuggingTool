@@ -149,7 +149,7 @@ class ObdApi {
                 this.onOpenChannel(resultData);
                 break;
             case this.messageType.MsgType_ChannelAccept_N33:
-                this.onChannelAccept(resultData);
+                this.onAcceptChannel(resultData);
                 break;
             case this.messageType.MsgType_FundingCreate_AssetFundingCreated_N34:
                 this.onChannelFundingCreated(resultData);
@@ -398,7 +398,7 @@ class ObdApi {
      * @param info AcceptChannelInfo
      * @param callback function
      */
-    channelAccept(info, callback) {
+    acceptChannel(info, callback) {
         if (this.isNotString(info.temporary_channel_id)) {
             alert("empty temporary_channel_id");
             return;
@@ -416,7 +416,7 @@ class ObdApi {
         msg.data = info;
         this.sendData(msg, callback);
     }
-    onChannelAccept(jsonData) { }
+    onAcceptChannel(jsonData) { }
     /**
      * MsgType_FundingCreate_AssetFundingCreated_N34
      * @param info ChannelFundingCreatedInfo
