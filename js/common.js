@@ -123,20 +123,26 @@ function acceptChannel(msgType) {
 
     var temp_cid = $("#temporary_channel_id").val();
     var pubkey   = $("#funding_pubkey").val();
+    var approval = $("#checkbox_n33").prop("checked");
 
-    if ($("#checkbox_n33").prop("checked")) {
+    console.info('VALUE = ' + temp_cid + ' | ' + pubkey + ' | ' + approval);
+
+    if (approval) {
         if (temp_cid.trim() === '' || pubkey.trim() === '') {
             alert('Please input complete data.');
             return;
         }
     }
 
-    // OBD API
-    obdApi.openChannel(pubkey, temp_cid, function(e) {
-        console.info('openChannel - OBD Response = ' + JSON.stringify(e));
+    var info = {
+        temporary_channel_id: temp_cid,
+        funding_pubkey: pubkey,
+        approval: approval
+    }
 
-        // Save List of friends who have interacted.
-        saveFriends(temp_cid);
+    // OBD API
+    obdApi.acceptChannel(info, function(e) {
+        console.info('acceptChannel - OBD Response = ' + JSON.stringify(e));
         createOBDResponseDiv(e, msgType);
     });
 }
