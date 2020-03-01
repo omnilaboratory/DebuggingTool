@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Data</title>
+    <script src="https://lib.sinaapp.com/js/jquery/2.0.2/jquery-2.0.2.min.js"></script>
+    <script src="js/btctool.js"></script>
+    <script src="js/pojo.js"></script>
+    <script src="js/obdapi.js"></script>
+    <script src="js/common.js"></script>
+</head>
+
+<body>
+    <div id="container" style="width:device-width">
+        <!-- API invoked area, click left side menu to display. -->
+        <div id="content">
+            <!-- Dynamic create in 'common.js' -->
+            <div id="user_data_list"></div>
+        </div>
+    </div>
+</body>
+
+<script>
+    // var jsonFile = "json/user_data_list.json";
+    // dynamic create api_list div.
+    // $.getJSON(jsonFile, function(result) {
+
+        // var data = {
+        //     id:          "Addresses",
+        //     description: "uytAddresses created with mnemonic from USER: "
+        // };
+
+        // var api_id = data.id;
+        // var description = data.description;
+
+        // // create [a] element
+        // var apiList = $("#content");
+        // var obj = document.createElement('a');
+        // obj.id = api_id;
+        // obj.href = '#';
+        // obj.setAttribute('description', description);
+        // obj.innerText = api_id;
+        // apiList.append(obj);
+
+        // // $("#Addresses").hide();
+        // // var ele="#"+api_id;
+        // $("#"+api_id).hide();
+        // console.info('obj = '+obj.getAttribute("description"));
+
+        getUserDataList(1);
+
+    // });
+</script>
+
+</html>

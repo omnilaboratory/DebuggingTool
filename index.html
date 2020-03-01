@@ -13,26 +13,15 @@
 </head>
 
 <script>
-    /* test mnemonic */
-    // var mnemonic = btctool.generateMnemonic(128);
-    // console.info(mnemonic);
-    // mnemonic = "shrug interest tiny social benefit better drink movie negative loud crime cattle undo fan toss inmate sock tree february picnic rescue flower tuition forum";
-    // var isMnemonic = btctool.validateMnemonic(mnemonic);
-    // console.info(isMnemonic);
-    // var info = btctool.generateWalletInfo(mnemonic, 1, false);
-    // console.info(info);
-
     // invoked when page refresh.
     getUtilList();
     getAPIList();
     getUserDataList();
 
-    // Remove the list of user id already logined.
-    localStorage.removeItem('user_id_logined');
+    localStorage.removeItem("LoginStatus");
 </script>
 
 <body>
-    <!-- <div id="container" style="width:1440px"> -->
     <div id="container" style="width:device-width">
 
         <!-- Header -->
@@ -68,7 +57,7 @@
             <!-- First, you need to connect to a OBD node. -->
             <a href="#" onclick="connectNode()">Connect to OBD node</a>
 
-            <br><br><br>
+            <!-- <br><br><br> -->
 
             <!-- USER DATA LIST - Dynamic create -->
             <p style="font-family: Arial, Helvetica, sans-serif;
@@ -76,21 +65,20 @@
 
             <div id="user_data_list"></div>
 
-            <br>
+            <!-- <br> -->
+            <!-- APIs for Debugging - Dynamic create -->
+            <p style="font-family: Arial, Helvetica, sans-serif;
+                color:gray;">APIs for Debugging</p>
 
+            <div id="api_list"></div>
+
+            <!-- <br> -->
             <!-- APIs for Util - Dynamic create -->
             <p style="font-family: Arial, Helvetica, sans-serif;
                 color: gray;">Util</p>
 
             <div id="util_list"></div>
 
-            <br>
-
-            <!-- APIs for Debugging - Dynamic create -->
-            <p style="font-family: Arial, Helvetica, sans-serif;
-                color:gray;">APIs for Debugging</p>
-
-            <div id="api_list"></div>
         </div>
 
         <!-- API invoked area, click left side menu to display. -->
@@ -108,5 +96,4 @@
         </div>
     </div>
 </body>
-
 </html>

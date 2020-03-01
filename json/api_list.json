@@ -36,7 +36,7 @@
                     "buttons": [
                         {
                             "innerText": "Get It",
-                            "onclick": "displayUserData(Addresses)"
+                            "onclick": "displayUserDataInNewHtml()"
                         },
                         {
                             "innerText": "Auto Create",
@@ -79,6 +79,52 @@
                         {
                             "innerText": "Auto Create",
                             "onclick": "autoCreateFundingPubkey()"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "fundingBTC",
+            "type_id": 1009,
+            "description": "FundingBTC is used for depositing bitcoin into a channel. Since the basic Omnilayer protocal uses BTC as miner fee in transferring assets, this message 1009 is special for depositing BTC for future transactions.",
+            "parameters": [
+                {
+                    "name": "from_address",
+                    "buttons": []
+                },
+                {
+                    "name": "from_address_private_key",
+                    "buttons": [
+                        {
+                            "innerText": "Get It",
+                            "onclick": "displayUserData(Addresses)"
+                        },
+                        {
+                            "innerText": "Auto Create Addr and Privkey",
+                            "onclick": "autoCreateFundingPubkey(0)"
+                        }
+                    ]
+                },
+                {
+                    "name": "to_address",
+                    "buttons": [
+                        {
+                            "innerText": "Get It",
+                            "onclick": "displayUserData(Addresses)"
+                        }
+                    ]
+                },
+                {
+                    "name": "amount",
+                    "buttons": []
+                },
+                {
+                    "name": "miner_fee",
+                    "buttons": [
+                        {
+                            "innerText": "Auto Calc",
+                            "onclick": "autoCalcMinerFee()"
                         }
                     ]
                 }

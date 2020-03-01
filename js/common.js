@@ -8,7 +8,7 @@ var isConnectToOBD = false;
 var isLogined = false;
 
 // Save userID of a user already logined.
-let userID;
+var userID;
 
 // cssStyle
 var cssStyle = 'color:gray';
@@ -127,24 +127,56 @@ function acceptChannel(msgType) {
 
     // console.info('VALUE = ' + temp_cid + ' | ' + pubkey + ' | ' + approval);
 
-    if (approval) {
-        if (temp_cid.trim() === '' || pubkey.trim() === '') {
-            alert('Please input complete data.');
-            return;
-        }
-    }
+    // if (approval) {
+    //     if (temp_cid.trim() === '' || pubkey.trim() === '') {
+    //         alert('Please input complete data.');
+    //         return;
+    //     }
+    // }
 
-    var info = {
-        temporary_channel_id: temp_cid,
-        funding_pubkey:       pubkey,
-        approval:             approval
-    }
+    // var info = {
+    //     temporary_channel_id: temp_cid,
+    //     funding_pubkey:       pubkey,
+    //     approval:             approval
+    // }
+
+    let info = new AcceptChannelInfo();
+    info.temporary_channel_id = temp_cid;
+    info.funding_pubkey = pubkey;
+    info.approval = approval;
 
     // console.info('INFO = ' + JSON.stringify(info));
 
     // OBD API
     obdApi.acceptChannel(info, function(e) {
         console.info('acceptChannel - OBD Response = ' + JSON.stringify(e));
+        createOBDResponseDiv(e, msgType);
+    });
+}
+
+// funding BTC API at local.
+function fundingBTC(msgType) {
+
+    var from_address = $("#from_address").val();
+    var from_address_private_key   = $("#from_address_private_key").val();
+    var to_address   = $("#to_address").val();
+    var amount       = $("#amount").val();
+    var miner_fee    = $("#miner_fee").val();
+
+    // console.info('VALUE = ' + temp_cid + ' | ' + pubkey + ' | ' + approval);
+
+    let info = new BtcFundingInfo();
+    info.from_address = from_address;
+    info.from_address_private_key = from_address_private_key;
+    info.to_address = to_address;
+    info.amount     = Number(amount);
+    info.miner_fee  = Number(miner_fee);
+
+    // console.info('INFO = ' + JSON.stringify(info));
+
+    // OBD API
+    obdApi.fundingBTC(info, function(e) {
+        console.info('fundingBTC - OBD Response = ' + JSON.stringify(e));
         createOBDResponseDiv(e, msgType);
     });
 }
@@ -190,8 +222,7 @@ function invokeAPIs(objSelf) {
             createOBDResponseDiv(mnemonic);
             break;
         case enumMsgType.MsgType_Core_FundingBTC_1009:
-            let info = new BtcFundingInfo();
-            obdApi.fundingBTC(info);
+            fundingBTC(msgType);
             break;
         case enumMsgType.MsgType_Core_Omni_GetTransaction_1206:
             txid = "c76710920860456dff2433197db79dd030f9b527e83a2e253f5bc6ab7d197e73";
@@ -246,7 +277,7 @@ function displayOBDMessages(content) {
 }
 
 // getUserDataList
-function getUserDataList() {
+function getUserDataList(param) {
 
     var api_id, description, apiItem;
     var jsonFile = "json/user_data_list.json";
@@ -256,9 +287,9 @@ function getUserDataList() {
         // get [user_data_list] div
         var apiList = $("#user_data_list");
 
-        for (let index = 0; index < result.data.length; index++) {
-            api_id = result.data[index].id;
-            description = result.data[index].description;
+        for (let i = 0; i < result.data.length; i++) {
+            api_id = result.data[i].id;
+            description = result.data[i].description;
 
             // create [a] element
             apiItem = document.createElement('a');
@@ -271,13 +302,18 @@ function getUserDataList() {
 
             createHtmlElement(apiList, 'p');
         }
+
+        if (param === 1) {
+            $("#user_data_list").hide();
+            displayUserData(Addresses, param);
+        }
     });
 }
 
 // getUtilList
 function getUtilList() {
     var jsonFile = "json/util_list.json";
-    var divName = "#util_list";
+    var divName  = "#util_list";
 
     createLeftSideMenu(jsonFile, divName);
 }
@@ -285,7 +321,7 @@ function getUtilList() {
 // getAPIList
 function getAPIList() {
     var jsonFile = "json/api_list.json";
-    var divName = "#api_list";
+    var divName  = "#api_list";
 
     createLeftSideMenu(jsonFile, divName);
 }
@@ -300,10 +336,10 @@ function createLeftSideMenu(jsonFile, divName) {
         // get [api_list] div
         var apiList = $(divName);
 
-        for (let index = 0; index < result.data.length; index++) {
-            api_id = result.data[index].id;
-            type_id = result.data[index].type_id;
-            description = result.data[index].description;
+        for (let i = 0; i < result.data.length; i++) {
+            api_id = result.data[i].id;
+            type_id = result.data[i].type_id;
+            description = result.data[i].description;
 
             // create [a] element
             apiItem = document.createElement('a');
@@ -332,21 +368,15 @@ function displayAPIContent(obj) {
 
 // create 
 function createApiNameDiv(obj) {
-
-    // get [content] div
     var content_div = $("#name_req_div");
-
     // create [api_name] element
     createHtmlElement(content_div, 'h2', obj.innerHTML);
-
     // create [api_description] element
     createHtmlElement(content_div, 'text', obj.getAttribute("description"));
 }
 
 // create 
 function createRequestDiv(obj) {
-
-    // get [content] div
     var content_div = $("#name_req_div");
 
     // create [title] element
@@ -488,32 +518,14 @@ function connectNode() {
 
 // remove name and request Div
 function removeNameReqDiv() {
-
-    // var parent = document.getElementById('content');
-    // var children_amount = parent.children.length;
-    // // console.log('content div children = ' + children_amount);
-
-    // if (children_amount != 0) {
-    //     for (let index = children_amount - 1; index >= 0; index--) {
-    //         // console.log('index = ' + index);
-    //         parent.removeChild(parent.children[index]);
-    //     }
-    // }
-
     $("#name_req_div").remove();
-
-    // get [content] div
-    var content_div = $("#content");
-
     var name_req_div = document.createElement('div');
-    name_req_div.id = "name_req_div";
-    content_div.append(name_req_div);
+    name_req_div.id  = "name_req_div";
+    $("#content").append(name_req_div);
 }
 
 // create ConnectNodeDiv
 function createConnectNodeDiv() {
-
-    // get [content] div
     var content_div = $("#name_req_div");
 
     // create [title] element
@@ -807,27 +819,41 @@ function autoCreateMnemonic() {
 }
 
 // Generate a new pub key of an address.
-function autoCreateFundingPubkey() {
+function autoCreateFundingPubkey(param) {
     // Generate address by local js library.
     var result = getNewAddressWithMnemonic();
     if (result === '') return;
-    $("#funding_pubkey").val(result.result.pubkey);
+
+    switch (param) {
+        case 0:
+            $("#from_address").val(result.result.address);
+            $("#from_address_private_key").val(result.result.wif);
+            break;
+        default:
+            $("#funding_pubkey").val(result.result.pubkey);
+            break;
+    }
+
     saveAddrData(result);
+}
+
+// auto Calculation Miner Fee
+function autoCalcMinerFee() {
+    $("#miner_fee").val('0.00001');
 }
 
 //----------------------------------------------------------------
 // Functions of display User Data.
-function displayUserData(obj) {
+function displayUserData(obj, param) {
     removeNameReqDiv();
     createApiNameDiv(obj);
 
     switch (obj.id) {
         case 'MnemonicWords':
-            // console.info('Mnemonic Words');
             displayMnemonic();
             break;
         case 'Addresses':
-            displayAddresses();
+            displayAddresses(param);
             break;
         case 'Friends':
             displayFriends();
@@ -859,18 +885,33 @@ function displayMnemonic() {
 }
 
 //
-function displayAddresses() {
+function displayAddresses(param) {
     // get [name_req_div] div
     var parent = $("#name_req_div");
 
-    if (!isLogined) { // Not login.
-        createHtmlElement(parent, 'text', 'NO USER LOGINED.');
-        return;
+    console.info('LOGINED userID = '+userID);
+    
+    if (param === 1) {
+        var status = JSON.parse(localStorage.getItem('LoginStatus'));
+        console.info('saveLoginStatus  = ' + status);
+        if (status) {
+            if (!status.isLogined) { // Not login.
+                createHtmlElement(parent, 'text', 'NO USER LOGINED.');
+                return;
+            } else {
+                userID = status.userID;
+            }
+        }
+
+    } else {
+        if (!isLogined) { // Not login.
+            createHtmlElement(parent, 'text', 'NO USER LOGINED.');
+            return;
+        }
     }
 
     var arrData;
     var addr = JSON.parse(localStorage.getItem('addr'));
-    // console.info('localStorage KEY  = ' + addr);
 
     // If has data
     if (addr) {
@@ -878,11 +919,8 @@ function displayAddresses() {
             if (userID === addr.result[i].userID) {
                 // userID
                 createHtmlElement(parent, 'text', addr.result[i].userID);
-                // createHtmlElement(parent, 'p');
-
                 // title
                 createHtmlElement(parent, 'h2', 'Address List');
-                // createHtmlElement(parent, 'p');
 
                 for (let i2 = 0; i2 < addr.result[i].data.length; i2++) {
                     arrData = [
@@ -894,7 +932,6 @@ function displayAddresses() {
 
                     // Display list NO.
                     createHtmlElement(parent, 'h4', 'NO. ' + (i2 + 1));
-                    // createHtmlElement(parent, 'p');
 
                     for (let i3 = 0; i3 < arrData.length; i3++) {
                         createHtmlElement(parent, 'text', arrData[i3]);
@@ -958,4 +995,21 @@ function createHtmlElement(parent, elementName, myInnerText, cssStyle) {
     }
 
     parent.append(element);
+}
+
+//
+function displayUserDataInNewHtml() {
+    saveLoginStatus();
+    window.open('userData.html', 'data', 'height=600, width=800, top=150, ' + 
+        'left=500, toolbar=no, menubar=no, scrollbars=no, resizable=no, ' + 
+        'location=no, status=no');
+}
+
+//
+function saveLoginStatus() {
+    let data = {
+        isLogined: isLogined,
+        userID:    userID
+    }
+    window.localStorage.setItem('LoginStatus', JSON.stringify(data));
 }
