@@ -894,13 +894,11 @@ function displayAddresses(param) {
     if (param === 1) {
         var status = JSON.parse(localStorage.getItem('LoginStatus'));
         console.info('saveLoginStatus  = ' + status);
-        if (status) {
-            if (!status.isLogined) { // Not login.
-                createHtmlElement(parent, 'text', 'NO USER LOGINED.');
-                return;
-            } else {
-                userID = status.userID;
-            }
+        if (!status.isLogined) { // Not login.
+            createHtmlElement(parent, 'text', 'NO USER LOGINED.');
+            return;
+        } else {
+            userID = status.userID;
         }
 
     } else {
