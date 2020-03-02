@@ -23,7 +23,8 @@
 </body>
 
 <script>
-    var data = JSON.parse(localStorage.getItem('go_where'));
+    var name = getSaveNme();
+    var data = JSON.parse(localStorage.getItem(name));
     // console.info('goWhere= '+ data.goWhere);
     getUserDataList(data.goWhere);
 </script>

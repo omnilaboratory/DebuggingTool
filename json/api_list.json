@@ -65,7 +65,7 @@
                     "buttons": [
                         {
                             "innerText": "Get It",
-                            "onclick": ""
+                            "onclick": "displayUserDataInNewHtml('TempChannelInfo')"
                         }
                     ]
                 },
@@ -111,7 +111,7 @@
                     "buttons": [
                         {
                             "innerText": "Get It (Channel Addr)",
-                            "onclick": ""
+                            "onclick": "displayUserDataInNewHtml('TempChannelInfo')"
                         }
                     ]
                 },

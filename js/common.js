@@ -19,9 +19,34 @@ var obdMessages = '';
 // mnemonic using for login
 var mnemonicWithLogined = '';
 
+//
+var inNewHtml = 'inNewHtml';
+
+//
+var saveTempCI = 'tempChannelInfo';
+
+//
+var saveAddr = 'addr';
+
+//
+var saveFriends = 'list_of_friends';
+
+//
+var saveMnemonic = 'mnemonic';
+
+//
+var saveGoWhere = 'go_where';
+
+// the info save to local storage [tempChannelInfo].
+var channelInfo;
+
 // word wrap code.
 // result.setAttribute('style', 'word-break: break-all;white-space: normal;');
 
+// Get name of saveGoWhere variable.
+function getSaveNme() {
+    return saveGoWhere;
+}
 
 // getNewAddressWithMnemonic by local js library
 function getNewAddressWithMnemonic() {
@@ -113,7 +138,9 @@ function openChannel(msgType) {
         console.info('openChannel - OBD Response = ' + JSON.stringify(e));
 
         // Save List of friends who have interacted.
-        saveFriends(name);
+        saveFriendsList(name);
+        // Save Non-finalized channel information.
+        saveTempChannelInfo(e);
         createOBDResponseDiv(e, msgType);
     });
 }
@@ -127,29 +154,16 @@ function acceptChannel(msgType) {
 
     // console.info('VALUE = ' + temp_cid + ' | ' + pubkey + ' | ' + approval);
 
-    // if (approval) {
-    //     if (temp_cid.trim() === '' || pubkey.trim() === '') {
-    //         alert('Please input complete data.');
-    //         return;
-    //     }
-    // }
-
-    // var info = {
-    //     temporary_channel_id: temp_cid,
-    //     funding_pubkey:       pubkey,
-    //     approval:             approval
-    // }
-
     let info = new AcceptChannelInfo();
     info.temporary_channel_id = temp_cid;
     info.funding_pubkey = pubkey;
     info.approval = approval;
 
-    // console.info('INFO = ' + JSON.stringify(info));
-
     // OBD API
     obdApi.acceptChannel(info, function(e) {
         console.info('acceptChannel - OBD Response = ' + JSON.stringify(e));
+        // Save Non-finalized channel information.
+        saveTempChannelInfo(e);
         createOBDResponseDiv(e, msgType);
     });
 }
@@ -254,13 +268,22 @@ function displayOBDMessages(content) {
         case enumMsgType.MsgType_GetMnemonic_101:
             return;
         case enumMsgType.MsgType_ChannelOpen_N32:
-            content.result = 'USER : ' + content.from + ' launch an Open Channel request.';
+            content.result = 'USER : ' + content.from + 
+                ' launch an Open Channel request. ' + 
+                'The [temporary_channel_id] is : ' + 
+                content.result.temporary_channel_id;
             break;
         case enumMsgType.MsgType_ChannelAccept_N33:
             if (content.result.curr_state === 20) {  // Accept
-                content.result = 'USER : ' + content.from + ' Accept Open Channel request.';
+                content.result = 'USER : ' + content.from + 
+                    ' Accept Open Channel request. ' + 
+                    'The [temporary_channel_id] is : ' + 
+                    content.result.temporary_channel_id;
             } else if (content.result.curr_state === 30) { // Not Accept
-                content.result = 'USER : ' + content.from + ' Not Accept Open Channel request.';
+                content.result = 'USER : ' + content.from + 
+                    ' Not Accept Open Channel request. ' + 
+                    'The [temporary_channel_id] is : ' + 
+                    content.result.temporary_channel_id;
             }
             break;
     }
@@ -268,6 +291,9 @@ function displayOBDMessages(content) {
     content = JSON.stringify(content.result);
     content = content.replace("\"","").replace("\"","");
     console.info("OBD DIS - content = ", content);
+
+    // the info save to local storage [tempChannelInfo].
+    channelInfo = content;
 
     // Some case do not need displayed.
     if (content === 'already login' || content === 'undefined') return;
@@ -304,17 +330,20 @@ function getUserDataList(goWhere) {
         }
 
         // display User Data in new html page.
-        console.info('goWhere LIST = '+ goWhere);
+        // console.info('goWhere LIST = '+ goWhere);
         if (goWhere) $("#user_data_list").hide();
         switch (goWhere) {
             case 'MnemonicWords':
                 displayUserData(MnemonicWords);
                 break;
             case 'Addresses':
-                displayUserData(Addresses, 'inNewHtml');
+                displayUserData(Addresses, inNewHtml);
                 break;
             case 'Friends':
                 displayUserData(Friends);
+                break;
+            case 'TempChannelInfo':
+                displayUserData(TempChannelInfo, inNewHtml);
                 break;
         }
     });
@@ -649,15 +678,25 @@ function parseDataN32(response) {
     var arrData = [
         'chain_hash : ' + response.chain_hash,
         'channel_reserve_satoshis : ' + response.channel_reserve_satoshis,
+        'delayed_payment_base_point : ' + response.delayed_payment_base_point,
+        'dust_limit_satoshis : ' + response.dust_limit_satoshis,
+        'fee_rate_per_kw : ' + response.fee_rate_per_kw,
         'funding_address : ' + response.funding_address,
         'funding_pubkey : ' + response.funding_pubkey,
         'funding_satoshis : ' + response.funding_satoshis,
+        'htlc_base_point : ' + response.htlc_base_point,
+        'htlc_minimum_msat : ' + response.htlc_minimum_msat,
+        'max_accepted_htlcs : ' + response.max_accepted_htlcs,
+        'max_htlc_value_in_flight_msat : ' + response.max_htlc_value_in_flight_msat,
+        'payment_base_point : ' + response.payment_base_point,
+        'push_msat : ' + response.push_msat,
+        'revocation_base_point : ' + response.revocation_base_point,
         'temporary_channel_id : ' + response.temporary_channel_id,
+        'to_self_delay : ' + response.to_self_delay,
     ];
 
     for (let i = 0; i < arrData.length; i++) {
         createHtmlElement(obd_response_div, 'p', arrData[i]);
-        // createHtmlElement(obd_response_div, 'p');
     }
 }
 
@@ -666,25 +705,50 @@ function parseDataN33(response) {
     // curr_state = 20 is accept open channel request.
     // curr_state = 30 is NOT accept open channel request.
     var arrData = [
+        'accept_at : ' + response.accept_at,
         'address_a : ' + response.address_a,
+        'address_b : ' + response.address_b,
         'chain_hash : ' + response.chain_hash,
         'channel_address : ' + response.channel_address,
+        'channel_address_redeem_script : ' + response.channel_address_redeem_script,
+        'channel_address_script_pub_key : ' + response.channel_address_script_pub_key,
+        'channel_id : ' + response.channel_id,
+        'channel_reserve_satoshis : ' + response.channel_reserve_satoshis,
+        'close_at : ' + response.close_at,
+        'create_at : ' + response.create_at,
         'create_by : ' + response.create_by,
         'curr_state : ' + response.curr_state,
+        'delayed_payment_base_point : ' + response.delayed_payment_base_point,
+        'dust_limit_satoshis : ' + response.dust_limit_satoshis,
+        'fee_rate_per_kw : ' + response.fee_rate_per_kw,
+        'funding_address : ' + response.funding_address,
+        'funding_pubkey : ' + response.funding_pubkey,
+        'funding_satoshis : ' + response.funding_satoshis,
+        'htlc_base_point : ' + response.htlc_base_point,
+        'htlc_minimum_msat : ' + response.htlc_minimum_msat,
+        'id : ' + response.id,
+        'max_accepted_htlcs : ' + response.max_accepted_htlcs,
+        'max_htlc_value_in_flight_msat : ' + response.max_htlc_value_in_flight_msat,
+        'payment_base_point : ' + response.payment_base_point,
         'peer_id_a : ' + response.peer_id_a,
         'peer_id_b : ' + response.peer_id_b,
+        'pub_key_a : ' + response.pub_key_a,
+        'pub_key_b : ' + response.pub_key_b,
+        'push_msat : ' + response.push_msat,
+        'revocation_base_point : ' + response.revocation_base_point,
+        'temporary_channel_id : ' + response.temporary_channel_id,
+        'to_self_delay : ' + response.to_self_delay,
     ];
 
     for (let i = 0; i < arrData.length; i++) {
         createHtmlElement(obd_response_div, 'p', arrData[i]);
-        // createHtmlElement(obd_response_div, 'p');
     }
 }
 
 // get a new index of address
 function getNewAddrIndex() {
 
-    var addr = JSON.parse(localStorage.getItem('addr'));
+    var addr = JSON.parse(localStorage.getItem(saveAddr));
     // console.info('localStorage KEY  = ' + addr);
 
     // If has data.
@@ -710,7 +774,7 @@ function getNewAddrIndex() {
 // Address data generated with mnemonic save to local storage.
 function saveAddrData(response) {
     
-    var addr = JSON.parse(localStorage.getItem('addr'));
+    var addr = JSON.parse(localStorage.getItem(saveAddr));
     // console.info('localStorage KEY  = ' + addr);
 
     // If has data.
@@ -726,7 +790,7 @@ function saveAddrData(response) {
                     wif:     response.result.wif
                 }
                 addr.result[i].data.push(new_data);
-                window.localStorage.setItem('addr', JSON.stringify(addr));
+                localStorage.setItem(saveAddr, JSON.stringify(addr));
                 return;
             }
         }
@@ -742,7 +806,7 @@ function saveAddrData(response) {
             }]
         }
         addr.result.push(new_data);
-        window.localStorage.setItem('addr', JSON.stringify(addr));
+        localStorage.setItem(saveAddr, JSON.stringify(addr));
 
     } else {
         // console.info('FIRST DATA');
@@ -757,14 +821,100 @@ function saveAddrData(response) {
                 }]
             }]
         }
-        window.localStorage.setItem('addr', JSON.stringify(data));
+        localStorage.setItem(saveAddr, JSON.stringify(data));
+    }
+}
+
+// Process data for saveTempChannelInfo func.
+function getTempCIData(response) {
+    // var data;
+    // var isFromOpenChannel = false;
+
+    // try {
+    //     var create_at = response.result.create_at;
+    // } catch (error) {
+    //     console.info('VALUE = -32');
+    //     isFromOpenChannel = true;
+    // }
+
+    // if (isFromOpenChannel) {
+    //     data = {
+    //         create_at: '',
+    //         create_by: '',
+    //         accept_at: '',
+    //         address_a: '',
+    //         address_b: '',
+    //         channel_address: '',
+    //         temporary_channel_id: response.temporary_channel_id
+    //     };
+    // } else {
+    //     data = {
+    //         create_at: response.create_at,
+    //         create_by: response.create_by,
+    //         accept_at: response.accept_at,
+    //         address_a: response.address_a,
+    //         address_b: response.address_b,
+    //         channel_address: response.channel_address,
+    //         temporary_channel_id: response.temporary_channel_id
+    //     }
+    // }
+
+    var data = {
+        channelInfo: channelInfo,
+        create_at: response.create_at,
+        create_by: response.create_by,
+        accept_at: response.accept_at,
+        address_a: response.address_a,
+        address_b: response.address_b,
+        channel_address: response.channel_address,
+        temporary_channel_id: response.temporary_channel_id
+    }
+
+    return data;
+}
+
+// Non-finalized channel information.
+function saveTempChannelInfo(response) {
+    
+    var tempCI = JSON.parse(localStorage.getItem(saveTempCI));
+    // console.info('localStorage KEY  = ' + addr);
+
+    // If has data.
+    if (tempCI) {
+        // console.info('HAS DATA');
+        for (let i = 0; i < tempCI.result.length; i++) {
+            if (userID === tempCI.result[i].userID) {
+                // Add new dato to 
+                tempCI.result[i].data.push(getTempCIData(response));
+                localStorage.setItem(saveTempCI, JSON.stringify(tempCI));
+                return;
+            }
+        }
+
+        // A new User ID.
+        let new_data = {
+            userID: userID,
+            data: [getTempCIData(response)]
+        }
+        tempCI.result.push(new_data);
+        localStorage.setItem(saveTempCI, JSON.stringify(tempCI));
+
+    } else {
+        // console.info('FIRST DATA');
+        let data = {
+            result: [{
+                userID: userID,
+                data: [getTempCIData(response)]
+            }]
+        }
+        localStorage.setItem(saveTempCI, JSON.stringify(data));
     }
 }
 
 // mnemonic words generated with signUp api save to local storage.
 function saveMnemonicData(response) {
 
-    var mnemonic = JSON.parse(localStorage.getItem('mnemonic'));
+    var mnemonic = JSON.parse(localStorage.getItem(saveMnemonic));
     // console.info('localStorage KEY  = ' + addr);
 
     // If has data.
@@ -774,7 +924,7 @@ function saveMnemonicData(response) {
             mnemonic: response,
         }
         mnemonic.result.push(new_data);
-        window.localStorage.setItem('mnemonic', JSON.stringify(mnemonic));
+        localStorage.setItem(saveMnemonic, JSON.stringify(mnemonic));
 
     } else {
         // console.info('FIRST DATA');
@@ -783,15 +933,15 @@ function saveMnemonicData(response) {
                 mnemonic: response
             }]
         }
-        window.localStorage.setItem('mnemonic', JSON.stringify(data));
+        localStorage.setItem(saveMnemonic, JSON.stringify(data));
     }
 }
 
 // List of friends who have interacted
-function saveFriends(name) {
+function saveFriendsList(name) {
     
     // var name = $("#recipient_peer_id").val();
-    var list = JSON.parse(localStorage.getItem('list_of_friends'));
+    var list = JSON.parse(localStorage.getItem(saveFriends));
 
     // If has data.
     if (list) {
@@ -804,7 +954,7 @@ function saveFriends(name) {
             name: name,
         }
         list.result.push(new_data);
-        window.localStorage.setItem('list_of_friends', JSON.stringify(list));
+        localStorage.setItem(saveFriends, JSON.stringify(list));
 
     } else {
         // console.info('FIRST DATA');
@@ -813,7 +963,7 @@ function saveFriends(name) {
                 name: name
             }]
         }
-        window.localStorage.setItem('list_of_friends', JSON.stringify(data));
+        localStorage.setItem(saveFriends, JSON.stringify(data));
     }
 }
 
@@ -868,6 +1018,9 @@ function displayUserData(obj, param) {
         case 'Friends':
             displayFriends();
             break;
+        case 'TempChannelInfo':
+            displayTempChannelInfo(param);
+            break;
     }
 }
 
@@ -875,7 +1028,7 @@ function displayUserData(obj, param) {
 function displayMnemonic() {
     // get [name_req_div] div
     var parent = $("#name_req_div");
-    var mnemonic = JSON.parse(localStorage.getItem('mnemonic'));
+    var mnemonic = JSON.parse(localStorage.getItem(saveMnemonic));
     // console.info('localStorage KEY  = ' + addr);
 
     // If has data
@@ -897,11 +1050,10 @@ function displayAddresses(param) {
     // get [name_req_div] div
     var parent = $("#name_req_div");
 
-    console.info('LOGINED userID = '+userID);
+    // console.info('LOGINED userID = '+userID);
     
-    if (param === 'inNewHtml') {
-        var status = JSON.parse(localStorage.getItem('go_where'));
-        console.info('go_where status = ' + status);
+    if (param === inNewHtml) {
+        var status = JSON.parse(localStorage.getItem(saveGoWhere));
         if (!status.isLogined) { // Not login.
             createHtmlElement(parent, 'text', 'NO USER LOGINED.');
             return;
@@ -917,7 +1069,7 @@ function displayAddresses(param) {
     }
 
     var arrData;
-    var addr = JSON.parse(localStorage.getItem('addr'));
+    var addr = JSON.parse(localStorage.getItem(saveAddr));
 
     // If has data
     if (addr) {
@@ -962,7 +1114,7 @@ function displayFriends() {
     // get [name_req_div] div
     var parent = $("#name_req_div");
 
-    var list = JSON.parse(localStorage.getItem('list_of_friends'));
+    var list = JSON.parse(localStorage.getItem(saveFriends));
 
     // If has data
     if (list) {
@@ -973,6 +1125,77 @@ function displayFriends() {
         }
     } else { // NO LOCAL STORAGE DATA YET.
         createHtmlElement(parent, 'h3', 'NO DATA YET.');
+    }
+}
+
+// displayTempChannelInfo
+function displayTempChannelInfo(param) {
+    // get [name_req_div] div
+    var parent = $("#name_req_div");
+
+    /*
+    if (param === inNewHtml) {
+        var status = JSON.parse(localStorage.getItem(saveGoWhere));
+        if (!status.isLogined) { // Not login.
+            createHtmlElement(parent, 'text', 'NO USER LOGINED.');
+            return;
+        } else {
+            userID = status.userID;
+        }
+        
+    } else {
+        if (!isLogined) { // Not login.
+            createHtmlElement(parent, 'text', 'NO USER LOGINED.');
+            return;
+        }
+    }
+    */
+
+
+    var arrData, count = 1;
+    var list = JSON.parse(localStorage.getItem(saveTempCI));
+
+    // If has data
+    if (list) {
+        for (let i = 0; i < list.result.length; i++) {
+            // if (userID === list.result[i].userID) {
+                // userID
+                // createHtmlElement(parent, 'text', list.result[i].userID);
+                // title
+                // createHtmlElement(parent, 'h2', 'Non-finalized Channel Info:');
+
+                for (let i2 = 0; i2 < list.result[i].data.length; i2++) {
+                    arrData = [
+                        'channel_address : ' + list.result[i].data[i2].channel_address,
+                        'temporary_channel_id : '   + list.result[i].data[i2].temporary_channel_id,
+                        'create_at : ' + list.result[i].data[i2].create_at,
+                        'create_by : '     + list.result[i].data[i2].create_by,
+                        'accept_at : '     + list.result[i].data[i2].accept_at,
+                        'address_a : '     + list.result[i].data[i2].address_a,
+                        'address_b : '     + list.result[i].data[i2].address_b,
+                    ];
+
+                    // Display list NO.
+                    // createHtmlElement(parent, 'h4', 'NO. ' + (i2 + 1));
+                    createHtmlElement(parent, 'h4', 'NO. ' + count);
+                    createHtmlElement(parent, 'h5', list.result[i].data[i2].channelInfo);
+                    count++;
+
+                    for (let i3 = 0; i3 < arrData.length; i3++) {
+                        createHtmlElement(parent, 'text', arrData[i3]);
+                        createHtmlElement(parent, 'br');
+                    }
+                }
+
+                // return;
+            // }
+        }
+
+        // The user has not create address yet.
+        // displayNoData(parent);
+
+    } else { // NO LOCAL STORAGE DATA YET.
+        displayNoData(parent);
     }
 }
 
@@ -1018,5 +1241,5 @@ function saveGoWhereData(goWhere) {
         isLogined: isLogined,
         userID:    userID
     }
-    window.localStorage.setItem('go_where', JSON.stringify(data));
+    localStorage.setItem(saveGoWhere, JSON.stringify(data));
 }
