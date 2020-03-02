@@ -16,7 +16,7 @@
                     "buttons": [
                         {
                             "innerText": "Get It",
-                            "onclick": "displayUserData(MnemonicWords)"
+                            "onclick": "displayUserDataInNewHtml('MnemonicWords')"
                         },
                         {
                             "innerText": "Auto Create",
@@ -36,7 +36,7 @@
                     "buttons": [
                         {
                             "innerText": "Get It",
-                            "onclick": "displayUserDataInNewHtml()"
+                            "onclick": "displayUserDataInNewHtml('Addresses')"
                         },
                         {
                             "innerText": "Auto Create",
@@ -49,7 +49,7 @@
                     "buttons": [
                         {
                             "innerText": "Friends",
-                            "onclick": "displayUserData(Friends)"
+                            "onclick": "displayUserDataInNewHtml('Friends')"
                         }
                     ]
                 }
@@ -74,7 +74,7 @@
                     "buttons": [
                         {
                             "innerText": "Get It",
-                            "onclick": "displayUserData(Addresses)"
+                            "onclick": "displayUserDataInNewHtml('Addresses')"
                         },
                         {
                             "innerText": "Auto Create",
@@ -98,7 +98,7 @@
                     "buttons": [
                         {
                             "innerText": "Get It",
-                            "onclick": "displayUserData(Addresses)"
+                            "onclick": "displayUserDataInNewHtml('Addresses')"
                         },
                         {
                             "innerText": "Auto Create Addr and Privkey",
@@ -110,8 +110,8 @@
                     "name": "to_address",
                     "buttons": [
                         {
-                            "innerText": "Get It",
-                            "onclick": "displayUserData(Addresses)"
+                            "innerText": "Get It (Channel Addr)",
+                            "onclick": ""
                         }
                     ]
                 },

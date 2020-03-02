@@ -23,35 +23,9 @@
 </body>
 
 <script>
-    // var jsonFile = "json/user_data_list.json";
-    // dynamic create api_list div.
-    // $.getJSON(jsonFile, function(result) {
-
-        // var data = {
-        //     id:          "Addresses",
-        //     description: "uytAddresses created with mnemonic from USER: "
-        // };
-
-        // var api_id = data.id;
-        // var description = data.description;
-
-        // // create [a] element
-        // var apiList = $("#content");
-        // var obj = document.createElement('a');
-        // obj.id = api_id;
-        // obj.href = '#';
-        // obj.setAttribute('description', description);
-        // obj.innerText = api_id;
-        // apiList.append(obj);
-
-        // // $("#Addresses").hide();
-        // // var ele="#"+api_id;
-        // $("#"+api_id).hide();
-        // console.info('obj = '+obj.getAttribute("description"));
-
-        getUserDataList(1);
-
-    // });
+    var data = JSON.parse(localStorage.getItem('go_where'));
+    // console.info('goWhere= '+ data.goWhere);
+    getUserDataList(data.goWhere);
 </script>
 
 </html>

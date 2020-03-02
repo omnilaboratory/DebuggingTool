@@ -277,7 +277,7 @@ function displayOBDMessages(content) {
 }
 
 // getUserDataList
-function getUserDataList(param) {
+function getUserDataList(goWhere) {
 
     var api_id, description, apiItem;
     var jsonFile = "json/user_data_list.json";
@@ -303,9 +303,19 @@ function getUserDataList(param) {
             createHtmlElement(apiList, 'p');
         }
 
-        if (param === 1) {
-            $("#user_data_list").hide();
-            displayUserData(Addresses, param);
+        // display User Data in new html page.
+        console.info('goWhere LIST = '+ goWhere);
+        if (goWhere) $("#user_data_list").hide();
+        switch (goWhere) {
+            case 'MnemonicWords':
+                displayUserData(MnemonicWords);
+                break;
+            case 'Addresses':
+                displayUserData(Addresses, 'inNewHtml');
+                break;
+            case 'Friends':
+                displayUserData(Friends);
+                break;
         }
     });
 }
@@ -858,8 +868,6 @@ function displayUserData(obj, param) {
         case 'Friends':
             displayFriends();
             break;
-        default:
-            break;
     }
 }
 
@@ -891,9 +899,9 @@ function displayAddresses(param) {
 
     console.info('LOGINED userID = '+userID);
     
-    if (param === 1) {
-        var status = JSON.parse(localStorage.getItem('LoginStatus'));
-        console.info('saveLoginStatus  = ' + status);
+    if (param === 'inNewHtml') {
+        var status = JSON.parse(localStorage.getItem('go_where'));
+        console.info('go_where status = ' + status);
         if (!status.isLogined) { // Not login.
             createHtmlElement(parent, 'text', 'NO USER LOGINED.');
             return;
@@ -996,18 +1004,19 @@ function createHtmlElement(parent, elementName, myInnerText, cssStyle) {
 }
 
 //
-function displayUserDataInNewHtml() {
-    saveLoginStatus();
+function displayUserDataInNewHtml(goWhere) {
+    saveGoWhereData(goWhere);
     window.open('userData.html', 'data', 'height=600, width=800, top=150, ' + 
         'left=500, toolbar=no, menubar=no, scrollbars=no, resizable=no, ' + 
         'location=no, status=no');
 }
 
 //
-function saveLoginStatus() {
+function saveGoWhereData(goWhere) {
     let data = {
+        goWhere:   goWhere,
         isLogined: isLogined,
         userID:    userID
     }
-    window.localStorage.setItem('LoginStatus', JSON.stringify(data));
+    window.localStorage.setItem('go_where', JSON.stringify(data));
 }
