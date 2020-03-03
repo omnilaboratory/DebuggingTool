@@ -44,7 +44,7 @@ var channelInfo;
 // result.setAttribute('style', 'word-break: break-all;white-space: normal;');
 
 // Get name of saveGoWhere variable.
-function getSaveNme() {
+function getSaveName() {
     return saveGoWhere;
 }
 
@@ -266,24 +266,25 @@ function displayOBDMessages(content) {
         case enumMsgType.MsgType_Mnemonic_CreateAddress_N200:
         case enumMsgType.MsgType_Mnemonic_GetAddressByIndex_201:
         case enumMsgType.MsgType_GetMnemonic_101:
+        case enumMsgType.MsgType_Core_BalanceByAddress_1008:
             return;
         case enumMsgType.MsgType_ChannelOpen_N32:
-            content.result = 'USER : ' + content.from + 
-                ' launch an Open Channel request. ' + 
-                'The [temporary_channel_id] is : ' + 
-                content.result.temporary_channel_id;
+            content.result = 'LAUNCH - ' + content.from + 
+                ' - launch an Open Channel request. ';
+                // 'The [temporary_channel_id] is : ' + 
+                // content.result.temporary_channel_id;
             break;
         case enumMsgType.MsgType_ChannelAccept_N33:
             if (content.result.curr_state === 20) {  // Accept
-                content.result = 'USER : ' + content.from + 
-                    ' Accept Open Channel request. ' + 
-                    'The [temporary_channel_id] is : ' + 
-                    content.result.temporary_channel_id;
+                content.result = 'ACCEPT - ' + content.from + 
+                    ' - accept Open Channel request. ';
+                    // 'The [temporary_channel_id] is : ' + 
+                    // content.result.temporary_channel_id;
             } else if (content.result.curr_state === 30) { // Not Accept
-                content.result = 'USER : ' + content.from + 
-                    ' Not Accept Open Channel request. ' + 
-                    'The [temporary_channel_id] is : ' + 
-                    content.result.temporary_channel_id;
+                content.result = 'DECLINE - ' + content.from + 
+                    ' - decline Open Channel request. ';
+                    // 'The [temporary_channel_id] is : ' + 
+                    // content.result.temporary_channel_id;
             }
             break;
     }
@@ -326,7 +327,7 @@ function getUserDataList(goWhere) {
             apiItem.innerText = api_id;
             apiList.append(apiItem);
 
-            createHtmlElement(apiList, 'p');
+            createElement(apiList, 'p');
         }
 
         // display User Data in new html page.
@@ -390,7 +391,7 @@ function createLeftSideMenu(jsonFile, divName) {
             apiItem.innerText = api_id;
             apiList.append(apiItem);
 
-            createHtmlElement(apiList, 'p');
+            createElement(apiList, 'p');
         }
     });
 }
@@ -409,9 +410,9 @@ function displayAPIContent(obj) {
 function createApiNameDiv(obj) {
     var content_div = $("#name_req_div");
     // create [api_name] element
-    createHtmlElement(content_div, 'h2', obj.innerHTML);
+    createElement(content_div, 'h2', obj.innerHTML);
     // create [api_description] element
-    createHtmlElement(content_div, 'text', obj.getAttribute("description"));
+    createElement(content_div, 'text', obj.getAttribute("description"));
 }
 
 // create 
@@ -419,17 +420,17 @@ function createRequestDiv(obj) {
     var content_div = $("#name_req_div");
 
     // create [title] element
-    createHtmlElement(content_div, 'h2', 'Request');
+    createElement(content_div, 'h2', 'Request');
 
     // create [func_title] element
-    createHtmlElement(content_div, 'text', 'func: ', cssStyle);
+    createElement(content_div, 'text', 'func: ', cssStyle);
 
     // create [func_name] element: id = JS function name.
-    createHtmlElement(content_div, 'text', obj.getAttribute("id"));
+    createElement(content_div, 'text', obj.getAttribute("id"));
 
     // create [type_id] element
     var value = " type ( " + obj.getAttribute("type_id") + " )";
-    createHtmlElement(content_div, 'text', value, cssStyle);
+    createElement(content_div, 'text', value, cssStyle);
 }
 
 // dynamic create input parameters div area.
@@ -454,7 +455,7 @@ function createInputParamDiv(obj, jsonFile) {
                 }
 
                 // create [title] element
-                createHtmlElement(content_div, 'p', 'Input Parameters:');
+                createElement(content_div, 'p', 'Input Parameters:');
                 
                 // Parameters
                 createParamOfAPI(arrParams, content_div);
@@ -466,7 +467,7 @@ function createInputParamDiv(obj, jsonFile) {
             var type_id = Number(obj.getAttribute("type_id"));
             if (type_id === enumMsgType.MsgType_ChannelAccept_N33) {
                 // console.info('CHECKBOX');
-                createHtmlElement(content_div, 'text', 'Approval ');
+                createElement(content_div, 'text', 'Approval ');
     
                 var element = document.createElement('input');
                 element.id   = 'checkbox_n33';
@@ -500,7 +501,7 @@ function createParamOfAPI(arrParams, content_div) {
 
     for (let i = 0; i < arrParams.length; i++) {
         // create [param_title] element
-        createHtmlElement(content_div, 'text', arrParams[i].name + ' : ', cssStyle);
+        createElement(content_div, 'text', arrParams[i].name + ' : ', cssStyle);
 
         // create [input box of param] element
         input_box = document.createElement('input');
@@ -508,7 +509,7 @@ function createParamOfAPI(arrParams, content_div) {
         content_div.append(input_box);
 
         createButtonOfParam(arrParams, i, content_div);
-        createHtmlElement(content_div, 'p');
+        createElement(content_div, 'p');
     }
 }
 
@@ -537,7 +538,7 @@ function createInvokeAPIButton(obj) {
     // get [content] div
     var content_div = $("#name_req_div");
 
-    createHtmlElement(content_div, 'p');
+    createElement(content_div, 'p');
 
     // create [Send button] element
     var button = document.createElement('button');
@@ -568,10 +569,10 @@ function createConnectNodeDiv() {
     var content_div = $("#name_req_div");
 
     // create [title] element
-    createHtmlElement(content_div, 'h2', 'OBD Node');
+    createElement(content_div, 'h2', 'OBD Node');
 
     // create [input title] element
-    createHtmlElement(content_div, 'text', 'Node URL: ', cssStyle);
+    createElement(content_div, 'text', 'Node URL: ', cssStyle);
 
     // create [input] element
     var node_url = document.createElement('input');
@@ -591,7 +592,7 @@ function createConnectNodeDiv() {
     // already connected
     if (isConnectToOBD === true) {
         changeConnectButtonStatus();
-        createHtmlElement(content_div, 'h3', 'Already connected.');
+        createElement(content_div, 'h3', 'Already connected.');
     }
 }
 
@@ -636,7 +637,7 @@ function createOBDResponseDiv(response, msgType) {
     $("#name_req_div").append(obd_response_div);
 
     // create [title] element
-    createHtmlElement(obd_response_div, 'h2', 'OBD Response');
+    createElement(obd_response_div, 'h2', 'OBD Response');
 
     switch (msgType) {
         case enumMsgType.MsgType_Mnemonic_CreateAddress_N200:
@@ -650,7 +651,7 @@ function createOBDResponseDiv(response, msgType) {
             parseDataN33(response);
             break;
         default:
-            createHtmlElement(obd_response_div, 'p', response);
+            createElement(obd_response_div, 'p', response);
             break;
     }
 }
@@ -668,8 +669,8 @@ function parseDataN200(response) {
     ];
 
     for (let i = 0; i < arrData.length; i++) {
-        createHtmlElement(obd_response_div, 'text', arrData[i]);
-        createHtmlElement(obd_response_div, 'p');
+        createElement(obd_response_div, 'text', arrData[i]);
+        createElement(obd_response_div, 'p');
     }
 }
 
@@ -696,7 +697,7 @@ function parseDataN32(response) {
     ];
 
     for (let i = 0; i < arrData.length; i++) {
-        createHtmlElement(obd_response_div, 'p', arrData[i]);
+        createElement(obd_response_div, 'p', arrData[i]);
     }
 }
 
@@ -741,7 +742,7 @@ function parseDataN33(response) {
     ];
 
     for (let i = 0; i < arrData.length; i++) {
-        createHtmlElement(obd_response_div, 'p', arrData[i]);
+        createElement(obd_response_div, 'p', arrData[i]);
     }
 }
 
@@ -827,37 +828,6 @@ function saveAddrData(response) {
 
 // Process data for saveTempChannelInfo func.
 function getTempCIData(response) {
-    // var data;
-    // var isFromOpenChannel = false;
-
-    // try {
-    //     var create_at = response.result.create_at;
-    // } catch (error) {
-    //     console.info('VALUE = -32');
-    //     isFromOpenChannel = true;
-    // }
-
-    // if (isFromOpenChannel) {
-    //     data = {
-    //         create_at: '',
-    //         create_by: '',
-    //         accept_at: '',
-    //         address_a: '',
-    //         address_b: '',
-    //         channel_address: '',
-    //         temporary_channel_id: response.temporary_channel_id
-    //     };
-    // } else {
-    //     data = {
-    //         create_at: response.create_at,
-    //         create_by: response.create_by,
-    //         accept_at: response.accept_at,
-    //         address_a: response.address_a,
-    //         address_b: response.address_b,
-    //         channel_address: response.channel_address,
-    //         temporary_channel_id: response.temporary_channel_id
-    //     }
-    // }
 
     var data = {
         channelInfo: channelInfo,
@@ -876,33 +846,36 @@ function getTempCIData(response) {
 // Non-finalized channel information.
 function saveTempChannelInfo(response) {
     
-    var tempCI = JSON.parse(localStorage.getItem(saveTempCI));
+    var list = JSON.parse(localStorage.getItem(saveTempCI));
     // console.info('localStorage KEY  = ' + addr);
 
     // If has data.
-    if (tempCI) {
+    if (list) {
         // console.info('HAS DATA');
-        for (let i = 0; i < tempCI.result.length; i++) {
-            if (userID === tempCI.result[i].userID) {
+        for (let i = 0; i < list.result.length; i++) {
+            // if (userID === tempCI.result[i].userID) {
+            if (response.temporary_channel_id === list.result[i].temporary_channel_id) {
                 // Add new dato to 
-                tempCI.result[i].data.push(getTempCIData(response));
-                localStorage.setItem(saveTempCI, JSON.stringify(tempCI));
+                list.result[i].data.push(getTempCIData(response));
+                localStorage.setItem(saveTempCI, JSON.stringify(list));
                 return;
             }
         }
 
-        // A new User ID.
+        // A new 
         let new_data = {
+            temporary_channel_id: response.temporary_channel_id,
             userID: userID,
             data: [getTempCIData(response)]
         }
-        tempCI.result.push(new_data);
-        localStorage.setItem(saveTempCI, JSON.stringify(tempCI));
+        list.result.push(new_data);
+        localStorage.setItem(saveTempCI, JSON.stringify(list));
 
     } else {
         // console.info('FIRST DATA');
         let data = {
             result: [{
+                temporary_channel_id: response.temporary_channel_id,
                 userID: userID,
                 data: [getTempCIData(response)]
             }]
@@ -970,6 +943,19 @@ function saveFriendsList(name) {
 //----------------------------------------------------------------
 // Functions of buttons.
 
+// 
+function getBtcBalance(strAddr) {
+    // console.info('strAddr = ' + strAddr);
+    // OBD API
+    obdApi.getBtcBalanceByAddress(strAddr, function(e) {
+        console.info('getBtcBalance - OBD Response = ' + JSON.stringify(e));
+        var result = JSON.stringify(e);
+        result     = result.replace("\"","").replace("\"","");
+        result     = 'BALANCE : ' + result + ' BTC ';
+        $("#" + strAddr).text(result);
+    });
+}
+
 // Generate new mnemonic words.
 function autoCreateMnemonic() {
     // Generate mnemonic by local js library.
@@ -1034,14 +1020,11 @@ function displayMnemonic() {
     // If has data
     if (mnemonic) {
         for (let i = 0; i < mnemonic.result.length; i++) {
-            // Display list NO.
-            createHtmlElement(parent, 'h4', 'NO. ' + (i + 1));
-            // createHtmlElement(parent, 'p');
-            createHtmlElement(parent, 'text', mnemonic.result[i].mnemonic);
-            // createHtmlElement(parent, 'p');
+            createElement(parent, 'h4', 'NO. ' + (i + 1));
+            createElement(parent, 'text', mnemonic.result[i].mnemonic);
         }
     } else { // NO LOCAL STORAGE DATA YET.
-        createHtmlElement(parent, 'h3', 'NO DATA YET. YOU CAN CREATE ONE WITH [signUp].');
+        createElement(parent, 'h3', 'NO DATA YET. YOU CAN CREATE ONE WITH [signUp].');
     }
 }
 
@@ -1055,7 +1038,7 @@ function displayAddresses(param) {
     if (param === inNewHtml) {
         var status = JSON.parse(localStorage.getItem(saveGoWhere));
         if (!status.isLogined) { // Not login.
-            createHtmlElement(parent, 'text', 'NO USER LOGINED.');
+            createElement(parent, 'text', 'NO USER LOGINED.');
             return;
         } else {
             userID = status.userID;
@@ -1063,7 +1046,7 @@ function displayAddresses(param) {
 
     } else {
         if (!isLogined) { // Not login.
-            createHtmlElement(parent, 'text', 'NO USER LOGINED.');
+            createElement(parent, 'text', 'NO USER LOGINED.');
             return;
         }
     }
@@ -1075,12 +1058,14 @@ function displayAddresses(param) {
     if (addr) {
         for (let i = 0; i < addr.result.length; i++) {
             if (userID === addr.result[i].userID) {
-                // userID
-                createHtmlElement(parent, 'text', addr.result[i].userID);
-                // title
-                createHtmlElement(parent, 'h2', 'Address List');
+                createElement(parent, 'text', addr.result[i].userID);
+                createElement(parent, 'h2', 'Address List');
 
                 for (let i2 = 0; i2 < addr.result[i].data.length; i2++) {
+                    createElement(parent, 'h4', 'NO. ' + (i2 + 1));
+                    var strAddr = addr.result[i].data[i2].address;
+                    createBalanceElement(parent, strAddr);
+
                     arrData = [
                         'ADDRESS : ' + addr.result[i].data[i2].address,
                         'INDEX : '   + addr.result[i].data[i2].index,
@@ -1088,12 +1073,9 @@ function displayAddresses(param) {
                         'WIF : '     + addr.result[i].data[i2].wif
                     ];
 
-                    // Display list NO.
-                    createHtmlElement(parent, 'h4', 'NO. ' + (i2 + 1));
-
                     for (let i3 = 0; i3 < arrData.length; i3++) {
-                        createHtmlElement(parent, 'text', arrData[i3]);
-                        createHtmlElement(parent, 'br');
+                        createElement(parent, 'text', arrData[i3]);
+                        createElement(parent, 'br');
                     }
                 }
 
@@ -1109,6 +1091,24 @@ function displayAddresses(param) {
     }
 }
 
+//
+function createBalanceElement(parent, strAddr) {
+    // create [text] element
+    var title = document.createElement('text');
+    title.id  = strAddr;
+    title.innerText = 'BALANCE : ';
+    parent.append(title);
+
+    // create [button] element
+    var button = document.createElement('button');
+    button.innerText = 'Get Balance';
+    var clickFunc = "getBtcBalance('" + strAddr + "')";
+    button.setAttribute('onclick', clickFunc);
+    parent.append(button);
+
+    createElement(parent, 'br');
+}
+
 // List of friends who have interacted
 function displayFriends() {
     // get [name_req_div] div
@@ -1120,11 +1120,11 @@ function displayFriends() {
     if (list) {
         for (let i = 0; i < list.result.length; i++) {
             // Display list NO.
-            createHtmlElement(parent, 'h4', 'NO. ' + (i + 1));
-            createHtmlElement(parent, 'text', list.result[i].name);
+            createElement(parent, 'h4', 'NO. ' + (i + 1));
+            createElement(parent, 'text', list.result[i].name);
         }
     } else { // NO LOCAL STORAGE DATA YET.
-        createHtmlElement(parent, 'h3', 'NO DATA YET.');
+        createElement(parent, 'h3', 'NO DATA YET.');
     }
 }
 
@@ -1137,7 +1137,7 @@ function displayTempChannelInfo(param) {
     if (param === inNewHtml) {
         var status = JSON.parse(localStorage.getItem(saveGoWhere));
         if (!status.isLogined) { // Not login.
-            createHtmlElement(parent, 'text', 'NO USER LOGINED.');
+            createElement(parent, 'text', 'NO USER LOGINED.');
             return;
         } else {
             userID = status.userID;
@@ -1145,49 +1145,51 @@ function displayTempChannelInfo(param) {
         
     } else {
         if (!isLogined) { // Not login.
-            createHtmlElement(parent, 'text', 'NO USER LOGINED.');
+            createElement(parent, 'text', 'NO USER LOGINED.');
             return;
         }
     }
     */
 
 
-    var arrData, count = 1;
+    var arrData;
     var list = JSON.parse(localStorage.getItem(saveTempCI));
 
     // If has data
     if (list) {
         for (let i = 0; i < list.result.length; i++) {
             // if (userID === list.result[i].userID) {
-                // userID
-                // createHtmlElement(parent, 'text', list.result[i].userID);
-                // title
-                // createHtmlElement(parent, 'h2', 'Non-finalized Channel Info:');
+                createElement(parent, 'h4', 'NO. ' + (i + 1) + 
+                    ' - Temp Channel ID is: ' + list.result[i].temporary_channel_id);
 
                 for (let i2 = 0; i2 < list.result[i].data.length; i2++) {
-                    arrData = [
-                        'channel_address : ' + list.result[i].data[i2].channel_address,
-                        'temporary_channel_id : '   + list.result[i].data[i2].temporary_channel_id,
-                        'create_at : ' + list.result[i].data[i2].create_at,
-                        'create_by : '     + list.result[i].data[i2].create_by,
-                        'accept_at : '     + list.result[i].data[i2].accept_at,
-                        'address_a : '     + list.result[i].data[i2].address_a,
-                        'address_b : '     + list.result[i].data[i2].address_b,
-                    ];
-
-                    // Display list NO.
-                    // createHtmlElement(parent, 'h4', 'NO. ' + (i2 + 1));
-                    createHtmlElement(parent, 'h4', 'NO. ' + count);
-                    createHtmlElement(parent, 'h5', list.result[i].data[i2].channelInfo);
-                    count++;
+                    var title = list.result[i].data[i2].channelInfo;
+                    createElement(parent, 'h5', title);
+                    
+                    // Construct data will be displayed.
+                    if (title.substring(0, 6) === 'LAUNCH') {
+                        arrData = [
+                            'temporary_channel_id : '   + list.result[i].data[i2].temporary_channel_id,
+                        ];
+                    } else {
+                        arrData = [
+                            'channel_address : ' + list.result[i].data[i2].channel_address,
+                            'temporary_channel_id : '   + list.result[i].data[i2].temporary_channel_id,
+                            'create_at : ' + list.result[i].data[i2].create_at,
+                            'create_by : '     + list.result[i].data[i2].create_by,
+                            'accept_at : '     + list.result[i].data[i2].accept_at,
+                            'address_a : '     + list.result[i].data[i2].address_a,
+                            'address_b : '     + list.result[i].data[i2].address_b,
+                        ];
+                    }
 
                     for (let i3 = 0; i3 < arrData.length; i3++) {
-                        createHtmlElement(parent, 'text', arrData[i3]);
-                        createHtmlElement(parent, 'br');
+                        createElement(parent, 'text', arrData[i3]);
+                        createElement(parent, 'br');
                     }
                 }
 
-                // return;
+            //     return;
             // }
         }
 
@@ -1195,23 +1197,23 @@ function displayTempChannelInfo(param) {
         // displayNoData(parent);
 
     } else { // NO LOCAL STORAGE DATA YET.
-        displayNoData(parent);
+        createElement(parent, 'h3', 'NO DATA YET.');
     }
 }
 
 // 
 function displayNoData(parent) {
     // userID
-    createHtmlElement(parent, 'text', userID);
+    createElement(parent, 'text', userID);
     // title
-    createHtmlElement(parent, 'h3', 'NO DATA YET.');
+    createElement(parent, 'h3', 'NO DATA YET.');
 }
 
 //----------------------------------------------------------------
 // Functions of Common Util.
 
 // create html elements
-function createHtmlElement(parent, elementName, myInnerText, cssStyle) {
+function createElement(parent, elementName, myInnerText, cssStyle) {
 
     var element = document.createElement(elementName);
 
@@ -1242,4 +1244,9 @@ function saveGoWhereData(goWhere) {
         userID:    userID
     }
     localStorage.setItem(saveGoWhere, JSON.stringify(data));
+}
+
+// Bitcoin Testnet Faucet
+function openTestnetFaucet() {
+    window.open('https://testnet-faucet.mempool.co/');
 }

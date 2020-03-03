@@ -23,10 +23,27 @@
 </body>
 
 <script>
-    var name = getSaveNme();
+    var name = getSaveName();
     var data = JSON.parse(localStorage.getItem(name));
-    // console.info('goWhere= '+ data.goWhere);
+    console.info('goWhere= '+ data.goWhere);
     getUserDataList(data.goWhere);
+
+    // 
+    function connectOBD() {
+        var node_url = 'ws://127.0.0.1:60020/ws';
+        // console.info('node url = ' + node_url);
+
+        obdApi.connectToServer(node_url, function(response) {
+            // console.info('OBD Response = ' + response);
+        }, function(globalResponse) {
+        });
+    }
+
+    //
+    if (data.goWhere === 'Addresses') {
+        console.info('IS from Addresses');
+        connectOBD();
+    }
 </script>
 
 </html>

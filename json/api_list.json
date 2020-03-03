@@ -87,11 +87,20 @@
         {
             "id": "fundingBTC",
             "type_id": 1009,
-            "description": "FundingBTC is used for depositing bitcoin into a channel. Since the basic Omnilayer protocal uses BTC as miner fee in transferring assets, this message 1009 is special for depositing BTC for future transactions.",
+            "description": "FundingBTC is used for depositing bitcoin into a channel. Since the basic Omnilayer protocal uses BTC as miner fee in transferring assets, this message 1009 is special for depositing BTC for future transactions.  NOTE: For the current design, [FundingBTC] need to be run 3 times. And every time [FundingBTC] done, [BTCFundingCreated] and [BTCFundingSigned] need to be run in order.",
             "parameters": [
                 {
                     "name": "from_address",
-                    "buttons": []
+                    "buttons": [
+                        {
+                            "innerText": "Get It",
+                            "onclick": "displayUserDataInNewHtml('Addresses')"
+                        },
+                        {
+                            "innerText": "Bitcoin Testnet Faucet",
+                            "onclick": "openTestnetFaucet()"
+                        }
+                    ]
                 },
                 {
                     "name": "from_address_private_key",
