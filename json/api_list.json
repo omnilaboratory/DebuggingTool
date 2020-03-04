@@ -138,6 +138,74 @@
                     ]
                 }
             ]
+        },
+        {
+            "id": "BTCFundingCreated",
+            "type_id": -3400,
+            "description": "BTCFundingCreated is used to notify the success of funding BTC to the counterpart of the channel. Alice tells her OBD to notify Bob that she created the funding transaction by payloads packed in this message -3400.",
+            "parameters": [
+                {
+                    "name": "temporary_channel_id",
+                    "buttons": [
+                        {
+                            "innerText": "Get It",
+                            "onclick": "displayUserDataInNewHtml('TempChannelInfo')"
+                        }
+                    ]
+                },
+                {
+                    "name": "channel_address_private_key",
+                    "buttons": [
+                        {
+                            "innerText": "Get It",
+                            "onclick": "displayUserDataInNewHtml('Addresses')"
+                        }
+                    ]
+                },
+                {
+                    "name": "funding_tx_hex",
+                    "buttons": [
+                        {
+                            "innerText": "Get It",
+                            "onclick": "displayUserDataInNewHtml('TempChannelInfo')"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "BTCFundingSigned",
+            "type_id": -3500,
+            "description": "BTCFundingSigned is used to response the transfering bitcoin event by the partner of the channel. Bob tells his OBD to reply Alice that he knows the funding by message -3500.",
+            "parameters": [
+                {
+                    "name": "temporary_channel_id",
+                    "buttons": [
+                        {
+                            "innerText": "Get It",
+                            "onclick": "displayUserDataInNewHtml('TempChannelInfo')"
+                        }
+                    ]
+                },
+                {
+                    "name": "channel_address_private_key",
+                    "buttons": [
+                        {
+                            "innerText": "Get It",
+                            "onclick": "displayUserDataInNewHtml('Addresses')"
+                        }
+                    ]
+                },
+                {
+                    "name": "funding_txid",
+                    "buttons": [
+                        {
+                            "innerText": "Get It",
+                            "onclick": "displayUserDataInNewHtml('TempChannelInfo')"
+                        }
+                    ]
+                }
+            ]
         }
     ]
 }
