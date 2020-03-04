@@ -172,12 +172,10 @@ function acceptChannel(msgType) {
 function fundingBTC(msgType) {
 
     var from_address = $("#from_address").val();
-    var from_address_private_key   = $("#from_address_private_key").val();
+    var from_address_private_key = $("#from_address_private_key").val();
     var to_address   = $("#to_address").val();
     var amount       = $("#amount").val();
     var miner_fee    = $("#miner_fee").val();
-
-    // console.info('VALUE = ' + temp_cid + ' | ' + pubkey + ' | ' + approval);
 
     let info = new BtcFundingInfo();
     info.from_address = from_address;
@@ -186,11 +184,21 @@ function fundingBTC(msgType) {
     info.amount     = Number(amount);
     info.miner_fee  = Number(miner_fee);
 
-    // console.info('INFO = ' + JSON.stringify(info));
+    // TESTING CODE - Get temporary_channel_id with channel_address.
+    var tempChID;
+    var list = JSON.parse(localStorage.getItem(saveTempCI));
+    for (let i = 0; i < list.result.length; i++) {
+        for (let i2 = 0; i2 < list.result[i].data.length; i2++) {
+            if (to_address === list.result[i].data[i2].channel_address) {
+                tempChID = list.result[i].data[i2].temporary_channel_id;
+            }
+        }
+    }
 
     // OBD API
     obdApi.fundingBTC(info, function(e) {
         console.info('fundingBTC - OBD Response = ' + JSON.stringify(e));
+        saveTempChannelInfo(e, tempChID, true);
         createOBDResponseDiv(e, msgType);
     });
 }
@@ -267,6 +275,7 @@ function displayOBDMessages(content) {
         case enumMsgType.MsgType_Mnemonic_GetAddressByIndex_201:
         case enumMsgType.MsgType_GetMnemonic_101:
         case enumMsgType.MsgType_Core_BalanceByAddress_1008:
+        case enumMsgType.MsgType_Core_FundingBTC_1009:
             return;
         case enumMsgType.MsgType_ChannelOpen_N32:
             content.result = 'LAUNCH - ' + content.from + 
@@ -650,6 +659,9 @@ function createOBDResponseDiv(response, msgType) {
         case enumMsgType.MsgType_ChannelAccept_N33:
             parseDataN33(response);
             break;
+        case enumMsgType.MsgType_Core_FundingBTC_1009:
+            parseData1009(response);
+            break;
         default:
             createElement(obd_response_div, 'p', response);
             break;
@@ -658,6 +670,18 @@ function createOBDResponseDiv(response, msgType) {
 
 //----------------------------------------------------------------
 // Functions of processing each response from invoke APIs.
+
+// parseData1009 - 
+function parseData1009(response) {
+    var arrData = [
+        'HEX : ' + response.hex,
+        'TXID : ' + response.txid,
+    ];
+
+    for (let i = 0; i < arrData.length; i++) {
+        createElement(obd_response_div, 'p', arrData[i]);
+    }
+}
 
 // parseDataN200 - getNewAddressWithMnemonic
 function parseDataN200(response) {
@@ -669,8 +693,8 @@ function parseDataN200(response) {
     ];
 
     for (let i = 0; i < arrData.length; i++) {
-        createElement(obd_response_div, 'text', arrData[i]);
-        createElement(obd_response_div, 'p');
+        createElement(obd_response_div, 'p', arrData[i]);
+        // createElement(obd_response_div, 'p');
     }
 }
 
@@ -837,48 +861,81 @@ function getTempCIData(response) {
         address_a: response.address_a,
         address_b: response.address_b,
         channel_address: response.channel_address,
-        temporary_channel_id: response.temporary_channel_id
+        temporary_channel_id: response.temporary_channel_id,
+    }
+
+    return data;
+}
+
+// Depositing btc record.
+function getDepositBTCRecord(response) {
+    var data = {
+        from_address: $("#from_address").val(),
+        amount: $("#amount").val(),
+        hex:  response.hex,
+        txid: response.txid,
+        date: new Date().toLocaleString(),
+    }
+    return data;
+}
+
+// 
+function dataConstruct(response, tempChID, hasData) {
+    var data;
+    if (hasData) {
+        data = {
+            temporary_channel_id: tempChID,
+            userID: userID,
+            data: [getTempCIData(response)],
+            btc:  [getDepositBTCRecord(response)]
+        }
+    } else {
+        data = {
+            temporary_channel_id: tempChID,
+            userID: userID,
+            data: [getTempCIData(response)],
+            btc: []
+        }
     }
 
     return data;
 }
 
 // Non-finalized channel information.
-function saveTempChannelInfo(response) {
-    
+function saveTempChannelInfo(response, param, hasData) {
+    var tempChID;
     var list = JSON.parse(localStorage.getItem(saveTempCI));
     // console.info('localStorage KEY  = ' + addr);
+
+    if (response.temporary_channel_id) {
+        tempChID = response.temporary_channel_id;
+    } else {
+        tempChID = param;
+    }
 
     // If has data.
     if (list) {
         // console.info('HAS DATA');
         for (let i = 0; i < list.result.length; i++) {
-            // if (userID === tempCI.result[i].userID) {
-            if (response.temporary_channel_id === list.result[i].temporary_channel_id) {
-                // Add new dato to 
-                list.result[i].data.push(getTempCIData(response));
+            if (tempChID === list.result[i].temporary_channel_id) {
+                if (hasData) {
+                    list.result[i].btc.push(getDepositBTCRecord(response));
+                } else {
+                    list.result[i].data.push(getTempCIData(response));
+                }
                 localStorage.setItem(saveTempCI, JSON.stringify(list));
                 return;
             }
         }
 
         // A new 
-        let new_data = {
-            temporary_channel_id: response.temporary_channel_id,
-            userID: userID,
-            data: [getTempCIData(response)]
-        }
-        list.result.push(new_data);
+        list.result.push(dataConstruct(response, tempChID, hasData));
         localStorage.setItem(saveTempCI, JSON.stringify(list));
 
     } else {
         // console.info('FIRST DATA');
         let data = {
-            result: [{
-                temporary_channel_id: response.temporary_channel_id,
-                userID: userID,
-                data: [getTempCIData(response)]
-            }]
+            result: [dataConstruct(response, tempChID, hasData)]
         }
         localStorage.setItem(saveTempCI, JSON.stringify(data));
     }
@@ -1162,9 +1219,10 @@ function displayTempChannelInfo(param) {
                 createElement(parent, 'h4', 'NO. ' + (i + 1) + 
                     ' - Temp Channel ID is: ' + list.result[i].temporary_channel_id);
 
+                // Display channel info.
                 for (let i2 = 0; i2 < list.result[i].data.length; i2++) {
                     var title = list.result[i].data[i2].channelInfo;
-                    createElement(parent, 'h5', title);
+                    createElement(parent, 'h5', '--> ' + title);
                     
                     // Construct data will be displayed.
                     if (title.substring(0, 6) === 'LAUNCH') {
@@ -1186,6 +1244,32 @@ function displayTempChannelInfo(param) {
                     for (let i3 = 0; i3 < arrData.length; i3++) {
                         createElement(parent, 'text', arrData[i3]);
                         createElement(parent, 'br');
+                    }
+                }
+                
+                // Display depositing btc record.
+                // console.info(list.result[i].btc[0])
+                if (list.result[i].btc[0]) {
+                    createElement(parent, 'h5', '--> DEPOSITING - BTC Record');
+                    for (let i4 = 0; i4 < list.result[i].btc.length; i4++) {
+                        createElement(parent, 'text', 'NO. ' + (i4 + 1));
+                        createElement(parent, 'text', ' -- ' + list.result[i].btc[i4].date);
+                        createElement(parent, 'br');
+                        createElement(parent, 'text', '---------------------------------------------');
+                        createElement(parent, 'br');
+
+                        arrData = [
+                            'from_address : '   + list.result[i].btc[i4].from_address,
+                            'amount : '   + list.result[i].btc[i4].amount,
+                            // 'date : '   + list.result[i].btc[i4].date,
+                            'txid : '   + list.result[i].btc[i4].txid,
+                            'hex : '   + list.result[i].btc[i4].hex,
+                        ];
+
+                        for (let i5 = 0; i5 < arrData.length; i5++) {
+                            createElement(parent, 'text', arrData[i5]);
+                            createElement(parent, 'br');
+                        }
                     }
                 }
 
