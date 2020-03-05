@@ -318,10 +318,6 @@ class ObdApi {
             alert("empty channel_address_private_key");
             return;
         }
-        if (info.amount == null || info.amount <= 0) {
-            alert("wrong amount");
-            return;
-        }
         let msg = new Message();
         msg.type = this.messageType.MsgType_FundingCreate_BtcCreate_N3400;
         msg.data = info;
@@ -332,7 +328,7 @@ class ObdApi {
      * @param info FundingBtcSigned
      * @param callback  Function
      */
-    btcFundingSign(info, callback) {
+    btcFundingSigned(info, callback) {
         if (this.isNotString(info.temporary_channel_id)) {
             alert("empty temporary_channel_id");
             return;

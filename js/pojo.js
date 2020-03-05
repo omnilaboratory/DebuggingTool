@@ -16,7 +16,6 @@ class BtcFundingInfo {
 class FundingBtcCreated {
     constructor() {
         this.temporary_channel_id = "";
-        this.amount = 0;
         this.funding_tx_hex = "";
         this.channel_address_private_key = "";
     }
