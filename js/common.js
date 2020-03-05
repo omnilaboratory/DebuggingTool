@@ -1144,15 +1144,27 @@ function saveFriendsList(name) {
 //----------------------------------------------------------------
 // Functions of buttons.
 
-// 
-function getBtcBalance(strAddr) {
+// get balance of btc and omni assets of an address.
+function getBalance(strAddr) {
     // console.info('strAddr = ' + strAddr);
+
+    var result;
+
     // OBD API
     obdApi.getBtcBalanceByAddress(strAddr, function(e) {
         console.info('getBtcBalance - OBD Response = ' + JSON.stringify(e));
-        var result = JSON.stringify(e);
+        result = JSON.stringify(e);
         result     = result.replace("\"","").replace("\"","");
         result     = 'BALANCE : ' + result + ' BTC ';
+        $("#" + strAddr).text(result);
+    });
+
+    // for omni assets
+    obdApi.omniGetAllBalancesForAddress(strAddr, function(e) {
+        console.info('omniGetAllBalancesForAddress - OBD Response = ' + JSON.stringify(e));
+        var result_2 = JSON.stringify(e);
+        result_2     = result_2.replace("\"","").replace("\"","");
+        result     += ' | OMNI : ' + result_2 + ' OMNI ';
         $("#" + strAddr).text(result);
     });
 }
@@ -1264,6 +1276,7 @@ function displayAddresses(param) {
 
                 for (let i2 = 0; i2 < addr.result[i].data.length; i2++) {
                     createElement(parent, 'h4', 'NO. ' + (i2 + 1));
+
                     var strAddr = addr.result[i].data[i2].address;
                     createBalanceElement(parent, strAddr);
 
@@ -1303,7 +1316,7 @@ function createBalanceElement(parent, strAddr) {
     // create [button] element
     var button = document.createElement('button');
     button.innerText = 'Get Balance';
-    var clickFunc = "getBtcBalance('" + strAddr + "')";
+    var clickFunc = "getBalance('" + strAddr + "')";
     button.setAttribute('onclick', clickFunc);
     parent.append(button);
 

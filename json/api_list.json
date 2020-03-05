@@ -206,6 +206,57 @@
                     ]
                 }
             ]
+        },
+        {
+            "id": "FundingAsset",
+            "type_id": 2001,
+            "description": "FundingAsset do: Alice starts to deposit omni assets to the channel. This is quite similar to the the btc funding procedure.",
+            "parameters": [
+                {
+                    "name": "from_address",
+                    "buttons": [
+                        {
+                            "innerText": "Get It",
+                            "onclick": "displayUserDataInNewHtml('Addresses')"
+                        }
+                    ]
+                },
+                {
+                    "name": "from_address_private_key",
+                    "buttons": [
+                        {
+                            "innerText": "Get It",
+                            "onclick": "displayUserDataInNewHtml('Addresses')"
+                        },
+                        {
+                            "innerText": "Auto Create Addr and Privkey",
+                            "onclick": "autoCreateFundingPubkey(0)"
+                        }
+                    ]
+                },
+                {
+                    "name": "to_address",
+                    "buttons": [
+                        {
+                            "innerText": "Get It (Channel Addr)",
+                            "onclick": "displayUserDataInNewHtml('TempChannelInfo')"
+                        }
+                    ]
+                },
+                {
+                    "name": "amount",
+                    "buttons": []
+                },
+                {
+                    "name": "property_id",
+                    "buttons": [
+                        {
+                            "innerText": "Get It",
+                            "onclick": "autoCalcMinerFee()"
+                        }
+                    ]
+                }
+            ]
         }
     ]
 }
