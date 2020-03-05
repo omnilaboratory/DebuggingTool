@@ -13,6 +13,22 @@ class BtcFundingInfo {
         this.miner_fee = 0.0;
     }
 }
+class FundingBtcCreated {
+    constructor() {
+        this.temporary_channel_id = "";
+        this.amount = 0;
+        this.funding_tx_hex = "";
+        this.channel_address_private_key = "";
+    }
+}
+class FundingBtcSigned {
+    constructor() {
+        this.temporary_channel_id = "";
+        this.funding_txid = "";
+        this.channel_address_private_key = "";
+        this.approval = false;
+    }
+}
 class OmniFundingAssetInfo {
     constructor() {
         this.from_address = "";
@@ -160,8 +176,8 @@ class OmniSendIssuanceManaged {
     }
 }
 class OmniSendIssuanceFixed extends OmniSendIssuanceManaged {
-    constructor() {
-        super(...arguments);
+    constructor(...args) {
+        super(...args);
         this.amount = 0;
     }
 }
