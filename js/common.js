@@ -245,6 +245,41 @@ function fundingBTC(msgType) {
     });
 }
 
+// funding Omni Asset API at local.
+function fundingAsset(msgType) {
+
+    var from_address = $("#from_address").val();
+    var from_address_private_key = $("#from_address_private_key").val();
+    var to_address   = $("#to_address").val();
+    var amount       = $("#amount").val();
+    var property_id  = $("#property_id").val();
+
+    let info = new OmniFundingAssetInfo();
+    info.from_address = from_address;
+    info.from_address_private_key = from_address_private_key;
+    info.to_address = to_address;
+    info.amount     = Number(amount);
+    info.property_id  = Number(property_id);
+
+    // Get temporary_channel_id with channel_address.
+    var tempChID;
+    var list = JSON.parse(localStorage.getItem(saveTempCI));
+    for (let i = 0; i < list.result.length; i++) {
+        for (let i2 = 0; i2 < list.result[i].data.length; i2++) {
+            if (to_address === list.result[i].data[i2].channel_address) {
+                tempChID = list.result[i].data[i2].temporary_channel_id;
+            }
+        }
+    }
+
+    // OBD API
+    obdApi.fundingAssetOfOmni(info, function(e) {
+        console.info('fundingAssetOfOmni - OBD Response = ' + JSON.stringify(e));
+        saveTempChannelInfo(e, tempChID, msgType);
+        createOBDResponseDiv(e, msgType);
+    });
+}
+
 // Invoke each APIs.
 function invokeAPIs(objSelf) {
 
@@ -294,6 +329,15 @@ function invokeAPIs(objSelf) {
         case enumMsgType.MsgType_FundingSign_BtcSign_N3500:
             btcFundingSigned(msgType);
             break;
+        case enumMsgType.MsgType_Core_Omni_FundingAsset_2001:
+            fundingAsset(msgType);
+            break;
+        case enumMsgType.MsgType_FundingCreate_AssetFundingCreated_N34:
+            assetFundingCreated(msgType);
+            break;
+        case enumMsgType.MsgType_FundingSign_AssetFundingSigned_N35:
+            assetFundingSigned(msgType);
+            break;
         case enumMsgType.MsgType_Core_Omni_GetTransaction_1206:
             txid = "c76710920860456dff2433197db79dd030f9b527e83a2e253f5bc6ab7d197e73";
             obdApi.getOmniTxByTxid(txid);
@@ -325,6 +369,8 @@ function displayOBDMessages(content) {
         case enumMsgType.MsgType_GetMnemonic_101:
         case enumMsgType.MsgType_Core_BalanceByAddress_1008:
         case enumMsgType.MsgType_Core_FundingBTC_1009:
+        case enumMsgType.MsgType_Core_Omni_Getbalance_1200:
+        case enumMsgType.MsgType_Core_Omni_FundingAsset_2001:
             return;
         case enumMsgType.MsgType_ChannelOpen_N32:
             content.result = 'LAUNCH - ' + content.from + 
@@ -532,6 +578,7 @@ function createInputParamDiv(obj, jsonFile) {
             switch (msgType) {
                 case enumMsgType.MsgType_ChannelAccept_N33:
                 case enumMsgType.MsgType_FundingSign_BtcSign_N3500:
+                case enumMsgType.MsgType_FundingSign_AssetFundingSigned_N35:
                     displayApprovalCheckbox(content_div, obj, msgType);
                     break;
             }
@@ -550,6 +597,9 @@ function displayApprovalCheckbox(content_div, obj, msgType) {
             break;
         case enumMsgType.MsgType_FundingSign_BtcSign_N3500:
             element.id   = 'checkbox_n3500';
+            break;
+        case enumMsgType.MsgType_FundingSign_AssetFundingSigned_N35:
+            element.id   = 'checkbox_n35';
             break;
     }
 
@@ -586,6 +636,16 @@ function clickApproval(obj) {
                 $("#channel_address_private_keyGet").hide();
                 $("#funding_txid").hide();
                 $("#funding_txidGet").hide();
+            }
+            break;
+
+        case 'checkbox_n35':
+            if (obj.checked) {
+                $("#fundee_channel_address_private_key").show();
+                $("#fundee_channel_address_private_keyGet").show();
+            } else {
+                $("#fundee_channel_address_private_key").hide();
+                $("#fundee_channel_address_private_keyGet").hide();
             }
             break;
     }
@@ -756,6 +816,13 @@ function createOBDResponseDiv(response, msgType) {
         case enumMsgType.MsgType_FundingSign_BtcSign_N3500:
             parseDataN3500(response);
             break;
+        case enumMsgType.MsgType_Core_Omni_FundingAsset_2001:
+            parseData2001(response);
+            break;
+        case enumMsgType.MsgType_FundingCreate_AssetFundingCreated_N34:
+        case enumMsgType.MsgType_FundingSign_AssetFundingSigned_N35:
+            parseDataN34N35(response);
+            break;
         default:
             createElement(obd_response_div, 'p', response);
             break;
@@ -765,10 +832,42 @@ function createOBDResponseDiv(response, msgType) {
 //----------------------------------------------------------------
 // Functions of processing each response from invoke APIs.
 
+// parseDataN34N35 - 
+function parseDataN34N35(response) {
+    var arrData = [
+        'CHANNEL_ID : ' + response.channel_id,
+        'channel_info_id : ' + response.channel_info_id,
+        'amount_a : ' + response.amount_a,
+        'amount_b : ' + response.amount_b,
+        'property_id : ' + response.property_id,
+        'create_at : ' + response.create_at,
+        'create_by : ' + response.create_by,
+        'curr_state : ' + response.curr_state,
+        'fundee_sign_at : ' + response.fundee_sign_at,
+        'funder_address : ' + response.funder_address,
+        'funder_pub_key_2_for_commitment : ' + response.funder_pub_key_2_for_commitment,
+        'funding_output_index : ' + response.funding_output_index,
+        'funding_tx_hex : ' + response.funding_tx_hex,
+        'funding_txid : ' + response.funding_txid,
+        'id : ' + response.id,
+        'peer_id_a : ' + response.peer_id_a,
+        'peer_id_b : ' + response.peer_id_b,
+    ];
+
+    for (let i = 0; i < arrData.length; i++) {
+        createElement(obd_response_div, 'p', arrData[i]);
+    }
+}
+
+// parseDataN2001 - 
+function parseData2001(response) {
+    createElement(obd_response_div, 'p', response.hex);
+}
+
 // parseDataN3500 - 
 function parseDataN3500(response) {
     var arrData = [
-        'channel_id : ' + response.channel_id,
+        'CHANNEL_ID : ' + response.channel_id,
         'TEMP_CH_ID : ' + response.temporary_channel_id,
         'create_at : ' + response.create_at,
         'ID : ' + response.id,
@@ -974,8 +1073,8 @@ function saveAddrData(response) {
     }
 }
 
-// Process data for saveTempChannelInfo func.
-function getTempCIData(response) {
+// Record full flow channel data.
+function channelData(response) {
 
     var data = {
         channelInfo: channelInfo,
@@ -992,7 +1091,7 @@ function getTempCIData(response) {
 }
 
 // Depositing btc record.
-function getDepositBTCRecord(response, msgType) {
+function btcData(response, msgType) {
     var btc = {
         from_address: $("#from_address").val(),
         amount: $("#amount").val(),
@@ -1004,6 +1103,20 @@ function getDepositBTCRecord(response, msgType) {
     return btc;
 }
 
+// Depositing omni assets record.
+function omniAssetData(response, msgType) {
+    var omniAsset = {
+        from_address: $("#from_address").val(),
+        amount: $("#amount").val(),
+        property_id: $("#property_id").val(),
+        hex:  response.hex,
+        // txid: response.txid,
+        date: new Date().toLocaleString(),
+        msgType: msgType,
+    }
+    return omniAsset;
+}
+
 // 
 function dataConstruct(response, tempChID, msgType) {
     var data;
@@ -1011,15 +1124,21 @@ function dataConstruct(response, tempChID, msgType) {
         data = {
             temporary_channel_id: tempChID,
             userID: userID,
-            data: [getTempCIData(response)],
-            btc:  [getDepositBTCRecord(response, msgType)]
+            data: [channelData(response)],
+            btc:  [btcData(response, msgType)],
+            omniAsset: [omniAssetData(response, msgType)],
+            transfer: [],
+            htlc: [],
         }
     } else {
         data = {
             temporary_channel_id: tempChID,
             userID: userID,
-            data: [getTempCIData(response)],
-            btc: []
+            data: [channelData(response)],
+            btc: [],
+            omniAsset: [],
+            transfer: [],
+            htlc: [],
         }
     }
 
@@ -1042,7 +1161,7 @@ function saveTempChannelInfo(response, param, msgType) {
             if (tempChID === list.result[i].temporary_channel_id) {
                 switch (msgType) {
                     case enumMsgType.MsgType_Core_FundingBTC_1009:
-                        list.result[i].btc.push(getDepositBTCRecord(response, msgType));
+                        list.result[i].btc.push(btcData(response, msgType));
                         break;
                     case enumMsgType.MsgType_FundingCreate_BtcCreate_N3400:
                         for (let i2 = 0; i2 < list.result[i].btc.length; i2++) {
@@ -1062,8 +1181,11 @@ function saveTempChannelInfo(response, param, msgType) {
                             }
                         }
                         break;
+                    case enumMsgType.MsgType_Core_Omni_FundingAsset_2001:
+                        list.result[i].omniAsset.push(omniAssetData(response, msgType));
+                        break;
                     default:
-                        list.result[i].data.push(getTempCIData(response));
+                        list.result[i].data.push(channelData(response));
                         break;
                 }
 
@@ -1154,18 +1276,22 @@ function getBalance(strAddr) {
     obdApi.getBtcBalanceByAddress(strAddr, function(e) {
         console.info('getBtcBalance - OBD Response = ' + JSON.stringify(e));
         result = JSON.stringify(e);
-        result     = result.replace("\"","").replace("\"","");
-        result     = 'BALANCE : ' + result + ' BTC ';
+        result = result.replace("\"","").replace("\"","");
+        result = 'BALANCE : ' + result + ' BTC ';
         $("#" + strAddr).text(result);
     });
 
     // for omni assets
     obdApi.omniGetAllBalancesForAddress(strAddr, function(e) {
         console.info('omniGetAllBalancesForAddress - OBD Response = ' + JSON.stringify(e));
-        var result_2 = JSON.stringify(e);
-        result_2     = result_2.replace("\"","").replace("\"","");
-        result     += ' | OMNI : ' + result_2 + ' OMNI ';
-        $("#" + strAddr).text(result);
+        
+        if (e != "") {
+            for (let i = 0; i < e.length; i++) {
+                result += ' | ' + e[i].balance + ' ' + e[i].name + 
+                    ' (Property ID: ' + e[i].propertyid + ')';
+            }
+            $("#" + strAddr).text(result);
+        }
     });
 }
 
@@ -1376,7 +1502,10 @@ function displayTempChannelInfo(param) {
             partChannelInfo(parent, list, i)
             
             // Display depositing btc record.
-            depositingBTCRecord(parent, list, i);
+            btcRecord(parent, list, i);
+            
+            // Display depositing omni asset record.
+            omniAssetRecord(parent, list, i);
         }
     } else { // NO LOCAL STORAGE DATA YET.
         createElement(parent, 'h3', 'NO DATA YET.');
@@ -1417,18 +1546,18 @@ function partChannelInfo(parent, list, i) {
 }
 
 // Display depositing btc record.
-function depositingBTCRecord(parent, list, i) {
+function btcRecord(parent, list, i) {
 
     var arrData;
 
     if (list.result[i].btc[0]) {
         createElement(parent, 'h5', '--> DEPOSITING - BTC Record');
-        for (let i4 = 0; i4 < list.result[i].btc.length; i4++) {
+        for (let i2 = 0; i2 < list.result[i].btc.length; i2++) {
             createElement(parent, 'br');
-            createElement(parent, 'text', 'NO. ' + (i4 + 1));
+            createElement(parent, 'text', 'NO. ' + (i2 + 1));
 
             var status;
-            switch (list.result[i].btc[i4].msgType) {
+            switch (list.result[i].btc[i2].msgType) {
                 case enumMsgType.MsgType_Core_FundingBTC_1009:
                     status = 'Precharge (1009)';
                     break;
@@ -1443,20 +1572,65 @@ function depositingBTCRecord(parent, list, i) {
             }
 
             createElement(parent, 'text', ' -- ' + status);
-            createElement(parent, 'text', ' -- ' + list.result[i].btc[i4].date);
+            createElement(parent, 'text', ' -- ' + list.result[i].btc[i2].date);
             createElement(parent, 'br');
             createElement(parent, 'text', '---------------------------------------------');
             createElement(parent, 'br');
 
             arrData = [
-                'from_address : '   + list.result[i].btc[i4].from_address,
-                'amount : '   + list.result[i].btc[i4].amount,
-                'txid : '   + list.result[i].btc[i4].txid,
-                'hex : '   + list.result[i].btc[i4].hex,
+                'from_address : '   + list.result[i].btc[i2].from_address,
+                'amount : '   + list.result[i].btc[i2].amount,
+                'txid : '   + list.result[i].btc[i2].txid,
+                'hex : '   + list.result[i].btc[i2].hex,
             ];
 
-            for (let i5 = 0; i5 < arrData.length; i5++) {
-                createElement(parent, 'text', arrData[i5]);
+            for (let i3 = 0; i3 < arrData.length; i3++) {
+                createElement(parent, 'text', arrData[i3]);
+                createElement(parent, 'br');
+            }
+        }
+    }
+}
+
+// Display depositing omni asset record.
+function omniAssetRecord(parent, list, i) {
+
+    var arrData;
+
+    if (list.result[i].omniAsset[0]) {
+        createElement(parent, 'h5', '--> DEPOSITING - Omni Asset Record');
+        for (let i2 = 0; i2 < list.result[i].omniAsset.length; i2++) {
+            // createElement(parent, 'br');
+            // createElement(parent, 'text', 'NO. ' + (i4 + 1));
+
+            var status;
+            switch (list.result[i].omniAsset[i2].msgType) {
+                case enumMsgType.MsgType_Core_Omni_FundingAsset_2001:
+                    status = 'Precharge (2001)';
+                    break;
+                case enumMsgType.MsgType_FundingCreate_AssetFundingCreated_N34:
+                    status = 'Noticed (-34)';
+                    break;
+                case enumMsgType.MsgType_FundingSign_AssetFundingSigned_N35:
+                    status = 'Confirmed (-35)';
+                    break;
+            }
+
+            createElement(parent, 'text', ' -- ' + status);
+            createElement(parent, 'text', ' -- ' + list.result[i].omniAsset[i2].date);
+            createElement(parent, 'br');
+            createElement(parent, 'text', '---------------------------------------------');
+            createElement(parent, 'br');
+
+            arrData = [
+                'from_address : '   + list.result[i].omniAsset[i2].from_address,
+                'amount : '   + list.result[i].omniAsset[i2].amount,
+                'property_id : '   + list.result[i].omniAsset[i2].property_id,
+                'hex : '   + list.result[i].omniAsset[i2].hex,
+            ];
+
+            for (let i3 = 0; i3 < arrData.length; i3++) {
+                createElement(parent, 'text', arrData[i3]);
                 createElement(parent, 'br');
             }
         }

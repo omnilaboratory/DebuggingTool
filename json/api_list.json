@@ -252,7 +252,84 @@
                     "buttons": [
                         {
                             "innerText": "Get It",
-                            "onclick": "autoCalcMinerFee()"
+                            "onclick": "displayUserDataInNewHtml('Addresses')"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "AssetFundingCreated",
+            "type_id": -34,
+            "description": "AssetFundingCreated is used to notify the success of omni asset funding transaction to the counter partner of the channel.",
+            "parameters": [
+                {
+                    "name": "temporary_channel_id",
+                    "buttons": [
+                        {
+                            "innerText": "Get It",
+                            "onclick": "displayUserDataInNewHtml('TempChannelInfo')"
+                        }
+                    ]
+                },
+                {
+                    "name": "temp_address_pub_key",
+                    "buttons": [
+                        {
+                            "innerText": "Get It",
+                            "onclick": "displayUserDataInNewHtml('Addresses')"
+                        }
+                    ]
+                },
+                {
+                    "name": "temp_address_private_key",
+                    "buttons": [
+                        {
+                            "innerText": "Get It",
+                            "onclick": "displayUserDataInNewHtml('Addresses')"
+                        }
+                    ]
+                },
+                {
+                    "name": "channel_address_private_key",
+                    "buttons": [
+                        {
+                            "innerText": "Get It",
+                            "onclick": "displayUserDataInNewHtml('Addresses')"
+                        }
+                    ]
+                },
+                {
+                    "name": "funding_tx_hex",
+                    "buttons": [
+                        {
+                            "innerText": "Get It",
+                            "onclick": "displayUserDataInNewHtml('TempChannelInfo')"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "AssetFundingSigned",
+            "type_id": -35,
+            "description": "AssetFundingSigned is used to response the transfering omni asset event by the partner of the channel. Bob tells his OBD to reply Alice that he knows the funding by message -35, and OBD will creat commitment transactions (C1a & RD1a).",
+            "parameters": [
+                {
+                    "name": "channel_id",
+                    "buttons": [
+                        {
+                            "innerText": "Get It",
+                            "onclick": "displayUserDataInNewHtml('TempChannelInfo')"
+                        }
+                    ]
+                },
+                {
+                    "name": "fundee_channel_address_private_key",
+                    "buttons": [
+                        {
+                            "innerText": "Get It",
+                            "onclick": "displayUserDataInNewHtml('Addresses')"
                         }
                     ]
                 }
