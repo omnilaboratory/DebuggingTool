@@ -88,7 +88,15 @@ class ObdApi {
         this.ws.send(JSON.stringify(msg));
     }
     getDataFromServer(jsonData) {
+        let callback = this.callbackMap[jsonData.type];
         if (jsonData.status == false) {
+            //omni error ,do not alert
+            if (jsonData.type == this.messageType.MsgType_Core_Omni_Getbalance_1200) {
+                if (callback != null) {
+                    callback("");
+                }
+                return;
+            }
             if (jsonData.type != this.messageType.MsgType_Error_0) {
                 alert(jsonData.result);
             }
@@ -110,7 +118,6 @@ class ObdApi {
         if (jsonData.from != jsonData.to) {
             return;
         }
-        let callback = this.callbackMap[jsonData.type];
         if (callback != null) {
             if (jsonData.type == this.messageType.MsgType_UserLogin_1) {
                 resultData = jsonData.from + " " + jsonData.result;
