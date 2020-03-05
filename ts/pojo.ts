@@ -12,6 +12,19 @@ class BtcFundingInfo {
   miner_fee: number = 0.0;
 }
 
+class FundingBtcCreated {
+  temporary_channel_id: string = "";
+  amount: number = 0;
+  funding_tx_hex: string = "";
+  channel_address_private_key: string = "";
+}
+class FundingBtcSigned {
+  temporary_channel_id: string = "";
+  funding_txid: string = "";
+  channel_address_private_key: string = "";
+  approval: boolean = false;
+}
+
 class OmniFundingAssetInfo {
   from_address: string = "";
   from_address_private_key: string = "";
@@ -153,9 +166,7 @@ class OmniSendGrant {
   amount: number = 0;
   memo: string = "";
 }
-class OmniSendRevoke extends OmniSendGrant{
-  
-}
+class OmniSendRevoke extends OmniSendGrant {}
 
 class CloseChannelSign {
   channel_id: string = "";

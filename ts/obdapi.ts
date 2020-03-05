@@ -333,6 +333,61 @@ class ObdApi {
     }
     public onFundingBTC(jsonData: any) { }
 
+
+    /**
+     * MsgType_FundingCreate_BtcCreate_N3400
+     * @param info  FundingBtcCreated
+     * @param callback  Function
+     */
+    public btcFundingCreated(info: FundingBtcCreated, callback: Function) {
+        if(this.isNotString(info.temporary_channel_id)){
+            alert("empty temporary_channel_id");
+            return;
+        }
+        if(this.isNotString(info.funding_tx_hex)){
+            alert("empty funding_tx_hex");
+            return;
+        }
+        if(this.isNotString(info.channel_address_private_key)){
+            alert("empty channel_address_private_key");
+            return;
+        }
+        if(info.amount==null||info.amount<=0){
+            alert("wrong amount");
+            return;
+        }
+
+        let msg = new Message();
+        msg.type = this.messageType.MsgType_FundingCreate_BtcCreate_N3400;
+        msg.data = info;
+        this.sendData(msg, callback);
+    }
+
+    /**
+     * MsgType_FundingSign_BtcSign_N3500
+     * @param info FundingBtcSigned
+     * @param callback  Function
+     */
+    public btcFundingSign(info: FundingBtcSigned, callback: Function) {
+        if(this.isNotString(info.temporary_channel_id)){
+            alert("empty temporary_channel_id");
+            return;
+        }
+        if(this.isNotString(info.funding_txid)){
+            alert("empty funding_txid");
+            return;
+        }
+        if(this.isNotString(info.channel_address_private_key)){
+            alert("empty channel_address_private_key");
+            return;
+        }
+
+        let msg = new Message();
+        msg.type = this.messageType.MsgType_FundingSign_BtcSign_N3500;
+        msg.data = info;
+        this.sendData(msg, callback);
+    }
+
     /**
      * MsgType_Core_Omni_ListProperties_1205
      * @param callback function
