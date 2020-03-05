@@ -179,6 +179,17 @@ function btcFundingCreated(msgType) {
     });
 }
 
+// BTC Funding Signed -3500 API at local.
+function btcFundingSigned(msgType) {
+
+    // OBD API
+    obdApi.fundingBTC(info, function(e) {
+        console.info('fundingBTC - OBD Response = ' + JSON.stringify(e));
+        saveTempChannelInfo(e, tempChID, msgType);
+        createOBDResponseDiv(e, msgType);
+    });
+}
+
 // funding BTC API at local.
 function fundingBTC(msgType) {
 
@@ -259,6 +270,9 @@ function invokeAPIs(objSelf) {
             break;
         case enumMsgType.MsgType_FundingCreate_BtcCreate_N3400:
             btcFundingCreated(msgType);
+            break;
+        case enumMsgType.MsgType_FundingSign_BtcSign_N3500:
+            btcFundingSigned(msgType);
             break;
         case enumMsgType.MsgType_Core_Omni_GetTransaction_1206:
             txid = "c76710920860456dff2433197db79dd030f9b527e83a2e253f5bc6ab7d197e73";
