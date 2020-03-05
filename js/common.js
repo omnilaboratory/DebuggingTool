@@ -171,10 +171,19 @@ function acceptChannel(msgType) {
 // BTC Funding Created -3400 API at local.
 function btcFundingCreated(msgType) {
 
+    var temp_cid = $("#temporary_channel_id").val();
+    var privkey  = $("#channel_address_private_key").val();
+    var tx_hex   = $("#funding_tx_hex").val();
+
+    let info = new FundingBtcCreated();
+    info.temporary_channel_id = temp_cid;
+    info.channel_address_private_key = privkey;
+    info.funding_tx_hex = tx_hex;
+
     // OBD API
-    obdApi.fundingBTC(info, function(e) {
-        console.info('fundingBTC - OBD Response = ' + JSON.stringify(e));
-        saveTempChannelInfo(e, tempChID, msgType);
+    obdApi.btcFundingCreated(info, function(e) {
+        console.info('btcFundingCreated - OBD Response = ' + JSON.stringify(e));
+        saveTempChannelInfo(e, temp_cid, msgType);
         createOBDResponseDiv(e, msgType);
     });
 }
@@ -182,10 +191,21 @@ function btcFundingCreated(msgType) {
 // BTC Funding Signed -3500 API at local.
 function btcFundingSigned(msgType) {
 
+    var temp_cid = $("#temporary_channel_id").val();
+    var privkey  = $("#channel_address_private_key").val();
+    var tx_id    = $("#funding_txid").val();
+    var approval = $("#checkbox_n3500").prop("checked");
+
+    let info = new FundingBtcSigned();
+    info.temporary_channel_id = temp_cid;
+    info.channel_address_private_key = privkey;
+    info.funding_txid = tx_id;
+    info.approval = approval;
+
     // OBD API
-    obdApi.fundingBTC(info, function(e) {
-        console.info('fundingBTC - OBD Response = ' + JSON.stringify(e));
-        saveTempChannelInfo(e, tempChID, msgType);
+    obdApi.btcFundingSigned(info, function(e) {
+        console.info('btcFundingSigned - OBD Response = ' + JSON.stringify(e));
+        saveTempChannelInfo(e, temp_cid, msgType);
         createOBDResponseDiv(e, msgType);
     });
 }
@@ -324,6 +344,14 @@ function displayOBDMessages(content) {
                     // 'The [temporary_channel_id] is : ' + 
                     // content.result.temporary_channel_id;
             }
+            break;
+        case enumMsgType.MsgType_FundingCreate_BtcCreate_N3400:
+            content.result = 'Notification - ' + content.from + 
+                ' - depositing some BTC in Channel.';
+            break;
+        case enumMsgType.MsgType_FundingSign_BtcSign_N3500:
+            content.result = 'Reply - ' + content.from + 
+                ' - depositing BTC message.';
             break;
     }
 
@@ -492,55 +520,74 @@ function createInputParamDiv(obj, jsonFile) {
                     break;
                 }
 
-                // create [title] element
                 createElement(content_div, 'p', 'Input Parameters:');
-                
                 // Parameters
                 createParamOfAPI(arrParams, content_div);
             }
         }
         
-        // For AcceptChannel api.
+        // display Approval Checkbox
         if (jsonFile === 'json/api_list.json') {
-            var type_id = Number(obj.getAttribute("type_id"));
-
-            if (type_id === enumMsgType.MsgType_ChannelAccept_N33) {
-                // console.info('CHECKBOX');
-                createElement(content_div, 'text', 'Approval ');
-    
-                var element = document.createElement('input');
-                element.id   = 'checkbox_n33';
-                element.type = 'checkbox';
-                element.defaultChecked = true;
-                element.setAttribute('onclick', 'clickApproval(this)');
-                content_div.append(element);
-            }
-
-            if (type_id === enumMsgType.MsgType_FundingSign_BtcSign_N3500) {
-                createElement(content_div, 'text', 'Approval ');
-    
-                var element = document.createElement('input');
-                element.id   = 'checkbox_n33';
-                element.type = 'checkbox';
-                element.defaultChecked = true;
-                element.setAttribute('onclick', 'clickApproval(this)');
-                content_div.append(element);
+            var msgType = Number(obj.getAttribute("type_id"));
+            switch (msgType) {
+                case enumMsgType.MsgType_ChannelAccept_N33:
+                case enumMsgType.MsgType_FundingSign_BtcSign_N3500:
+                    displayApprovalCheckbox(content_div, obj, msgType);
+                    break;
             }
         }
     });
 }
 
+// display Approval Checkbox
+function displayApprovalCheckbox(content_div, obj, msgType) {
+    
+    createElement(content_div, 'text', 'Approval ');
+    var element = document.createElement('input');
+    switch (msgType) {
+        case enumMsgType.MsgType_ChannelAccept_N33:
+            element.id   = 'checkbox_n33';
+            break;
+        case enumMsgType.MsgType_FundingSign_BtcSign_N3500:
+            element.id   = 'checkbox_n3500';
+            break;
+    }
+
+    element.type = 'checkbox';
+    element.defaultChecked = true;
+    element.setAttribute('onclick', 'clickApproval(this)');
+    content_div.append(element);
+}
+
 // 
 function clickApproval(obj) {
     // console.info('clickApproval checked = ' + obj.checked);
-    if (obj.checked) {
-        $("#funding_pubkey").show();
-        $("#funding_pubkeyGet").show();
-        $("#funding_pubkeyAut").show();
-    } else {
-        $("#funding_pubkey").hide();
-        $("#funding_pubkeyGet").hide();
-        $("#funding_pubkeyAut").hide();
+    switch (obj.id) {
+        case 'checkbox_n33':
+            if (obj.checked) {
+                $("#funding_pubkey").show();
+                $("#funding_pubkeyGet").show();
+                $("#funding_pubkeyAut").show();
+            } else {
+                $("#funding_pubkey").hide();
+                $("#funding_pubkeyGet").hide();
+                $("#funding_pubkeyAut").hide();
+            }
+            break;
+
+        case 'checkbox_n3500':
+            if (obj.checked) {
+                $("#channel_address_private_key").show();
+                $("#channel_address_private_keyGet").show();
+                $("#funding_txid").show();
+                $("#funding_txidGet").show();
+            } else {
+                $("#channel_address_private_key").hide();
+                $("#channel_address_private_keyGet").hide();
+                $("#funding_txid").hide();
+                $("#funding_txidGet").hide();
+            }
+            break;
     }
 }
 
@@ -703,6 +750,12 @@ function createOBDResponseDiv(response, msgType) {
         case enumMsgType.MsgType_Core_FundingBTC_1009:
             parseData1009(response);
             break;
+        case enumMsgType.MsgType_FundingCreate_BtcCreate_N3400:
+            parseDataN3400(response);
+            break;
+        case enumMsgType.MsgType_FundingSign_BtcSign_N3500:
+            parseDataN3500(response);
+            break;
         default:
             createElement(obd_response_div, 'p', response);
             break;
@@ -711,6 +764,36 @@ function createOBDResponseDiv(response, msgType) {
 
 //----------------------------------------------------------------
 // Functions of processing each response from invoke APIs.
+
+// parseDataN3500 - 
+function parseDataN3500(response) {
+    var arrData = [
+        'channel_id : ' + response.channel_id,
+        'TEMP_CH_ID : ' + response.temporary_channel_id,
+        'create_at : ' + response.create_at,
+        'ID : ' + response.id,
+        'OWNER : ' + response.owner,
+        'TXID : ' + response.txid,
+        'TX_HASH : ' + response.tx_hash,
+    ];
+
+    for (let i = 0; i < arrData.length; i++) {
+        createElement(obd_response_div, 'p', arrData[i]);
+    }
+}
+
+// parseDataN3400 - 
+function parseDataN3400(response) {
+    var arrData = [
+        'TEMP_CH_ID : ' + response.temporary_channel_id,
+        'TXID : ' + response.funding_txid,
+        'AMOUNT : ' + response.amount,
+    ];
+
+    for (let i = 0; i < arrData.length; i++) {
+        createElement(obd_response_div, 'p', arrData[i]);
+    }
+}
 
 // parseData1009 - 
 function parseData1009(response) {
@@ -972,8 +1055,9 @@ function saveTempChannelInfo(response, param, msgType) {
                     case enumMsgType.MsgType_FundingSign_BtcSign_N3500:
                         for (let i2 = 0; i2 < list.result[i].btc.length; i2++) {
                             if ($("#funding_txid").val() === list.result[i].btc[i2].txid) {
-                                list.result[i].btc[i2].msgType = msgType;
                                 list.result[i].btc[i2].txid = response.txid;
+                                list.result[i].btc[i2].hex  = response.tx_hash;
+                                list.result[i].btc[i2].msgType = msgType;
                                 list.result[i].btc[i2].date = new Date().toLocaleString();
                             }
                         }
