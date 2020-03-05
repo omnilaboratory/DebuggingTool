@@ -89,6 +89,15 @@ class HtlcHInfo {
         this.recipient_peer_id = "";
     }
 }
+class HtlcRequestFindPathAndSendH {
+    constructor() {
+        this.h = "";
+        this.property_id = 0;
+        this.amount = 0;
+        this.recipient_peer_id = "";
+        this.memo = "";
+    }
+}
 class HtlcHSignInfo {
     constructor() {
         this.request_hash = "";
@@ -267,7 +276,6 @@ class MessageType {
         this.MsgType_HTLC_AddHTLC_N40 = -40;
         this.MsgType_HTLC_CreatedRAndHInfoList_N4001 = -4001;
         this.MsgType_HTLC_CreatedRAndHInfoItem_N4002 = -4002;
-        this.MsgType_HTLC_AddHTLCSigned_N41 = -41;
         this.MsgType_HTLC_SignedRAndHInfoList_N4101 = -4101;
         this.MsgType_HTLC_SignedRAndHInfoItem_N4102 = -4102;
         this.MsgType_HTLC_GetRFromLCommitTx_N4103 = -4103;

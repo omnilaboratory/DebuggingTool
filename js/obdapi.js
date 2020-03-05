@@ -178,9 +178,6 @@ class ObdApi {
             case this.messageType.MsgType_HTLC_AddHTLC_N40:
                 this.onAddHtlc(resultData);
                 break;
-            case this.messageType.MsgType_HTLC_AddHTLCSigned_N41:
-                this.onAddHtlcSigned(resultData);
-                break;
             case this.messageType.MsgType_HTLC_FindPathAndSendH_N42:
                 this.onHtlcFindPathAndSendH(resultData);
                 break;
@@ -459,8 +456,7 @@ class ObdApi {
             return;
         }
         if (info.approval == null) {
-            alert("empty approval");
-            return;
+            info.approval = false;
         }
         if (info.approval == true) {
             if (this.isNotString(info.funding_pubkey)) {
@@ -516,13 +512,14 @@ class ObdApi {
             alert("empty channel_id");
             return;
         }
-        if (this.isNotString(info.fundee_channel_address_private_key)) {
-            alert("empty fundee_channel_address_private_key");
-            return;
-        }
         if (info.approval == null) {
-            alert("empty approval");
-            return;
+            info.approval = false;
+        }
+        if (info.approval == true) {
+            if (this.isNotString(info.fundee_channel_address_private_key)) {
+                alert("empty fundee_channel_address_private_key");
+                return;
+            }
         }
         let msg = new Message();
         msg.type = this.messageType.MsgType_FundingSign_AssetFundingSigned_N35;
@@ -576,29 +573,30 @@ class ObdApi {
             alert("empty channel_id");
             return;
         }
-        if (this.isNotString(info.curr_temp_address_pub_key)) {
-            alert("empty curr_temp_address_pub_key");
-            return;
-        }
-        if (this.isNotString(info.curr_temp_address_private_key)) {
-            alert("empty curr_temp_address_private_key");
-            return;
-        }
-        if (this.isNotString(info.last_temp_private_key)) {
-            alert("empty last_temp_private_key");
-            return;
-        }
-        if (this.isNotString(info.request_commitment_hash)) {
-            alert("empty request_commitment_hash");
-            return;
-        }
-        if (this.isNotString(info.channel_address_private_key)) {
-            alert("empty channel_address_private_key");
-            return;
-        }
         if (info.approval == null) {
-            alert("empty approval");
-            return;
+            info.approval = false;
+        }
+        if (info.approval == true) {
+            if (this.isNotString(info.curr_temp_address_pub_key)) {
+                alert("empty curr_temp_address_pub_key");
+                return;
+            }
+            if (this.isNotString(info.curr_temp_address_private_key)) {
+                alert("empty curr_temp_address_private_key");
+                return;
+            }
+            if (this.isNotString(info.last_temp_private_key)) {
+                alert("empty last_temp_private_key");
+                return;
+            }
+            if (this.isNotString(info.request_commitment_hash)) {
+                alert("empty request_commitment_hash");
+                return;
+            }
+            if (this.isNotString(info.channel_address_private_key)) {
+                alert("empty channel_address_private_key");
+                return;
+            }
         }
         let msg = new Message();
         msg.type = this.messageType.MsgType_CommitmentTxSigned_RevokeAndAcknowledgeCommitmentTransaction_N352;
@@ -655,50 +653,33 @@ class ObdApi {
     }
     onAddHtlc(jsonData) { }
     /**
-     * MsgType_HTLC_AddHTLCSigned_N41
-     * @param info HtlcHSignInfo
-     * @param callback function
-     */
-    addHtlcSigned(info, callback) {
-        if (this.isNotString(info.request_hash)) {
-            alert("empty request_hash");
-            return;
-        }
-        if (this.isNotString(info.h)) {
-            alert("empty h");
-            return;
-        }
-        if (info.property_id == null || info.property_id <= 0) {
-            alert("empty property_id");
-            return;
-        }
-        if (info.amount == null || info.amount <= 0) {
-            alert("wrong amount");
-            return;
-        }
-        if (info.approval == null) {
-            alert("wrong approval");
-            return;
-        }
-        let msg = new Message();
-        msg.type = this.messageType.MsgType_HTLC_AddHTLCSigned_N41;
-        msg.data = info;
-        this.sendData(msg, callback);
-    }
-    onAddHtlcSigned(jsonData) { }
-    /**
      * MsgType_HTLC_FindPathAndSendH_N42
      * @param h string
      * @param callback function
      */
-    htlcFindPathAndSendH(h, callback) {
-        if (this.isNotString(h)) {
+    htlcFindPathAndSendH(info, callback) {
+        if (this.isNotString(info.h)) {
             alert("empty h");
             return;
         }
+        if (this.isNotString(info.recipient_peer_id)) {
+            alert("empty recipient_peer_id");
+            return;
+        }
+        if (info.property_id <= 0) {
+            alert("wrong recipient_peer_id");
+            return;
+        }
+        if (info.amount <= 0) {
+            alert("wrong amount");
+            return;
+        }
+        if (this.isNotString(info.memo)) {
+            info.memo = "";
+        }
         let msg = new Message();
         msg.type = this.messageType.MsgType_HTLC_FindPathAndSendH_N42;
-        msg.data["h"] = h;
+        msg.data = info;
         this.sendData(msg, callback);
     }
     onHtlcFindPathAndSendH(jsonData) { }
@@ -734,37 +715,38 @@ class ObdApi {
             alert("empty request_hash");
             return;
         }
-        if (this.isNotString(info.channel_address_private_key)) {
-            alert("empty channel_address_private_key");
-            return;
-        }
-        if (this.isNotString(info.last_temp_address_private_key)) {
-            alert("empty last_temp_address_private_key");
-            return;
-        }
-        if (this.isNotString(info.curr_rsmc_temp_address_pub_key)) {
-            alert("empty curr_rsmc_temp_address_pub_key");
-            return;
-        }
-        if (this.isNotString(info.curr_rsmc_temp_address_private_key)) {
-            alert("empty curr_rsmc_temp_address_private_key");
-            return;
-        }
-        if (this.isNotString(info.curr_htlc_temp_address_pub_key)) {
-            alert("empty curr_htlc_temp_address_pub_key");
-            return;
-        }
-        if (this.isNotString(info.curr_htlc_temp_address_private_key)) {
-            alert("empty curr_htlc_temp_address_private_key");
-            return;
-        }
-        if (this.isNotString(info.curr_htlc_temp_address_he1b_ofh_pub_key)) {
-            alert("empty curr_htlc_temp_address_he1b_ofh_pub_key");
-            return;
-        }
         if (info.approval == null) {
-            alert("empty approval");
-            return;
+            info.approval = false;
+        }
+        if (info.approval == true) {
+            if (this.isNotString(info.channel_address_private_key)) {
+                alert("empty channel_address_private_key");
+                return;
+            }
+            if (this.isNotString(info.last_temp_address_private_key)) {
+                alert("empty last_temp_address_private_key");
+                return;
+            }
+            if (this.isNotString(info.curr_rsmc_temp_address_pub_key)) {
+                alert("empty curr_rsmc_temp_address_pub_key");
+                return;
+            }
+            if (this.isNotString(info.curr_rsmc_temp_address_private_key)) {
+                alert("empty curr_rsmc_temp_address_private_key");
+                return;
+            }
+            if (this.isNotString(info.curr_htlc_temp_address_pub_key)) {
+                alert("empty curr_htlc_temp_address_pub_key");
+                return;
+            }
+            if (this.isNotString(info.curr_htlc_temp_address_private_key)) {
+                alert("empty curr_htlc_temp_address_private_key");
+                return;
+            }
+            if (this.isNotString(info.curr_htlc_temp_address_he1b_ofh_pub_key)) {
+                alert("empty curr_htlc_temp_address_he1b_ofh_pub_key");
+                return;
+            }
         }
         let msg = new Message();
         msg.type = this.messageType.MsgType_HTLC_SignGetH_N44;
@@ -1405,8 +1387,7 @@ class ObdApi {
             return;
         }
         if (info.approval == null) {
-            alert('empty approval');
-            return;
+            info.approval = false;
         }
         let msg = new Message();
         msg.type = this.messageType.MsgType_CloseChannelSign_N39;
