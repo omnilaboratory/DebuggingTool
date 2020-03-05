@@ -336,8 +336,8 @@ class ObdApi {
 
     /**
      * MsgType_FundingCreate_BtcCreate_N3400
-     * @param info 
-     * @param callback 
+     * @param info  FundingBtcCreated
+     * @param callback  Function
      */
     public btcFundingCreated(info: FundingBtcCreated, callback: Function) {
         if(this.isNotString(info.temporary_channel_id)){
@@ -365,8 +365,8 @@ class ObdApi {
 
     /**
      * MsgType_FundingSign_BtcSign_N3500
-     * @param info 
-     * @param callback 
+     * @param info FundingBtcSigned
+     * @param callback  Function
      */
     public btcFundingSign(info: FundingBtcSigned, callback: Function) {
         if(this.isNotString(info.temporary_channel_id)){
