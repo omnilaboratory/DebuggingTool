@@ -78,6 +78,14 @@ class HtlcHInfo {
   recipient_peer_id: string = "";
 }
 
+class HtlcRequestFindPathAndSendH{
+  h: string = "";
+  property_id: number = 0;
+  amount: number = 0;
+  recipient_peer_id: string = "";
+  memo: string = "";
+}
+
 class HtlcHSignInfo {
   request_hash: string = "";
   property_id: number = 0;
@@ -254,7 +262,6 @@ class MessageType {
   MsgType_HTLC_AddHTLC_N40 = -40;
   MsgType_HTLC_CreatedRAndHInfoList_N4001 = -4001;
   MsgType_HTLC_CreatedRAndHInfoItem_N4002 = -4002;
-  MsgType_HTLC_AddHTLCSigned_N41 = -41;
   MsgType_HTLC_SignedRAndHInfoList_N4101 = -4101;
   MsgType_HTLC_SignedRAndHInfoItem_N4102 = -4102;
   MsgType_HTLC_GetRFromLCommitTx_N4103 = -4103;
