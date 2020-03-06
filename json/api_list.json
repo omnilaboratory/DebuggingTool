@@ -65,7 +65,7 @@
                     "buttons": [
                         {
                             "innerText": "Get It",
-                            "onclick": "displayUserDataInNewHtml('TempChannelInfo')"
+                            "onclick": "displayUserDataInNewHtml('ChannelCreation')"
                         }
                     ]
                 },
@@ -120,7 +120,7 @@
                     "buttons": [
                         {
                             "innerText": "Get It (Channel Addr)",
-                            "onclick": "displayUserDataInNewHtml('TempChannelInfo')"
+                            "onclick": "displayUserDataInNewHtml('ChannelCreation')"
                         }
                     ]
                 },
@@ -149,7 +149,7 @@
                     "buttons": [
                         {
                             "innerText": "Get It",
-                            "onclick": "displayUserDataInNewHtml('TempChannelInfo')"
+                            "onclick": "displayUserDataInNewHtml('ChannelCreation')"
                         }
                     ]
                 },
@@ -167,7 +167,7 @@
                     "buttons": [
                         {
                             "innerText": "Get It",
-                            "onclick": "displayUserDataInNewHtml('TempChannelInfo')"
+                            "onclick": "displayUserDataInNewHtml('ChannelCreation')"
                         }
                     ]
                 }
@@ -183,7 +183,7 @@
                     "buttons": [
                         {
                             "innerText": "Get It",
-                            "onclick": "displayUserDataInNewHtml('TempChannelInfo')"
+                            "onclick": "displayUserDataInNewHtml('ChannelCreation')"
                         }
                     ]
                 },
@@ -201,7 +201,7 @@
                     "buttons": [
                         {
                             "innerText": "Get It",
-                            "onclick": "displayUserDataInNewHtml('TempChannelInfo')"
+                            "onclick": "displayUserDataInNewHtml('ChannelCreation')"
                         }
                     ]
                 }
@@ -239,7 +239,7 @@
                     "buttons": [
                         {
                             "innerText": "Get It (Channel Addr)",
-                            "onclick": "displayUserDataInNewHtml('TempChannelInfo')"
+                            "onclick": "displayUserDataInNewHtml('ChannelCreation')"
                         }
                     ]
                 },
@@ -268,7 +268,7 @@
                     "buttons": [
                         {
                             "innerText": "Get It",
-                            "onclick": "displayUserDataInNewHtml('TempChannelInfo')"
+                            "onclick": "displayUserDataInNewHtml('ChannelCreation')"
                         }
                     ]
                 },
@@ -304,7 +304,7 @@
                     "buttons": [
                         {
                             "innerText": "Get It",
-                            "onclick": "displayUserDataInNewHtml('TempChannelInfo')"
+                            "onclick": "displayUserDataInNewHtml('ChannelCreation')"
                         }
                     ]
                 }
@@ -320,7 +320,7 @@
                     "buttons": [
                         {
                             "innerText": "Get It",
-                            "onclick": "displayUserDataInNewHtml('TempChannelInfo')"
+                            "onclick": "displayUserDataInNewHtml('ChannelCreation')"
                         }
                     ]
                 },

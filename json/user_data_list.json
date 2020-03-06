@@ -13,8 +13,8 @@
             "description": "List of friends who have interacted."
         },
         {
-            "id": "TempChannelInfo",
-            "description": "List of Non-finalized channel information."
+            "id": "ChannelCreation",
+            "description": "List of channel creation process records."
         }
     ]
 }

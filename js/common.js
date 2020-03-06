@@ -23,7 +23,7 @@ var mnemonicWithLogined = '';
 var inNewHtml = 'inNewHtml';
 
 //
-var saveTempCI = 'tempChannelInfo';
+var saveTempCI = 'ChannelCreation';
 
 //
 var saveAddr = 'addr';
@@ -37,7 +37,7 @@ var saveMnemonic = 'mnemonic';
 //
 var saveGoWhere = 'go_where';
 
-// the info save to local storage [tempChannelInfo].
+// the info save to local storage [ChannelCreation].
 var channelInfo;
 
 // word wrap code.
@@ -140,7 +140,7 @@ function openChannel(msgType) {
         // Save List of friends who have interacted.
         saveFriendsList(name);
         // Save Non-finalized channel information.
-        saveTempChannelInfo(e);
+        saveChannelCreation(e);
         createOBDResponseDiv(e, msgType);
     });
 }
@@ -163,7 +163,7 @@ function acceptChannel(msgType) {
     obdApi.acceptChannel(info, function(e) {
         console.info('acceptChannel - OBD Response = ' + JSON.stringify(e));
         // Save Non-finalized channel information.
-        saveTempChannelInfo(e);
+        saveChannelCreation(e);
         createOBDResponseDiv(e, msgType);
     });
 }
@@ -183,7 +183,7 @@ function btcFundingCreated(msgType) {
     // OBD API
     obdApi.btcFundingCreated(info, function(e) {
         console.info('btcFundingCreated - OBD Response = ' + JSON.stringify(e));
-        saveTempChannelInfo(e, temp_cid, msgType);
+        saveChannelCreation(e, temp_cid, msgType);
         createOBDResponseDiv(e, msgType);
     });
 }
@@ -205,7 +205,51 @@ function btcFundingSigned(msgType) {
     // OBD API
     obdApi.btcFundingSigned(info, function(e) {
         console.info('btcFundingSigned - OBD Response = ' + JSON.stringify(e));
-        saveTempChannelInfo(e, temp_cid, msgType);
+        saveChannelCreation(e, temp_cid, msgType);
+        createOBDResponseDiv(e, msgType);
+    });
+}
+
+// Omni Asset Funding Created -34 API at local.
+function assetFundingCreated(msgType) {
+
+    var temp_cid = $("#temporary_channel_id").val();
+    var t_ad_pbk = $("#temp_address_pub_key").val();
+    var t_ad_prk = $("#temp_address_private_key").val();
+    var privkey  = $("#channel_address_private_key").val();
+    var tx_hex   = $("#funding_tx_hex").val();
+
+    let info = new ChannelFundingCreatedInfo();
+    info.temporary_channel_id = temp_cid;
+    info.temp_address_pub_key = t_ad_pbk;
+    info.temp_address_private_key = t_ad_prk;
+    info.channel_address_private_key = privkey;
+    info.funding_tx_hex = tx_hex;
+
+    // OBD API
+    obdApi.channelFundingCreated(info, function(e) {
+        console.info('N34 - OBD Response = ' + JSON.stringify(e));
+        saveChannelCreation(e, temp_cid, msgType);
+        createOBDResponseDiv(e, msgType);
+    });
+}
+
+// Omni Asset Funding Signed -35 API at local.
+function assetFundingSigned(msgType) {
+
+    var channel_id = $("#channel_id").val();
+    var privkey  = $("#fundee_channel_address_private_key").val();
+    var approval = $("#checkbox_n35").prop("checked");
+
+    let info = new ChannelFundingSignedInfo();
+    info.channel_id = channel_id;
+    info.fundee_channel_address_private_key = privkey;
+    info.approval = approval;
+
+    // OBD API
+    obdApi.channelFundingSigned(info, function(e) {
+        console.info('N35 - OBD Response = ' + JSON.stringify(e));
+        saveChannelCreation(e, channel_id, msgType);
         createOBDResponseDiv(e, msgType);
     });
 }
@@ -240,7 +284,7 @@ function fundingBTC(msgType) {
     // OBD API
     obdApi.fundingBTC(info, function(e) {
         console.info('fundingBTC - OBD Response = ' + JSON.stringify(e));
-        saveTempChannelInfo(e, tempChID, msgType);
+        saveChannelCreation(e, tempChID, msgType);
         createOBDResponseDiv(e, msgType);
     });
 }
@@ -275,7 +319,7 @@ function fundingAsset(msgType) {
     // OBD API
     obdApi.fundingAssetOfOmni(info, function(e) {
         console.info('fundingAssetOfOmni - OBD Response = ' + JSON.stringify(e));
-        saveTempChannelInfo(e, tempChID, msgType);
+        saveChannelCreation(e, tempChID, msgType);
         createOBDResponseDiv(e, msgType);
     });
 }
@@ -379,7 +423,7 @@ function displayOBDMessages(content) {
                 // content.result.temporary_channel_id;
             break;
         case enumMsgType.MsgType_ChannelAccept_N33:
-            if (content.result.curr_state === 20) {  // Accept
+            if (content.result.curr_state === 11) {  // Accept
                 content.result = 'ACCEPT - ' + content.from + 
                     ' - accept Open Channel request. ';
                     // 'The [temporary_channel_id] is : ' + 
@@ -393,11 +437,19 @@ function displayOBDMessages(content) {
             break;
         case enumMsgType.MsgType_FundingCreate_BtcCreate_N3400:
             content.result = 'Notification - ' + content.from + 
-                ' - depositing some BTC in Channel.';
+                ' - depositing BTC in Channel.';
             break;
         case enumMsgType.MsgType_FundingSign_BtcSign_N3500:
             content.result = 'Reply - ' + content.from + 
                 ' - depositing BTC message.';
+            break;
+        case enumMsgType.MsgType_FundingCreate_AssetFundingCreated_N34:
+            content.result = 'Notification - ' + content.from + 
+                ' - depositing Omni Asset in Channel.';
+            break;
+        case enumMsgType.MsgType_FundingSign_AssetFundingSigned_N35:
+            content.result = 'Reply - ' + content.from + 
+                ' - depositing Omni Asset message.';
             break;
     }
 
@@ -405,7 +457,7 @@ function displayOBDMessages(content) {
     content = content.replace("\"","").replace("\"","");
     console.info("OBD DIS - content = ", content);
 
-    // the info save to local storage [tempChannelInfo].
+    // the info save to local storage [ChannelCreation].
     channelInfo = content;
 
     // Some case do not need displayed.
@@ -455,8 +507,8 @@ function getUserDataList(goWhere) {
             case 'Friends':
                 displayUserData(Friends);
                 break;
-            case 'TempChannelInfo':
-                displayUserData(TempChannelInfo, inNewHtml);
+            case 'ChannelCreation':
+                displayUserData(ChannelCreation, inNewHtml);
                 break;
         }
     });
@@ -1110,10 +1162,25 @@ function omniAssetData(response, msgType) {
         amount: $("#amount").val(),
         property_id: $("#property_id").val(),
         hex:  response.hex,
-        // txid: response.txid,
         date: new Date().toLocaleString(),
         msgType: msgType,
+
+        channel_id: '',
+        amount_a: '',
+        amount_b: '',
+        peer_id_a: '',
+        peer_id_b: '',
+        create_at: '',
+        create_by: '',
+        curr_state: '',
+        fundee_sign_at: '',
+        funder_address: '',
+        funder_pub_key_2_for_commitment: '',
+        funding_output_index: '',
+        funding_tx_hex: '',
+        funding_txid: '',
     }
+
     return omniAsset;
 }
 
@@ -1146,14 +1213,14 @@ function dataConstruct(response, tempChID, msgType) {
 }
 
 // Non-finalized channel information.
-function saveTempChannelInfo(response, param, msgType) {
+function saveChannelCreation(response, channelID, msgType) {
     var tempChID;
     var list = JSON.parse(localStorage.getItem(saveTempCI));
 
     if (response.temporary_channel_id) {
         tempChID = response.temporary_channel_id;
     } else {
-        tempChID = param;
+        tempChID = channelID;
     }
 
     if (list) {
@@ -1174,8 +1241,8 @@ function saveTempChannelInfo(response, param, msgType) {
                     case enumMsgType.MsgType_FundingSign_BtcSign_N3500:
                         for (let i2 = 0; i2 < list.result[i].btc.length; i2++) {
                             if ($("#funding_txid").val() === list.result[i].btc[i2].txid) {
-                                list.result[i].btc[i2].txid = response.txid;
-                                list.result[i].btc[i2].hex  = response.tx_hash;
+                                // list.result[i].btc[i2].txid = response.txid;
+                                // list.result[i].btc[i2].hex  = response.tx_hash;
                                 list.result[i].btc[i2].msgType = msgType;
                                 list.result[i].btc[i2].date = new Date().toLocaleString();
                             }
@@ -1183,6 +1250,21 @@ function saveTempChannelInfo(response, param, msgType) {
                         break;
                     case enumMsgType.MsgType_Core_Omni_FundingAsset_2001:
                         list.result[i].omniAsset.push(omniAssetData(response, msgType));
+                        break;
+                    case enumMsgType.MsgType_FundingCreate_AssetFundingCreated_N34:
+                        for (let i2 = 0; i2 < list.result[i].omniAsset.length; i2++) {
+                            if ($("#funding_tx_hex").val() === list.result[i].omniAsset[i2].hex) {
+                                list.result[i].temporary_channel_id = response.channel_id;
+                                updateOmniAssetData(response, list.result[i].omniAsset[i2], msgType);
+                            }
+                        }
+                        break;
+                    case enumMsgType.MsgType_FundingSign_AssetFundingSigned_N35:
+                        for (let i2 = 0; i2 < list.result[i].omniAsset.length; i2++) {
+                            if ($("#channel_id").val() === list.result[i].omniAsset[i2].channel_id) {
+                                updateOmniAssetData(response, list.result[i].omniAsset[i2], msgType);
+                            }
+                        }
                         break;
                     default:
                         list.result[i].data.push(channelData(response));
@@ -1205,6 +1287,26 @@ function saveTempChannelInfo(response, param, msgType) {
         }
         localStorage.setItem(saveTempCI, JSON.stringify(data));
     }
+}
+
+//
+function updateOmniAssetData(response, data, msgType) {
+    data.msgType = msgType;
+    data.date    = new Date().toLocaleString();
+    data.channel_id = response.channel_id;
+    data.amount_a = response.amount_a;
+    data.amount_b = response.amount_b;
+    data.peer_id_a = response.peer_id_a;
+    data.peer_id_b = response.peer_id_b;
+    data.create_at = response.create_at;
+    data.create_by = response.create_by;
+    data.curr_state = response.curr_state;
+    data.fundee_sign_at = response.fundee_sign_at;
+    data.funder_address = response.funder_address;
+    data.funder_pub_key_2_for_commitment = response.funder_pub_key_2_for_commitment;
+    data.funding_output_index = response.funding_output_index;
+    data.funding_tx_hex = response.funding_tx_hex;
+    data.funding_txid = response.funding_txid;
 }
 
 // mnemonic words generated with signUp api save to local storage.
@@ -1277,6 +1379,7 @@ function getBalance(strAddr) {
         console.info('getBtcBalance - OBD Response = ' + JSON.stringify(e));
         result = JSON.stringify(e);
         result = result.replace("\"","").replace("\"","");
+        result = parseFloat(result);
         result = 'BALANCE : ' + result + ' BTC ';
         $("#" + strAddr).text(result);
     });
@@ -1287,7 +1390,7 @@ function getBalance(strAddr) {
         
         if (e != "") {
             for (let i = 0; i < e.length; i++) {
-                result += ' | ' + e[i].balance + ' ' + e[i].name + 
+                result += ' *** ' + parseFloat(e[i].balance) + ' ' + e[i].name + 
                     ' (Property ID: ' + e[i].propertyid + ')';
             }
             $("#" + strAddr).text(result);
@@ -1343,8 +1446,8 @@ function displayUserData(obj, param) {
         case 'Friends':
             displayFriends();
             break;
-        case 'TempChannelInfo':
-            displayTempChannelInfo(param);
+        case 'ChannelCreation':
+            displayChannelCreation(param);
             break;
     }
 }
@@ -1468,8 +1571,8 @@ function displayFriends() {
     }
 }
 
-// displayTempChannelInfo
-function displayTempChannelInfo(param) {
+// List of channel creation process records.
+function displayChannelCreation(param) {
     // get [name_req_div] div
     var parent = $("#name_req_div");
 
@@ -1495,8 +1598,12 @@ function displayTempChannelInfo(param) {
 
     if (list) {
         for (let i = 0; i < list.result.length; i++) {
-            createElement(parent, 'h4', 'NO. ' + (i + 1) + 
-                ' - Temp Channel ID is: ' + list.result[i].temporary_channel_id);
+            // createElement(parent, 'h4', 'NO. ' + (i + 1) + 
+            //     ' - Temp Channel ID is: ' + list.result[i].temporary_channel_id);
+            createElement(parent, 'h4', 'NO. ' + (i + 1));
+            
+            // Display channel id in creation process.
+            channelID(parent, list, i);
 
             // Display channel info.
             partChannelInfo(parent, list, i)
@@ -1509,6 +1616,22 @@ function displayTempChannelInfo(param) {
         }
     } else { // NO LOCAL STORAGE DATA YET.
         createElement(parent, 'h3', 'NO DATA YET.');
+    }
+}
+
+// Display channel id in creation process.
+function channelID(parent, list, i) {
+    // var msgType;
+    try {
+        var msgType = list.result[i].omniAsset[0].msgType;
+    } catch (error) {}
+
+    if (msgType === enumMsgType.MsgType_FundingSign_AssetFundingSigned_N35) {
+        createElement(parent, 'h4', 'DONE - Channel ID : ' + 
+            list.result[i].temporary_channel_id);
+    } else {
+        createElement(parent, 'h4', 'TEMP - Channel ID : ' + 
+            list.result[i].temporary_channel_id);
     }
 }
 
@@ -1627,6 +1750,22 @@ function omniAssetRecord(parent, list, i) {
                 'amount : '   + list.result[i].omniAsset[i2].amount,
                 'property_id : '   + list.result[i].omniAsset[i2].property_id,
                 'hex : '   + list.result[i].omniAsset[i2].hex,
+
+                '----------------------',
+                'channel_id : '   + list.result[i].omniAsset[i2].channel_id,
+                'amount_a : '   + list.result[i].omniAsset[i2].amount_a,
+                'amount_b : '   + list.result[i].omniAsset[i2].amount_b,
+                'peer_id_a : '   + list.result[i].omniAsset[i2].peer_id_a,
+                'peer_id_b : '   + list.result[i].omniAsset[i2].peer_id_b,
+                'create_at : '   + list.result[i].omniAsset[i2].create_at,
+                'create_by : '   + list.result[i].omniAsset[i2].create_by,
+                'curr_state : '   + list.result[i].omniAsset[i2].curr_state,
+                'fundee_sign_at : '   + list.result[i].omniAsset[i2].fundee_sign_at,
+                'funder_address : '   + list.result[i].omniAsset[i2].funder_address,
+                'funder_pub_key_2_for_commitment : '   + list.result[i].omniAsset[i2].funder_pub_key_2_for_commitment,
+                'funding_output_index : '   + list.result[i].omniAsset[i2].funding_output_index,
+                'funding_tx_hex : '   + list.result[i].omniAsset[i2].funding_tx_hex,
+                'funding_txid : '   + list.result[i].omniAsset[i2].funding_txid,
             ];
 
             for (let i3 = 0; i3 < arrData.length; i3++) {
