@@ -357,7 +357,7 @@ function CTxSigned(msgType) {
     var curr_temp_address_pub_key = $("#curr_temp_address_pub_key").val();
     var curr_temp_address_private_key = $("#curr_temp_address_private_key").val();
     var channel_address_private_key  = $("#channel_address_private_key").val();
-    var last_temp_private_key   = $("#last_temp_private_key").val();
+    var last_temp_address_private_key   = $("#last_temp_address_private_key").val();
     var request_commitment_hash   = $("#request_commitment_hash").val();
     var approval = $("#checkbox_n352").prop("checked");
 
@@ -366,7 +366,7 @@ function CTxSigned(msgType) {
     info.curr_temp_address_pub_key = curr_temp_address_pub_key;
     info.curr_temp_address_private_key = curr_temp_address_private_key;
     info.channel_address_private_key = channel_address_private_key;
-    info.last_temp_private_key = last_temp_private_key;
+    info.last_temp_address_private_key = last_temp_address_private_key;
     info.request_commitment_hash = request_commitment_hash;
     info.approval = approval;
 
@@ -608,7 +608,7 @@ function createLeftSideMenu(jsonFile, divName) {
             // create [a] element
             apiItem = document.createElement('a');
             apiItem.id = api_id;
-            apiItem.href = '#';
+            apiItem.href = 'javascript:void(0);';
             apiItem.setAttribute('type_id', type_id);
             apiItem.setAttribute('description', description);
             apiItem.setAttribute('onclick', 'displayAPIContent(this)');
@@ -770,8 +770,8 @@ function clickApproval(obj) {
                 $("#curr_temp_address_pub_keyGet").show();
                 $("#curr_temp_address_private_key").show();
                 $("#curr_temp_address_private_keyGet").show();
-                $("#last_temp_private_key").show();
-                $("#last_temp_private_keyGet").show();
+                $("#last_temp_address_private_key").show();
+                $("#last_temp_address_private_keyGet").show();
                 $("#channel_address_private_key").show();
                 $("#channel_address_private_keyGet").show();
             } else {
@@ -779,8 +779,8 @@ function clickApproval(obj) {
                 $("#curr_temp_address_pub_keyGet").hide();
                 $("#curr_temp_address_private_key").hide();
                 $("#curr_temp_address_private_keyGet").hide();
-                $("#last_temp_private_key").hide();
-                $("#last_temp_private_keyGet").hide();
+                $("#last_temp_address_private_key").hide();
+                $("#last_temp_address_private_keyGet").hide();
                 $("#channel_address_private_key").hide();
                 $("#channel_address_private_keyGet").hide();
             }

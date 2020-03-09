@@ -433,7 +433,7 @@
                     ]
                 },
                 {
-                    "name": "last_temp_private_key",
+                    "name": "last_temp_address_private_key",
                     "buttons": [
                         {
                             "innerText": "Get It",
