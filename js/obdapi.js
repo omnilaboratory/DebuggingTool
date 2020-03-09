@@ -573,6 +573,10 @@ class ObdApi {
             alert("empty channel_id");
             return;
         }
+        if (this.isNotString(info.request_commitment_hash)) {
+            alert("empty request_commitment_hash");
+            return;
+        }
         if (info.approval == null) {
             info.approval = false;
         }
@@ -587,10 +591,6 @@ class ObdApi {
             }
             if (this.isNotString(info.last_temp_private_key)) {
                 alert("empty last_temp_private_key");
-                return;
-            }
-            if (this.isNotString(info.request_commitment_hash)) {
-                alert("empty request_commitment_hash");
                 return;
             }
             if (this.isNotString(info.channel_address_private_key)) {
