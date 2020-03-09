@@ -337,11 +337,11 @@ class ObdApi {
             alert("empty temporary_channel_id");
             return;
         }
+        if (this.isNotString(info.funding_txid)) {
+            alert("empty funding_txid");
+            return;
+        }
         if (info.approval == true) {
-            if (this.isNotString(info.funding_txid)) {
-                alert("empty funding_txid");
-                return;
-            }
             if (this.isNotString(info.channel_address_private_key)) {
                 alert("empty channel_address_private_key");
                 return;
@@ -573,6 +573,10 @@ class ObdApi {
             alert("empty channel_id");
             return;
         }
+        if (this.isNotString(info.request_commitment_hash)) {
+            alert("empty request_commitment_hash");
+            return;
+        }
         if (info.approval == null) {
             info.approval = false;
         }
@@ -585,12 +589,8 @@ class ObdApi {
                 alert("empty curr_temp_address_private_key");
                 return;
             }
-            if (this.isNotString(info.last_temp_private_key)) {
-                alert("empty last_temp_private_key");
-                return;
-            }
-            if (this.isNotString(info.request_commitment_hash)) {
-                alert("empty request_commitment_hash");
+            if (this.isNotString(info.last_temp_address_private_key)) {
+                alert("empty last_temp_address_private_key");
                 return;
             }
             if (this.isNotString(info.channel_address_private_key)) {

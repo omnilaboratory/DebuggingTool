@@ -76,7 +76,7 @@ class CommitmentTxSigned {
         this.channel_id = "";
         this.curr_temp_address_pub_key = "";
         this.curr_temp_address_private_key = "";
-        this.last_temp_private_key = "";
+        this.last_temp_address_private_key = "";
         this.request_commitment_hash = "";
         this.channel_address_private_key = "";
         this.approval = false;
