@@ -373,11 +373,12 @@ class ObdApi {
             alert("empty temporary_channel_id");
             return;
         }
+        if(this.isNotString(info.funding_txid)){
+            alert("empty funding_txid");
+            return;
+        }
+        
         if(info.approval==true){
-            if(this.isNotString(info.funding_txid)){
-                alert("empty funding_txid");
-                return;
-            }
             if(this.isNotString(info.channel_address_private_key)){
                 alert("empty channel_address_private_key");
                 return;
