@@ -589,10 +589,6 @@ class ObdApi {
                 alert("empty curr_temp_address_private_key");
                 return;
             }
-            if (this.isNotString(info.last_temp_address_private_key)) {
-                alert("empty last_temp_address_private_key");
-                return;
-            }
             if (this.isNotString(info.channel_address_private_key)) {
                 alert("empty channel_address_private_key");
                 return;
