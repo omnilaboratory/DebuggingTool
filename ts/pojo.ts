@@ -102,7 +102,6 @@ class SignGetHInfo {
   curr_rsmc_temp_address_private_key: string = "";
   curr_htlc_temp_address_pub_key: string = "";
   curr_htlc_temp_address_private_key: string = "";
-  curr_htlc_temp_address_he1b_ofh_pub_key: string = "";
   approval: boolean = false;
 }
 
@@ -116,14 +115,12 @@ class HtlcRequestOpen {
   curr_htlc_temp_address_private_key: string = "";
   curr_htlc_temp_address_for_ht1a_pub_key: string = "";
   curr_htlc_temp_address_for_ht1a_private_key: string = "";
-  curr_htlc_temp_address_for_hed1a_ofh_pub_key: string = "";
 }
 
 class HtlcSendRInfo {
   request_hash: string = "";
   r: string = "";
   channel_address_private_key: string = "";
-  curr_htlc_temp_address_he1b_ofh_private_key: string = "";
   curr_htlc_temp_address_for_he1b_pub_key: string = "";
   curr_htlc_temp_address_for_he1b_private_key: string = "";
 }
@@ -132,7 +129,6 @@ class HtlcVerifyRInfo {
   request_hash: string = "";
   r: string = "";
   channel_address_private_key: string = "";
-  curr_htlc_temp_address_for_hed1a_ofh_private_key: string = "";
 }
 
 class CloseHtlcTxInfo {
@@ -179,6 +175,28 @@ class CloseChannelSign {
   channel_id: string = "";
   request_close_channel_hash: string = "";
   approval: boolean = false;
+}
+
+/**
+ * -80
+ */
+class AtomicSwapRequest{
+  channel_id_from: string = "";
+  channel_id_to: string = "";
+  recipient_peer_id: string = "";
+  property_sent: number = 0;
+  amount: number = 0;
+  exchange_rate: number = 0;
+  property_received: number = 0;
+  transaction_id: string = "";
+  time_locker: number = 0;
+}
+
+/**
+ * -81
+ */
+class AtomicSwapAccepted extends AtomicSwapRequest {
+  target_transaction_id: string = "";
 }
 
 class MessageType {
@@ -277,4 +295,7 @@ class MessageType {
   MsgType_HTLC_CloseSigned_N49 = -49;
   MsgType_HTLC_RequestCloseChannel_N50 = -50;
   MsgType_HTLC_CloseChannelSigned_N51 = -51;
+
+  MsgType_Atomic_Swap_N80         = -80
+	MsgType_Atomic_Swap_Accept_N81  = -81
 }

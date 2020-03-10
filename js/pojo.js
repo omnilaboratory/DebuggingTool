@@ -116,7 +116,6 @@ class SignGetHInfo {
         this.curr_rsmc_temp_address_private_key = "";
         this.curr_htlc_temp_address_pub_key = "";
         this.curr_htlc_temp_address_private_key = "";
-        this.curr_htlc_temp_address_he1b_ofh_pub_key = "";
         this.approval = false;
     }
 }
@@ -131,7 +130,6 @@ class HtlcRequestOpen {
         this.curr_htlc_temp_address_private_key = "";
         this.curr_htlc_temp_address_for_ht1a_pub_key = "";
         this.curr_htlc_temp_address_for_ht1a_private_key = "";
-        this.curr_htlc_temp_address_for_hed1a_ofh_pub_key = "";
     }
 }
 class HtlcSendRInfo {
@@ -139,7 +137,6 @@ class HtlcSendRInfo {
         this.request_hash = "";
         this.r = "";
         this.channel_address_private_key = "";
-        this.curr_htlc_temp_address_he1b_ofh_private_key = "";
         this.curr_htlc_temp_address_for_he1b_pub_key = "";
         this.curr_htlc_temp_address_for_he1b_private_key = "";
     }
@@ -149,7 +146,6 @@ class HtlcVerifyRInfo {
         this.request_hash = "";
         this.r = "";
         this.channel_address_private_key = "";
-        this.curr_htlc_temp_address_for_hed1a_ofh_private_key = "";
     }
 }
 class CloseHtlcTxInfo {
@@ -204,6 +200,31 @@ class CloseChannelSign {
         this.channel_id = "";
         this.request_close_channel_hash = "";
         this.approval = false;
+    }
+}
+/**
+ * -80
+ */
+class AtomicSwapRequest {
+    constructor() {
+        this.channel_id_from = "";
+        this.channel_id_to = "";
+        this.recipient_peer_id = "";
+        this.property_sent = 0;
+        this.amount = 0;
+        this.exchange_rate = 0;
+        this.property_received = 0;
+        this.transaction_id = "";
+        this.time_locker = 0;
+    }
+}
+/**
+ * -81
+ */
+class AtomicSwapAccepted extends AtomicSwapRequest {
+    constructor(...args) {
+        super(...args);
+        this.target_transaction_id = "";
     }
 }
 class MessageType {
@@ -291,5 +312,7 @@ class MessageType {
         this.MsgType_HTLC_CloseSigned_N49 = -49;
         this.MsgType_HTLC_RequestCloseChannel_N50 = -50;
         this.MsgType_HTLC_CloseChannelSigned_N51 = -51;
+        this.MsgType_Atomic_Swap_N80 = -80;
+        this.MsgType_Atomic_Swap_Accept_N81 = -81;
     }
 }

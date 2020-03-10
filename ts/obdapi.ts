@@ -826,10 +826,6 @@ class ObdApi {
                 alert("empty curr_htlc_temp_address_private_key");
                 return;
             }
-            if(this.isNotString(info.curr_htlc_temp_address_he1b_ofh_pub_key)){
-                alert("empty curr_htlc_temp_address_he1b_ofh_pub_key");
-                return;
-            }
         }
 
         let msg = new Message();
@@ -882,11 +878,6 @@ class ObdApi {
             alert("empty curr_htlc_temp_address_for_ht1a_private_key");
             return;
         }
-        if(this.isNotString(info.curr_htlc_temp_address_for_hed1a_ofh_pub_key)){
-            alert("empty curr_htlc_temp_address_for_hed1a_ofh_pub_key");
-            return;
-        }
-
 
         let msg = new Message();
         msg.type = this.messageType.MsgType_HTLC_CreateCommitmentTx_N45;
@@ -912,10 +903,6 @@ class ObdApi {
         }
         if(this.isNotString(info.channel_address_private_key)){
             alert("empty channel_address_private_keycurr_htlc_temp_address_he1b_ofh_private_key");
-            return;
-        }
-        if(this.isNotString(info.curr_htlc_temp_address_he1b_ofh_private_key)){
-            alert("empty curr_htlc_temp_address_he1b_ofh_private_key");
             return;
         }
         if(this.isNotString(info.curr_htlc_temp_address_for_he1b_pub_key)){
@@ -949,10 +936,6 @@ class ObdApi {
         }
         if(this.isNotString(info.channel_address_private_key)){
             alert("empty channel_address_private_key");
-            return;
-        }
-        if(this.isNotString(info.curr_htlc_temp_address_for_hed1a_ofh_private_key)){
-            alert("empty curr_htlc_temp_address_for_hed1a_ofh_private_key");
             return;
         }
 
@@ -1524,16 +1507,101 @@ class ObdApi {
     }
     public onCloseChannelSign(jsonData: any) { }
 
+    /**
+     * MsgType_Atomic_Swap_N80
+     * @param info AtomicSwapRequest 
+     * @param callback function
+     */
+    public atomicSwap(info:AtomicSwapRequest, callback: Function) {
+        if(this.isNotString(info.channel_id_from)){
+            alert('empty channel_id_from');
+            return;
+        }
+        if(this.isNotString(info.channel_id_to)){
+            alert('empty channel_id_to');
+            return;
+        }
+        if(this.isNotString(info.recipient_peer_id)){
+            alert('empty recipient_peer_id');
+            return;
+        }
+        if(this.isNotString(info.transaction_id)){
+            alert('empty transaction_id');
+            return;
+        }
+        
+        if(info.property_sent<=0){
+            alert('wrong property_sent');
+            return;
+        }
+        if(info.amount<=0){
+            alert('wrong amount');
+            return;
+        }
+        if(info.exchange_rate<=0){
+            alert('wrong exchange_rate');
+            return;
+        }
+        if(info.property_received<=0){
+            alert('wrong property_received');
+            return;
+        }
 
-    private isString(str:String):boolean{
-        if(str==null){
-            return false;
-        }
-        if(str.trim().length==0){
-            return false;
-        }
-        return true;
+        let msg = new Message();
+        msg.type = this.messageType.MsgType_Atomic_Swap_N80;
+        msg.data = info;
+        this.sendData(msg, callback);
     }
+    /**
+     * MsgType_Atomic_Swap_Accept_N81
+     * @param info AtomicSwapAccepted 
+     * @param callback function
+     */
+    public atomicSwapAccepted(info:AtomicSwapAccepted, callback: Function) {
+        if(this.isNotString(info.channel_id_from)){
+            alert('empty channel_id_from');
+            return;
+        }
+        if(this.isNotString(info.channel_id_to)){
+            alert('empty channel_id_to');
+            return;
+        }
+        if(this.isNotString(info.recipient_peer_id)){
+            alert('empty recipient_peer_id');
+            return;
+        }
+        if(this.isNotString(info.transaction_id)){
+            alert('empty transaction_id');
+            return;
+        }
+        if(this.isNotString(info.target_transaction_id)){
+            alert('empty target_transaction_id');
+            return;
+        }
+        if(info.property_sent<=0){
+            alert('wrong property_sent');
+            return;
+        }
+        if(info.amount<=0){
+            alert('wrong amount');
+            return;
+        }
+        if(info.exchange_rate<=0){
+            alert('wrong exchange_rate');
+            return;
+        }
+        if(info.property_received<=0){
+            alert('wrong property_received');
+            return;
+        }
+
+        let msg = new Message();
+        msg.type = this.messageType.MsgType_Atomic_Swap_Accept_N81;
+        msg.data = info;
+        this.sendData(msg, callback);
+    }
+
+
     private isNotString(str:String):boolean{
         if(str==null){
             return true;
