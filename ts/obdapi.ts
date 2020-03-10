@@ -810,10 +810,6 @@ class ObdApi {
                 alert("empty channel_address_private_key");
                 return;
             }
-            if(this.isNotString(info.last_temp_address_private_key)){
-                alert("empty last_temp_address_private_key");
-                return;
-            }
             if(this.isNotString(info.curr_rsmc_temp_address_pub_key)){
                 alert("empty curr_rsmc_temp_address_pub_key");
                 return;
