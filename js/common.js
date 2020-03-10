@@ -324,6 +324,70 @@ function fundingAsset(msgType) {
     });
 }
 
+// createInvoice API at local.
+function createInvoice(msgType) {
+
+    var property_id  = $("#property_id").val();
+    var amount       = $("#amount").val();
+    var recipient_peer_id  = $("#recipient_peer_id").val();
+
+    let info = new HtlcHInfo();
+    info.property_id  = Number(property_id);
+    info.amount     = Number(amount);
+    info.recipient_peer_id = recipient_peer_id;
+
+    // OBD API
+    obdApi.htlcInvoice(info, function(e) {
+        console.info('createInvoice - OBD Response = ' + JSON.stringify(e));
+        // saveChannelCreation(e, tempChID, msgType);
+        createOBDResponseDiv(e, msgType);
+    });
+}
+
+// -42 htlcFindPathAndSendH API at local.
+function htlcFindPathAndSendH(msgType) {
+
+    var property_id  = $("#property_id").val();
+    var amount       = $("#amount").val();
+    var recipient_peer_id  = $("#recipient_peer_id").val();
+    var h       = $("#h").val();
+    var memo    = $("#memo").val();
+
+    let info = new HtlcRequestFindPathAndSendH();
+    info.property_id  = Number(property_id);
+    info.amount     = Number(amount);
+    info.recipient_peer_id = recipient_peer_id;
+    info.h     = h;
+    info.memo = memo;
+
+    // OBD API
+    obdApi.htlcFindPathAndSendH(info, function(e) {
+        console.info('-42 htlcFindPathAndSendH - OBD Response = ' + JSON.stringify(e));
+        // saveChannelCreation(e, tempChID, msgType);
+        createOBDResponseDiv(e, msgType);
+    });
+}
+
+// add HTLC API at local.
+function addHTLC(msgType) {
+
+    var property_id  = $("#property_id").val();
+    var amount       = $("#amount").val();
+    var recipient_peer_id  = $("#recipient_peer_id").val();
+
+    let info = new HtlcHInfo();
+    info.property_id  = Number(property_id);
+    info.amount     = Number(amount);
+    info.recipient_peer_id = recipient_peer_id;
+
+    // OBD API
+    obdApi.addHtlc(info, function(e) {
+        console.info('addHTLC - OBD Response = ' + JSON.stringify(e));
+        // saveChannelCreation(e, tempChID, msgType);
+        createOBDResponseDiv(e, msgType);
+    });
+}
+
 // Commitment Transaction Created -351 API at local.
 function CTxCreated(msgType) {
 
@@ -336,7 +400,7 @@ function CTxCreated(msgType) {
 
     let info = new CommitmentTx();
     info.channel_id = channel_id;
-    info.amount = amount;
+    info.amount = Number(amount);
     info.curr_temp_address_pub_key = curr_temp_address_pub_key;
     info.curr_temp_address_private_key = curr_temp_address_private_key;
     info.channel_address_private_key = channel_address_private_key;
@@ -454,6 +518,15 @@ function invokeAPIs(objSelf) {
         case enumMsgType.MsgType_ChannelAccept_N33:
             acceptChannel(msgType);
             break;
+        case enumMsgType.MsgType_HTLC_Invoice_N4003:
+            createInvoice(msgType);
+            break;
+        case enumMsgType.MsgType_HTLC_AddHTLC_N40:
+            addHTLC(msgType);
+            break;
+        case enumMsgType.MsgType_HTLC_FindPathAndSendH_N42:
+            htlcFindPathAndSendH(msgType);
+            break;
         
         default:
             console.info(msgType + " do not exist");
@@ -475,6 +548,7 @@ function displayOBDMessages(content) {
         case enumMsgType.MsgType_Core_FundingBTC_1009:
         case enumMsgType.MsgType_Core_Omni_Getbalance_1200:
         case enumMsgType.MsgType_Core_Omni_FundingAsset_2001:
+        case enumMsgType.MsgType_HTLC_Invoice_N4003:
             return;
         case enumMsgType.MsgType_ChannelOpen_N32:
             content.result = 'LAUNCH - ' + content.from + 
@@ -510,6 +584,14 @@ function displayOBDMessages(content) {
         case enumMsgType.MsgType_FundingSign_AssetFundingSigned_N35:
             content.result = 'Reply - ' + content.from + 
                 ' - depositing Omni Asset message.';
+            break;
+        case enumMsgType.MsgType_CommitmentTx_CommitmentTransactionCreated_N351:
+            content.result = 'RSMC transfer - ' + content.from + 
+                ' - launch a transfer.';
+            break;
+        case enumMsgType.MsgType_CommitmentTxSigned_RevokeAndAcknowledgeCommitmentTransaction_N352:
+            content.result = 'RSMC transfer - ' + content.from + 
+                ' - accept a transfer.';
             break;
     }
 
@@ -691,6 +773,7 @@ function createInputParamDiv(obj, jsonFile) {
                 case enumMsgType.MsgType_ChannelAccept_N33:
                 case enumMsgType.MsgType_FundingSign_BtcSign_N3500:
                 case enumMsgType.MsgType_FundingSign_AssetFundingSigned_N35:
+                case enumMsgType.MsgType_CommitmentTxSigned_RevokeAndAcknowledgeCommitmentTransaction_N352:
                     displayApprovalCheckbox(content_div, obj, msgType);
                     break;
             }
@@ -966,6 +1049,15 @@ function createOBDResponseDiv(response, msgType) {
         case enumMsgType.MsgType_CommitmentTxSigned_RevokeAndAcknowledgeCommitmentTransaction_N352:
             parseDataN352(response);
             break;
+        case enumMsgType.MsgType_HTLC_Invoice_N4003:
+            parseDataN4003(response);
+            break;
+        case enumMsgType.MsgType_HTLC_AddHTLC_N40:
+            parseDataN40(response);
+            break;
+        case enumMsgType.MsgType_HTLC_FindPathAndSendH_N42:
+            parseDataN42(response);
+            break;
         default:
             createElement(obd_response_div, 'p', response);
             break;
@@ -975,10 +1067,50 @@ function createOBDResponseDiv(response, msgType) {
 //----------------------------------------------------------------
 // Functions of processing each response from invoke APIs.
 
+// parseDataN42 - 
+function parseDataN42(response) {
+    var arrData = [
+        'h : ' + response.h,
+        'request_hash : ' + response.request_hash,
+    ];
+
+    for (let i = 0; i < arrData.length; i++) {
+        createElement(obd_response_div, 'p', arrData[i]);
+    }
+}
+
+// parseDataN40 - 
+function parseDataN40(response) {
+    var arrData = [
+        'recipient_peer_id : ' + response.recipient_peer_id,
+        'amount : ' + response.amount,
+        'property_id : ' + response.propertyId,
+        'msg : ' + response.msg,
+    ];
+
+    for (let i = 0; i < arrData.length; i++) {
+        createElement(obd_response_div, 'p', arrData[i]);
+    }
+}
+
+// parseDataN4003 - 
+function parseDataN4003(response) {
+    var arrData = [
+        'recipient_peer_id : ' + response.recipient_peer_id,
+        'amount : ' + response.amount,
+        'property_id : ' + response.propertyId,
+        'msg : ' + response.msg,
+    ];
+
+    for (let i = 0; i < arrData.length; i++) {
+        createElement(obd_response_div, 'p', arrData[i]);
+    }
+}
+
 // parseDataN352 - 
 function parseDataN352(response) {
     var arrData = [
-        'CHANNEL_ID : ' + response.channel_id,
+        'channel_id : ' + response.channel_id,
         'property_id : ' + response.property_id,
         'amount_to_htlc : ' + response.amount_to_htlc,
         'amount_to_other : ' + response.amount_to_other,
@@ -1027,7 +1159,7 @@ function parseDataN352(response) {
 // parseDataN351 - 
 function parseDataN351(response) {
     var arrData = [
-        'CHANNEL_ID : ' + response.channel_id,
+        'channel_id : ' + response.channel_id,
         'amount : ' + response.amount,
         'property_id : ' + response.property_id,
         'channel_address_private_key : ' + response.channel_address_private_key,
@@ -1045,7 +1177,7 @@ function parseDataN351(response) {
 // parseDataN34N35 - 
 function parseDataN34N35(response) {
     var arrData = [
-        'CHANNEL_ID : ' + response.channel_id,
+        'channel_id : ' + response.channel_id,
         'channel_info_id : ' + response.channel_info_id,
         'amount_a : ' + response.amount_a,
         'amount_b : ' + response.amount_b,
@@ -1077,13 +1209,13 @@ function parseData2001(response) {
 // parseDataN3500 - 
 function parseDataN3500(response) {
     var arrData = [
-        'CHANNEL_ID : ' + response.channel_id,
-        'TEMP_CH_ID : ' + response.temporary_channel_id,
+        'channel_id : ' + response.channel_id,
+        'temporary_channel_id : ' + response.temporary_channel_id,
         'create_at : ' + response.create_at,
-        'ID : ' + response.id,
-        'OWNER : ' + response.owner,
-        'TXID : ' + response.txid,
-        'TX_HASH : ' + response.tx_hash,
+        'id : ' + response.id,
+        'owner : ' + response.owner,
+        'txid : ' + response.txid,
+        'tx_hash : ' + response.tx_hash,
     ];
 
     for (let i = 0; i < arrData.length; i++) {
@@ -1094,9 +1226,9 @@ function parseDataN3500(response) {
 // parseDataN3400 - 
 function parseDataN3400(response) {
     var arrData = [
-        'TEMP_CH_ID : ' + response.temporary_channel_id,
-        'TXID : ' + response.funding_txid,
-        'AMOUNT : ' + response.amount,
+        'temporary_channel_id : ' + response.temporary_channel_id,
+        'funding_txid : ' + response.funding_txid,
+        'amount : ' + response.amount,
     ];
 
     for (let i = 0; i < arrData.length; i++) {
@@ -1107,8 +1239,8 @@ function parseDataN3400(response) {
 // parseData1009 - 
 function parseData1009(response) {
     var arrData = [
-        'HEX : ' + response.hex,
-        'TXID : ' + response.txid,
+        'hex : ' + response.hex,
+        'txid : ' + response.txid,
     ];
 
     for (let i = 0; i < arrData.length; i++) {
@@ -1316,7 +1448,7 @@ function btcData(response, msgType) {
 // transfer (RSMC) record.
 function rsmcData(response, msgType) {
     var rsmcData = {
-        RSMC_in_Channel: response.channel_id,
+        channel_id: response.channel_id,
         amount: response.amount,
         property_id:  response.property_id,
         request_commitment_hash: response.request_commitment_hash,
@@ -1332,6 +1464,7 @@ function rsmcData(response, msgType) {
         sign_at: '',
         to_other_txid: '',
     }
+
     return rsmcData;
 }
 
@@ -1991,8 +2124,8 @@ function rsmcRecord(parent, list, i) {
     if (list.result[i].transfer[0]) {
         createElement(parent, 'h5', '--> RSMC - transfer in channel');
         for (let i2 = 0; i2 < list.result[i].transfer.length; i2++) {
-            // createElement(parent, 'br');
-            // createElement(parent, 'text', 'NO. ' + (i4 + 1));
+            createElement(parent, 'br');
+            createElement(parent, 'text', 'NO. ' + (i2 + 1));
 
             var status;
             switch (list.result[i].transfer[i2].msgType) {
@@ -2011,7 +2144,7 @@ function rsmcRecord(parent, list, i) {
             createElement(parent, 'br');
 
             arrData = [
-                'RSMC_in_Channel : '   + list.result[i].transfer[i2].channel_id,
+                'channel_id : '   + list.result[i].transfer[i2].channel_id,
                 'amount : '   + list.result[i].transfer[i2].amount,
                 'property_id : '   + list.result[i].transfer[i2].property_id,
                 'request_commitment_hash : '   + list.result[i].transfer[i2].request_commitment_hash,

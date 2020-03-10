@@ -451,6 +451,77 @@
                     ]
                 }
             ]
+        },
+        {
+            "id": "addHTLC",
+            "type_id": -40,
+            "description": "Add HTLC is used to create a HTLC.",
+            "parameters": [
+                {
+                    "name": "property_id",
+                    "buttons": [
+                        {
+                            "innerText": "Get It",
+                            "onclick": "displayUserDataInNewHtml('Addresses')"
+                        }
+                    ]
+                },
+                {
+                    "name": "amount",
+                    "buttons": []
+                },
+                {
+                    "name": "recipient_peer_id",
+                    "buttons": [
+                        {
+                            "innerText": "Friends",
+                            "onclick": "displayUserDataInNewHtml('Friends')"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "SendH2Middleman",
+            "type_id": -42,
+            "description": "SendH2Middleman is used for looking for a path to transfer to target and Send H to middleman.",
+            "parameters": [
+                {
+                    "name": "h",
+                    "buttons": [
+                        {
+                            "innerText": "Get It",
+                            "onclick": "displayUserDataInNewHtml('Addresses')"
+                        }
+                    ]
+                },
+                {
+                    "name": "memo",
+                    "buttons": []
+                },
+                {
+                    "name": "property_id",
+                    "buttons": [
+                        {
+                            "innerText": "Get It",
+                            "onclick": "displayUserDataInNewHtml('Addresses')"
+                        }
+                    ]
+                },
+                {
+                    "name": "amount",
+                    "buttons": []
+                },
+                {
+                    "name": "recipient_peer_id",
+                    "buttons": [
+                        {
+                            "innerText": "Friends",
+                            "onclick": "displayUserDataInNewHtml('Friends')"
+                        }
+                    ]
+                }
+            ]
         }
     ]
 }

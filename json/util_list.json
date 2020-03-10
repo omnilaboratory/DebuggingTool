@@ -22,6 +22,35 @@
                     "buttons": []
                 }
             ]
+        },
+        {
+            "id": "createInvoice",
+            "type_id": -4003,
+            "description": "createInvoice is used to generate an invoice for receiver.",
+            "parameters": [
+                {
+                    "name": "property_id",
+                    "buttons": [
+                        {
+                            "innerText": "Get It",
+                            "onclick": "displayUserDataInNewHtml('Addresses')"
+                        }
+                    ]
+                },
+                {
+                    "name": "amount",
+                    "buttons": []
+                },
+                {
+                    "name": "recipient_peer_id",
+                    "buttons": [
+                        {
+                            "innerText": "Friends",
+                            "onclick": "displayUserDataInNewHtml('Friends')"
+                        }
+                    ]
+                }
+            ]
         }
     ]
 }
