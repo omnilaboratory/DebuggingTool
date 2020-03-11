@@ -310,8 +310,6 @@ class MessageType {
         this.MsgType_HTLC_VerifyR_N47 = -47;
         this.MsgType_HTLC_RequestCloseCurrTx_N48 = -48;
         this.MsgType_HTLC_CloseSigned_N49 = -49;
-        this.MsgType_HTLC_RequestCloseChannel_N50 = -50;
-        this.MsgType_HTLC_CloseChannelSigned_N51 = -51;
         this.MsgType_Atomic_Swap_N80 = -80;
         this.MsgType_Atomic_Swap_Accept_N81 = -81;
     }
