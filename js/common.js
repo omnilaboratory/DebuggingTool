@@ -168,6 +168,39 @@ function acceptChannel(msgType) {
     });
 }
 
+/** 
+ * -44 htlc Sign GetH API at local.
+ * @param msgType
+ */
+function htlcSignGetH(msgType) {
+
+    var request_hash   = $("#request_hash").val();
+    var channel_address_private_key   = $("#channel_address_private_key").val();
+    var last_temp_address_private_key   = $("#last_temp_address_private_key").val();
+    var curr_rsmc_temp_address_pub_key   = $("#curr_rsmc_temp_address_pub_key").val();
+    var curr_rsmc_temp_address_private_key   = $("#curr_rsmc_temp_address_private_key").val();
+    var curr_htlc_temp_address_pub_key   = $("#curr_htlc_temp_address_pub_key").val();
+    var curr_htlc_temp_address_private_key   = $("#curr_htlc_temp_address_private_key").val();
+    var approval = $("#checkbox_n44").prop("checked");
+
+    let info = new SignGetHInfo();
+    info.request_hash = request_hash;
+    info.channel_address_private_key = channel_address_private_key;
+    info.last_temp_address_private_key = last_temp_address_private_key;
+    info.curr_rsmc_temp_address_pub_key = curr_rsmc_temp_address_pub_key;
+    info.curr_rsmc_temp_address_private_key = curr_rsmc_temp_address_private_key;
+    info.curr_htlc_temp_address_pub_key = curr_htlc_temp_address_pub_key;
+    info.curr_htlc_temp_address_private_key = curr_htlc_temp_address_private_key;
+    info.approval = approval;
+
+    // OBD API
+    obdApi.htlcSignGetH(info, function(e) {
+        console.info('-44 htlcSignGetH - OBD Response = ' + JSON.stringify(e));
+        saveChannelCreation(e, e.channelId, msgType);
+        createOBDResponseDiv(e, msgType);
+    });
+}
+
 // BTC Funding Created -3400 API at local.
 function btcFundingCreated(msgType) {
 
@@ -363,13 +396,13 @@ function htlcFindPathAndSendH(msgType) {
     // OBD API
     obdApi.htlcFindPathAndSendH(info, function(e) {
         console.info('-42 htlcFindPathAndSendH - OBD Response = ' + JSON.stringify(e));
-        // saveChannelCreation(e, tempChID, msgType);
+        saveChannelCreation(e, e.channelId, msgType);
         createOBDResponseDiv(e, msgType);
     });
 }
 
 // add HTLC API at local.
-function addHTLC(msgType) {
+function WillBeUpdatedHTLCFindPath(msgType) {
 
     var property_id  = $("#property_id").val();
     var amount       = $("#amount").val();
@@ -389,7 +422,7 @@ function addHTLC(msgType) {
 }
 
 // Commitment Transaction Created -351 API at local.
-function CTxCreated(msgType) {
+function RSMCCTxCreated(msgType) {
 
     var channel_id = $("#channel_id").val();
     var amount = $("#amount").val();
@@ -408,14 +441,14 @@ function CTxCreated(msgType) {
 
     // OBD API
     obdApi.commitmentTransactionCreated(info, function(e) {
-        console.info('CTxCreated - OBD Response = ' + JSON.stringify(e));
+        console.info('RSMCCTxCreated - OBD Response = ' + JSON.stringify(e));
         saveChannelCreation(e, channel_id, msgType);
         createOBDResponseDiv(e, msgType);
     });
 }
 
 // Revoke and Acknowledge Commitment Transaction -352 API at local.
-function CTxSigned(msgType) {
+function RSMCCTxSigned(msgType) {
 
     var channel_id = $("#channel_id").val();
     var curr_temp_address_pub_key = $("#curr_temp_address_pub_key").val();
@@ -436,7 +469,7 @@ function CTxSigned(msgType) {
 
     // OBD API
     obdApi.revokeAndAcknowledgeCommitmentTransaction(info, function(e) {
-        console.info('CTxSigned - OBD Response = ' + JSON.stringify(e));
+        console.info('RSMCCTxSigned - OBD Response = ' + JSON.stringify(e));
         saveChannelCreation(e, channel_id, msgType);
         createOBDResponseDiv(e, msgType);
     });
@@ -501,10 +534,10 @@ function invokeAPIs(objSelf) {
             assetFundingSigned(msgType);
             break;
         case enumMsgType.MsgType_CommitmentTx_CommitmentTransactionCreated_N351:
-            CTxCreated(msgType);
+            RSMCCTxCreated(msgType);
             break;
         case enumMsgType.MsgType_CommitmentTxSigned_RevokeAndAcknowledgeCommitmentTransaction_N352:
-            CTxSigned(msgType);
+            RSMCCTxSigned(msgType);
             break;
         case enumMsgType.MsgType_Core_Omni_GetTransaction_1206:
             txid = "c76710920860456dff2433197db79dd030f9b527e83a2e253f5bc6ab7d197e73";
@@ -522,10 +555,13 @@ function invokeAPIs(objSelf) {
             createInvoice(msgType);
             break;
         case enumMsgType.MsgType_HTLC_AddHTLC_N40:
-            addHTLC(msgType);
+            WillBeUpdatedHTLCFindPath(msgType);
             break;
         case enumMsgType.MsgType_HTLC_FindPathAndSendH_N42:
             htlcFindPathAndSendH(msgType);
+            break;
+        case enumMsgType.MsgType_HTLC_SignGetH_N44:
+            htlcSignGetH(msgType);
             break;
         
         default:
@@ -593,6 +629,14 @@ function displayOBDMessages(content) {
             content.result = 'RSMC transfer - ' + content.from + 
                 ' - accept a transfer.';
             break;
+        case enumMsgType.MsgType_HTLC_FindPathAndSendH_N42:
+            content.result = 'HTLC - ' + content.from + 
+                ' - launch a HTLC transfer.';
+            break;
+        case enumMsgType.MsgType_HTLC_SignGetH_N44:
+            content.result = 'HTLC - ' + content.from + 
+                ' - accept a HTLC transfer.';
+            break;
     }
 
     content = JSON.stringify(content.result);
@@ -627,7 +671,7 @@ function getUserDataList(goWhere) {
             // create [a] element
             apiItem = document.createElement('a');
             apiItem.id = api_id;
-            apiItem.href = '#';
+            apiItem.href = 'javascript:void(0);';
             apiItem.setAttribute('description', description);
             apiItem.setAttribute('onclick', 'displayUserData(this)');
             apiItem.innerText = api_id;
@@ -774,6 +818,7 @@ function createInputParamDiv(obj, jsonFile) {
                 case enumMsgType.MsgType_FundingSign_BtcSign_N3500:
                 case enumMsgType.MsgType_FundingSign_AssetFundingSigned_N35:
                 case enumMsgType.MsgType_CommitmentTxSigned_RevokeAndAcknowledgeCommitmentTransaction_N352:
+                case enumMsgType.MsgType_HTLC_SignGetH_N44:
                     displayApprovalCheckbox(content_div, obj, msgType);
                     break;
             }
@@ -798,6 +843,9 @@ function displayApprovalCheckbox(content_div, obj, msgType) {
             break;
         case enumMsgType.MsgType_CommitmentTxSigned_RevokeAndAcknowledgeCommitmentTransaction_N352:
             element.id   = 'checkbox_n352';
+            break;
+        case enumMsgType.MsgType_HTLC_SignGetH_N44:
+            element.id   = 'checkbox_n44';
             break;
     }
 
@@ -862,6 +910,35 @@ function clickApproval(obj) {
                 $("#curr_temp_address_pub_keyGet").hide();
                 $("#curr_temp_address_private_key").hide();
                 $("#curr_temp_address_private_keyGet").hide();
+                $("#last_temp_address_private_key").hide();
+                $("#last_temp_address_private_keyGet").hide();
+                $("#channel_address_private_key").hide();
+                $("#channel_address_private_keyGet").hide();
+            }
+            break;
+        case 'checkbox_n44':
+            if (obj.checked) {
+                $("#curr_rsmc_temp_address_pub_key").show();
+                $("#curr_rsmc_temp_address_pub_keyGet").show();
+                $("#curr_rsmc_temp_address_private_key").show();
+                $("#curr_rsmc_temp_address_private_keyGet").show();
+                $("#curr_htlc_temp_address_pub_key").show();
+                $("#curr_htlc_temp_address_pub_keyGet").show();
+                $("#curr_htlc_temp_address_private_key").show();
+                $("#curr_htlc_temp_address_private_keyGet").show();
+                $("#last_temp_address_private_key").show();
+                $("#last_temp_address_private_keyGet").show();
+                $("#channel_address_private_key").show();
+                $("#channel_address_private_keyGet").show();
+            } else {
+                $("#curr_rsmc_temp_address_pub_key").hide();
+                $("#curr_rsmc_temp_address_pub_keyGet").hide();
+                $("#curr_rsmc_temp_address_private_key").hide();
+                $("#curr_rsmc_temp_address_private_keyGet").hide();
+                $("#curr_htlc_temp_address_pub_key").hide();
+                $("#curr_htlc_temp_address_pub_keyGet").hide();
+                $("#curr_htlc_temp_address_private_key").hide();
+                $("#curr_htlc_temp_address_private_keyGet").hide();
                 $("#last_temp_address_private_key").hide();
                 $("#last_temp_address_private_keyGet").hide();
                 $("#channel_address_private_key").hide();
@@ -1058,6 +1135,9 @@ function createOBDResponseDiv(response, msgType) {
         case enumMsgType.MsgType_HTLC_FindPathAndSendH_N42:
             parseDataN42(response);
             break;
+        case enumMsgType.MsgType_HTLC_SignGetH_N44:
+            parseDataN44(response);
+            break;
         default:
             createElement(obd_response_div, 'p', response);
             break;
@@ -1067,9 +1147,24 @@ function createOBDResponseDiv(response, msgType) {
 //----------------------------------------------------------------
 // Functions of processing each response from invoke APIs.
 
+// parseDataN44 - 
+function parseDataN44(response) {
+    var arrData = [
+        'approval : ' + response.approval,
+        'channelId : ' + response.channelId,
+        'request_hash : ' + response.request_hash,
+        'sender : ' + response.sender,
+    ];
+
+    for (let i = 0; i < arrData.length; i++) {
+        createElement(obd_response_div, 'p', arrData[i]);
+    }
+}
+
 // parseDataN42 - 
 function parseDataN42(response) {
     var arrData = [
+        'channelId : ' + response.channelId,
         'h : ' + response.h,
         'request_hash : ' + response.request_hash,
     ];
@@ -1445,9 +1540,34 @@ function btcData(response, msgType) {
     return btc;
 }
 
+// transfer (HTLC) record.
+function htlcData(response, msgType) {
+    var data = {
+        channelId: response.channelId,
+        h: response.h,
+        request_hash:  response.request_hash,
+        date: new Date().toLocaleString(),
+        msgType: msgType,
+
+        sender: '',
+        approval: '',
+    }
+
+    return data;
+}
+
+//
+function updateHtlcData(response, data, msgType) {
+    data.msgType  = msgType;
+    data.date     = new Date().toLocaleString();
+    data.request_hash = response.request_hash;
+    data.sender   = response.sender;
+    data.approval = response.approval;
+}
+
 // transfer (RSMC) record.
 function rsmcData(response, msgType) {
-    var rsmcData = {
+    var data = {
         channel_id: response.channel_id,
         amount: response.amount,
         property_id:  response.property_id,
@@ -1465,7 +1585,7 @@ function rsmcData(response, msgType) {
         to_other_txid: '',
     }
 
-    return rsmcData;
+    return data;
 }
 
 //
@@ -1554,6 +1674,18 @@ function saveChannelCreation(response, channelID, msgType) {
         for (let i = 0; i < list.result.length; i++) {
             if (chID === list.result[i].temporary_channel_id) {
                 switch (msgType) {
+                    case enumMsgType.MsgType_HTLC_FindPathAndSendH_N42:
+                        list.result[i].htlc.push(htlcData(response, msgType));
+                        break;
+                    case enumMsgType.MsgType_HTLC_SignGetH_N44:
+                        for (let i2 = 0; i2 < list.result[i].htlc.length; i2++) {
+                            if ($("#request_hash").val() === list.result[i].htlc[i2].request_hash) {
+                                updateHtlcData(response, list.result[i].htlc[i2], msgType);
+                            }
+                        }
+                        break;
+                    case enumMsgType.MsgType_HTLC_CreateCommitmentTx_N45:
+                        break;
                     case enumMsgType.MsgType_CommitmentTx_CommitmentTransactionCreated_N351:
                         list.result[i].transfer.push(rsmcData(response, msgType));
                         break;
@@ -1953,6 +2085,9 @@ function displayChannelCreation(param) {
             
             // Display RSMC - transfer in channel.
             rsmcRecord(parent, list, i);
+            
+            // Display HTLC - transfer in channel.
+            htlcRecord(parent, list, i);
         }
     } else { // NO LOCAL STORAGE DATA YET.
         createElement(parent, 'h3', 'NO DATA YET.');
@@ -2158,6 +2293,52 @@ function rsmcRecord(parent, list, i) {
                 'send_at : '   + list.result[i].transfer[i2].send_at,
                 'sign_at : '   + list.result[i].transfer[i2].sign_at,
                 'to_other_txid : '   + list.result[i].transfer[i2].to_other_txid,
+            ];
+
+            for (let i3 = 0; i3 < arrData.length; i3++) {
+                createElement(parent, 'text', arrData[i3]);
+                createElement(parent, 'br');
+            }
+        }
+    }
+}
+
+// Display HTLC - transfer in channel.
+function htlcRecord(parent, list, i) {
+
+    var arrData;
+
+    if (list.result[i].htlc[0]) {
+        createElement(parent, 'h5', '--> HTLC - transfer in channel');
+        for (let i2 = 0; i2 < list.result[i].htlc.length; i2++) {
+            createElement(parent, 'br');
+            createElement(parent, 'text', 'NO. ' + (i2 + 1));
+
+            var status;
+            switch (list.result[i].htlc[i2].msgType) {
+                case enumMsgType.MsgType_HTLC_FindPathAndSendH_N42:
+                    status = 'Launch (-42)';
+                    break;
+                case enumMsgType.MsgType_HTLC_SignGetH_N44:
+                    status = 'Reply (-44)';
+                    break;
+                case enumMsgType.MsgType_HTLC_CreateCommitmentTx_N45:
+                    status = 'Done (-45)';
+                    break;
+            }
+
+            createElement(parent, 'text', ' -- ' + status);
+            createElement(parent, 'text', ' -- ' + list.result[i].htlc[i2].date);
+            createElement(parent, 'br');
+            createElement(parent, 'text', '---------------------------------------------');
+            createElement(parent, 'br');
+
+            arrData = [
+                'channelId : '    + list.result[i].htlc[i2].channelId,
+                'h : '            + list.result[i].htlc[i2].h,
+                'request_hash : ' + list.result[i].htlc[i2].request_hash,
+                'sender : '       + list.result[i].htlc[i2].sender,
+                'approval : '     + list.result[i].htlc[i2].approval,
             ];
 
             for (let i3 = 0; i3 < arrData.length; i3++) {
