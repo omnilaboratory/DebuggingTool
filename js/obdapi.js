@@ -850,7 +850,7 @@ class ObdApi {
     /* ***************** backward R end*****************/
     /* ***************** close htlc tx begin*****************/
     /**
-     * MsgType_HTLC_VerifyR_N47
+     * MsgType_HTLC_RequestCloseCurrTx_N48
      * @param info CloseHtlcTxInfo
      * @param callback function
      * */
@@ -880,7 +880,7 @@ class ObdApi {
             return;
         }
         let msg = new Message();
-        msg.type = this.messageType.MsgType_HTLC_VerifyR_N47;
+        msg.type = this.messageType.MsgType_HTLC_RequestCloseCurrTx_N48;
         msg.data = info;
         this.sendData(msg, callback);
     }
