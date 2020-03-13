@@ -201,6 +201,155 @@ function htlcSignGetH(msgType) {
     });
 }
 
+/** 
+ * -45 CreateHtlcCTx API at local.
+ * @param msgType
+ */
+function createHtlcCTx(msgType) {
+
+    var request_hash   = $("#request_hash").val();
+    var channel_address_private_key   = $("#channel_address_private_key").val();
+    var last_temp_address_private_key   = $("#last_temp_address_private_key").val();
+    var curr_rsmc_temp_address_pub_key   = $("#curr_rsmc_temp_address_pub_key").val();
+    var curr_rsmc_temp_address_private_key   = $("#curr_rsmc_temp_address_private_key").val();
+    var curr_htlc_temp_address_pub_key   = $("#curr_htlc_temp_address_pub_key").val();
+    var curr_htlc_temp_address_private_key   = $("#curr_htlc_temp_address_private_key").val();
+    var curr_htlc_temp_address_for_ht1a_pub_key   = $("#curr_htlc_temp_address_for_ht1a_pub_key").val();
+    var curr_htlc_temp_address_for_ht1a_private_key   = $("#curr_htlc_temp_address_for_ht1a_private_key").val();
+
+    let info = new HtlcRequestOpen();
+    info.request_hash = request_hash;
+    info.channel_address_private_key = channel_address_private_key;
+    info.last_temp_address_private_key = last_temp_address_private_key;
+    info.curr_rsmc_temp_address_pub_key = curr_rsmc_temp_address_pub_key;
+    info.curr_rsmc_temp_address_private_key = curr_rsmc_temp_address_private_key;
+    info.curr_htlc_temp_address_pub_key = curr_htlc_temp_address_pub_key;
+    info.curr_htlc_temp_address_private_key = curr_htlc_temp_address_private_key;
+    info.curr_htlc_temp_address_for_ht1a_pub_key = curr_htlc_temp_address_for_ht1a_pub_key;
+    info.curr_htlc_temp_address_for_ht1a_private_key = curr_htlc_temp_address_for_ht1a_private_key;
+
+    // Get channel_id with request_hash.
+    var tempChID;
+    var list = JSON.parse(localStorage.getItem(saveTempCI));
+    for (let i = 0; i < list.result.length; i++) {
+        for (let i2 = 0; i2 < list.result[i].htlc.length; i2++) {
+            if (request_hash === list.result[i].htlc[i2].request_hash) {
+                tempChID = list.result[i].htlc[i2].channelId;
+            }
+        }
+    }
+
+    // OBD API
+    obdApi.htlcCreateCommitmentTx(info, function(e) {
+        console.info('-45 htlcCreateCommitmentTx - OBD Response = ' + JSON.stringify(e));
+        saveChannelCreation(e, tempChID, msgType);
+        createOBDResponseDiv(e, msgType);
+    });
+}
+
+/** 
+ * -46 htlcSendR API at local.
+ * @param msgType
+ */
+function htlcSendR(msgType) {
+
+    var r = $("#r").val();
+    var request_hash   = $("#request_hash").val();
+    var channel_address_private_key   = $("#channel_address_private_key").val();
+    var curr_htlc_temp_address_for_he1b_pub_key   = $("#curr_htlc_temp_address_for_he1b_pub_key").val();
+    var curr_htlc_temp_address_for_he1b_private_key   = $("#curr_htlc_temp_address_for_he1b_private_key").val();
+
+    let info = new HtlcSendRInfo();
+    info.r = r;
+    info.request_hash = request_hash;
+    info.channel_address_private_key = channel_address_private_key;
+    info.curr_htlc_temp_address_for_he1b_pub_key = curr_htlc_temp_address_for_he1b_pub_key;
+    info.curr_htlc_temp_address_for_he1b_private_key = curr_htlc_temp_address_for_he1b_private_key;
+
+    // Get channel_id with request_hash.
+    var tempChID;
+    var list = JSON.parse(localStorage.getItem(saveTempCI));
+    for (let i = 0; i < list.result.length; i++) {
+        for (let i2 = 0; i2 < list.result[i].htlc.length; i2++) {
+            if (request_hash === list.result[i].htlc[i2].request_hash) {
+                tempChID = list.result[i].htlc[i2].channelId;
+            }
+        }
+    }
+
+    // OBD API
+    obdApi.htlcSendR(info, function(e) {
+        console.info('-46 htlcSendR - OBD Response = ' + JSON.stringify(e));
+        saveChannelCreation(e, tempChID, msgType);
+        createOBDResponseDiv(e, msgType);
+    });
+}
+
+/** 
+ * -47 htlcVerifyR API at local.
+ * @param msgType
+ */
+function htlcVerifyR(msgType) {
+
+    var r = $("#r").val();
+    var request_hash   = $("#request_hash").val();
+    var channel_address_private_key   = $("#channel_address_private_key").val();
+
+    let info = new HtlcVerifyRInfo();
+    info.r = r;
+    info.request_hash = request_hash;
+    info.channel_address_private_key = channel_address_private_key;
+
+    // Get channel_id with request_hash.
+    var tempChID;
+    var list = JSON.parse(localStorage.getItem(saveTempCI));
+    for (let i = 0; i < list.result.length; i++) {
+        for (let i2 = 0; i2 < list.result[i].htlc.length; i2++) {
+            if (request_hash === list.result[i].htlc[i2].request_hash) {
+                tempChID = list.result[i].htlc[i2].channelId;
+            }
+        }
+    }
+
+    // OBD API
+    obdApi.htlcVerifyR(info, function(e) {
+        console.info('-47 htlcVerifyR - OBD Response = ' + JSON.stringify(e));
+        saveChannelCreation(e, tempChID, msgType);
+        createOBDResponseDiv(e, msgType);
+    });
+}
+
+/** 
+ * -48 closeHtlcTx API at local.
+ * @param msgType
+ */
+function closeHtlcTx(msgType) {
+
+    var channel_id   = $("#channel_id").val();
+    var channel_address_private_key   = $("#channel_address_private_key").val();
+    var last_rsmc_temp_address_private_key   = $("#last_rsmc_temp_address_private_key").val();
+    var last_htlc_temp_address_private_key   = $("#last_htlc_temp_address_private_key").val();
+    var last_htlc_temp_address_for_htnx_private_key   = $("#last_htlc_temp_address_for_htnx_private_key").val();
+    var curr_rsmc_temp_address_pub_key   = $("#curr_rsmc_temp_address_pub_key").val();
+    var curr_rsmc_temp_address_private_key   = $("#curr_rsmc_temp_address_private_key").val();
+
+    let info = new CloseHtlcTxInfo();
+    info.channel_id = channel_id;
+    info.channel_address_private_key = channel_address_private_key;
+    info.last_rsmc_temp_address_private_key = last_rsmc_temp_address_private_key;
+    info.last_htlc_temp_address_private_key = last_htlc_temp_address_private_key;
+    info.last_htlc_temp_address_for_htnx_private_key = last_htlc_temp_address_for_htnx_private_key;
+    info.curr_rsmc_temp_address_pub_key = curr_rsmc_temp_address_pub_key;
+    info.curr_rsmc_temp_address_private_key = curr_rsmc_temp_address_private_key;
+
+    // OBD API
+    obdApi.closeHtlcTx(info, function(e) {
+        console.info('-48 closeHtlcTx - OBD Response = ' + JSON.stringify(e));
+        saveChannelCreation(e, channel_id, msgType);
+        createOBDResponseDiv(e, msgType);
+    });
+}
+
 // BTC Funding Created -3400 API at local.
 function btcFundingCreated(msgType) {
 
@@ -396,7 +545,7 @@ function htlcFindPathAndSendH(msgType) {
     // OBD API
     obdApi.htlcFindPathAndSendH(info, function(e) {
         console.info('-42 htlcFindPathAndSendH - OBD Response = ' + JSON.stringify(e));
-        saveChannelCreation(e, e.channelId, msgType);
+        saveChannelCreation(e, e.channelId, msgType, info);
         createOBDResponseDiv(e, msgType);
     });
 }
@@ -563,6 +712,18 @@ function invokeAPIs(objSelf) {
         case enumMsgType.MsgType_HTLC_SignGetH_N44:
             htlcSignGetH(msgType);
             break;
+        case enumMsgType.MsgType_HTLC_CreateCommitmentTx_N45:
+            createHtlcCTx(msgType);
+            break;
+        case enumMsgType.MsgType_HTLC_SendR_N46:
+            htlcSendR(msgType);
+            break;
+        case enumMsgType.MsgType_HTLC_VerifyR_N47:
+            htlcVerifyR(msgType);
+            break;
+        case enumMsgType.MsgType_HTLC_RequestCloseCurrTx_N48:
+            closeHtlcTx(msgType);
+            break;
         
         default:
             console.info(msgType + " do not exist");
@@ -636,6 +797,22 @@ function displayOBDMessages(content) {
         case enumMsgType.MsgType_HTLC_SignGetH_N44:
             content.result = 'HTLC - ' + content.from + 
                 ' - accept a HTLC transfer.';
+            break;
+        case enumMsgType.MsgType_HTLC_CreateCommitmentTx_N45:
+            content.result = 'HTLC - ' + content.from + 
+                ' - had create HTLC commitment transactions.';
+            break;
+        case enumMsgType.MsgType_HTLC_SendR_N46:
+            content.result = 'HTLC - ' + content.from + 
+                ' - Sent R.';
+            break;
+        case enumMsgType.MsgType_HTLC_VerifyR_N47:
+            content.result = 'HTLC - ' + content.from + 
+                ' - Verify R.';
+            break;
+        case enumMsgType.MsgType_HTLC_RequestCloseCurrTx_N48:
+            content.result = 'HTLC - ' + content.from + 
+                ' - Request Close.';
             break;
     }
 
@@ -1138,6 +1315,18 @@ function createOBDResponseDiv(response, msgType) {
         case enumMsgType.MsgType_HTLC_SignGetH_N44:
             parseDataN44(response);
             break;
+        case enumMsgType.MsgType_HTLC_CreateCommitmentTx_N45:
+            parseDataN45(response);
+            break;
+        case enumMsgType.MsgType_HTLC_SendR_N46:
+            parseDataN46(response);
+            break;
+        case enumMsgType.MsgType_HTLC_VerifyR_N47:
+            parseDataN47(response);
+            break;
+        case enumMsgType.MsgType_HTLC_RequestCloseCurrTx_N48:
+            parseDataN48(response);
+            break;
         default:
             createElement(obd_response_div, 'p', response);
             break;
@@ -1146,6 +1335,60 @@ function createOBDResponseDiv(response, msgType) {
 
 //----------------------------------------------------------------
 // Functions of processing each response from invoke APIs.
+
+// parseDataN48 - 
+function parseDataN48(response) {
+    var arrData = [
+        'channel_id : ' + response.channel_id,
+        'create_at : ' + response.create_at,
+        'create_by : ' + response.create_by,
+        'curr_rsmc_temp_address_pub_key : ' + response.curr_rsmc_temp_address_pub_key,
+        'curr_state : ' + response.curr_state,
+        'id : ' + response.id,
+        'request_hash : ' + response.request_hash,
+    ];
+
+    for (let i = 0; i < arrData.length; i++) {
+        createElement(obd_response_div, 'p', arrData[i]);
+    }
+}
+
+// parseDataN47 - 
+function parseDataN47(response) {
+    var arrData = [
+        'r : ' + response.r,
+        'request_hash : ' + response.request_hash,
+    ];
+
+    for (let i = 0; i < arrData.length; i++) {
+        createElement(obd_response_div, 'p', arrData[i]);
+    }
+}
+
+// parseDataN46 - 
+function parseDataN46(response) {
+    var arrData = [
+        'id : ' + response.id,
+        'r : ' + response.r,
+        'request_hash : ' + response.request_hash,
+    ];
+
+    for (let i = 0; i < arrData.length; i++) {
+        createElement(obd_response_div, 'p', arrData[i]);
+    }
+}
+
+// parseDataN45 - 
+function parseDataN45(response) {
+    var arrData = [
+        'h : ' + response.h,
+        'request_hash : ' + response.request_hash,
+    ];
+
+    for (let i = 0; i < arrData.length; i++) {
+        createElement(obd_response_div, 'p', arrData[i]);
+    }
+}
 
 // parseDataN44 - 
 function parseDataN44(response) {
@@ -1541,14 +1784,20 @@ function btcData(response, msgType) {
 }
 
 // transfer (HTLC) record.
-function htlcData(response, msgType) {
+function htlcData(response, msgType, info) {
     var data = {
         channelId: response.channelId,
         h: response.h,
+        r: '',
         request_hash:  response.request_hash,
         date: new Date().toLocaleString(),
         msgType: msgType,
 
+        property_id: info.property_id,
+        amount: info.amount,
+        memo: info.memo,
+
+        curr_state: '',
         sender: '',
         approval: '',
     }
@@ -1660,7 +1909,7 @@ function dataConstruct(response, tempChID, msgType) {
 }
 
 // Non-finalized channel information.
-function saveChannelCreation(response, channelID, msgType) {
+function saveChannelCreation(response, channelID, msgType, info) {
     var chID;
     var list = JSON.parse(localStorage.getItem(saveTempCI));
 
@@ -1675,7 +1924,7 @@ function saveChannelCreation(response, channelID, msgType) {
             if (chID === list.result[i].temporary_channel_id) {
                 switch (msgType) {
                     case enumMsgType.MsgType_HTLC_FindPathAndSendH_N42:
-                        list.result[i].htlc.push(htlcData(response, msgType));
+                        list.result[i].htlc.push(htlcData(response, msgType, info));
                         break;
                     case enumMsgType.MsgType_HTLC_SignGetH_N44:
                         for (let i2 = 0; i2 < list.result[i].htlc.length; i2++) {
@@ -1685,6 +1934,34 @@ function saveChannelCreation(response, channelID, msgType) {
                         }
                         break;
                     case enumMsgType.MsgType_HTLC_CreateCommitmentTx_N45:
+                    case enumMsgType.MsgType_HTLC_VerifyR_N47:
+                        for (let i2 = 0; i2 < list.result[i].htlc.length; i2++) {
+                            if ($("#request_hash").val() === list.result[i].htlc[i2].request_hash) {
+                                list.result[i].htlc[i2].request_hash = response.request_hash;
+                                list.result[i].htlc[i2].msgType      = msgType;
+                                list.result[i].htlc[i2].date         = new Date().toLocaleString();
+                            }
+                        }
+                        break;
+                    case enumMsgType.MsgType_HTLC_SendR_N46:
+                        for (let i2 = 0; i2 < list.result[i].htlc.length; i2++) {
+                            if ($("#request_hash").val() === list.result[i].htlc[i2].request_hash) {
+                                list.result[i].htlc[i2].r            = response.r;
+                                list.result[i].htlc[i2].request_hash = response.request_hash;
+                                list.result[i].htlc[i2].msgType      = msgType;
+                                list.result[i].htlc[i2].date         = new Date().toLocaleString();
+                            }
+                        }
+                        break;
+                    case enumMsgType.MsgType_HTLC_RequestCloseCurrTx_N48:
+                        for (let i2 = 0; i2 < list.result[i].htlc.length; i2++) {
+                            if (response.request_hash === list.result[i].htlc[i2].request_hash) {
+                                list.result[i].htlc[i2].curr_state   = response.curr_state;
+                                list.result[i].htlc[i2].request_hash = response.request_hash;
+                                list.result[i].htlc[i2].msgType      = msgType;
+                                list.result[i].htlc[i2].date         = new Date().toLocaleString();
+                            }
+                        }
                         break;
                     case enumMsgType.MsgType_CommitmentTx_CommitmentTransactionCreated_N351:
                         list.result[i].transfer.push(rsmcData(response, msgType));
@@ -2317,13 +2594,22 @@ function htlcRecord(parent, list, i) {
             var status;
             switch (list.result[i].htlc[i2].msgType) {
                 case enumMsgType.MsgType_HTLC_FindPathAndSendH_N42:
-                    status = 'Launch (-42)';
+                    status = 'FindPathAndSendH (-42)';
                     break;
                 case enumMsgType.MsgType_HTLC_SignGetH_N44:
-                    status = 'Reply (-44)';
+                    status = 'H-Signed (-44)';
                     break;
                 case enumMsgType.MsgType_HTLC_CreateCommitmentTx_N45:
-                    status = 'Done (-45)';
+                    status = 'CreateCTx (-45)';
+                    break;
+                case enumMsgType.MsgType_HTLC_SendR_N46:
+                    status = 'Send R (-46)';
+                    break;
+                case enumMsgType.MsgType_HTLC_VerifyR_N47:
+                    status = 'Verify R (-47)';
+                    break;
+                case enumMsgType.MsgType_HTLC_RequestCloseCurrTx_N48:
+                    status = 'Request Close (-48)';
                     break;
             }
 
@@ -2336,7 +2622,12 @@ function htlcRecord(parent, list, i) {
             arrData = [
                 'channelId : '    + list.result[i].htlc[i2].channelId,
                 'h : '            + list.result[i].htlc[i2].h,
+                'r : '            + list.result[i].htlc[i2].r,
                 'request_hash : ' + list.result[i].htlc[i2].request_hash,
+                'property_id : '  + list.result[i].htlc[i2].property_id,
+                'amount : '       + list.result[i].htlc[i2].amount,
+                'memo : '         + list.result[i].htlc[i2].memo,
+                'curr_state : '   + list.result[i].htlc[i2].curr_state,
                 'sender : '       + list.result[i].htlc[i2].sender,
                 'approval : '     + list.result[i].htlc[i2].approval,
             ];

@@ -592,6 +592,250 @@
                     ]
                 }
             ]
+        },
+        {
+            "id": "CreateHtlcCTx",
+            "type_id": -45,
+            "description": "CreateHtlcCTx is used to create HTLC commitment transactions.",
+            "parameters": [
+                {
+                    "name": "request_hash",
+                    "buttons": [
+                        {
+                            "innerText": "Get It",
+                            "onclick": "displayUserDataInNewHtml('ChannelCreation')"
+                        }
+                    ]
+                },
+                {
+                    "name": "channel_address_private_key",
+                    "buttons": [
+                        {
+                            "innerText": "Get It",
+                            "onclick": "displayUserDataInNewHtml('Addresses')"
+                        }
+                    ]
+                },
+                {
+                    "name": "last_temp_address_private_key",
+                    "buttons": [
+                        {
+                            "innerText": "Get It",
+                            "onclick": "displayUserDataInNewHtml('Addresses')"
+                        }
+                    ]
+                },
+                {
+                    "name": "curr_rsmc_temp_address_pub_key",
+                    "buttons": [
+                        {
+                            "innerText": "Get It",
+                            "onclick": "displayUserDataInNewHtml('Addresses')"
+                        }
+                    ]
+                },
+                {
+                    "name": "curr_rsmc_temp_address_private_key",
+                    "buttons": [
+                        {
+                            "innerText": "Get It",
+                            "onclick": "displayUserDataInNewHtml('Addresses')"
+                        }
+                    ]
+                },
+                {
+                    "name": "curr_htlc_temp_address_pub_key",
+                    "buttons": [
+                        {
+                            "innerText": "Get It",
+                            "onclick": "displayUserDataInNewHtml('Addresses')"
+                        }
+                    ]
+                },
+                {
+                    "name": "curr_htlc_temp_address_private_key",
+                    "buttons": [
+                        {
+                            "innerText": "Get It",
+                            "onclick": "displayUserDataInNewHtml('Addresses')"
+                        }
+                    ]
+                },
+                {
+                    "name": "curr_htlc_temp_address_for_ht1a_pub_key",
+                    "buttons": [
+                        {
+                            "innerText": "Get It",
+                            "onclick": "displayUserDataInNewHtml('Addresses')"
+                        }
+                    ]
+                },
+                {
+                    "name": "curr_htlc_temp_address_for_ht1a_private_key",
+                    "buttons": [
+                        {
+                            "innerText": "Get It",
+                            "onclick": "displayUserDataInNewHtml('Addresses')"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "HTLCSendR",
+            "type_id": -46,
+            "description": "HTLCSendR is used to forward R to a node.",
+            "parameters": [
+                {
+                    "name": "request_hash",
+                    "buttons": [
+                        {
+                            "innerText": "Get It",
+                            "onclick": "displayUserDataInNewHtml('ChannelCreation')"
+                        }
+                    ]
+                },
+                {
+                    "name": "r",
+                    "buttons": [
+                        {
+                            "innerText": "Get It",
+                            "onclick": "displayUserDataInNewHtml('Addresses')"
+                        }
+                    ]
+                },
+                {
+                    "name": "channel_address_private_key",
+                    "buttons": [
+                        {
+                            "innerText": "Get It",
+                            "onclick": "displayUserDataInNewHtml('Addresses')"
+                        }
+                    ]
+                },
+                {
+                    "name": "curr_htlc_temp_address_for_he1b_pub_key",
+                    "buttons": [
+                        {
+                            "innerText": "Get It",
+                            "onclick": "displayUserDataInNewHtml('Addresses')"
+                        }
+                    ]
+                },
+                {
+                    "name": "curr_htlc_temp_address_for_he1b_private_key",
+                    "buttons": [
+                        {
+                            "innerText": "Get It",
+                            "onclick": "displayUserDataInNewHtml('Addresses')"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "HTLCVerifyR",
+            "type_id": -47,
+            "description": "HTLCVerifyR: Reciever reverify R. If correct, then creates rest HTLC commitment transactions.",
+            "parameters": [
+                {
+                    "name": "request_hash",
+                    "buttons": [
+                        {
+                            "innerText": "Get It",
+                            "onclick": "displayUserDataInNewHtml('ChannelCreation')"
+                        }
+                    ]
+                },
+                {
+                    "name": "r",
+                    "buttons": [
+                        {
+                            "innerText": "Get It",
+                            "onclick": "displayUserDataInNewHtml('Addresses')"
+                        }
+                    ]
+                },
+                {
+                    "name": "channel_address_private_key",
+                    "buttons": [
+                        {
+                            "innerText": "Get It",
+                            "onclick": "displayUserDataInNewHtml('Addresses')"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "CloseHTLC",
+            "type_id": -48,
+            "description": "CloseHTLC is used to close a HTLC channel. For continue using OBD to transfer assets OR some reasons Alice need to close this HTLC channel between she and Bob. Then Alice launch the closing request.",
+            "parameters": [
+                {
+                    "name": "channel_id",
+                    "buttons": [
+                        {
+                            "innerText": "Get It",
+                            "onclick": "displayUserDataInNewHtml('ChannelCreation')"
+                        }
+                    ]
+                },
+                {
+                    "name": "channel_address_private_key",
+                    "buttons": [
+                        {
+                            "innerText": "Get It",
+                            "onclick": "displayUserDataInNewHtml('Addresses')"
+                        }
+                    ]
+                },
+                {
+                    "name": "last_rsmc_temp_address_private_key",
+                    "buttons": [
+                        {
+                            "innerText": "Get It",
+                            "onclick": "displayUserDataInNewHtml('Addresses')"
+                        }
+                    ]
+                },
+                {
+                    "name": "last_htlc_temp_address_private_key",
+                    "buttons": [
+                        {
+                            "innerText": "Get It",
+                            "onclick": "displayUserDataInNewHtml('Addresses')"
+                        }
+                    ]
+                },
+                {
+                    "name": "last_htlc_temp_address_for_htnx_private_key",
+                    "buttons": [
+                        {
+                            "innerText": "Get It",
+                            "onclick": "displayUserDataInNewHtml('Addresses')"
+                        }
+                    ]
+                },
+                {
+                    "name": "curr_rsmc_temp_address_pub_key",
+                    "buttons": [
+                        {
+                            "innerText": "Get It",
+                            "onclick": "displayUserDataInNewHtml('Addresses')"
+                        }
+                    ]
+                },
+                {
+                    "name": "curr_rsmc_temp_address_private_key",
+                    "buttons": [
+                        {
+                            "innerText": "Get It",
+                            "onclick": "displayUserDataInNewHtml('Addresses')"
+                        }
+                    ]
+                }
+            ]
         }
     ]
 }
