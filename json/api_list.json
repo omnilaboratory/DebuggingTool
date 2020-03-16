@@ -836,6 +836,117 @@
                     ]
                 }
             ]
+        },
+        {
+            "id": "CloseHTLCSigned",
+            "type_id": -49,
+            "description": "CloseHTLCSigned is used to response the request of close HTLC channel.",
+            "parameters": [
+                {
+                    "name": "request_close_htlc_hash",
+                    "buttons": [
+                        {
+                            "innerText": "Get It",
+                            "onclick": "displayUserDataInNewHtml('ChannelCreation')"
+                        }
+                    ]
+                },
+                {
+                    "name": "channel_address_private_key",
+                    "buttons": [
+                        {
+                            "innerText": "Get It",
+                            "onclick": "displayUserDataInNewHtml('Addresses')"
+                        }
+                    ]
+                },
+                {
+                    "name": "last_rsmc_temp_address_private_key",
+                    "buttons": [
+                        {
+                            "innerText": "Get It",
+                            "onclick": "displayUserDataInNewHtml('Addresses')"
+                        }
+                    ]
+                },
+                {
+                    "name": "last_htlc_temp_address_private_key",
+                    "buttons": [
+                        {
+                            "innerText": "Get It",
+                            "onclick": "displayUserDataInNewHtml('Addresses')"
+                        }
+                    ]
+                },
+                {
+                    "name": "last_htlc_temp_address_for_htnx_private_key",
+                    "buttons": [
+                        {
+                            "innerText": "Get It",
+                            "onclick": "displayUserDataInNewHtml('Addresses')"
+                        }
+                    ]
+                },
+                {
+                    "name": "curr_rsmc_temp_address_pub_key",
+                    "buttons": [
+                        {
+                            "innerText": "Get It",
+                            "onclick": "displayUserDataInNewHtml('Addresses')"
+                        }
+                    ]
+                },
+                {
+                    "name": "curr_rsmc_temp_address_private_key",
+                    "buttons": [
+                        {
+                            "innerText": "Get It",
+                            "onclick": "displayUserDataInNewHtml('Addresses')"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "CloseChannel",
+            "type_id": -38,
+            "description": "CloseChannel request to close a channel.",
+            "parameters": [
+                {
+                    "name": "channel_id",
+                    "buttons": [
+                        {
+                            "innerText": "Get It",
+                            "onclick": "displayUserDataInNewHtml('ChannelCreation')"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "CloseChannelSigned",
+            "type_id": -39,
+            "description": "CloseChannelSigned response to request of close a channel.",
+            "parameters": [
+                {
+                    "name": "channel_id",
+                    "buttons": [
+                        {
+                            "innerText": "Get It",
+                            "onclick": "displayUserDataInNewHtml('ChannelCreation')"
+                        }
+                    ]
+                },
+                {
+                    "name": "request_close_channel_hash",
+                    "buttons": [
+                        {
+                            "innerText": "Get It",
+                            "onclick": "displayUserDataInNewHtml('ChannelCreation')"
+                        }
+                    ]
+                }
+            ]
         }
     ]
 }

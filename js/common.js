@@ -350,6 +350,87 @@ function closeHtlcTx(msgType) {
     });
 }
 
+/** 
+ * -49 closeHtlcTxSigned API at local.
+ * @param msgType
+ */
+function closeHtlcTxSigned(msgType) {
+
+    var request_close_htlc_hash   = $("#request_close_htlc_hash").val();
+    var channel_address_private_key   = $("#channel_address_private_key").val();
+    var last_rsmc_temp_address_private_key   = $("#last_rsmc_temp_address_private_key").val();
+    var last_htlc_temp_address_private_key   = $("#last_htlc_temp_address_private_key").val();
+    var last_htlc_temp_address_for_htnx_private_key   = $("#last_htlc_temp_address_for_htnx_private_key").val();
+    var curr_rsmc_temp_address_pub_key   = $("#curr_rsmc_temp_address_pub_key").val();
+    var curr_rsmc_temp_address_private_key   = $("#curr_rsmc_temp_address_private_key").val();
+
+    let info = new CloseHtlcTxInfoSigned();
+    info.request_close_htlc_hash = request_close_htlc_hash;
+    info.channel_address_private_key = channel_address_private_key;
+    info.last_rsmc_temp_address_private_key = last_rsmc_temp_address_private_key;
+    info.last_htlc_temp_address_private_key = last_htlc_temp_address_private_key;
+    info.last_htlc_temp_address_for_htnx_private_key = last_htlc_temp_address_for_htnx_private_key;
+    info.curr_rsmc_temp_address_pub_key = curr_rsmc_temp_address_pub_key;
+    info.curr_rsmc_temp_address_private_key = curr_rsmc_temp_address_private_key;
+
+    // Get channel_id with request_hash.
+    var channel_id;
+    var list = JSON.parse(localStorage.getItem(saveTempCI));
+    for (let i = 0; i < list.result.length; i++) {
+        for (let i2 = 0; i2 < list.result[i].htlc.length; i2++) {
+            if (request_close_htlc_hash === list.result[i].htlc[i2].request_hash) {
+                channel_id = list.result[i].htlc[i2].channelId;
+            }
+        }
+    }
+
+    // OBD API
+    obdApi.closeHtlcTxSigned(info, function(e) {
+        console.info('-49 closeHtlcTxSigned - OBD Response = ' + JSON.stringify(e));
+        saveChannelCreation(e, channel_id, msgType);
+        createOBDResponseDiv(e, msgType);
+    });
+}
+
+/** 
+ * -38 closeChannel API at local.
+ * @param msgType
+ */
+function closeChannel(msgType) {
+
+    var channel_id   = $("#channel_id").val();
+
+    // OBD API
+    obdApi.closeChannel(channel_id, function(e) {
+        console.info('-38 closeChannel - OBD Response = ' + JSON.stringify(e));
+        saveChannelCreation(e, channel_id, msgType);
+        createOBDResponseDiv(e, msgType);
+    });
+}
+
+/** 
+ * -39 closeChannelSigned API at local.
+ * @param msgType
+ */
+function closeChannelSigned(msgType) {
+
+    var channel_id   = $("#channel_id").val();
+    var request_close_channel_hash   = $("#request_close_channel_hash").val();
+    var approval = $("#checkbox_n39").prop("checked");
+
+    let info = new CloseChannelSign();
+    info.channel_id = channel_id;
+    info.request_close_channel_hash = request_close_channel_hash;
+    info.approval = approval;
+
+    // OBD API
+    obdApi.closeChannelSign(info, function(e) {
+        console.info('-39 closeChannelSign - OBD Response = ' + JSON.stringify(e));
+        saveChannelCreation(e, channel_id, msgType);
+        createOBDResponseDiv(e, msgType);
+    });
+}
+
 // BTC Funding Created -3400 API at local.
 function btcFundingCreated(msgType) {
 
@@ -724,6 +805,15 @@ function invokeAPIs(objSelf) {
         case enumMsgType.MsgType_HTLC_RequestCloseCurrTx_N48:
             closeHtlcTx(msgType);
             break;
+        case enumMsgType.MsgType_HTLC_CloseSigned_N49:
+            closeHtlcTxSigned(msgType);
+            break;
+        case enumMsgType.MsgType_CloseChannelRequest_N38:
+            closeChannel(msgType);
+            break;
+        case enumMsgType.MsgType_CloseChannelSign_N39:
+            closeChannelSigned(msgType);
+            break;
         
         default:
             console.info(msgType + " do not exist");
@@ -813,6 +903,15 @@ function displayOBDMessages(content) {
         case enumMsgType.MsgType_HTLC_RequestCloseCurrTx_N48:
             content.result = 'HTLC - ' + content.from + 
                 ' - Request Close.';
+            break;
+        case enumMsgType.MsgType_HTLC_CloseSigned_N49:
+            content.result = 'HTLC - ' + content.result.msg;
+            break;
+        case enumMsgType.MsgType_CloseChannelRequest_N38:
+            content.result = 'N38 Request Close Channel from - ' + content.from;
+            break;
+        case enumMsgType.MsgType_CloseChannelSign_N39:
+            content.result = 'N39 Response Close Channel from - ' + content.from;
             break;
     }
 
@@ -911,7 +1010,8 @@ function createLeftSideMenu(jsonFile, divName) {
             // create [a] element
             apiItem = document.createElement('a');
             apiItem.id = api_id;
-            apiItem.href = 'javascript:void(0);';
+            apiItem.href = '#';
+            // apiItem.href = 'javascript:void(0);';
             apiItem.setAttribute('type_id', type_id);
             apiItem.setAttribute('description', description);
             apiItem.setAttribute('onclick', 'displayAPIContent(this)');
@@ -996,6 +1096,7 @@ function createInputParamDiv(obj, jsonFile) {
                 case enumMsgType.MsgType_FundingSign_AssetFundingSigned_N35:
                 case enumMsgType.MsgType_CommitmentTxSigned_RevokeAndAcknowledgeCommitmentTransaction_N352:
                 case enumMsgType.MsgType_HTLC_SignGetH_N44:
+                case enumMsgType.MsgType_CloseChannelSign_N39:
                     displayApprovalCheckbox(content_div, obj, msgType);
                     break;
             }
@@ -1023,6 +1124,9 @@ function displayApprovalCheckbox(content_div, obj, msgType) {
             break;
         case enumMsgType.MsgType_HTLC_SignGetH_N44:
             element.id   = 'checkbox_n44';
+            break;
+        case enumMsgType.MsgType_CloseChannelSign_N39:
+            element.id   = 'checkbox_n39';
             break;
     }
 
@@ -1120,6 +1224,16 @@ function clickApproval(obj) {
                 $("#last_temp_address_private_keyGet").hide();
                 $("#channel_address_private_key").hide();
                 $("#channel_address_private_keyGet").hide();
+            }
+            break;
+
+        case 'checkbox_n39':
+            if (obj.checked) {
+                $("#request_close_channel_hash").show();
+                $("#request_close_channel_hashGet").show();
+            } else {
+                $("#request_close_channel_hash").hide();
+                $("#request_close_channel_hashGet").hide();
             }
             break;
     }
@@ -1327,6 +1441,15 @@ function createOBDResponseDiv(response, msgType) {
         case enumMsgType.MsgType_HTLC_RequestCloseCurrTx_N48:
             parseDataN48(response);
             break;
+        case enumMsgType.MsgType_HTLC_CloseSigned_N49:
+            parseDataN49(response);
+            break;
+        case enumMsgType.MsgType_CloseChannelRequest_N38:
+            parseDataN38(response);
+            break;
+        case enumMsgType.MsgType_CloseChannelSign_N39:
+            parseDataN39(response);
+            break;
         default:
             createElement(obd_response_div, 'p', response);
             break;
@@ -1335,6 +1458,41 @@ function createOBDResponseDiv(response, msgType) {
 
 //----------------------------------------------------------------
 // Functions of processing each response from invoke APIs.
+
+// parseDataN39 - 
+function parseDataN39(response) {
+    var arrData = [
+        'channel_id : ' + response.channel_id,
+        'request_close_channel_hash : ' + response.request_close_channel_hash,
+    ];
+
+    for (let i = 0; i < arrData.length; i++) {
+        createElement(obd_response_div, 'p', arrData[i]);
+    }
+}
+
+// parseDataN38 - 
+function parseDataN38(response) {
+    var arrData = [
+        'channel_id : ' + response.channel_id,
+        'request_close_channel_hash : ' + response.request_close_channel_hash,
+    ];
+
+    for (let i = 0; i < arrData.length; i++) {
+        createElement(obd_response_div, 'p', arrData[i]);
+    }
+}
+
+// parseDataN49 - 
+function parseDataN49(response) {
+    var arrData = [
+        'msg : ' + response.msg,
+    ];
+
+    for (let i = 0; i < arrData.length; i++) {
+        createElement(obd_response_div, 'p', arrData[i]);
+    }
+}
 
 // parseDataN48 - 
 function parseDataN48(response) {
@@ -1765,6 +1923,9 @@ function channelData(response) {
         address_b: response.address_b,
         channel_address: response.channel_address,
         temporary_channel_id: response.temporary_channel_id,
+
+        request_close_channel_hash: response.request_close_channel_hash,
+        date: new Date().toLocaleString(),
     }
 
     return data;
@@ -1963,6 +2124,14 @@ function saveChannelCreation(response, channelID, msgType, info) {
                             }
                         }
                         break;
+                    case enumMsgType.MsgType_HTLC_CloseSigned_N49:
+                        for (let i2 = 0; i2 < list.result[i].htlc.length; i2++) {
+                            if ($("#request_close_htlc_hash").val() === list.result[i].htlc[i2].request_hash) {
+                                list.result[i].htlc[i2].msgType = msgType;
+                                list.result[i].htlc[i2].date    = new Date().toLocaleString();
+                            }
+                        }
+                        break;
                     case enumMsgType.MsgType_CommitmentTx_CommitmentTransactionCreated_N351:
                         list.result[i].transfer.push(rsmcData(response, msgType));
                         break;
@@ -2010,6 +2179,14 @@ function saveChannelCreation(response, channelID, msgType, info) {
                             if ($("#channel_id").val() === list.result[i].omniAsset[i2].channel_id) {
                                 updateOmniAssetData(response, list.result[i].omniAsset[i2], msgType);
                             }
+                        }
+                        break;
+                    case enumMsgType.MsgType_CloseChannelRequest_N38:
+                        if (list.result[i].data.length > 2) {
+                            list.result[i].data[2].request_close_channel_hash = response.request_close_channel_hash;
+                            list.result[i].data[2].date = new Date().toLocaleString();
+                        } else {
+                            list.result[i].data.push(channelData(response));
                         }
                         break;
                     default:
@@ -2401,6 +2578,16 @@ function partChannelInfo(parent, list, i) {
             arrData = [
                 'temporary_channel_id : '   + list.result[i].data[i2].temporary_channel_id,
             ];
+        } else if (title.substring(0, 3) === 'N38') {
+            arrData = [
+                'request_close_channel_hash : ' + list.result[i].data[i2].request_close_channel_hash,
+                'date : ' + list.result[i].data[i2].date,
+            ];
+        } else if (title.substring(0, 3) === 'N39') {
+            arrData = [
+                'request_close_channel_hash : ' + list.result[i].data[i2].request_close_channel_hash,
+                'date : ' + list.result[i].data[i2].date,
+            ];
         } else {
             arrData = [
                 'channel_address : ' + list.result[i].data[i2].channel_address,
@@ -2610,6 +2797,9 @@ function htlcRecord(parent, list, i) {
                     break;
                 case enumMsgType.MsgType_HTLC_RequestCloseCurrTx_N48:
                     status = 'Request Close (-48)';
+                    break;
+                case enumMsgType.MsgType_HTLC_CloseSigned_N49:
+                    status = 'Closed (-49)';
                     break;
             }
 
