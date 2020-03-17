@@ -631,6 +631,20 @@ function htlcFindPathAndSendH(msgType) {
     });
 }
 
+// -43 htlcSendH API at local.
+function htlcSendH(msgType) {
+
+    var h            = $("#h").val();
+    var request_hash = $("#request_hash").val();
+
+    // OBD API
+    obdApi.htlcSendH(h, request_hash, function(e) {
+        console.info('-43 htlcSendH - OBD Response = ' + JSON.stringify(e));
+        // saveChannelCreation(e);
+        createOBDResponseDiv(e, msgType);
+    });
+}
+
 // add HTLC API at local.
 function WillBeUpdatedHTLCFindPath(msgType) {
 
@@ -790,6 +804,9 @@ function invokeAPIs(objSelf) {
         case enumMsgType.MsgType_HTLC_FindPathAndSendH_N42:
             htlcFindPathAndSendH(msgType);
             break;
+        case enumMsgType.MsgType_HTLC_SendH_N43:
+            htlcSendH(msgType);
+            break;
         case enumMsgType.MsgType_HTLC_SignGetH_N44:
             htlcSignGetH(msgType);
             break;
@@ -883,6 +900,10 @@ function displayOBDMessages(content) {
         case enumMsgType.MsgType_HTLC_FindPathAndSendH_N42:
             content.result = 'HTLC - ' + content.from + 
                 ' - launch a HTLC transfer.';
+            break;
+        case enumMsgType.MsgType_HTLC_SendH_N43:
+            content.result = 'HTLC - ' + content.from + 
+                ' - send H to next node.';
             break;
         case enumMsgType.MsgType_HTLC_SignGetH_N44:
             content.result = 'HTLC - ' + content.from + 
@@ -1426,6 +1447,9 @@ function createOBDResponseDiv(response, msgType) {
         case enumMsgType.MsgType_HTLC_FindPathAndSendH_N42:
             parseDataN42(response);
             break;
+        case enumMsgType.MsgType_HTLC_SendH_N43:
+            parseDataN43(response);
+            break;
         case enumMsgType.MsgType_HTLC_SignGetH_N44:
             parseDataN44(response);
             break;
@@ -1566,6 +1590,18 @@ function parseDataN44(response) {
 function parseDataN42(response) {
     var arrData = [
         'channelId : ' + response.channelId,
+        'h : ' + response.h,
+        'request_hash : ' + response.request_hash,
+    ];
+
+    for (let i = 0; i < arrData.length; i++) {
+        createElement(obd_response_div, 'p', arrData[i]);
+    }
+}
+
+// parseDataN43 - 
+function parseDataN43(response) {
+    var arrData = [
         'h : ' + response.h,
         'request_hash : ' + response.request_hash,
     ];

@@ -524,6 +524,31 @@
             ]
         },
         {
+            "id": "HTLCSendH",
+            "type_id": -43,
+            "description": "HTLCSendH is used to send the H to next node.",
+            "parameters": [
+                {
+                    "name": "h",
+                    "buttons": [
+                        {
+                            "innerText": "Get It",
+                            "onclick": "displayUserDataInNewHtml('ChannelCreation')"
+                        }
+                    ]
+                },
+                {
+                    "name": "request_hash",
+                    "buttons": [
+                        {
+                            "innerText": "Get It",
+                            "onclick": "displayUserDataInNewHtml('ChannelCreation')"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
             "id": "HTLCSignGetH",
             "type_id": -44,
             "description": "HTLCSignGetH is used to response a routing request by middleman..",
