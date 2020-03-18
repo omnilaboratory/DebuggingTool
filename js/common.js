@@ -43,6 +43,17 @@ var channelInfo;
 // word wrap code.
 // result.setAttribute('style', 'word-break: break-all;white-space: normal;');
 
+/**
+ * Save fundingBTC parameters value.
+ */
+var btcFromAddr, btcFromAddrPrivKey, btcToAddr, btcAmount, btcMinerFee;
+
+/**
+ * Save temporary_channel_id parameters value.
+ */
+var strTempChID;
+
+
 // Get name of saveGoWhere variable.
 function getSaveName() {
     return saveGoWhere;
@@ -145,7 +156,7 @@ function openChannel(msgType) {
     });
 }
 
-// accept Channel API at local.
+// -33 accept Channel API at local.
 function acceptChannel(msgType) {
 
     var temp_cid = $("#temporary_channel_id").val();
@@ -159,9 +170,12 @@ function acceptChannel(msgType) {
     info.funding_pubkey = pubkey;
     info.approval = approval;
 
+    // Save value to variable
+    strTempChID = temp_cid;
+
     // OBD API
     obdApi.acceptChannel(info, function(e) {
-        console.info('acceptChannel - OBD Response = ' + JSON.stringify(e));
+        console.info('-33 acceptChannel - OBD Response = ' + JSON.stringify(e));
         // Save Non-finalized channel information.
         saveChannelCreation(e);
         createOBDResponseDiv(e, msgType);
@@ -379,7 +393,7 @@ function closeHtlcTxSigned(msgType) {
     for (let i = 0; i < list.result.length; i++) {
         for (let i2 = 0; i2 < list.result[i].htlc.length; i2++) {
             if (request_close_htlc_hash === list.result[i].htlc[i2].request_hash) {
-                channel_id = list.result[i].htlc[i2].channelId;
+                channel_id = list.result[i].htlc[i2].channel_id;
             }
         }
     }
@@ -431,6 +445,21 @@ function closeChannelSigned(msgType) {
     });
 }
 
+/** 
+ * -35104 getLatestCommitmentTx API at local.
+ * @param msgType
+ */
+function getLatestCommitmentTx(msgType) {
+
+    var channel_id   = $("#channel_id").val();
+
+    // OBD API
+    obdApi.getLatestCommitmentTxByChannelId(channel_id, function(e) {
+        console.info('-35104 getLatestCommitmentTx - OBD Response = ' + JSON.stringify(e));
+        createOBDResponseDiv(e, msgType);
+    });
+}
+
 // BTC Funding Created -3400 API at local.
 function btcFundingCreated(msgType) {
 
@@ -442,6 +471,9 @@ function btcFundingCreated(msgType) {
     info.temporary_channel_id = temp_cid;
     info.channel_address_private_key = privkey;
     info.funding_tx_hex = tx_hex;
+
+    // Save value to variable
+    strTempChID = temp_cid;
 
     // OBD API
     obdApi.btcFundingCreated(info, function(e) {
@@ -464,6 +496,9 @@ function btcFundingSigned(msgType) {
     info.channel_address_private_key = privkey;
     info.funding_txid = tx_id;
     info.approval = approval;
+
+    // Save value to variable
+    strTempChID = temp_cid;
 
     // OBD API
     obdApi.btcFundingSigned(info, function(e) {
@@ -488,6 +523,9 @@ function assetFundingCreated(msgType) {
     info.temp_address_private_key = t_ad_prk;
     info.channel_address_private_key = privkey;
     info.funding_tx_hex = tx_hex;
+
+    // Save value to variable
+    strTempChID = temp_cid;
 
     // OBD API
     obdApi.channelFundingCreated(info, function(e) {
@@ -532,6 +570,13 @@ function fundingBTC(msgType) {
     info.to_address = to_address;
     info.amount     = Number(amount);
     info.miner_fee  = Number(miner_fee);
+
+    //Save value to variable
+    btcFromAddr = from_address;
+    btcFromAddrPrivKey = from_address_private_key;
+    btcToAddr = to_address;
+    btcAmount = amount;
+    btcMinerFee = miner_fee;
 
     // Get temporary_channel_id with channel_address.
     var tempChID;
@@ -727,6 +772,9 @@ function invokeAPIs(objSelf) {
 
     switch (msgType) {
         // Util APIs.
+        case enumMsgType.MsgType_CommitmentTx_LatestCommitmentTxByChanId_N35104:
+            getLatestCommitmentTx(msgType);
+            break;
         case enumMsgType.MsgType_Core_GetNewAddress_1001:
             obdApi.getNewAddress(function(e) {
                 console.info('OBD Response = ' + e);
@@ -853,6 +901,7 @@ function displayOBDMessages(content) {
         case enumMsgType.MsgType_Core_Omni_Getbalance_1200:
         case enumMsgType.MsgType_Core_Omni_FundingAsset_2001:
         case enumMsgType.MsgType_HTLC_Invoice_N4003:
+        case enumMsgType.MsgType_CommitmentTx_LatestCommitmentTxByChanId_N35104:
             return;
         case enumMsgType.MsgType_ChannelOpen_N32:
             content.result = 'LAUNCH - ' + content.from + 
@@ -1277,6 +1326,24 @@ function createParamOfAPI(arrParams, content_div) {
         createButtonOfParam(arrParams, i, content_div);
         createElement(content_div, 'p');
     }
+
+    //
+    if (arrParams[0].name = 'temporary_channel_id') {
+        if (strTempChID) {
+            $("#temporary_channel_id").val(strTempChID);
+        }
+    }
+    
+    // Only for fundingBTC api.
+    if (arrParams[0].name = 'from_address') {
+        if (btcFromAddr) {
+            $("#from_address").val(btcFromAddr);
+            $("#from_address_private_key").val(btcFromAddrPrivKey);
+            $("#to_address").val(btcToAddr);
+            $("#amount").val(btcAmount);
+            $("#miner_fee").val(btcMinerFee);
+        }
+    }
 }
 
 // create button of parameter
@@ -1406,6 +1473,9 @@ function createOBDResponseDiv(response, msgType) {
     createElement(obd_response_div, 'h2', 'OBD Response');
 
     switch (msgType) {
+        case enumMsgType.MsgType_CommitmentTx_LatestCommitmentTxByChanId_N35104:
+            parseDataN35104(response);
+            break;
         case enumMsgType.MsgType_Mnemonic_CreateAddress_N200:
         case enumMsgType.MsgType_Mnemonic_GetAddressByIndex_201:
             parseDataN200(response);
@@ -1482,6 +1552,20 @@ function createOBDResponseDiv(response, msgType) {
 
 //----------------------------------------------------------------
 // Functions of processing each response from invoke APIs.
+
+// parseDataN35104 - 
+function parseDataN35104(response) {
+    var arrData = [
+        'channel_id : ' + response.channel_id,
+        'amount_to_htlc : ' + response.amount_to_htlc,
+        'amount_to_other : ' + response.amount_to_other,
+        'amount_to_rsmc : ' + response.amount_to_rsmc,
+    ];
+
+    for (let i = 0; i < arrData.length; i++) {
+        createElement(obd_response_div, 'p', arrData[i]);
+    }
+}
 
 // parseDataN39 - 
 function parseDataN39(response) {
@@ -1982,21 +2066,33 @@ function btcData(response, msgType) {
 
 // transfer (HTLC) record.
 function htlcData(response, msgType, info) {
-    var data = {
-        channelId: response.channelId,
-        h: response.h,
-        r: '',
-        request_hash:  response.request_hash,
-        date: new Date().toLocaleString(),
-        msgType: msgType,
-
-        property_id: info.property_id,
-        amount: info.amount,
-        memo: info.memo,
-
-        curr_state: '',
-        sender: '',
-        approval: '',
+    if (info) {
+        var data = {
+            channelId: response.channelId,
+            h: response.h,
+            r: '',
+            request_hash:  response.request_hash,
+            date: new Date().toLocaleString(),
+            msgType: msgType,
+    
+            property_id: info.property_id,
+            amount: info.amount,
+            memo: info.memo,
+    
+            curr_state: '',
+            sender: '',
+            approval: '',
+        }
+    } else {
+        var data = {
+            channel_id: response.channel_id,
+            create_at: response.create_at,
+            create_by: response.create_by,
+            curr_state: response.curr_state,
+            request_hash:  response.request_hash,
+            date: new Date().toLocaleString(),
+            msgType: msgType,
+        }
     }
 
     return data;
@@ -2151,14 +2247,7 @@ function saveChannelCreation(response, channelID, msgType, info) {
                         }
                         break;
                     case enumMsgType.MsgType_HTLC_RequestCloseCurrTx_N48:
-                        for (let i2 = 0; i2 < list.result[i].htlc.length; i2++) {
-                            if (response.request_hash === list.result[i].htlc[i2].request_hash) {
-                                list.result[i].htlc[i2].curr_state   = response.curr_state;
-                                list.result[i].htlc[i2].request_hash = response.request_hash;
-                                list.result[i].htlc[i2].msgType      = msgType;
-                                list.result[i].htlc[i2].date         = new Date().toLocaleString();
-                            }
-                        }
+                        list.result[i].htlc.push(htlcData(response, msgType));
                         break;
                     case enumMsgType.MsgType_HTLC_CloseSigned_N49:
                         for (let i2 = 0; i2 < list.result[i].htlc.length; i2++) {
@@ -2845,18 +2934,34 @@ function htlcRecord(parent, list, i) {
             createElement(parent, 'text', '---------------------------------------------');
             createElement(parent, 'br');
 
-            arrData = [
-                'channelId : '    + list.result[i].htlc[i2].channelId,
-                'h : '            + list.result[i].htlc[i2].h,
-                'r : '            + list.result[i].htlc[i2].r,
-                'request_hash : ' + list.result[i].htlc[i2].request_hash,
-                'property_id : '  + list.result[i].htlc[i2].property_id,
-                'amount : '       + list.result[i].htlc[i2].amount,
-                'memo : '         + list.result[i].htlc[i2].memo,
-                'curr_state : '   + list.result[i].htlc[i2].curr_state,
-                'sender : '       + list.result[i].htlc[i2].sender,
-                'approval : '     + list.result[i].htlc[i2].approval,
-            ];
+            switch (list.result[i].htlc[i2].msgType) {
+                case enumMsgType.MsgType_HTLC_RequestCloseCurrTx_N48:
+                case enumMsgType.MsgType_HTLC_CloseSigned_N49:
+                    arrData = [
+                        'channel_id : '   + list.result[i].htlc[i2].channel_id,
+                        'create_at : '    + list.result[i].htlc[i2].create_at,
+                        'create_by : '    + list.result[i].htlc[i2].create_by,
+                        'curr_state : '   + list.result[i].htlc[i2].curr_state,
+                        'request_hash : ' + list.result[i].htlc[i2].request_hash,
+                    ];
+                    break;
+
+                default:
+                    arrData = [
+                        'channelId : '    + list.result[i].htlc[i2].channelId,
+                        'h : '            + list.result[i].htlc[i2].h,
+                        'r : '            + list.result[i].htlc[i2].r,
+                        'request_hash : ' + list.result[i].htlc[i2].request_hash,
+                        'property_id : '  + list.result[i].htlc[i2].property_id,
+                        'amount : '       + list.result[i].htlc[i2].amount,
+                        'memo : '         + list.result[i].htlc[i2].memo,
+                        'curr_state : '   + list.result[i].htlc[i2].curr_state,
+                        'sender : '       + list.result[i].htlc[i2].sender,
+                        'approval : '     + list.result[i].htlc[i2].approval,
+                    ];
+                    break;
+            }
+            
 
             for (let i3 = 0; i3 < arrData.length; i3++) {
                 createElement(parent, 'text', arrData[i3]);

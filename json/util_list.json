@@ -51,6 +51,22 @@
                     ]
                 }
             ]
+        },
+        {
+            "id": "GetLatestCommitmentTransaction",
+            "type_id": -35104,
+            "description": "GetLatestCommitmentTransaction is used to get latest commitment transaction.",
+            "parameters": [
+                {
+                    "name": "channel_id",
+                    "buttons": [
+                        {
+                            "innerText": "Get It",
+                            "onclick": "displayUserDataInNewHtml('ChannelCreation')"
+                        }
+                    ]
+                }
+            ]
         }
     ]
 }
