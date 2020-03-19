@@ -446,6 +446,78 @@ function closeChannelSigned(msgType) {
 }
 
 /** 
+ * 1200 getBalanceForOmni API at local.
+ * @param msgType
+ */
+function getBalanceForOmni(msgType) {
+
+    var address   = $("#address").val();
+
+    // OBD API
+    obdApi.omniGetAllBalancesForAddress(address, function(e) {
+        console.info('1200 getBalanceForOmni - OBD Response = ' + JSON.stringify(e));
+        createOBDResponseDiv(e, msgType);
+    });
+}
+
+/** 
+ * -35109 getAllBRTx API at local.
+ * @param msgType
+ */
+function getAllBRTx(msgType) {
+
+    var channel_id   = $("#channel_id").val();
+
+    // OBD API
+    obdApi.getAllBRTx(channel_id, function(e) {
+        console.info('-35109 getAllBRTx - OBD Response = ' + JSON.stringify(e));
+        createOBDResponseDiv(e, msgType);
+    });
+}
+
+/** 
+ * -3207 GetChannelDetail API at local.
+ * @param msgType
+ */
+function getChannelDetail(msgType) {
+
+    var id   = $("#id").val();
+
+    // OBD API
+    obdApi.getChannelById(Number(id), function(e) {
+        console.info('-3207 GetChannelDetail - OBD Response = ' + JSON.stringify(e));
+        createOBDResponseDiv(e, msgType);
+    });
+}
+
+/** 
+ * -3202 getAllChannels API at local.
+ * @param msgType
+ */
+function getAllChannels(msgType) {
+    // OBD API
+    obdApi.getAllChannels(function(e) {
+        console.info('-3202 getAllChannels - OBD Response = ' + JSON.stringify(e));
+        createOBDResponseDiv(e, msgType);
+    });
+}
+
+/** 
+ * -35101 GetAllCommitmentTransactions API at local.
+ * @param msgType
+ */
+function getAllCommitmentTransactions(msgType) {
+
+    var channel_id   = $("#channel_id").val();
+
+    // OBD API
+    obdApi.getItemsByChannelId(channel_id, function(e) {
+        console.info('-35101 GetAllCommitmentTransactions - OBD Response = ' + JSON.stringify(e));
+        createOBDResponseDiv(e, msgType);
+    });
+}
+
+/** 
  * -35104 getLatestCommitmentTx API at local.
  * @param msgType
  */
@@ -772,6 +844,18 @@ function invokeAPIs(objSelf) {
 
     switch (msgType) {
         // Util APIs.
+        case enumMsgType.MsgType_CommitmentTx_AllBRByChanId_N35109:
+            getAllBRTx(msgType);
+            break;
+        case enumMsgType.MsgType_GetChannelInfoByChanId_N3207:
+            getChannelDetail(msgType);
+            break;
+        case enumMsgType.MsgType_ChannelOpen_AllItem_N3202:
+            getAllChannels(msgType);
+            break;
+        case enumMsgType.MsgType_CommitmentTx_ItemsByChanId_N35101:
+            getAllCommitmentTransactions(msgType);
+            break;
         case enumMsgType.MsgType_CommitmentTx_LatestCommitmentTxByChanId_N35104:
             getLatestCommitmentTx(msgType);
             break;
@@ -902,6 +986,10 @@ function displayOBDMessages(content) {
         case enumMsgType.MsgType_Core_Omni_FundingAsset_2001:
         case enumMsgType.MsgType_HTLC_Invoice_N4003:
         case enumMsgType.MsgType_CommitmentTx_LatestCommitmentTxByChanId_N35104:
+        case enumMsgType.MsgType_CommitmentTx_ItemsByChanId_N35101:
+        case enumMsgType.MsgType_ChannelOpen_AllItem_N3202:
+        case enumMsgType.MsgType_GetChannelInfoByChanId_N3207:
+        case enumMsgType.MsgType_CommitmentTx_AllBRByChanId_N35109:
             return;
         case enumMsgType.MsgType_ChannelOpen_N32:
             content.result = 'LAUNCH - ' + content.from + 
@@ -1473,6 +1561,18 @@ function createOBDResponseDiv(response, msgType) {
     createElement(obd_response_div, 'h2', 'OBD Response');
 
     switch (msgType) {
+        case enumMsgType.MsgType_CommitmentTx_AllBRByChanId_N35109:
+            parseDataN35109(response);
+            break;
+        case enumMsgType.MsgType_GetChannelInfoByChanId_N3207:
+            parseDataN3207(response);
+            break;
+        case enumMsgType.MsgType_ChannelOpen_AllItem_N3202:
+            parseDataN3202(response);
+            break;
+        case enumMsgType.MsgType_CommitmentTx_ItemsByChanId_N35101:
+            parseDataN35101(response);
+            break;
         case enumMsgType.MsgType_CommitmentTx_LatestCommitmentTxByChanId_N35104:
             parseDataN35104(response);
             break;
@@ -1553,6 +1653,199 @@ function createOBDResponseDiv(response, msgType) {
 //----------------------------------------------------------------
 // Functions of processing each response from invoke APIs.
 
+// parseDataN3207 - 
+function parseDataN3207(response) {
+    var arrData = [
+        'accept_at : ' + response.accept_at,
+        'address_a : ' + response.address_a,
+        'address_b : ' + response.address_b,
+        'chain_hash : ' + response.chain_hash,
+        'channel_address : ' + response.channel_address,
+        'channel_address_redeem_script : ' + response.channel_address_redeem_script,
+        'channel_address_script_pub_key : ' + response.channel_address_script_pub_key,
+        'channel_id : ' + response.channel_id,
+        'channel_reserve_satoshis : ' + response.channel_reserve_satoshis,
+        'close_at : ' + response.close_at,
+        'create_at : ' + response.create_at,
+        'create_by : ' + response.create_by,
+        'curr_state : ' + response.curr_state,
+        'delayed_payment_base_point : ' + response.delayed_payment_base_point,
+        'dust_limit_satoshis : ' + response.dust_limit_satoshis,
+        'fee_rate_per_kw : ' + response.fee_rate_per_kw,
+        'funding_address : ' + response.funding_address,
+        'funding_pubkey : ' + response.funding_pubkey,
+        'funding_satoshis : ' + response.funding_satoshis,
+        'htlc_base_point : ' + response.htlc_base_point,
+        'htlc_minimum_msat : ' + response.htlc_minimum_msat,
+        'id : ' + response.id,
+        'max_accepted_htlcs : ' + response.max_accepted_htlcs,
+        'max_htlc_value_in_flight_msat : ' + response.max_htlc_value_in_flight_msat,
+        'payment_base_point : ' + response.payment_base_point,
+        'peer_id_a : ' + response.peer_id_a,
+        'peer_id_b : ' + response.peer_id_b,
+        'property_id : ' + response.property_id,
+        'pub_key_a : ' + response.pub_key_a,
+        'pub_key_b : ' + response.pub_key_b,
+        'push_msat : ' + response.push_msat,
+        'revocation_base_point : ' + response.revocation_base_point,
+        'temporary_channel_id : ' + response.temporary_channel_id,
+        'to_self_delay : ' + response.to_self_delay,
+    ];
+
+    for (let i = 0; i < arrData.length; i++) {
+        createElement(obd_response_div, 'p', arrData[i]);
+    }
+}
+
+// parseDataN3202 - 
+function parseDataN3202(response) {
+
+    var arrData;
+
+    createElement(obd_response_div, 'p', 'Total Count = ' + response.count);
+
+    for (let i = 0; i < response.body.length; i++) {
+        arrData = [
+            'accept_at : ' + response.body[i].accept_at,
+            'address_a : ' + response.body[i].address_a,
+            'address_b : ' + response.body[i].address_b,
+            'chain_hash : ' + response.body[i].chain_hash,
+            'channel_address : ' + response.body[i].channel_address,
+            'channel_address_redeem_script : ' + response.body[i].channel_address_redeem_script,
+            'channel_address_script_pub_key : ' + response.body[i].channel_address_script_pub_key,
+            'channel_id : ' + response.body[i].channel_id,
+            'channel_reserve_satoshis : ' + response.body[i].channel_reserve_satoshis,
+            'close_at : ' + response.body[i].close_at,
+            'create_at : ' + response.body[i].create_at,
+            'create_by : ' + response.body[i].create_by,
+            'curr_state : ' + response.body[i].curr_state,
+            'delayed_payment_base_point : ' + response.body[i].delayed_payment_base_point,
+            'dust_limit_satoshis : ' + response.body[i].dust_limit_satoshis,
+            'fee_rate_per_kw : ' + response.body[i].fee_rate_per_kw,
+            'funding_address : ' + response.body[i].funding_address,
+            'funding_pubkey : ' + response.body[i].funding_pubkey,
+            'funding_satoshis : ' + response.body[i].funding_satoshis,
+            'htlc_base_point : ' + response.body[i].htlc_base_point,
+            'htlc_minimum_msat : ' + response.body[i].htlc_minimum_msat,
+            'id : ' + response.body[i].id,
+            'max_accepted_htlcs : ' + response.body[i].max_accepted_htlcs,
+            'max_htlc_value_in_flight_msat : ' + response.body[i].max_htlc_value_in_flight_msat,
+            'payment_base_point : ' + response.body[i].payment_base_point,
+            'peer_id_a : ' + response.body[i].peer_id_a,
+            'peer_id_b : ' + response.body[i].peer_id_b,
+            'property_id : ' + response.body[i].property_id,
+            'pub_key_a : ' + response.body[i].pub_key_a,
+            'pub_key_b : ' + response.body[i].pub_key_b,
+            'push_msat : ' + response.body[i].push_msat,
+            'revocation_base_point : ' + response.body[i].revocation_base_point,
+            'temporary_channel_id : ' + response.body[i].temporary_channel_id,
+            'to_self_delay : ' + response.body[i].to_self_delay,
+        ];
+
+        createElement(obd_response_div, 'h4', 'NO. ' + (i + 1));
+
+        for (let i2 = 0; i2 < arrData.length; i2++) {
+            createElement(obd_response_div, 'p', arrData[i2]);
+        }
+    }
+}
+
+// parseDataN35109 - 
+function parseDataN35109(response) {
+
+    var arrData;
+
+    createElement(obd_response_div, 'p', 'Total Count = ' + response.length);
+
+    for (let i = 0; i < response.length; i++) {
+        arrData = [
+            'channel_id : ' + response[i].channel_id,
+            'amount : ' + response[i].amount,
+            'commitment_tx_id : ' + response[i].commitment_tx_id,
+            'create_at : ' + response[i].create_at,
+            'create_by : ' + response[i].create_by,
+            'curr_state : ' + response[i].curr_state,
+            'id : ' + response[i].id,
+            'input_amount : ' + response[i].input_amount,
+            'input_txid : ' + response[i].input_txid,
+            'input_vout : ' + response[i].input_vout,
+            'last_edit_time : ' + response[i].last_edit_time,
+            'owner : ' + response[i].owner,
+            'peer_id_a : ' + response[i].peer_id_a,
+            'peer_id_b : ' + response[i].peer_id_b,
+            'property_id : ' + response[i].property_id,
+            'send_at : ' + response[i].send_at,
+            'sign_at : ' + response[i].sign_at,
+            'transaction_sign_hex : ' + response[i].transaction_sign_hex,
+            'txid : ' + response[i].txid,
+        ];
+
+        createElement(obd_response_div, 'h4', 'NO. ' + (i + 1));
+
+        for (let i2 = 0; i2 < arrData.length; i2++) {
+            createElement(obd_response_div, 'p', arrData[i2]);
+        }
+    }
+}
+
+// parseDataN35101 - 
+function parseDataN35101(response) {
+
+    var arrData;
+
+    createElement(obd_response_div, 'p', 'Total Count = ' + response.totalCount);
+
+    for (let i = 0; i < response.body.length; i++) {
+        arrData = [
+            'channel_id : ' + response.body[i].channel_id,
+            'amount_to_htlc : ' + response.body[i].amount_to_htlc,
+            'amount_to_other : ' + response.body[i].amount_to_other,
+            'amount_to_rsmc : ' + response.body[i].amount_to_rsmc,
+            'create_at : ' + response.body[i].create_at,
+            'create_by : ' + response.body[i].create_by,
+            'curr_hash : ' + response.body[i].curr_hash,
+            'curr_state : ' + response.body[i].curr_state,
+            'htlc_h : ' + response.body[i].htlc_h,
+            'htlc_multi_address : ' + response.body[i].htlc_multi_address,
+            'htlc_multi_address_script_pub_key : ' + response.body[i].htlc_multi_address_script_pub_key,
+            'htlc_r : ' + response.body[i].htlc_r,
+            'htlc_redeem_script : ' + response.body[i].htlc_redeem_script,
+            'htlc_sender : ' + response.body[i].htlc_sender,
+            'htlc_temp_address_pub_key : ' + response.body[i].htlc_temp_address_pub_key,
+            'htlc_tx_hash : ' + response.body[i].htlc_tx_hash,
+            'htlc_txid : ' + response.body[i].htlc_txid,
+            'id : ' + response.body[i].id,
+            'input_amount : ' + response.body[i].input_amount,
+            'input_txid : ' + response.body[i].input_txid,
+            'input_vout : ' + response.body[i].input_vout,
+            'last_commitment_tx_id : ' + response.body[i].last_commitment_tx_id,
+            'last_edit_time : ' + response.body[i].last_edit_time,
+            'last_hash : ' + response.body[i].last_hash,
+            'owner : ' + response.body[i].owner,
+            'peer_id_a : ' + response.body[i].peer_id_a,
+            'peer_id_b : ' + response.body[i].peer_id_b,
+            'property_id : ' + response.body[i].property_id,
+            'rsmc_multi_address : ' + response.body[i].rsmc_multi_address,
+            'rsmc_multi_address_script_pub_key : ' + response.body[i].rsmc_multi_address_script_pub_key,
+            'rsmc_redeem_script : ' + response.body[i].rsmc_redeem_script,
+            'rsmc_temp_address_pub_key : ' + response.body[i].rsmc_temp_address_pub_key,
+            'rsmc_tx_hash : ' + response.body[i].rsmc_tx_hash,
+            'rsmc_txid : ' + response.body[i].rsmc_txid,
+            'send_at : ' + response.body[i].send_at,
+            'sign_at : ' + response.body[i].sign_at,
+            'to_other_tx_hash : ' + response.body[i].to_other_tx_hash,
+            'to_other_txid : ' + response.body[i].to_other_txid,
+            'tx_type : ' + response.body[i].tx_type,
+        ];
+
+        createElement(obd_response_div, 'h4', 'NO. ' + (i + 1));
+
+        for (let i2 = 0; i2 < arrData.length; i2++) {
+            createElement(obd_response_div, 'p', arrData[i2]);
+        }
+    }
+}
+
 // parseDataN35104 - 
 function parseDataN35104(response) {
     var arrData = [
@@ -1560,6 +1853,41 @@ function parseDataN35104(response) {
         'amount_to_htlc : ' + response.amount_to_htlc,
         'amount_to_other : ' + response.amount_to_other,
         'amount_to_rsmc : ' + response.amount_to_rsmc,
+        'create_at : ' + response.create_at,
+        'create_by : ' + response.create_by,
+        'curr_hash : ' + response.curr_hash,
+        'curr_state : ' + response.curr_state,
+        'htlc_h : ' + response.htlc_h,
+        'htlc_multi_address : ' + response.htlc_multi_address,
+        'htlc_multi_address_script_pub_key : ' + response.htlc_multi_address_script_pub_key,
+        'htlc_r : ' + response.htlc_r,
+        'htlc_redeem_script : ' + response.htlc_redeem_script,
+        'htlc_sender : ' + response.htlc_sender,
+        'htlc_temp_address_pub_key : ' + response.htlc_temp_address_pub_key,
+        'htlc_tx_hash : ' + response.htlc_tx_hash,
+        'htlc_txid : ' + response.htlc_txid,
+        'id : ' + response.id,
+        'input_amount : ' + response.input_amount,
+        'input_txid : ' + response.input_txid,
+        'input_vout : ' + response.input_vout,
+        'last_commitment_tx_id : ' + response.last_commitment_tx_id,
+        'last_edit_time : ' + response.last_edit_time,
+        'last_hash : ' + response.last_hash,
+        'owner : ' + response.owner,
+        'peer_id_a : ' + response.peer_id_a,
+        'peer_id_b : ' + response.peer_id_b,
+        'property_id : ' + response.property_id,
+        'rsmc_multi_address : ' + response.rsmc_multi_address,
+        'rsmc_multi_address_script_pub_key : ' + response.rsmc_multi_address_script_pub_key,
+        'rsmc_redeem_script : ' + response.rsmc_redeem_script,
+        'rsmc_temp_address_pub_key : ' + response.rsmc_temp_address_pub_key,
+        'rsmc_tx_hash : ' + response.rsmc_tx_hash,
+        'rsmc_txid : ' + response.rsmc_txid,
+        'send_at : ' + response.send_at,
+        'sign_at : ' + response.sign_at,
+        'to_other_tx_hash : ' + response.to_other_tx_hash,
+        'to_other_txid : ' + response.to_other_txid,
+        'tx_type : ' + response.tx_type,
     ];
 
     for (let i = 0; i < arrData.length; i++) {

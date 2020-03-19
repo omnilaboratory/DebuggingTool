@@ -53,6 +53,40 @@
             ]
         },
         {
+            "id": "GetAllChannels",
+            "type_id": -3202,
+            "description": "GetAllChannels is used to get all of channels.",
+            "parameters": []
+        },
+        {
+            "id": "GetChannelDetail",
+            "type_id": -3207,
+            "description": "GetChannelDetail is used to get detail data of a channel.",
+            "parameters": [
+                {
+                    "name": "id",
+                    "buttons": [
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "GetAllCommitmentTransactions",
+            "type_id": -35101,
+            "description": "GetAllCommitmentTransactions is used to get a list of commitment transactions in one channel.",
+            "parameters": [
+                {
+                    "name": "channel_id",
+                    "buttons": [
+                        {
+                            "innerText": "Get It",
+                            "onclick": "displayUserDataInNewHtml('ChannelCreation')"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
             "id": "GetLatestCommitmentTransaction",
             "type_id": -35104,
             "description": "GetLatestCommitmentTransaction is used to get latest commitment transaction.",
@@ -63,6 +97,38 @@
                         {
                             "innerText": "Get It",
                             "onclick": "displayUserDataInNewHtml('ChannelCreation')"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "GetAllBreachRemedyTransactions",
+            "type_id": -35109,
+            "description": "GetAllBreachRemedyTransactions is used to get all of Breach Remedy transactions.",
+            "parameters": [
+                {
+                    "name": "channel_id",
+                    "buttons": [
+                        {
+                            "innerText": "Get It",
+                            "onclick": "displayUserDataInNewHtml('ChannelCreation')"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "GetAllBreachRemedyTransactions",
+            "type_id": 1200,
+            "description": "GetAllBreachRemedyTransactions is used to get all of Breach Remedy transactions.",
+            "parameters": [
+                {
+                    "name": "address",
+                    "buttons": [
+                        {
+                            "innerText": "Get It",
+                            "onclick": "displayUserDataInNewHtml('Addresses')"
                         }
                     ]
                 }
