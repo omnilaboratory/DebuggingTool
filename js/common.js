@@ -844,6 +844,9 @@ function invokeAPIs(objSelf) {
 
     switch (msgType) {
         // Util APIs.
+        case enumMsgType.MsgType_Core_Omni_Getbalance_1200:
+            getBalanceForOmni(msgType);
+            break;
         case enumMsgType.MsgType_CommitmentTx_AllBRByChanId_N35109:
             getAllBRTx(msgType);
             break;
@@ -1561,6 +1564,9 @@ function createOBDResponseDiv(response, msgType) {
     createElement(obd_response_div, 'h2', 'OBD Response');
 
     switch (msgType) {
+        case enumMsgType.MsgType_Core_Omni_Getbalance_1200:
+            parseData1200(response);
+            break;
         case enumMsgType.MsgType_CommitmentTx_AllBRByChanId_N35109:
             parseDataN35109(response);
             break;
@@ -1652,6 +1658,30 @@ function createOBDResponseDiv(response, msgType) {
 
 //----------------------------------------------------------------
 // Functions of processing each response from invoke APIs.
+
+// parseData1200 - 
+function parseData1200(response) {
+
+    var arrData;
+
+    createElement(obd_response_div, 'p', 'Total Count = ' + response.length);
+
+    for (let i = 0; i < response.length; i++) {
+        arrData = [
+            'balance : '    + response[i].balance,
+            'frozen : '     + response[i].frozen,
+            'name : '       + response[i].name,
+            'propertyid : ' + response[i].propertyid,
+            'reserved : '   + response[i].reserved,
+        ];
+
+        createElement(obd_response_div, 'h4', 'NO. ' + (i + 1));
+
+        for (let i2 = 0; i2 < arrData.length; i2++) {
+            createElement(obd_response_div, 'p', arrData[i2]);
+        }
+    }
+}
 
 // parseDataN3207 - 
 function parseDataN3207(response) {

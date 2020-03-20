@@ -119,9 +119,9 @@
             ]
         },
         {
-            "id": "GetAllBreachRemedyTransactions",
+            "id": "GetBalanceForOmni",
             "type_id": 1200,
-            "description": "GetAllBreachRemedyTransactions is used to get all of Breach Remedy transactions.",
+            "description": "GetBalanceForOmni is used to get balance of omni asset.",
             "parameters": [
                 {
                     "name": "address",
