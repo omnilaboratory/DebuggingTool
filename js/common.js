@@ -406,7 +406,6 @@ function closeHtlcTxSigned(msgType) {
     });
 }
 
-
 /** 
  * -80 atomicSwap API at local.
  * @param msgType
