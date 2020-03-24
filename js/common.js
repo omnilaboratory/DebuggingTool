@@ -407,6 +407,78 @@ function closeHtlcTxSigned(msgType) {
 }
 
 /** 
+ * -80 atomicSwap API at local.
+ * @param msgType
+ */
+function atomicSwap(msgType) {
+
+    var channel_id_from   = $("#channel_id_from").val();
+    var channel_id_to   = $("#channel_id_to").val();
+    var recipient_peer_id   = $("#recipient_peer_id").val();
+    var property_sent   = $("#property_sent").val();
+    var amount   = $("#amount").val();
+    var exchange_rate   = $("#exchange_rate").val();
+    var property_received   = $("#property_received").val();
+    var transaction_id   = $("#transaction_id").val();
+    var time_locker   = $("#time_locker").val();
+
+    let info = new AtomicSwapRequest();
+    info.channel_id_from = channel_id_from;
+    info.channel_id_to = channel_id_to;
+    info.recipient_peer_id = recipient_peer_id;
+    info.property_sent = Number(property_sent);
+    info.amount = Number(amount);
+    info.exchange_rate = Number(exchange_rate);
+    info.property_received = Number(property_received);
+    info.transaction_id = transaction_id;
+    info.time_locker = Number(time_locker);
+
+    // OBD API
+    obdApi.atomicSwap(info, function(e) {
+        console.info('-80 atomicSwap - OBD Response = ' + JSON.stringify(e));
+        // saveChannelCreation(e, channel_id, msgType);
+        createOBDResponseDiv(e, msgType);
+    });
+}
+
+/** 
+ * -81 atomicSwapAccepted API at local.
+ * @param msgType
+ */
+function atomicSwapAccepted(msgType) {
+
+    var channel_id_from   = $("#channel_id_from").val();
+    var channel_id_to   = $("#channel_id_to").val();
+    var recipient_peer_id   = $("#recipient_peer_id").val();
+    var property_sent   = $("#property_sent").val();
+    var amount   = $("#amount").val();
+    var exchange_rate   = $("#exchange_rate").val();
+    var property_received   = $("#property_received").val();
+    var transaction_id   = $("#transaction_id").val();
+    var target_transaction_id   = $("#target_transaction_id").val();
+    var time_locker   = $("#time_locker").val();
+
+    let info = new AtomicSwapAccepted();
+    info.channel_id_from = channel_id_from;
+    info.channel_id_to = channel_id_to;
+    info.recipient_peer_id = recipient_peer_id;
+    info.property_sent = Number(property_sent);
+    info.amount = Number(amount);
+    info.exchange_rate = Number(exchange_rate);
+    info.property_received = Number(property_received);
+    info.transaction_id = transaction_id;
+    info.target_transaction_id = target_transaction_id;
+    info.time_locker = Number(time_locker);
+
+    // OBD API
+    obdApi.atomicSwapAccepted(info, function(e) {
+        console.info('-81 atomicSwapAccepted - OBD Response = ' + JSON.stringify(e));
+        // saveChannelCreation(e, channel_id, msgType);
+        createOBDResponseDiv(e, msgType);
+    });
+}
+
+/** 
  * -38 closeChannel API at local.
  * @param msgType
  */
@@ -966,7 +1038,12 @@ function invokeAPIs(objSelf) {
         case enumMsgType.MsgType_CloseChannelSign_N39:
             closeChannelSigned(msgType);
             break;
-        
+        case enumMsgType.MsgType_Atomic_Swap_N80:
+            atomicSwap(msgType);
+            break;
+        case enumMsgType.MsgType_Atomic_Swap_Accept_N81:
+            atomicSwapAccepted(msgType);
+            break;
         default:
             console.info(msgType + " do not exist");
             break;
@@ -1073,6 +1150,12 @@ function displayOBDMessages(content) {
             break;
         case enumMsgType.MsgType_CloseChannelSign_N39:
             content.result = 'N39 Response Close Channel from - ' + content.from;
+            break;
+        case enumMsgType.MsgType_Atomic_Swap_N80:
+            content.result = 'N80 Request Atomic Swap from - ' + content.from;
+            break;
+        case enumMsgType.MsgType_Atomic_Swap_Accept_N81:
+            content.result = 'N81 Response Atomic Swap from - ' + content.from;
             break;
     }
 
@@ -1650,6 +1733,12 @@ function createOBDResponseDiv(response, msgType) {
         case enumMsgType.MsgType_CloseChannelSign_N39:
             parseDataN39(response);
             break;
+        case enumMsgType.MsgType_Atomic_Swap_N80:
+            parseDataN80(response);
+            break;
+        case enumMsgType.MsgType_Atomic_Swap_Accept_N81:
+            parseDataN81(response);
+            break;
         default:
             createElement(obd_response_div, 'p', response);
             break;
@@ -1658,6 +1747,30 @@ function createOBDResponseDiv(response, msgType) {
 
 //----------------------------------------------------------------
 // Functions of processing each response from invoke APIs.
+
+// parseDataN81 - 
+function parseDataN81(response) {
+    var arrData = [
+        // 'channel_id : ' + response.channel_id,
+        // 'request_close_channel_hash : ' + response.request_close_channel_hash,
+    ];
+
+    for (let i = 0; i < arrData.length; i++) {
+        createElement(obd_response_div, 'p', arrData[i]);
+    }
+}
+
+// parseDataN80 - 
+function parseDataN80(response) {
+    var arrData = [
+        // 'channel_id : ' + response.channel_id,
+        // 'request_close_channel_hash : ' + response.request_close_channel_hash,
+    ];
+
+    for (let i = 0; i < arrData.length; i++) {
+        createElement(obd_response_div, 'p', arrData[i]);
+    }
+}
 
 // parseData1200 - 
 function parseData1200(response) {
@@ -2672,6 +2785,9 @@ function saveChannelCreation(response, channelID, msgType, info) {
                             list.result[i].data.push(channelData(response));
                         }
                         break;
+                    case enumMsgType.MsgType_CloseChannelSign_N39:
+                        list.result[i].data.push(channelData(response));
+                        break;
                     default:
                         list.result[i].data.push(channelData(response));
                         break;
@@ -3068,7 +3184,7 @@ function partChannelInfo(parent, list, i) {
             ];
         } else if (title.substring(0, 3) === 'N39') {
             arrData = [
-                'request_close_channel_hash : ' + list.result[i].data[i2].request_close_channel_hash,
+                'The channel is closed.',
                 'date : ' + list.result[i].data[i2].date,
             ];
         } else {

@@ -972,6 +972,139 @@
                     ]
                 }
             ]
+        },
+        {
+            "id": "AtomicSwap",
+            "type_id": -80,
+            "description": "AtomicSwap notifies the counterparty an atomic swap is created. The background and process of atomic swap can be found in chapter 5 of the OmniBOLT specification.",
+            "parameters": [
+                {
+                    "name": "channel_id_from",
+                    "buttons": [
+                        {
+                            "innerText": "Get It",
+                            "onclick": "displayUserDataInNewHtml('ChannelCreation')"
+                        }
+                    ]
+                },
+                {
+                    "name": "channel_id_to",
+                    "buttons": [
+                        {
+                            "innerText": "Get It",
+                            "onclick": "displayUserDataInNewHtml('ChannelCreation')"
+                        }
+                    ]
+                },
+                {
+                    "name": "recipient_peer_id",
+                    "buttons": [
+                        {
+                            "innerText": "Friends",
+                            "onclick": "displayUserDataInNewHtml('Friends')"
+                        }
+                    ]
+                },
+                {
+                    "name": "property_sent",
+                    "buttons": [
+                    ]
+                },
+                {
+                    "name": "amount",
+                    "buttons": [
+                    ]
+                },
+                {
+                    "name": "exchange_rate",
+                    "buttons": [
+                    ]
+                },
+                {
+                    "name": "property_received",
+                    "buttons": [
+                    ]
+                },
+                {
+                    "name": "transaction_id",
+                    "buttons": [
+                    ]
+                },
+                {
+                    "name": "time_locker",
+                    "buttons": [
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "AtomicSwapAccepted",
+            "type_id": -81,
+            "description": "AtomicSwapAccepted accepts or rejects a swap.",
+            "parameters": [
+                {
+                    "name": "channel_id_from",
+                    "buttons": [
+                        {
+                            "innerText": "Get It",
+                            "onclick": "displayUserDataInNewHtml('ChannelCreation')"
+                        }
+                    ]
+                },
+                {
+                    "name": "channel_id_to",
+                    "buttons": [
+                        {
+                            "innerText": "Get It",
+                            "onclick": "displayUserDataInNewHtml('ChannelCreation')"
+                        }
+                    ]
+                },
+                {
+                    "name": "recipient_peer_id",
+                    "buttons": [
+                        {
+                            "innerText": "Friends",
+                            "onclick": "displayUserDataInNewHtml('Friends')"
+                        }
+                    ]
+                },
+                {
+                    "name": "property_sent",
+                    "buttons": [
+                    ]
+                },
+                {
+                    "name": "amount",
+                    "buttons": [
+                    ]
+                },
+                {
+                    "name": "exchange_rate",
+                    "buttons": [
+                    ]
+                },
+                {
+                    "name": "property_received",
+                    "buttons": [
+                    ]
+                },
+                {
+                    "name": "transaction_id",
+                    "buttons": [
+                    ]
+                },
+                {
+                    "name": "target_transaction_id",
+                    "buttons": [
+                    ]
+                },
+                {
+                    "name": "time_locker",
+                    "buttons": [
+                    ]
+                }
+            ]
         }
     ]
 }
