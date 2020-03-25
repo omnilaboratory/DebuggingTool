@@ -115,7 +115,11 @@ class ObdApi {
             this.globalCallback(jsonData);
         }
         console.info(new Date(), "----------------------------get msg from server--------------------");
-        if (jsonData.from != jsonData.to) {
+        let fromId = jsonData.from;
+        let toId = jsonData.to;
+        fromId = fromId.split("@")[0];
+        toId = toId.split("@")[0];
+        if (fromId != toId) {
             return;
         }
         if (callback != null) {
