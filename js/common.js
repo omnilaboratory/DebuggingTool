@@ -422,7 +422,7 @@ function atomicSwap(msgType) {
     var transaction_id   = $("#transaction_id").val();
     var time_locker   = $("#time_locker").val();
 
-    
+
     let info = new AtomicSwapRequest();
     info.channel_id_from = channel_id_from;
     info.channel_id_to = channel_id_to;
