@@ -117,8 +117,9 @@ function logIn(msgType) {
 
     obdApi.logIn(mnemonic, function(e) {
         console.info('logIn - OBD Response = ' + JSON.stringify(e));
-        // If already logined, then stop listening to OBD Response,
-        // DO NOT update the userID.
+        let retData = JSON.stringify(e)
+            // If already logined, then stop listening to OBD Response,
+            // DO NOT update the userID.
         if (isLogined) {
             createOBDResponseDiv(retData, msgType);
             return;
