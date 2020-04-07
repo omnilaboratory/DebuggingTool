@@ -128,7 +128,6 @@ function logIn(msgType) {
         isLogined = true;
         mnemonicWithLogined = mnemonic;
         userID = e.userPeerId
-        console.info(userID)
         $("#logined").text(userID.substring(0, 10) + '...');
         createOBDResponseDiv(retData, msgType);
     });
