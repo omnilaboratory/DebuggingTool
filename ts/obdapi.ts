@@ -150,9 +150,6 @@ class ObdApi {
     }
 
     if (callback != null) {
-      if (jsonData.type == this.messageType.MsgType_UserLogin_1) {
-        resultData = jsonData.from + " " + jsonData.result;
-      }
       callback(resultData);
     }
 
