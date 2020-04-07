@@ -60,7 +60,7 @@ class ObdApi {
                 this.isLogin = false;
                 alert("ws close");
             };
-            this.ws.onerror = (e) => {
+            this.ws.onerror = e => {
                 console.info("ws error", e);
                 alert("ws error");
             };
@@ -123,9 +123,6 @@ class ObdApi {
             return;
         }
         if (callback != null) {
-            if (jsonData.type == this.messageType.MsgType_UserLogin_1) {
-                resultData = jsonData.from + " " + jsonData.result;
-            }
             callback(resultData);
         }
         switch (jsonData.type) {
@@ -1231,7 +1228,7 @@ class ObdApi {
      */
     getChannelById(id, callback) {
         if (id == null || id <= 0) {
-            alert('error id');
+            alert("error id");
             return;
         }
         let msg = new Message();
@@ -1247,7 +1244,7 @@ class ObdApi {
      */
     getAllBRTx(channel_id, callback) {
         if (this.isNotString(channel_id)) {
-            alert('empty channel_id');
+            alert("empty channel_id");
             return;
         }
         let msg = new Message();
@@ -1263,7 +1260,7 @@ class ObdApi {
      */
     getAllCommitmentTx(channel_id, callback) {
         if (this.isNotString(channel_id)) {
-            alert('empty channel_id');
+            alert("empty channel_id");
             return;
         }
         let msg = new Message();
@@ -1279,7 +1276,7 @@ class ObdApi {
      */
     getLatestCommitmentTx(channel_id, callback) {
         if (this.isNotString(channel_id)) {
-            alert('empty channel_id');
+            alert("empty channel_id");
             return;
         }
         let msg = new Message();
@@ -1295,7 +1292,7 @@ class ObdApi {
      */
     getLatestBRTx(channel_id, callback) {
         if (this.isNotString(channel_id)) {
-            alert('empty channel_id');
+            alert("empty channel_id");
             return;
         }
         let msg = new Message();
@@ -1311,7 +1308,7 @@ class ObdApi {
      */
     getAllRDTx(channel_id, callback) {
         if (this.isNotString(channel_id)) {
-            alert('empty channel_id');
+            alert("empty channel_id");
             return;
         }
         let msg = new Message();
@@ -1327,7 +1324,7 @@ class ObdApi {
      */
     sendBreachRemedyTransaction(channel_id, callback) {
         if (this.isNotString(channel_id)) {
-            alert('empty channel_id');
+            alert("empty channel_id");
             return;
         }
         let msg = new Message();
@@ -1343,7 +1340,7 @@ class ObdApi {
      */
     closeChannel(channel_id, callback) {
         if (this.isNotString(channel_id)) {
-            alert('empty channel_id');
+            alert("empty channel_id");
             return;
         }
         let msg = new Message();
@@ -1359,11 +1356,11 @@ class ObdApi {
      */
     closeChannelSign(info, callback) {
         if (this.isNotString(info.channel_id)) {
-            alert('empty channel_id');
+            alert("empty channel_id");
             return;
         }
         if (this.isNotString(info.request_close_channel_hash)) {
-            alert('empty request_close_channel_hash');
+            alert("empty request_close_channel_hash");
             return;
         }
         if (info.approval == null) {
@@ -1382,35 +1379,35 @@ class ObdApi {
      */
     atomicSwap(info, callback) {
         if (this.isNotString(info.channel_id_from)) {
-            alert('empty channel_id_from');
+            alert("empty channel_id_from");
             return;
         }
         if (this.isNotString(info.channel_id_to)) {
-            alert('empty channel_id_to');
+            alert("empty channel_id_to");
             return;
         }
         if (this.isNotString(info.recipient_peer_id)) {
-            alert('empty recipient_peer_id');
+            alert("empty recipient_peer_id");
             return;
         }
         if (this.isNotString(info.transaction_id)) {
-            alert('empty transaction_id');
+            alert("empty transaction_id");
             return;
         }
         if (info.property_sent <= 0) {
-            alert('wrong property_sent');
+            alert("wrong property_sent");
             return;
         }
         if (info.amount <= 0) {
-            alert('wrong amount');
+            alert("wrong amount");
             return;
         }
         if (info.exchange_rate <= 0) {
-            alert('wrong exchange_rate');
+            alert("wrong exchange_rate");
             return;
         }
         if (info.property_received <= 0) {
-            alert('wrong property_received');
+            alert("wrong property_received");
             return;
         }
         let msg = new Message();
@@ -1425,39 +1422,39 @@ class ObdApi {
      */
     atomicSwapAccepted(info, callback) {
         if (this.isNotString(info.channel_id_from)) {
-            alert('empty channel_id_from');
+            alert("empty channel_id_from");
             return;
         }
         if (this.isNotString(info.channel_id_to)) {
-            alert('empty channel_id_to');
+            alert("empty channel_id_to");
             return;
         }
         if (this.isNotString(info.recipient_peer_id)) {
-            alert('empty recipient_peer_id');
+            alert("empty recipient_peer_id");
             return;
         }
         if (this.isNotString(info.transaction_id)) {
-            alert('empty transaction_id');
+            alert("empty transaction_id");
             return;
         }
         if (this.isNotString(info.target_transaction_id)) {
-            alert('empty target_transaction_id');
+            alert("empty target_transaction_id");
             return;
         }
         if (info.property_sent <= 0) {
-            alert('wrong property_sent');
+            alert("wrong property_sent");
             return;
         }
         if (info.amount <= 0) {
-            alert('wrong amount');
+            alert("wrong amount");
             return;
         }
         if (info.exchange_rate <= 0) {
-            alert('wrong exchange_rate');
+            alert("wrong exchange_rate");
             return;
         }
         if (info.property_received <= 0) {
-            alert('wrong property_received');
+            alert("wrong property_received");
             return;
         }
         let msg = new Message();
