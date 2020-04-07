@@ -1072,6 +1072,9 @@ function displayOBDMessages(content) {
         case enumMsgType.MsgType_GetChannelInfoByChanId_N3207:
         case enumMsgType.MsgType_CommitmentTx_AllBRByChanId_N35109:
             return;
+        case enumMsgType.MsgType_UserLogin_1:
+            content.result = 'Logged In - ' + content.from;
+            break;
         case enumMsgType.MsgType_ChannelOpen_N32:
             content.result = 'LAUNCH - ' + content.from + 
                 ' - launch an Open Channel request. ';
@@ -1740,6 +1743,9 @@ function createOBDResponseDiv(response, msgType) {
         case enumMsgType.MsgType_Atomic_Swap_Accept_N81:
             parseDataN81(response);
             break;
+        case enumMsgType.MsgType_UserLogin_1:
+            parseData1(response);
+            break;
         default:
             createElement(obd_response_div, 'p', response);
             break;
@@ -1748,6 +1754,19 @@ function createOBDResponseDiv(response, msgType) {
 
 //----------------------------------------------------------------
 // Functions of processing each response from invoke APIs.
+
+// parseData1 - 
+function parseData1(response) {
+    var arrData = [
+        'p2pNodeAddress : ' + response.result.p2pNodeAddress,
+        'p2pNodePeerId : '  + response.result.p2pNodePeerId,
+        'userPeerId : '     + response.result.userPeerId,
+    ];
+
+    for (let i = 0; i < arrData.length; i++) {
+        createElement(obd_response_div, 'p', arrData[i]);
+    }
+}
 
 // parseDataN81 - 
 function parseDataN81(response) {
