@@ -20,16 +20,16 @@ var obdMessages = '';
 var mnemonicWithLogined = '';
 
 //
-var inNewHtml = 'inNewHtml';
+var inNewHtml = 'in_new_html';
 
 //
-var saveTempCI = 'ChannelCreation';
+var saveTempCI = 'channel_reation';
 
 //
 var saveAddr = 'addr';
 
 //
-var saveFriends = 'list_of_friends';
+var saveFriends = 'friends';
 
 //
 var saveMnemonic = 'mnemonic';
@@ -117,40 +117,40 @@ function logIn(msgType) {
 
     obdApi.logIn(mnemonic, function(e) {
         console.info('logIn - OBD Response = ' + JSON.stringify(e));
-        let retData = JSON.stringify(e)
-            // If already logined, then stop listening to OBD Response,
-            // DO NOT update the userID.
+        // If already logined, then stop listening to OBD Response,
+        // DO NOT update the userID.
         if (isLogined) {
-            createOBDResponseDiv(retData, msgType);
+            createOBDResponseDiv(e, msgType);
             return;
         }
 
         // Otherwise, a new loginning, update the userID.
-        isLogined = true;
         mnemonicWithLogined = mnemonic;
         userID = e.userPeerId
         $("#logined").text(userID.substring(0, 10) + '...');
-        createOBDResponseDiv(retData, msgType);
+        createOBDResponseDiv(e, msgType);
+        isLogined = true;
     });
 }
 
-// openChannel API at local.
+// -32 openChannel API at local.
 function openChannel(msgType) {
 
+    var p2pID  = $("#recipient_p2p_peer_id").val();
+    var name   = $("#recipient_peer_id").val();
     var pubkey = $("#funding_pubkey").val();
-    var name = $("#recipient_peer_id").val();
 
-    if (name.trim() === '' || pubkey.trim() === '') {
-        alert('Please input complete data.');
-        return;
-    }
+    // if (name.trim() === '' || pubkey.trim() === '') {
+    //     alert('Please input complete data.');
+    //     return;
+    // }
 
     // OBD API
-    obdApi.openChannel(pubkey, name, function(e) {
+    obdApi.openChannel(pubkey, name, p2pID, function(e) {
         console.info('openChannel - OBD Response = ' + JSON.stringify(e));
 
         // Save List of friends who have interacted.
-        saveFriendsList(name);
+        saveFriendsList(name, p2pID);
         // Save Non-finalized channel information.
         saveChannelCreation(e);
         createOBDResponseDiv(e, msgType);
@@ -1758,11 +1758,17 @@ function createOBDResponseDiv(response, msgType) {
 
 // parseData1 - 
 function parseData1(response) {
-    var arrData = [
-        'p2pNodeAddress : ' + response.result.p2pNodeAddress,
-        'p2pNodePeerId : '  + response.result.p2pNodePeerId,
-        'userPeerId : '     + response.result.userPeerId,
-    ];
+    if (isLogined) {
+        var arrData = [
+            'Status : ' + response,
+        ];
+    } else {
+        var arrData = [
+            'p2pNodeAddress : ' + response.p2pNodeAddress,
+            'p2pNodePeerId : '  + response.p2pNodePeerId,
+            'userPeerId : '     + response.userPeerId,
+        ];
+    }
 
     for (let i = 0; i < arrData.length; i++) {
         createElement(obd_response_div, 'p', arrData[i]);
@@ -2879,7 +2885,7 @@ function saveMnemonicData(response) {
 }
 
 // List of friends who have interacted
-function saveFriendsList(name) {
+function saveFriendsList(name, p2pID) {
 
     // var name = $("#recipient_peer_id").val();
     var list = JSON.parse(localStorage.getItem(saveFriends));
@@ -2892,7 +2898,8 @@ function saveFriendsList(name) {
         }
 
         let new_data = {
-            name: name,
+            name:  name,
+            p2pID: p2pID
         }
         list.result.push(new_data);
         localStorage.setItem(saveFriends, JSON.stringify(list));
@@ -2901,7 +2908,8 @@ function saveFriendsList(name) {
         // console.info('FIRST DATA');
         let data = {
             result: [{
-                name: name
+                name:  name,
+                p2pID: p2pID
             }]
         }
         localStorage.setItem(saveFriends, JSON.stringify(data));

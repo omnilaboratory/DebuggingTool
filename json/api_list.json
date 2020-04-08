@@ -32,15 +32,11 @@
             "description": "OpenChannel is used to request to create a channel with someone.",
             "parameters": [
                 {
-                    "name": "funding_pubkey",
+                    "name": "recipient_p2p_peer_id",
                     "buttons": [
                         {
-                            "innerText": "Get It",
-                            "onclick": "displayUserDataInNewHtml('Addresses')"
-                        },
-                        {
-                            "innerText": "Auto Create",
-                            "onclick": "autoCreateFundingPubkey()"
+                            "innerText": "Friends",
+                            "onclick": "displayUserDataInNewHtml('Friends')"
                         }
                     ]
                 },
@@ -50,6 +46,19 @@
                         {
                             "innerText": "Friends",
                             "onclick": "displayUserDataInNewHtml('Friends')"
+                        }
+                    ]
+                },
+                {
+                    "name": "funding_pubkey",
+                    "buttons": [
+                        {
+                            "innerText": "Get It",
+                            "onclick": "displayUserDataInNewHtml('Addresses')"
+                        },
+                        {
+                            "innerText": "Auto Create",
+                            "onclick": "autoCreateFundingPubkey()"
                         }
                     ]
                 }

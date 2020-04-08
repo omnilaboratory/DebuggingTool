@@ -2,6 +2,7 @@ class Message {
   type: number;
   data: Object = new Object();
   recipient_peer_id: string = "";
+  recipient_p2p_peer_id: string = "";
 }
 
 class BtcFundingInfo {

@@ -478,11 +478,13 @@ class ObdApi {
    * MsgType_ChannelOpen_N32
    * @param funding_pubkey string
    * @param recipient_peer_id string
+   * @param recipient_p2p_peer_id string
    * @param callback function
    */
   public openChannel(
     funding_pubkey: string,
     recipient_peer_id: string,
+    recipient_p2p_peer_id: string,
     callback: Function
   ) {
     if (this.isNotString(funding_pubkey)) {
@@ -495,10 +497,16 @@ class ObdApi {
       return;
     }
 
+    if (this.isNotString(recipient_p2p_peer_id)) {
+      alert("error recipient_p2p_peer_id");
+      return;
+    }
+
     let msg = new Message();
     msg.type = this.messageType.MsgType_ChannelOpen_N32;
     msg.data["funding_pubkey"] = funding_pubkey;
     msg.recipient_peer_id = recipient_peer_id;
+    msg.recipient_p2p_peer_id = recipient_p2p_peer_id;
     this.sendData(msg, callback);
   }
   public onOpenChannel(jsonData: any) {}
