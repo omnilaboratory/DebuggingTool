@@ -297,8 +297,13 @@ class ObdApi {
    * MsgType_p2p_ConnectServer_3
    * @param callback function
    */
-  public connectP2PNode(callback: Function) {
+  public connectP2PNode(p2pAddress: string, callback: Function) {
+    if(this.isNotString(p2pAddress)){
+      alert("empty p2pAddress");
+      return ;
+    }
     let msg = new Message();
+    msg.data = p2pAddress
     msg.type = this.messageType.MsgType_p2p_ConnectServer_3;
     this.sendData(msg, callback);
   }
