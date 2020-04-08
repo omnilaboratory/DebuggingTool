@@ -181,8 +181,8 @@ class OmniSendIssuanceManaged {
     }
 }
 class OmniSendIssuanceFixed extends OmniSendIssuanceManaged {
-    constructor() {
-        super(...arguments);
+    constructor(...args) {
+        super(...args);
         this.amount = 0;
     }
 }
@@ -223,8 +223,8 @@ class AtomicSwapRequest {
  * -81
  */
 class AtomicSwapAccepted extends AtomicSwapRequest {
-    constructor() {
-        super(...arguments);
+    constructor(...args) {
+        super(...args);
         this.target_transaction_id = "";
     }
 }
@@ -233,6 +233,7 @@ class MessageType {
         this.MsgType_Error_0 = 0;
         this.MsgType_UserLogin_1 = 1;
         this.MsgType_UserLogout_2 = 2;
+        this.MsgType_p2p_ConnectServer_3 = 3;
         this.MsgType_Core_GetNewAddress_1001 = 1001;
         this.MsgType_Core_GetMiningInfo_1002 = 1002;
         this.MsgType_Core_GetNetworkInfo_1003 = 1003;

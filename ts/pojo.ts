@@ -204,6 +204,7 @@ class MessageType {
   MsgType_Error_0 = 0;
   MsgType_UserLogin_1 = 1;
   MsgType_UserLogout_2 = 2;
+  MsgType_p2p_ConnectServer_3  = 3;
 
   MsgType_Core_GetNewAddress_1001 = 1001;
   MsgType_Core_GetMiningInfo_1002 = 1002;

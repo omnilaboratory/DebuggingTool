@@ -107,6 +107,11 @@ class ObdApi {
   }
 
   private getDataFromServer(jsonData: any) {
+    if(jsonData.type==0){
+      console.info(jsonData.data);
+      return;
+    }
+
     let callback = this.callbackMap[jsonData.type];
     if (jsonData.status == false) {
       //omni error ,do not alert
@@ -286,6 +291,16 @@ class ObdApi {
   }
   public onLogout(jsonData: any) {
     this.isLogin = false;
+  }
+
+  /**
+   * MsgType_p2p_ConnectServer_3
+   * @param callback function
+   */
+  public connectP2PNode(callback: Function) {
+    let msg = new Message();
+    msg.type = this.messageType.MsgType_p2p_ConnectServer_3;
+    this.sendData(msg, callback);
   }
 
   /**
