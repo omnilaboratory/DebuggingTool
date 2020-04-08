@@ -7,6 +7,17 @@
             "parameters": []
         },
         {
+            "id": "connectP2PNode",
+            "type_id": 3,
+            "description": "connectP2PNode is a temp func for development phrase. It connects to a p2p node.",
+            "parameters": [
+                {
+                    "name": "node_url",
+                    "buttons": []
+                }
+            ]
+        },
+        {
             "id": "logIn",
             "type_id": 1,
             "description": "LogIn is used to login to OBD.",
@@ -69,6 +80,24 @@
             "type_id": -33,
             "description": "AcceptChannel is used to response to request of creating channel. Bob replies to accept, his OBD completes his message and routes it to Alice's OBD. Then Alice sees the response of acceptance.",
             "parameters": [
+                {
+                    "name": "recipient_p2p_peer_id",
+                    "buttons": [
+                        {
+                            "innerText": "Friends",
+                            "onclick": "displayUserDataInNewHtml('Friends')"
+                        }
+                    ]
+                },
+                {
+                    "name": "recipient_peer_id",
+                    "buttons": [
+                        {
+                            "innerText": "Friends",
+                            "onclick": "displayUserDataInNewHtml('Friends')"
+                        }
+                    ]
+                },
                 {
                     "name": "temporary_channel_id",
                     "buttons": [

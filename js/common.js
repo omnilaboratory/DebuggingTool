@@ -133,6 +133,18 @@ function logIn(msgType) {
     });
 }
 
+// 3 connectP2PNode API at local.
+function connectP2PNode(msgType) {
+
+    var node_url  = $("#node_url").val();
+
+    // OBD API
+    obdApi.connectP2PNode(node_url, function(e) {
+        console.info('connectP2PNode - OBD Response = ' + JSON.stringify(e));
+        createOBDResponseDiv(e, msgType);
+    });
+}
+
 // -32 openChannel API at local.
 function openChannel(msgType) {
 
@@ -160,11 +172,11 @@ function openChannel(msgType) {
 // -33 accept Channel API at local.
 function acceptChannel(msgType) {
 
+    var p2pID    = $("#recipient_p2p_peer_id").val();
+    var name     = $("#recipient_peer_id").val();
     var temp_cid = $("#temporary_channel_id").val();
-    var pubkey = $("#funding_pubkey").val();
+    var pubkey   = $("#funding_pubkey").val();
     var approval = $("#checkbox_n33").prop("checked");
-
-    // console.info('VALUE = ' + temp_cid + ' | ' + pubkey + ' | ' + approval);
 
     let info = new AcceptChannelInfo();
     info.temporary_channel_id = temp_cid;
@@ -175,7 +187,7 @@ function acceptChannel(msgType) {
     strTempChID = temp_cid;
 
     // OBD API
-    obdApi.acceptChannel(info, function(e) {
+    obdApi.acceptChannel(p2pID, name, info, function(e) {
         console.info('-33 acceptChannel - OBD Response = ' + JSON.stringify(e));
         // Save Non-finalized channel information.
         saveChannelCreation(e);
@@ -1046,6 +1058,9 @@ function invokeAPIs(objSelf) {
         case enumMsgType.MsgType_Atomic_Swap_Accept_N81:
             atomicSwapAccepted(msgType);
             break;
+        case enumMsgType.MsgType_p2p_ConnectServer_3:
+            connectP2PNode(msgType);
+            break;
         default:
             console.info(msgType + " do not exist");
             break;
@@ -1075,6 +1090,9 @@ function displayOBDMessages(content) {
             return;
         case enumMsgType.MsgType_UserLogin_1:
             content.result = 'Logged In - ' + content.from;
+            break;
+        case enumMsgType.MsgType_p2p_ConnectServer_3:
+            content.result = 'Connect to P2P Node success.';
             break;
         case enumMsgType.MsgType_ChannelOpen_N32:
             content.result = 'LAUNCH - ' + content.from +
@@ -1747,6 +1765,9 @@ function createOBDResponseDiv(response, msgType) {
         case enumMsgType.MsgType_UserLogin_1:
             parseData1(response);
             break;
+        case enumMsgType.MsgType_p2p_ConnectServer_3:
+            parseData3(response);
+            break;
         default:
             createElement(obd_response_div, 'p', response);
             break;
@@ -1755,6 +1776,17 @@ function createOBDResponseDiv(response, msgType) {
 
 //----------------------------------------------------------------
 // Functions of processing each response from invoke APIs.
+
+// parseData3 - 
+function parseData3(response) {
+    var arrData = [
+        'Connect success.',
+    ];
+
+    for (let i = 0; i < arrData.length; i++) {
+        createElement(obd_response_div, 'p', arrData[i]);
+    }
+}
 
 // parseData1 - 
 function parseData1(response) {
@@ -3115,7 +3147,8 @@ function displayFriends() {
         for (let i = 0; i < list.result.length; i++) {
             // Display list NO.
             createElement(parent, 'h4', 'NO. ' + (i + 1));
-            createElement(parent, 'text', list.result[i].name);
+            createElement(parent, 'p', 'P2P_Peer_ID: ' + list.result[i].p2pID);
+            createElement(parent, 'p', 'Peer_ID: ' + list.result[i].name);
         }
     } else { // NO LOCAL STORAGE DATA YET.
         createElement(parent, 'h3', 'NO DATA YET.');

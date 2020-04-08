@@ -533,10 +533,26 @@ class ObdApi {
 
   /**
    * MsgType_ChannelAccept_N33
+   * @param recipient_p2p_peer_id string
+   * @param recipient_peer_id string
    * @param info AcceptChannelInfo
    * @param callback function
    */
-  public acceptChannel(info: AcceptChannelInfo, callback: Function) {
+  public acceptChannel(
+    recipient_p2p_peer_id: string,
+    recipient_peer_id: string,
+    info: AcceptChannelInfo, callback: Function) {
+    
+    if (this.isNotString(recipient_p2p_peer_id)) {
+      alert("error recipient_p2p_peer_id");
+      return;
+    }
+
+    if (this.isNotString(recipient_peer_id)) {
+      alert("error recipient_peer_id");
+      return;
+    }
+
     if (this.isNotString(info.temporary_channel_id)) {
       alert("empty temporary_channel_id");
       return;
@@ -555,6 +571,8 @@ class ObdApi {
 
     let msg = new Message();
     msg.type = this.messageType.MsgType_ChannelAccept_N33;
+    msg.recipient_peer_id = recipient_peer_id;
+    msg.recipient_p2p_peer_id = recipient_p2p_peer_id;
     msg.data = info;
     this.sendData(msg, callback);
   }
