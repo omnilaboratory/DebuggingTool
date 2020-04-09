@@ -365,10 +365,26 @@ class ObdApi {
 
   /**
    * MsgType_FundingCreate_BtcCreate_N3400
+   * @param recipient_p2p_peer_id string
+   * @param recipient_peer_id string
    * @param info  FundingBtcCreated
    * @param callback  Function
    */
-  public btcFundingCreated(info: FundingBtcCreated, callback: Function) {
+  public btcFundingCreated(
+    recipient_p2p_peer_id: string,
+    recipient_peer_id: string,
+    info: FundingBtcCreated, callback: Function) {
+
+    if (this.isNotString(recipient_p2p_peer_id)) {
+      alert("error recipient_p2p_peer_id");
+      return;
+    }
+
+    if (this.isNotString(recipient_peer_id)) {
+      alert("error recipient_peer_id");
+      return;
+    }
+
     if (this.isNotString(info.temporary_channel_id)) {
       alert("empty temporary_channel_id");
       return;
@@ -384,16 +400,34 @@ class ObdApi {
 
     let msg = new Message();
     msg.type = this.messageType.MsgType_FundingCreate_BtcCreate_N3400;
+    msg.recipient_peer_id = recipient_peer_id;
+    msg.recipient_p2p_peer_id = recipient_p2p_peer_id;
     msg.data = info;
     this.sendData(msg, callback);
   }
 
   /**
    * MsgType_FundingSign_BtcSign_N3500
+   * @param recipient_p2p_peer_id string
+   * @param recipient_peer_id string
    * @param info FundingBtcSigned
    * @param callback  Function
    */
-  public btcFundingSigned(info: FundingBtcSigned, callback: Function) {
+  public btcFundingSigned(
+    recipient_p2p_peer_id: string,
+    recipient_peer_id: string,
+    info: FundingBtcSigned, callback: Function) {
+
+    if (this.isNotString(recipient_p2p_peer_id)) {
+      alert("error recipient_p2p_peer_id");
+      return;
+    }
+
+    if (this.isNotString(recipient_peer_id)) {
+      alert("error recipient_peer_id");
+      return;
+    }
+
     if (this.isNotString(info.temporary_channel_id)) {
       alert("empty temporary_channel_id");
       return;
@@ -412,6 +446,8 @@ class ObdApi {
 
     let msg = new Message();
     msg.type = this.messageType.MsgType_FundingSign_BtcSign_N3500;
+    msg.recipient_peer_id = recipient_peer_id;
+    msg.recipient_p2p_peer_id = recipient_p2p_peer_id;
     msg.data = info;
     this.sendData(msg, callback);
   }
@@ -580,13 +616,28 @@ class ObdApi {
 
   /**
    * MsgType_FundingCreate_AssetFundingCreated_N34
+   * @param recipient_p2p_peer_id string
+   * @param recipient_peer_id string
    * @param info ChannelFundingCreatedInfo
    * @param callback function
    */
   public channelFundingCreated(
+    recipient_p2p_peer_id: string,
+    recipient_peer_id: string,
     info: ChannelFundingCreatedInfo,
     callback: Function
   ) {
+
+    if (this.isNotString(recipient_p2p_peer_id)) {
+      alert("error recipient_p2p_peer_id");
+      return;
+    }
+
+    if (this.isNotString(recipient_peer_id)) {
+      alert("error recipient_peer_id");
+      return;
+    }
+
     if (this.isNotString(info.temporary_channel_id)) {
       alert("empty temporary_channel_id");
       return;
@@ -610,6 +661,8 @@ class ObdApi {
 
     let msg = new Message();
     msg.type = this.messageType.MsgType_FundingCreate_AssetFundingCreated_N34;
+    msg.recipient_peer_id = recipient_peer_id;
+    msg.recipient_p2p_peer_id = recipient_p2p_peer_id;
     msg.data = info;
     this.sendData(msg, callback);
   }
@@ -617,13 +670,28 @@ class ObdApi {
 
   /**
    * MsgType_FundingSign_AssetFundingSigned_N35
+   * @param recipient_p2p_peer_id string
+   * @param recipient_peer_id string
    * @param info ChannelFundingSignedInfo
    * @param callback function
    */
   public channelFundingSigned(
+    recipient_p2p_peer_id: string,
+    recipient_peer_id: string,
     info: ChannelFundingSignedInfo,
     callback: Function
   ) {
+
+    if (this.isNotString(recipient_p2p_peer_id)) {
+      alert("error recipient_p2p_peer_id");
+      return;
+    }
+
+    if (this.isNotString(recipient_peer_id)) {
+      alert("error recipient_peer_id");
+      return;
+    }
+
     if (this.isNotString(info.channel_id)) {
       alert("empty channel_id");
       return;
@@ -640,6 +708,8 @@ class ObdApi {
 
     let msg = new Message();
     msg.type = this.messageType.MsgType_FundingSign_AssetFundingSigned_N35;
+    msg.recipient_peer_id = recipient_peer_id;
+    msg.recipient_p2p_peer_id = recipient_p2p_peer_id;
     msg.data = info;
     this.sendData(msg, callback);
   }
@@ -647,10 +717,27 @@ class ObdApi {
 
   /**
    * MsgType_CommitmentTx_CommitmentTransactionCreated_N351
+   * @param recipient_p2p_peer_id string
+   * @param recipient_peer_id string
    * @param info CommitmentTx
    * @param callback function
    */
-  public commitmentTransactionCreated(info: CommitmentTx, callback: Function) {
+  public commitmentTransactionCreated(
+    recipient_p2p_peer_id: string,
+    recipient_peer_id: string,
+    info: CommitmentTx, 
+    callback: Function) {
+
+    if (this.isNotString(recipient_p2p_peer_id)) {
+      alert("error recipient_p2p_peer_id");
+      return;
+    }
+
+    if (this.isNotString(recipient_peer_id)) {
+      alert("error recipient_peer_id");
+      return;
+    }
+
     if (this.isNotString(info.channel_id)) {
       alert("empty channel_id");
       return;
@@ -677,6 +764,8 @@ class ObdApi {
     }
     let msg = new Message();
     msg.type = this.messageType.MsgType_CommitmentTx_CommitmentTransactionCreated_N351;
+    msg.recipient_peer_id = recipient_peer_id;
+    msg.recipient_p2p_peer_id = recipient_p2p_peer_id;
     msg.data = info;
     this.sendData(msg, callback);
   }
@@ -684,13 +773,28 @@ class ObdApi {
 
   /**
    * MsgType_CommitmentTxSigned_RevokeAndAcknowledgeCommitmentTransaction_N352
+   * @param recipient_p2p_peer_id string
+   * @param recipient_peer_id string
    * @param info CommitmentTxSigned
    * @param callback function
    */
   public revokeAndAcknowledgeCommitmentTransaction(
+    recipient_p2p_peer_id: string,
+    recipient_peer_id: string,
     info: CommitmentTxSigned,
     callback: Function
   ) {
+
+    if (this.isNotString(recipient_p2p_peer_id)) {
+      alert("error recipient_p2p_peer_id");
+      return;
+    }
+
+    if (this.isNotString(recipient_peer_id)) {
+      alert("error recipient_peer_id");
+      return;
+    }
+    
     if (this.isNotString(info.channel_id)) {
       alert("empty channel_id");
       return;
@@ -721,6 +825,8 @@ class ObdApi {
 
     let msg = new Message();
     msg.type = this.messageType.MsgType_CommitmentTxSigned_RevokeAndAcknowledgeCommitmentTransaction_N352;
+    msg.recipient_peer_id = recipient_peer_id;
+    msg.recipient_p2p_peer_id = recipient_p2p_peer_id;
     msg.data = info;
     this.sendData(msg, callback);
   }
