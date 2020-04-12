@@ -10,7 +10,10 @@ class ObdApi {
 
   private callbackMap: Map<number, Function> = new Map<number, Function>();
 
-  private registerCallbackMap: Map<number, Function> = new Map<number, Function>();
+  private registerCallbackMap: Map<number, Function> = new Map<
+    number,
+    Function
+  >();
 
   /**
    * register event
@@ -63,20 +66,20 @@ class ObdApi {
         }
         this.isConnectToOBD = true;
       };
-      this.ws.onmessage = e => {
+      this.ws.onmessage = (e) => {
         let jsonData = JSON.parse(e.data);
         console.info(jsonData);
         this.getDataFromServer(jsonData);
       };
 
-      this.ws.onclose = e => {
+      this.ws.onclose = (e) => {
         console.info("ws close", e);
         this.isConnectToOBD = false;
         this.isLogin = false;
         alert("ws close");
       };
 
-      this.ws.onerror = e => {
+      this.ws.onerror = (e) => {
         console.info("ws error", e);
         alert("ws error");
       };
@@ -109,7 +112,7 @@ class ObdApi {
   }
 
   private getDataFromServer(jsonData: any) {
-    if(jsonData.type==0){
+    if (jsonData.type == 0) {
       console.info(jsonData.data);
       return;
     }
@@ -142,11 +145,10 @@ class ObdApi {
       this.globalCallback(jsonData);
     }
 
-    let  registerCallback = this.registerCallbackMap[jsonData.type]
-    if(registerCallback){
-      registerCallback(resultData)
+    let registerCallback = this.registerCallbackMap[jsonData.type];
+    if (registerCallback != null) {
+      registerCallback(resultData);
     }
-    
 
     console.info(
       new Date(),
@@ -306,12 +308,12 @@ class ObdApi {
    * @param callback function
    */
   public connectP2PNode(p2pAddress: string, callback: Function) {
-    if(this.isNotString(p2pAddress)){
+    if (this.isNotString(p2pAddress)) {
       alert("empty p2pAddress");
-      return ;
+      return;
     }
     let msg = new Message();
-    msg.data = p2pAddress
+    msg.data = p2pAddress;
     msg.type = this.messageType.MsgType_p2p_ConnectServer_3;
     this.sendData(msg, callback);
   }
@@ -381,8 +383,9 @@ class ObdApi {
   public btcFundingCreated(
     recipient_p2p_peer_id: string,
     recipient_peer_id: string,
-    info: FundingBtcCreated, callback: Function) {
-
+    info: FundingBtcCreated,
+    callback: Function
+  ) {
     if (this.isNotString(recipient_p2p_peer_id)) {
       alert("error recipient_p2p_peer_id");
       return;
@@ -424,8 +427,9 @@ class ObdApi {
   public btcFundingSigned(
     recipient_p2p_peer_id: string,
     recipient_peer_id: string,
-    info: FundingBtcSigned, callback: Function) {
-
+    info: FundingBtcSigned,
+    callback: Function
+  ) {
     if (this.isNotString(recipient_p2p_peer_id)) {
       alert("error recipient_p2p_peer_id");
       return;
@@ -585,8 +589,9 @@ class ObdApi {
   public acceptChannel(
     recipient_p2p_peer_id: string,
     recipient_peer_id: string,
-    info: AcceptChannelInfo, callback: Function) {
-    
+    info: AcceptChannelInfo,
+    callback: Function
+  ) {
     if (this.isNotString(recipient_p2p_peer_id)) {
       alert("error recipient_p2p_peer_id");
       return;
@@ -635,7 +640,6 @@ class ObdApi {
     info: ChannelFundingCreatedInfo,
     callback: Function
   ) {
-
     if (this.isNotString(recipient_p2p_peer_id)) {
       alert("error recipient_p2p_peer_id");
       return;
@@ -689,7 +693,6 @@ class ObdApi {
     info: ChannelFundingSignedInfo,
     callback: Function
   ) {
-
     if (this.isNotString(recipient_p2p_peer_id)) {
       alert("error recipient_p2p_peer_id");
       return;
@@ -733,9 +736,9 @@ class ObdApi {
   public commitmentTransactionCreated(
     recipient_p2p_peer_id: string,
     recipient_peer_id: string,
-    info: CommitmentTx, 
-    callback: Function) {
-
+    info: CommitmentTx,
+    callback: Function
+  ) {
     if (this.isNotString(recipient_p2p_peer_id)) {
       alert("error recipient_p2p_peer_id");
       return;
@@ -792,7 +795,6 @@ class ObdApi {
     info: CommitmentTxSigned,
     callback: Function
   ) {
-
     if (this.isNotString(recipient_p2p_peer_id)) {
       alert("error recipient_p2p_peer_id");
       return;
@@ -802,7 +804,7 @@ class ObdApi {
       alert("error recipient_peer_id");
       return;
     }
-    
+
     if (this.isNotString(info.channel_id)) {
       alert("empty channel_id");
       return;

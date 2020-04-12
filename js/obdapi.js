@@ -50,18 +50,18 @@ class ObdApi {
                 }
                 this.isConnectToOBD = true;
             };
-            this.ws.onmessage = e => {
+            this.ws.onmessage = (e) => {
                 let jsonData = JSON.parse(e.data);
                 console.info(jsonData);
                 this.getDataFromServer(jsonData);
             };
-            this.ws.onclose = e => {
+            this.ws.onclose = (e) => {
                 console.info("ws close", e);
                 this.isConnectToOBD = false;
                 this.isLogin = false;
                 alert("ws close");
             };
-            this.ws.onerror = e => {
+            this.ws.onerror = (e) => {
                 console.info("ws error", e);
                 alert("ws error");
             };
@@ -120,7 +120,7 @@ class ObdApi {
             this.globalCallback(jsonData);
         }
         let registerCallback = this.registerCallbackMap[jsonData.type];
-        if (registerCallback) {
+        if (registerCallback != null) {
             registerCallback(resultData);
         }
         console.info(new Date(), "----------------------------get msg from server--------------------");
