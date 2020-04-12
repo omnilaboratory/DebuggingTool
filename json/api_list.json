@@ -7,6 +7,17 @@
             "parameters": []
         },
         {
+            "id": "connectP2PNode",
+            "type_id": 3,
+            "description": "connectP2PNode is a temp func for development phrase. It connects to a p2p node.",
+            "parameters": [
+                {
+                    "name": "node_url",
+                    "buttons": []
+                }
+            ]
+        },
+        {
             "id": "logIn",
             "type_id": 1,
             "description": "LogIn is used to login to OBD.",
@@ -69,6 +80,24 @@
             "type_id": -33,
             "description": "AcceptChannel is used to response to request of creating channel. Bob replies to accept, his OBD completes his message and routes it to Alice's OBD. Then Alice sees the response of acceptance.",
             "parameters": [
+                {
+                    "name": "recipient_p2p_peer_id",
+                    "buttons": [
+                        {
+                            "innerText": "Friends",
+                            "onclick": "displayUserDataInNewHtml('Friends')"
+                        }
+                    ]
+                },
+                {
+                    "name": "recipient_peer_id",
+                    "buttons": [
+                        {
+                            "innerText": "Friends",
+                            "onclick": "displayUserDataInNewHtml('Friends')"
+                        }
+                    ]
+                },
                 {
                     "name": "temporary_channel_id",
                     "buttons": [
@@ -154,6 +183,24 @@
             "description": "BTCFundingCreated is used to notify the success of funding BTC to the counterpart of the channel. Alice tells her OBD to notify Bob that she created the funding transaction by payloads packed in this message -3400.",
             "parameters": [
                 {
+                    "name": "recipient_p2p_peer_id",
+                    "buttons": [
+                        {
+                            "innerText": "Friends",
+                            "onclick": "displayUserDataInNewHtml('Friends')"
+                        }
+                    ]
+                },
+                {
+                    "name": "recipient_peer_id",
+                    "buttons": [
+                        {
+                            "innerText": "Friends",
+                            "onclick": "displayUserDataInNewHtml('Friends')"
+                        }
+                    ]
+                },
+                {
                     "name": "temporary_channel_id",
                     "buttons": [
                         {
@@ -187,6 +234,24 @@
             "type_id": -3500,
             "description": "BTCFundingSigned is used to response the transfering bitcoin event by the partner of the channel. Bob tells his OBD to reply Alice that he knows the funding by message -3500.",
             "parameters": [
+                {
+                    "name": "recipient_p2p_peer_id",
+                    "buttons": [
+                        {
+                            "innerText": "Friends",
+                            "onclick": "displayUserDataInNewHtml('Friends')"
+                        }
+                    ]
+                },
+                {
+                    "name": "recipient_peer_id",
+                    "buttons": [
+                        {
+                            "innerText": "Friends",
+                            "onclick": "displayUserDataInNewHtml('Friends')"
+                        }
+                    ]
+                },
                 {
                     "name": "temporary_channel_id",
                     "buttons": [
@@ -273,6 +338,24 @@
             "description": "AssetFundingCreated is used to notify the success of omni asset funding transaction to the counter partner of the channel.",
             "parameters": [
                 {
+                    "name": "recipient_p2p_peer_id",
+                    "buttons": [
+                        {
+                            "innerText": "Friends",
+                            "onclick": "displayUserDataInNewHtml('Friends')"
+                        }
+                    ]
+                },
+                {
+                    "name": "recipient_peer_id",
+                    "buttons": [
+                        {
+                            "innerText": "Friends",
+                            "onclick": "displayUserDataInNewHtml('Friends')"
+                        }
+                    ]
+                },
+                {
                     "name": "temporary_channel_id",
                     "buttons": [
                         {
@@ -325,6 +408,24 @@
             "description": "AssetFundingSigned is used to response the transfering omni asset event by the partner of the channel. Bob tells his OBD to reply Alice that he knows the funding by message -35, and OBD will creat commitment transactions (C1a & RD1a).",
             "parameters": [
                 {
+                    "name": "recipient_p2p_peer_id",
+                    "buttons": [
+                        {
+                            "innerText": "Friends",
+                            "onclick": "displayUserDataInNewHtml('Friends')"
+                        }
+                    ]
+                },
+                {
+                    "name": "recipient_peer_id",
+                    "buttons": [
+                        {
+                            "innerText": "Friends",
+                            "onclick": "displayUserDataInNewHtml('Friends')"
+                        }
+                    ]
+                },
+                {
                     "name": "channel_id",
                     "buttons": [
                         {
@@ -349,6 +450,24 @@
             "type_id": -351,
             "description": "RSMC Commitment Transaction Created is used for paying omni assets by Revocable Sequence Maturity Contract(RSMC) within a channel. After creating a channel and funding the channel by BTC and assets, Alice/Bob then is able to use this channel to pay to the counterpart. OBD constructs commitment transaction for each payment between the two counterparts. The i-th commitment transaction will be invalidated after creating the (i+1)-th commitment transaction. [These temp addresses] are some data generated by OBD used in contructing temporary multi-sig addresses and temporary transactions for i-th commitment transaction. You shall find your corresponding temporary data within the responses of your OBD.",
             "parameters": [
+                {
+                    "name": "recipient_p2p_peer_id",
+                    "buttons": [
+                        {
+                            "innerText": "Friends",
+                            "onclick": "displayUserDataInNewHtml('Friends')"
+                        }
+                    ]
+                },
+                {
+                    "name": "recipient_peer_id",
+                    "buttons": [
+                        {
+                            "innerText": "Friends",
+                            "onclick": "displayUserDataInNewHtml('Friends')"
+                        }
+                    ]
+                },
                 {
                     "name": "channel_id",
                     "buttons": [
@@ -405,6 +524,24 @@
             "type_id": -352,
             "description": "RSMC revokeAndAcknowledgeCommitmentTransaction is used for Receiver revoke the previous commitment transaction and ackonwledge the new transaction.",
             "parameters": [
+                {
+                    "name": "recipient_p2p_peer_id",
+                    "buttons": [
+                        {
+                            "innerText": "Friends",
+                            "onclick": "displayUserDataInNewHtml('Friends')"
+                        }
+                    ]
+                },
+                {
+                    "name": "recipient_peer_id",
+                    "buttons": [
+                        {
+                            "innerText": "Friends",
+                            "onclick": "displayUserDataInNewHtml('Friends')"
+                        }
+                    ]
+                },
                 {
                     "name": "channel_id",
                     "buttons": [
