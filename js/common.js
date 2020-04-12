@@ -126,9 +126,9 @@ function logIn(msgType) {
     obdApi.logIn(mnemonic, function(e) {
 
         // Register event needed for listening.
-        var msgType = enumMsgType.MsgType_CommitmentTx_CommitmentTransactionCreated_N351;
-        obdApi.registerEvent(msgType, function(response) {
-            listeningN351(response, msgType);
+        var msg_type = enumMsgType.MsgType_CommitmentTx_CommitmentTransactionCreated_N351;
+        obdApi.registerEvent(msg_type, function(e) {
+            listeningN351(e, msg_type);
         });
 
         console.info('logIn - OBD Response = ' + JSON.stringify(e));
@@ -142,7 +142,8 @@ function logIn(msgType) {
         // Otherwise, a new loginning, update the userID.
         mnemonicWithLogined = mnemonic;
         userID = e.userPeerId;
-        $("#logined").text(userID.substring(0, 10) + '...');
+        $("#logined").text(userID);
+        // $("#logined").text(userID.substring(0, 10) + '...');
         createOBDResponseDiv(e, msgType);
         isLogined = true;
 
@@ -1230,7 +1231,7 @@ function displayOBDMessages(content) {
 // getUserDataList
 function getUserDataList(goWhere) {
 
-    var api_id, description, apiItem;
+    var api_id, description, apiItem, menuDiv;
     var jsonFile = "json/user_data_list.json";
 
     // dynamic create api_list div.
@@ -1242,14 +1243,18 @@ function getUserDataList(goWhere) {
             api_id = result.data[i].id;
             description = result.data[i].description;
 
-            // create [a] element
-            apiItem = document.createElement('a');
+            menuDiv = document.createElement('div');
+            menuDiv.setAttribute('class', 'menuItem');
+
+            apiItem = document.createElement('text');
             apiItem.id = api_id;
-            apiItem.href = 'javascript:void(0);';
+            // apiItem.href = 'javascript:void(0);';
             apiItem.setAttribute('description', description);
             apiItem.setAttribute('onclick', 'displayUserData(this)');
             apiItem.innerText = api_id;
-            apiList.append(apiItem);
+
+            menuDiv.append(apiItem);
+            apiList.append(menuDiv);
 
             createElement(apiList, 'p');
         }
@@ -1293,7 +1298,7 @@ function getAPIList() {
 // createLeftSideMenu
 function createLeftSideMenu(jsonFile, divName) {
 
-    var api_id, type_id, description, apiItem;
+    var api_id, type_id, description, apiItem, menuDiv;
 
     // dynamic create api_list div.
     $.getJSON(jsonFile, function(result) {
@@ -1305,16 +1310,20 @@ function createLeftSideMenu(jsonFile, divName) {
             type_id = result.data[i].type_id;
             description = result.data[i].description;
 
-            // create [a] element
-            apiItem = document.createElement('a');
+            menuDiv = document.createElement('div');
+            menuDiv.setAttribute('class', 'menuItem');
+
+            apiItem = document.createElement('text');
             apiItem.id = api_id;
-            apiItem.href = '#';
+            // apiItem.href = '#';
             // apiItem.href = 'javascript:void(0);';
             apiItem.setAttribute('type_id', type_id);
             apiItem.setAttribute('description', description);
             apiItem.setAttribute('onclick', 'displayAPIContent(this)');
             apiItem.innerText = api_id;
-            apiList.append(apiItem);
+
+            menuDiv.append(apiItem);
+            apiList.append(menuDiv);
 
             createElement(apiList, 'p');
         }
@@ -1334,28 +1343,47 @@ function displayAPIContent(obj) {
 // create 
 function createApiNameDiv(obj) {
     var content_div = $("#name_req_div");
+
+    var newDiv = document.createElement('div');
+    newDiv.setAttribute('class', 'panelItem');
+
     // create [api_name] element
-    createElement(content_div, 'h2', obj.innerHTML);
+    var title = document.createElement('div');
+    title.setAttribute('class', 'panelTitle');
+    createElement(title, 'h2', obj.innerHTML);
+    newDiv.append(title);
+
     // create [api_description] element
-    createElement(content_div, 'text', obj.getAttribute("description"));
+    createElement(newDiv, 'text', obj.getAttribute("description"));
+
+    content_div.append(newDiv);
 }
 
 // create 
 function createRequestDiv(obj) {
     var content_div = $("#name_req_div");
 
+    var newDiv = document.createElement('div');
+    newDiv.setAttribute('class', 'panelItem');
+
     // create [title] element
-    createElement(content_div, 'h2', 'Request');
+    var title = document.createElement('div');
+    title.setAttribute('class', 'panelTitle');
+    createElement(title, 'h2', 'Request');
+    newDiv.append(title);
+    // createElement(content_div, 'h2', 'Request');
 
     // create [func_title] element
-    createElement(content_div, 'text', 'func: ', cssStyle);
+    createElement(newDiv, 'text', 'func: ', cssStyle);
 
     // create [func_name] element: id = JS function name.
-    createElement(content_div, 'text', obj.getAttribute("id"));
+    createElement(newDiv, 'text', obj.getAttribute("id"));
 
     // create [type_id] element
     var value = " type ( " + obj.getAttribute("type_id") + " )";
-    createElement(content_div, 'text', value, cssStyle);
+    createElement(newDiv, 'text', value, cssStyle);
+
+    content_div.append(newDiv);
 }
 
 // dynamic create input parameters div area.
@@ -1379,9 +1407,14 @@ function createInputParamDiv(obj, jsonFile) {
                     break;
                 }
 
-                createElement(content_div, 'p', 'Input Parameters:');
+                var newDiv = document.createElement('div');
+                newDiv.setAttribute('class', 'panelItem');
+
+                createElement(newDiv, 'p', 'Input Parameters:');
                 // Parameters
-                createParamOfAPI(arrParams, content_div);
+                createParamOfAPI(arrParams, newDiv);
+
+                content_div.append(newDiv);
             }
         }
 
@@ -1395,7 +1428,8 @@ function createInputParamDiv(obj, jsonFile) {
                 case enumMsgType.MsgType_CommitmentTxSigned_RevokeAndAcknowledgeCommitmentTransaction_N352:
                 case enumMsgType.MsgType_HTLC_SignGetH_N44:
                 case enumMsgType.MsgType_CloseChannelSign_N39:
-                    displayApprovalCheckbox(content_div, obj, msgType);
+                    displayApprovalCheckbox(newDiv, obj, msgType);
+                    content_div.append(newDiv);
                     break;
             }
         }
@@ -1555,7 +1589,7 @@ function createParamOfAPI(arrParams, content_div) {
         createElement(content_div, 'p');
     }
 
-    //
+    // auto fill
     if (arrParams[0].name = 'temporary_channel_id') {
         if (strTempChID) {
             $("#temporary_channel_id").val(strTempChID);
@@ -1599,7 +1633,10 @@ function createInvokeAPIButton(obj) {
     // get [content] div
     var content_div = $("#name_req_div");
 
-    createElement(content_div, 'p');
+    var newDiv = document.createElement('div');
+    newDiv.setAttribute('class', 'panelItem');
+
+    createElement(newDiv, 'p');
 
     // create [Send button] element
     var button = document.createElement('button');
@@ -1607,7 +1644,8 @@ function createInvokeAPIButton(obj) {
     button.setAttribute('type_id', obj.getAttribute("type_id"));
     button.setAttribute('onclick', 'invokeAPIs(this)');
     button.innerText = 'Invoke API';
-    content_div.append(button);
+    newDiv.append(button);
+    content_div.append(newDiv);
 }
 
 //----------------------------------------------------------------
@@ -2288,46 +2326,48 @@ function parseDataN4003(response) {
 
 // parseDataN352 - 
 function parseDataN352(response) {
+
     var arrData = [
-        'channel_id : ' + response.channel_id,
-        'property_id : ' + response.property_id,
-        'amount_to_htlc : ' + response.amount_to_htlc,
-        'amount_to_other : ' + response.amount_to_other,
-        'amount_to_rsmc : ' + response.amount_to_rsmc,
-        'create_at : ' + response.create_at,
-        'create_by : ' + response.create_by,
-        'curr_hash : ' + response.curr_hash,
-        'curr_state : ' + response.curr_state,
-        'htlc_h : ' + response.htlc_h,
-        'htlc_multi_address : ' + response.htlc_multi_address,
-        'htlc_multi_address_script_pub_key : ' + response.htlc_multi_address_script_pub_key,
-        'htlc_r : ' + response.htlc_r,
-        'htlc_redeem_script : ' + response.htlc_redeem_script,
-        'htlc_sender : ' + response.htlc_sender,
-        'htlc_temp_address_pub_key : ' + response.htlc_temp_address_pub_key,
-        'htlc_tx_hash : ' + response.htlc_tx_hash,
-        'htlc_txid : ' + response.htlc_txid,
-        'id : ' + response.id,
-        'input_amount : ' + response.input_amount,
-        'input_txid : ' + response.input_txid,
-        'input_vout : ' + response.input_vout,
-        'last_commitment_tx_id : ' + response.last_commitment_tx_id,
-        'last_edit_time : ' + response.last_edit_time,
-        'last_hash : ' + response.last_hash,
-        'owner : ' + response.owner,
-        'peer_id_a : ' + response.peer_id_a,
-        'peer_id_b : ' + response.peer_id_b,
-        'rsmc_multi_address : ' + response.rsmc_multi_address,
-        'rsmc_multi_address_script_pub_key : ' + response.rsmc_multi_address_script_pub_key,
-        'rsmc_redeem_script : ' + response.rsmc_redeem_script,
-        'rsmc_temp_address_pub_key : ' + response.rsmc_temp_address_pub_key,
-        'rsmc_tx_hash : ' + response.rsmc_tx_hash,
-        'rsmc_txid : ' + response.rsmc_txid,
-        'send_at : ' + response.send_at,
-        'sign_at : ' + response.sign_at,
-        'to_other_tx_hash : ' + response.to_other_tx_hash,
-        'to_other_txid : ' + response.to_other_txid,
-        'tx_type : ' + response.tx_type,
+        'channel_id : ' + response.latestCcommitmentTxInfo.channel_id,
+        'property_id : ' + response.latestCcommitmentTxInfo.property_id,
+        'amount_to_htlc : ' + response.latestCcommitmentTxInfo.amount_to_htlc,
+        'amount_to_other : ' + response.latestCcommitmentTxInfo.amount_to_other,
+        'amount_to_rsmc : ' + response.latestCcommitmentTxInfo.amount_to_rsmc,
+        'create_at : ' + response.latestCcommitmentTxInfo.create_at,
+        'create_by : ' + response.latestCcommitmentTxInfo.create_by,
+        'curr_hash : ' + response.latestCcommitmentTxInfo.curr_hash,
+        'curr_state : ' + response.latestCcommitmentTxInfo.curr_state,
+        'htlc_h : ' + response.latestCcommitmentTxInfo.htlc_h,
+        'htlc_multi_address : ' + response.latestCcommitmentTxInfo.htlc_multi_address,
+        'htlc_multi_address_script_pub_key : ' + response.latestCcommitmentTxInfo.htlc_multi_address_script_pub_key,
+        'htlc_r : ' + response.latestCcommitmentTxInfo.htlc_r,
+        'htlc_redeem_script : ' + response.latestCcommitmentTxInfo.htlc_redeem_script,
+        'htlc_sender : ' + response.latestCcommitmentTxInfo.htlc_sender,
+        'htlc_temp_address_pub_key : ' + response.latestCcommitmentTxInfo.htlc_temp_address_pub_key,
+        'htlc_tx_hex : ' + response.latestCcommitmentTxInfo.htlc_tx_hex,
+        'htlc_txid : ' + response.latestCcommitmentTxInfo.htlc_txid,
+        'id : ' + response.latestCcommitmentTxInfo.id,
+        'input_amount : ' + response.latestCcommitmentTxInfo.input_amount,
+        'input_txid : ' + response.latestCcommitmentTxInfo.input_txid,
+        'input_vout : ' + response.latestCcommitmentTxInfo.input_vout,
+        'last_commitment_tx_id : ' + response.latestCcommitmentTxInfo.last_commitment_tx_id,
+        'last_edit_time : ' + response.latestCcommitmentTxInfo.last_edit_time,
+        'last_hash : ' + response.latestCcommitmentTxInfo.last_hash,
+        'owner : ' + response.latestCcommitmentTxInfo.owner,
+        'peer_id_a : ' + response.latestCcommitmentTxInfo.peer_id_a,
+        'peer_id_b : ' + response.latestCcommitmentTxInfo.peer_id_b,
+        'rsmc_input_txid : ' + response.latestCcommitmentTxInfo.rsmc_input_txid,
+        'rsmc_multi_address : ' + response.latestCcommitmentTxInfo.rsmc_multi_address,
+        'rsmc_multi_address_script_pub_key : ' + response.latestCcommitmentTxInfo.rsmc_multi_address_script_pub_key,
+        'rsmc_redeem_script : ' + response.latestCcommitmentTxInfo.rsmc_redeem_script,
+        'rsmc_temp_address_pub_key : ' + response.latestCcommitmentTxInfo.rsmc_temp_address_pub_key,
+        'rsmc_tx_hex : ' + response.latestCcommitmentTxInfo.rsmc_tx_hex,
+        'rsmc_txid : ' + response.latestCcommitmentTxInfo.rsmc_txid,
+        'send_at : ' + response.latestCcommitmentTxInfo.send_at,
+        'sign_at : ' + response.latestCcommitmentTxInfo.ign_at,
+        'to_other_tx_hex : ' + response.latestCcommitmentTxInfo.to_other_tx_hex,
+        'to_other_txid : ' + response.latestCcommitmentTxInfo.to_other_txid,
+        'tx_type : ' + response.latestCcommitmentTxInfo.tx_type,
     ];
 
     for (let i = 0; i < arrData.length; i++) {
@@ -2339,20 +2379,20 @@ function parseDataN352(response) {
 function parseDataN351(response) {
     var arrData = [
         // TO BOB INFO
-        'channelId : ' + response.channelId,
-        'amount : ' + response.amount,
-        'msgHash : ' + response.msgHash,
-        'rsmcHex : ' + response.rsmcHex,
-        'toOtherHex : ' + response.toOtherHex,
-        
-        // ALICE LOOK INFO
         // 'channelId : ' + response.channelId,
         // 'amount : ' + response.amount,
-        // 'commitmentHash : ' + response.commitmentHash,
-        // 'currTempAddressPubKey : ' + response.currTempAddressPubKey,
-        // 'lastTempAddressPrivateKey : ' + response.lastTempAddressPrivateKey,
+        // 'msgHash : ' + response.msgHash,
         // 'rsmcHex : ' + response.rsmcHex,
         // 'toOtherHex : ' + response.toOtherHex,
+        
+        // ALICE LOOK INFO
+        'channelId : ' + response.channelId,
+        'amount : ' + response.amount,
+        'commitmentHash : ' + response.commitmentHash,
+        'currTempAddressPubKey : ' + response.currTempAddressPubKey,
+        'lastTempAddressPrivateKey : ' + response.lastTempAddressPrivateKey,
+        'rsmcHex : ' + response.rsmcHex,
+        'toOtherHex : ' + response.toOtherHex,
     ];
 
     for (let i = 0; i < arrData.length; i++) {
@@ -2718,8 +2758,6 @@ function updateRsmcData(response, data, msgType) {
     data.date = new Date().toLocaleString();
 
     // data.amount_to_htlc = response.amount_to_htlc;
-
-    // data.amount_to_htlc = response.amount_to_htlc;
     // data.amount_to_other = response.amount_to_other;
     // data.amount_to_rsmc = response.amount_to_rsmc;
     // data.rsmc_multi_address = response.rsmc_multi_address;
@@ -2844,7 +2882,7 @@ function saveChannelCreation(response, channelID, msgType, info) {
                         break;
                     case enumMsgType.MsgType_CommitmentTxSigned_RevokeAndAcknowledgeCommitmentTransaction_N352:
                         for (let i2 = 0; i2 < list.result[i].transfer.length; i2++) {
-                            if ($("#request_commitment_hash").val() === list.result[i].transfer[i2].request_commitment_hash) {
+                            if ($("#request_commitment_hash").val() === list.result[i].transfer[i2].msgHash) {
                                 updateRsmcData(response, list.result[i].transfer[i2], msgType);
                             }
                         }
@@ -3095,15 +3133,20 @@ function displayMnemonic() {
     var mnemonic = JSON.parse(localStorage.getItem(saveMnemonic));
     // console.info('localStorage KEY  = ' + addr);
 
+    var newDiv = document.createElement('div');
+    newDiv.setAttribute('class', 'panelItem');
+
     // If has data
     if (mnemonic) {
         for (let i = 0; i < mnemonic.result.length; i++) {
-            createElement(parent, 'h4', 'NO. ' + (i + 1));
-            createElement(parent, 'text', mnemonic.result[i].mnemonic);
+            createElement(newDiv, 'h4', 'NO. ' + (i + 1));
+            createElement(newDiv, 'text', mnemonic.result[i].mnemonic);
         }
     } else { // NO LOCAL STORAGE DATA YET.
-        createElement(parent, 'h3', 'NO DATA YET. YOU CAN CREATE ONE WITH [signUp].');
+        createElement(newDiv, 'h3', 'NO DATA YET. YOU CAN CREATE ONE WITH [signUp].');
     }
+
+    parent.append(newDiv);
 }
 
 //
@@ -3111,12 +3154,16 @@ function displayAddresses(param) {
     // get [name_req_div] div
     var parent = $("#name_req_div");
 
+    var newDiv = document.createElement('div');
+    newDiv.setAttribute('class', 'panelItem');
+
     // console.info('LOGINED userID = '+userID);
 
     if (param === inNewHtml) {
         var status = JSON.parse(localStorage.getItem(saveGoWhere));
         if (!status.isLogined) { // Not login.
-            createElement(parent, 'text', 'NO USER LOGINED.');
+            createElement(newDiv, 'text', 'NO USER LOGINED.');
+            parent.append(newDiv);
             return;
         } else {
             userID = status.userID;
@@ -3124,7 +3171,8 @@ function displayAddresses(param) {
 
     } else {
         if (!isLogined) { // Not login.
-            createElement(parent, 'text', 'NO USER LOGINED.');
+            createElement(newDiv, 'text', 'NO USER LOGINED.');
+            parent.append(newDiv);
             return;
         }
     }
@@ -3136,14 +3184,14 @@ function displayAddresses(param) {
     if (addr) {
         for (let i = 0; i < addr.result.length; i++) {
             if (userID === addr.result[i].userID) {
-                createElement(parent, 'text', addr.result[i].userID);
-                createElement(parent, 'h2', 'Address List');
+                createElement(newDiv, 'text', addr.result[i].userID);
+                createElement(newDiv, 'h2', 'Address List');
 
                 for (let i2 = 0; i2 < addr.result[i].data.length; i2++) {
-                    createElement(parent, 'h4', 'NO. ' + (i2 + 1));
+                    createElement(newDiv, 'h4', 'NO. ' + (i2 + 1));
 
                     var strAddr = addr.result[i].data[i2].address;
-                    createBalanceElement(parent, strAddr);
+                    createBalanceElement(newDiv, strAddr);
 
                     arrData = [
                         'ADDRESS : ' + addr.result[i].data[i2].address,
@@ -3153,20 +3201,23 @@ function displayAddresses(param) {
                     ];
 
                     for (let i3 = 0; i3 < arrData.length; i3++) {
-                        createElement(parent, 'text', arrData[i3]);
-                        createElement(parent, 'br');
+                        createElement(newDiv, 'text', arrData[i3]);
+                        createElement(newDiv, 'br');
                     }
                 }
 
+                parent.append(newDiv);
                 return;
             }
         }
 
         // The user has not create address yet.
-        displayNoData(parent);
+        displayNoData(newDiv);
+        parent.append(newDiv);
 
     } else { // NO LOCAL STORAGE DATA YET.
-        displayNoData(parent);
+        displayNoData(newDiv);
+        parent.append(newDiv);
     }
 }
 
@@ -3195,23 +3246,31 @@ function displayFriends() {
 
     var list = JSON.parse(localStorage.getItem(saveFriends));
 
+    var newDiv = document.createElement('div');
+    newDiv.setAttribute('class', 'panelItem');
+
     // If has data
     if (list) {
         for (let i = 0; i < list.result.length; i++) {
             // Display list NO.
-            createElement(parent, 'h4', 'NO. ' + (i + 1));
-            createElement(parent, 'p', 'P2P_Peer_ID: ' + list.result[i].p2pID);
-            createElement(parent, 'p', 'Peer_ID: ' + list.result[i].name);
+            createElement(newDiv, 'h4', 'NO. ' + (i + 1));
+            createElement(newDiv, 'p', 'P2P_Peer_ID: ' + list.result[i].p2pID);
+            createElement(newDiv, 'p', 'Peer_ID: ' + list.result[i].name);
         }
     } else { // NO LOCAL STORAGE DATA YET.
-        createElement(parent, 'h3', 'NO DATA YET.');
+        createElement(newDiv, 'h3', 'NO DATA YET.');
     }
+
+    parent.append(newDiv);
 }
 
 // List of channel creation process records.
 function displayChannelCreation(param) {
     // get [name_req_div] div
     var parent = $("#name_req_div");
+
+    var newDiv = document.createElement('div');
+    newDiv.setAttribute('class', 'panelItem');
 
     /*
     if (param === inNewHtml) {
@@ -3237,29 +3296,31 @@ function displayChannelCreation(param) {
         for (let i = 0; i < list.result.length; i++) {
             // createElement(parent, 'h4', 'NO. ' + (i + 1) + 
             //     ' - Temp Channel ID is: ' + list.result[i].temporary_channel_id);
-            createElement(parent, 'h4', 'NO. ' + (i + 1));
+            createElement(newDiv, 'h4', 'NO. ' + (i + 1));
 
             // Display channel id in creation process.
-            channelID(parent, list, i);
+            channelID(newDiv, list, i);
 
             // Display channel info.
-            partChannelInfo(parent, list, i)
+            partChannelInfo(newDiv, list, i)
 
             // Display depositing btc record.
-            btcRecord(parent, list, i);
+            btcRecord(newDiv, list, i);
 
             // Display depositing omni asset record.
-            omniAssetRecord(parent, list, i);
+            omniAssetRecord(newDiv, list, i);
 
             // Display RSMC - transfer in channel.
-            rsmcRecord(parent, list, i);
+            rsmcRecord(newDiv, list, i);
 
             // Display HTLC - transfer in channel.
-            htlcRecord(parent, list, i);
+            htlcRecord(newDiv, list, i);
         }
     } else { // NO LOCAL STORAGE DATA YET.
-        createElement(parent, 'h3', 'NO DATA YET.');
+        createElement(newDiv, 'h3', 'NO DATA YET.');
     }
+
+    parent.append(newDiv);
 }
 
 // Display channel id in creation process.

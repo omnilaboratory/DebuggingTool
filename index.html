@@ -23,38 +23,18 @@
 <body>
     <!-- <div id="container" style="width:device-width"> -->
     <div id="container">
-
         <!-- Header -->
-        <!-- <div id="header" style="background-color:#FFA500;
-            height:170px;"> -->
-
         <div class="content" id="header">
-
-            <!-- <div style="width:360px;float:left;"><h1>OBD Debugging Tool</h1></div>
-            <br>
-            <div>
-                <text style="color:yellow;">Status: </text>
-                <text id="status">Not Connected</text>
-                <text style="color:yellow;">Logined: </text>
-                <text id="logined">No One</text>
-            </div> -->
-
-            <!-- TEST CSS -->
             <div class="top">
                 <div class="topLeft">OBD Debug Tool</div>
                 <div class="topRight">
                     <div class="topData">
                         <div class="topDataKey">Status:</div>
-                        <div class="topDataVal" id="status">&nbsp;Not Connected</div>
+                        <div class="topDataVal" id="status">Not Connected</div>
                         <div class="topDataKey">Logined:</div>
-                        <div class="topDataVal" id="logined">&nbsp;No One</div>
+                        <div class="topDataVal" id="logined">No One</div>
                     </div>
                     
-                    <!-- <div class="topData">
-                        <div class="topDataKey">Logined:</div>
-                        <div class="topDataVal" id="logined">&nbsp;No One</div>
-                    </div> -->
-
                     <!-- <div class="topData">
                         <div class="topDataKey">Balance:</div>
                         <div class="topDataVal">&nbsp;0.00&nbsp;USDT&nbsp;/&nbsp;0.00&nbsp;BTC&nbsp;/0.00&nbsp;LX</div>
@@ -62,53 +42,40 @@
                 </div>
             </div>
 
-            <br>
-            <div>
-                <div><text>OBD Messages</text></div>
-                <div><textarea id="obd_messages" cols="60" rows="6" 
+            <div class="textareaBG">
+                <!-- <div><text>OBD Messages</text></div> -->
+                <div class="textarea"><textarea id="obd_messages" cols="80" rows="7" 
                     readonly="yes" resize="none"></textarea></div>
             </div>
         </div>
 
-
-
         <!-- Left Side Menu -->
-        <div id="menu" style="background-color:#FFD700;
-            width:220px;float:left;">
+        <div class="main">
+            <div class="leftSide" id="menu">
+                <div class="menuTitle">Start</div>
+                <div class="menuItem">
+                    <!-- <a href="javascript:void(0);" onclick="connectNode()">Connect to OBD node</a> -->
+                    <text onclick="connectNode()">Connect to OBD node</text>
+                </div>
 
-            <p style="font-family: Arial, Helvetica, sans-serif;
-                color: gray;">Start</p>
+                <!-- USER DATA LIST - Dynamic create -->
+                <div class="menuTitle">User Data</div>
+                <div id="user_data_list"></div>
 
-            <!-- First, you need to connect to a OBD node. -->
-            <a href="javascript:void(0);" onclick="connectNode()">Connect to OBD node</a>
+                <!-- APIs for Debugging - Dynamic create -->
+                <div class="menuTitle">APIs for Debugging</div>
+                <div id="api_list"></div>
 
-            <br><br>
+                <!-- APIs for Util - Dynamic create -->
+                <div class="menuTitle">Util</div>
+                <div id="util_list"></div>
+            </div>
 
-            <!-- USER DATA LIST - Dynamic create -->
-            <p style="font-family: Arial, Helvetica, sans-serif;
-                color: gray;">User Data</p>
-
-            <div id="user_data_list"></div>
-
-            <br>
-            <!-- APIs for Debugging - Dynamic create -->
-            <p style="font-family: Arial, Helvetica, sans-serif;
-                color:gray;">APIs for Debugging</p>
-
-            <div id="api_list"></div>
-
-            <br>
-            <!-- APIs for Util - Dynamic create -->
-            <p style="font-family: Arial, Helvetica, sans-serif;
-                color: gray;">Util</p>
-
-            <div id="util_list"></div>
-        </div>
-
-        <!-- API invoked area, click left side menu to display. -->
-        <div id="content" style="width:450px;float:left;">
-
-            <!-- Dynamic create in 'common.js' -->
+            <!-- API invoked area, click left side menu to display. -->
+            <div id="content" style="width:600px;float:left;">
+            <!-- <div class="contain" id="content"> -->
+                <!-- Dynamic create in 'common.js' -->
+            </div>
         </div>
 
         <!-- Footer for display copyright info, etc. -->

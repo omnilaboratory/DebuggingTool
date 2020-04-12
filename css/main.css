@@ -3,7 +3,7 @@ body{
     margin: 0;
     background: #FFF;
     width: 100vw;
-    height: 100vh;
+    height: 200vh;
     min-width: 1180px;
 }
 .top{
@@ -11,6 +11,23 @@ body{
     background: #1E222A;
     width: 100%;
     display: flex;
+}
+.textareaBG{
+    height: 110px;
+    background: #1E222A;
+    width: 100%;
+    display: flex;
+}
+.textarea{
+    flex: 1;
+    height: 90px;
+    padding-left: 280px;
+    padding-right: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    color: #FFF;
+    font-size: 16px;
 }
 .topLeft{
     color: #FFF;
@@ -37,67 +54,81 @@ body{
     display: flex;
 }
 .topDataKey{
-    
+    padding-left: 30px;
 }
 .topDataVal{
+    padding-left: 10px;
     font-weight: 600;
 }
 .main{
-    height: calc(100vh - 120px);
+    height: calc(150vh - 120px);
     background: #f5f6f8; 
     padding: 30px 30px 30px 20px;
     display: flex;
 }
 .leftSide{
-    height: calc(100vh - 120px);
+    height: calc(150vh - 120px);
     background: #f5f6f8;
     width: 180px;
-    padding-right: 30px;
+    /* padding-right: 30px; */
+    padding: 1px 30px 30px 30px;
+    /* display: flex; */
     overflow-y: auto;
 }
-.menuListItem{
-    margin: 30px 0;
+/* .menuListItem{ */
+    /* margin: 50px 0; */
+    /* padding-top: 10px; */
+/* } */
+
+a {
+    text-decoration: none;
 }
+
 .menuTitle{
-    height: 50px;
-    line-height: 50px;
+    height: 30px;
+    line-height: 30px;
     color: #9195a5;
     cursor: default;
+    padding-top: 30px;
+    padding-bottom: 10px;
 }
-.menu{}
+/* .menu{} */
 .menuItem{
-    color: #9195a5;
+    color: #26272e;
     cursor: pointer;
-    height: 50px;
-    line-height: 50px;
-    font-size: 14px;
-    font-weight: 600;
+    height: 25px;
+    line-height: 25px;
+    font-size: 16px;
+    font-weight: 500;
+    text-decoration: none;
 }
 .menuItem.active{
     color: #1e222a;
 }
 .contain{
     flex: 1;
-    height: calc(100vh - 120px);
+    /* height: calc(100vh - 120px); */
+    width: 300px;
     overflow-y: auto;
 }
-.panel>.panelItem{
+.panelItem{
+/* .panel>.panelItem{ */
     background: #fff;
     -webkit-box-shadow: 0 2px 20px 0 rgba(0, 0, 0, 0.05);
     box-shadow: 0 2px 20px 0 rgba(0, 0, 0, 0.05);
     border-radius: 6px;
-    padding: 30px 30px;
-    margin-bottom: 30px;
+    padding: 20px 30px;
+    margin-bottom: 20px;
     color: #9195a5;
 }
-.panel>.panelItem:last-child{
+/* .panel>.panelItem:last-child{
     margin-bottom: 0px;
-}
+} */
 .panelTitle{
-    font-size: 30px;
+    font-size: 18px;
     color: #45474e;
-    font-weight: 800;
-    margin-bottom: 30px;
+    font-weight: 700;
+    /* margin-bottom: 20px; */
 }
 .hide{
     display: none;
