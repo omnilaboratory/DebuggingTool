@@ -5,7 +5,6 @@ class ObdApi {
         this.messageType = new MessageType();
         this.defaultAddress = "ws://127.0.0.1:60020/ws";
         this.callbackMap = new Map();
-        this.registerCallbackMap = new Map();
     }
     /**
      * register event
@@ -21,7 +20,7 @@ class ObdApi {
             callback("msgType is null");
             return;
         }
-        this.registerCallbackMap[msgType] = callback;
+        this.callbackMap[msgType] = callback;
     }
     /**
      * connectToServer
@@ -43,7 +42,8 @@ class ObdApi {
         console.info("connect to " + this.defaultAddress);
         try {
             this.ws = new WebSocket(this.defaultAddress);
-            this.ws.onopen = () => {
+            this.ws.onopen = (e) => {
+                console.info(e);
                 console.info("connect success");
                 if (callback != null) {
                     callback("connect success");
@@ -89,8 +89,8 @@ class ObdApi {
         this.ws.send(JSON.stringify(msg));
     }
     getDataFromServer(jsonData) {
+        console.info(jsonData.data);
         if (jsonData.type == 0) {
-            console.info(jsonData.data);
             return;
         }
         let callback = this.callbackMap[jsonData.type];
@@ -124,18 +124,20 @@ class ObdApi {
         let toId = jsonData.to;
         fromId = fromId.split("@")[0];
         toId = toId.split("@")[0];
+        //如果是广播信息，或者是被推送的信息（比如alice推送给Bob的351）
         if (fromId != toId) {
-            let registerCallback = this.registerCallbackMap[jsonData.type];
-            if (registerCallback != null) {
-                registerCallback(resultData);
+            if (callback != null) {
+                callback(resultData);
             }
             return;
         }
+        //是自己的调用api的数据反馈
         if (callback != null) {
             callback(resultData);
         }
         switch (jsonData.type) {
             case this.messageType.MsgType_UserLogin_1:
+                this.userPeerId = toId;
                 this.onLogIn(resultData);
                 break;
             case this.messageType.MsgType_UserLogout_2:

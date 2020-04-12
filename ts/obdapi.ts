@@ -10,10 +10,6 @@ class ObdApi {
 
   private callbackMap: Map<number, Function> = new Map<number, Function>();
 
-  private registerCallbackMap: Map<number, Function> = new Map<
-    number,
-    Function
-  >();
 
   /**
    * register event
@@ -29,7 +25,7 @@ class ObdApi {
       callback("msgType is null");
       return;
     }
-    this.registerCallbackMap[msgType] = callback;
+    this.callbackMap[msgType] = callback;
   }
 
   /**
@@ -59,7 +55,9 @@ class ObdApi {
     console.info("connect to " + this.defaultAddress);
     try {
       this.ws = new WebSocket(this.defaultAddress);
-      this.ws.onopen = () => {
+      this.ws.onopen = (e) => {
+        console.info(e);
+
         console.info("connect success");
         if (callback != null) {
           callback("connect success");
@@ -112,8 +110,8 @@ class ObdApi {
   }
 
   private getDataFromServer(jsonData: any) {
+    console.info(jsonData.data);
     if (jsonData.type == 0) {
-      console.info(jsonData.data);
       return;
     }
 
@@ -156,20 +154,22 @@ class ObdApi {
     fromId = fromId.split("@")[0];
     toId = toId.split("@")[0];
 
+    //如果是广播信息，或者是被推送的信息（比如alice推送给Bob的351）
     if (fromId != toId) {
-      let registerCallback = this.registerCallbackMap[jsonData.type];
-      if (registerCallback != null) {
-        registerCallback(resultData);
+      if (callback != null) {
+        callback(resultData);
       }
       return;
     }
-
+    
+    //是自己的调用api的数据反馈
     if (callback != null) {
       callback(resultData);
     }
 
     switch (jsonData.type) {
       case this.messageType.MsgType_UserLogin_1:
+        this.userPeerId = toId
         this.onLogIn(resultData);
         break;
       case this.messageType.MsgType_UserLogout_2:
@@ -280,6 +280,8 @@ class ObdApi {
     msg.data["mnemonic"] = mnemonic;
     this.sendData(msg, callback);
   }
+
+  private userPeerId:string
   public onLogIn(resultData: any) {
     if (this.isLogin == false) {
       this.isLogin = true;
