@@ -119,16 +119,16 @@ class ObdApi {
         if (this.globalCallback) {
             this.globalCallback(jsonData);
         }
-        let registerCallback = this.registerCallbackMap[jsonData.type];
-        if (registerCallback != null) {
-            registerCallback(resultData);
-        }
         console.info(new Date(), "----------------------------get msg from server--------------------");
         let fromId = jsonData.from;
         let toId = jsonData.to;
         fromId = fromId.split("@")[0];
         toId = toId.split("@")[0];
         if (fromId != toId) {
+            let registerCallback = this.registerCallbackMap[jsonData.type];
+            if (registerCallback != null) {
+                registerCallback(resultData);
+            }
             return;
         }
         if (callback != null) {
