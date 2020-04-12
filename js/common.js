@@ -104,6 +104,14 @@ function getAddressInfo() {
     return result;
 }
 
+// 
+function listeningN351(e, msgType) {
+    console.info('listeningN351 = ' + JSON.stringify(e));
+
+    saveChannelCreation(e, e.channelId, msgType);
+    // createOBDResponseDiv(e, msgType);
+}
+
 // logIn API at local.
 function logIn(msgType) {
 
@@ -116,6 +124,13 @@ function logIn(msgType) {
     }
 
     obdApi.logIn(mnemonic, function(e) {
+
+        // Register event needed for listening.
+        var msgType = enumMsgType.MsgType_CommitmentTx_CommitmentTransactionCreated_N351;
+        obdApi.registerEvent(msgType, function(response) {
+            listeningN351(response, msgType);
+        });
+
         console.info('logIn - OBD Response = ' + JSON.stringify(e));
         // If already logined, then stop listening to OBD Response,
         // DO NOT update the userID.
@@ -133,6 +148,7 @@ function logIn(msgType) {
 
         // save friends list
         saveFriendsList(userID, e.p2pNodePeerId);
+
     });
 }
 
@@ -902,7 +918,7 @@ function RSMCCTxCreated(msgType) {
     // OBD API
     obdApi.commitmentTransactionCreated(p2pID, name, info, function(e) {
         console.info('RSMCCTxCreated - OBD Response = ' + JSON.stringify(e));
-        saveChannelCreation(e, channel_id, msgType);
+        // saveChannelCreation(e, channel_id, msgType);
         createOBDResponseDiv(e, msgType);
     });
 }
@@ -2322,14 +2338,21 @@ function parseDataN352(response) {
 // parseDataN351 - 
 function parseDataN351(response) {
     var arrData = [
-        'channel_id : ' + response.channel_id,
+        // TO BOB INFO
+        'channelId : ' + response.channelId,
         'amount : ' + response.amount,
-        'property_id : ' + response.property_id,
-        'channel_address_private_key : ' + response.channel_address_private_key,
-        'curr_temp_address_pub_key : ' + response.curr_temp_address_pub_key,
-        'curr_temp_address_private_key : ' + response.curr_temp_address_private_key,
-        'last_temp_address_private_key : ' + response.last_temp_address_private_key,
-        'request_commitment_hash : ' + response.request_commitment_hash,
+        'msgHash : ' + response.msgHash,
+        'rsmcHex : ' + response.rsmcHex,
+        'toOtherHex : ' + response.toOtherHex,
+        
+        // ALICE LOOK INFO
+        // 'channelId : ' + response.channelId,
+        // 'amount : ' + response.amount,
+        // 'commitmentHash : ' + response.commitmentHash,
+        // 'currTempAddressPubKey : ' + response.currTempAddressPubKey,
+        // 'lastTempAddressPrivateKey : ' + response.lastTempAddressPrivateKey,
+        // 'rsmcHex : ' + response.rsmcHex,
+        // 'toOtherHex : ' + response.toOtherHex,
     ];
 
     for (let i = 0; i < arrData.length; i++) {
@@ -2666,21 +2689,24 @@ function updateHtlcData(response, data, msgType) {
 // transfer (RSMC) record.
 function rsmcData(response, msgType) {
     var data = {
-        channel_id: response.channel_id,
+        // to bob
+        channelId: response.channelId,
         amount: response.amount,
-        property_id: response.property_id,
-        request_commitment_hash: response.request_commitment_hash,
+        msgHash: response.msgHash,
+        rsmcHex: response.rsmcHex,
+        toOtherHex: response.toOtherHex,
+
+        // to alice
+        // channelId: response.channelId,
+        // amount: response.amount,
+        // commitmentHash: response.commitmentHash,
+        // currTempAddressPubKey: response.currTempAddressPubKey,
+        // lastTempAddressPrivateKey: response.lastTempAddressPrivateKey,
+        // rsmcHex: response.rsmcHex,
+        // toOtherHex: response.toOtherHex,
+
         date: new Date().toLocaleString(),
         msgType: msgType,
-
-        amount_to_htlc: '',
-        amount_to_other: '',
-        amount_to_rsmc: '',
-        rsmc_multi_address: '',
-        rsmc_txid: '',
-        send_at: '',
-        sign_at: '',
-        to_other_txid: '',
     }
 
     return data;
@@ -2690,14 +2716,17 @@ function rsmcData(response, msgType) {
 function updateRsmcData(response, data, msgType) {
     data.msgType = msgType;
     data.date = new Date().toLocaleString();
-    data.amount_to_htlc = response.amount_to_htlc;
-    data.amount_to_other = response.amount_to_other;
-    data.amount_to_rsmc = response.amount_to_rsmc;
-    data.rsmc_multi_address = response.rsmc_multi_address;
-    data.rsmc_txid = response.rsmc_txid;
-    data.send_at = response.send_at;
-    data.sign_at = response.sign_at;
-    data.to_other_txid = response.to_other_txid;
+
+    // data.amount_to_htlc = response.amount_to_htlc;
+
+    // data.amount_to_htlc = response.amount_to_htlc;
+    // data.amount_to_other = response.amount_to_other;
+    // data.amount_to_rsmc = response.amount_to_rsmc;
+    // data.rsmc_multi_address = response.rsmc_multi_address;
+    // data.rsmc_txid = response.rsmc_txid;
+    // data.send_at = response.send_at;
+    // data.sign_at = response.sign_at;
+    // data.to_other_txid = response.to_other_txid;
 }
 
 // Depositing omni assets record.
@@ -3423,20 +3452,13 @@ function rsmcRecord(parent, list, i) {
             createElement(parent, 'br');
 
             arrData = [
-                'channel_id : ' + list.result[i].transfer[i2].channel_id,
+                'channelId : ' + list.result[i].transfer[i2].channelId,
                 'amount : ' + list.result[i].transfer[i2].amount,
-                'property_id : ' + list.result[i].transfer[i2].property_id,
-                'request_commitment_hash : ' + list.result[i].transfer[i2].request_commitment_hash,
-
-                '----------------------',
-                'amount_to_htlc : ' + list.result[i].transfer[i2].amount_to_htlc,
-                'amount_to_other : ' + list.result[i].transfer[i2].amount_to_other,
-                'amount_to_rsmc : ' + list.result[i].transfer[i2].amount_to_rsmc,
-                'rsmc_multi_address : ' + list.result[i].transfer[i2].rsmc_multi_address,
-                'rsmc_txid : ' + list.result[i].transfer[i2].rsmc_txid,
-                'send_at : ' + list.result[i].transfer[i2].send_at,
-                'sign_at : ' + list.result[i].transfer[i2].sign_at,
-                'to_other_txid : ' + list.result[i].transfer[i2].to_other_txid,
+                'msgHash : ' + list.result[i].transfer[i2].msgHash,
+                // 'currTempAddressPubKey : ' + list.result[i].transfer[i2].currTempAddressPubKey,
+                // 'lastTempAddressPrivateKey : ' + list.result[i].transfer[i2].lastTempAddressPrivateKey,
+                'rsmcHex : ' + list.result[i].transfer[i2].rsmcHex,
+                'toOtherHex : ' + list.result[i].transfer[i2].toOtherHex,
             ];
 
             for (let i3 = 0; i3 < arrData.length; i3++) {

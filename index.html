@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>OBD Debugging Tool</title>
+    <link rel="stylesheet" href="css/main.css">
     <script src="https://lib.sinaapp.com/js/jquery/2.0.2/jquery-2.0.2.min.js"></script>
     <script src="js/btctool.js"></script>
     <script src="js/pojo.js"></script>
@@ -20,22 +21,46 @@
 </script>
 
 <body>
-    <div id="container" style="width:device-width">
+    <!-- <div id="container" style="width:device-width"> -->
+    <div id="container">
 
         <!-- Header -->
-        <div id="header" style="background-color:#FFA500;
-            height:170px;">
+        <!-- <div id="header" style="background-color:#FFA500;
+            height:170px;"> -->
 
-            <div style="width:360px;float:left;"><h1>OBD Debugging Tool</h1></div>
+        <div class="content" id="header">
+
+            <!-- <div style="width:360px;float:left;"><h1>OBD Debugging Tool</h1></div>
             <br>
-            <!-- <div> -->
-                <div>
-                    <text style="color:yellow;">Status: </text>
-                    <text id="status">Not Connected</text>
-                    <text style="color:yellow;">Logined: </text>
-                    <text id="logined">No One</text>
+            <div>
+                <text style="color:yellow;">Status: </text>
+                <text id="status">Not Connected</text>
+                <text style="color:yellow;">Logined: </text>
+                <text id="logined">No One</text>
+            </div> -->
+
+            <!-- TEST CSS -->
+            <div class="top">
+                <div class="topLeft">OBD Debug Tool</div>
+                <div class="topRight">
+                    <div class="topData">
+                        <div class="topDataKey">Status:</div>
+                        <div class="topDataVal" id="status">&nbsp;Not Connected</div>
+                        <div class="topDataKey">Logined:</div>
+                        <div class="topDataVal" id="logined">&nbsp;No One</div>
+                    </div>
+                    
+                    <!-- <div class="topData">
+                        <div class="topDataKey">Logined:</div>
+                        <div class="topDataVal" id="logined">&nbsp;No One</div>
+                    </div> -->
+
+                    <!-- <div class="topData">
+                        <div class="topDataKey">Balance:</div>
+                        <div class="topDataVal">&nbsp;0.00&nbsp;USDT&nbsp;/&nbsp;0.00&nbsp;BTC&nbsp;/0.00&nbsp;LX</div>
+                    </div> -->
                 </div>
-            <!-- </div> -->
+            </div>
 
             <br>
             <div>
@@ -44,6 +69,8 @@
                     readonly="yes" resize="none"></textarea></div>
             </div>
         </div>
+
+
 
         <!-- Left Side Menu -->
         <div id="menu" style="background-color:#FFD700;

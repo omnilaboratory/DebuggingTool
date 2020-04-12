@@ -1,0 +1,264 @@
+body{
+    padding: 0;
+    margin: 0;
+    background: #FFF;
+    width: 100vw;
+    height: 100vh;
+    min-width: 1180px;
+}
+.top{
+    height: 60px;
+    background: #1E222A;
+    width: 100%;
+    display: flex;
+}
+.topLeft{
+    color: #FFF;
+    height: 60px;
+    line-height: 60px;
+    font-size: 22px;
+    font-weight: 600;
+    width: 180px;
+    padding-left: 20px;
+    padding-right: 30px;
+}
+.topRight{
+    flex: 1;
+    height: 60px;
+    padding-left: 20px;
+    padding-right: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    color: #FFF;
+    font-size: 16px;
+}
+.topData{
+    display: flex;
+}
+.topDataKey{
+    
+}
+.topDataVal{
+    font-weight: 600;
+}
+.main{
+    height: calc(100vh - 120px);
+    background: #f5f6f8; 
+    padding: 30px 30px 30px 20px;
+    display: flex;
+}
+.leftSide{
+    height: calc(100vh - 120px);
+    background: #f5f6f8;
+    width: 180px;
+    padding-right: 30px;
+    overflow-y: auto;
+}
+.menuListItem{
+    margin: 30px 0;
+}
+.menuTitle{
+    height: 50px;
+    line-height: 50px;
+    color: #9195a5;
+    cursor: default;
+}
+.menu{}
+.menuItem{
+    color: #9195a5;
+    cursor: pointer;
+    height: 50px;
+    line-height: 50px;
+    font-size: 14px;
+    font-weight: 600;
+}
+.menuItem.active{
+    color: #1e222a;
+}
+.contain{
+    flex: 1;
+    height: calc(100vh - 120px);
+    overflow-y: auto;
+}
+.panel>.panelItem{
+    background: #fff;
+    -webkit-box-shadow: 0 2px 20px 0 rgba(0, 0, 0, 0.05);
+    box-shadow: 0 2px 20px 0 rgba(0, 0, 0, 0.05);
+    border-radius: 6px;
+    padding: 30px 30px;
+    margin-bottom: 30px;
+    color: #9195a5;
+}
+.panel>.panelItem:last-child{
+    margin-bottom: 0px;
+}
+.panelTitle{
+    font-size: 30px;
+    color: #45474e;
+    font-weight: 800;
+    margin-bottom: 30px;
+}
+.hide{
+    display: none;
+}
+.show{
+    display: block;
+}
+.messageAndConnectedPanelContent{
+    display: flex;
+}
+.message{
+flex: 1;
+margin-right: 10px;
+}
+.message>.toolBar{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 30px;
+}
+.message>.toolBar>.title{
+    font-size: 16px;
+}
+.message>.toolBar>.action{
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    font-size: 14px;
+}
+.messageContent{
+    border: 1px solid #9195a5;
+    padding: 12px 20px;
+    height: 90px;
+}
+.messageContent>.messageItem{
+    font-size: 14px;
+    line-height: 30px;
+}
+.connected{
+    flex: 1;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-left: 10px;
+    color: #9195a5;
+}
+.connected>.description{
+    font-size: 14px;
+    width: 120px;
+    text-align: center;
+}
+.connectedPeople{
+    width: 40px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-items: center;
+    align-content: center;
+    cursor: pointer;
+    
+}
+.connectedPeople>.headImage{
+    width: 30px;
+    height: 30px;
+    border-radius: 15px;
+    background-color: #000;
+}
+.connectedPeople>.userName{
+    margin-top: 10px;
+}
+.requestPanelContent{
+    position: relative;
+}
+.requestSendContent{
+    position: absolute;
+    right: 0;
+    top: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    height: 60px;
+}
+.requestSendContent>.sendBtn{
+    width: 70px;
+    height: 30px;
+    line-height: 30px;
+    text-align: center;
+    font-weight: 800;
+    font-size: 16px;
+    color: #1e222a;
+    border: 1px solid #1e222a;
+    cursor: pointer;
+    border-radius: 4px;
+    margin-bottom: 10px;
+}
+.requestSendContent>.btnDesc{
+    font-size: 12px;
+}
+.requestContent>.info{
+    display: flex;
+}
+.requestContent>.info>.key{
+    width: 80px;
+    font-size: 14px;
+    height: 30px;
+    line-height: 30px;
+}
+.requestContent>.info>.value{
+    font-weight: 800;
+    font-size: 16px;
+    color: #1e222a;
+    height: 30px;
+    line-height: 30px;
+}
+.requestContent>.info>.status{
+    width: 120px;
+    font-size: 14px;
+    height: 30px;
+    line-height: 30px;
+    text-align: right;
+}
+.requestContent>.paramsContent>.title{
+    font-weight: 800;
+    font-size: 16px;
+    height: 30px;
+    line-height: 30px;
+}
+.requestContent>.paramsContent>.paramsList>.paramsItem{
+    display: flex;
+    align-items: center;
+}
+.requestContent>.paramsContent>.paramsList>.paramsItem>.key{
+    width: 80px;
+    text-align: right;
+    margin-right: 6px;
+}
+.responseContent>.info>.item{
+    display: flex;
+    height: 40px;
+}
+.responseContent>.info>.from{
+    position: relative;
+}
+.responseContent>.info>.from>.fromDesc{
+    position: absolute;
+    top: -10px;
+    left: 560px;
+    font-size: 14px;
+}
+.responseContent>.info>.item>.key{
+    width: 80px;
+    font-size: 14px;
+    line-height: 40px;
+    height: 40px;
+}
+.responseContent>.info>.item>.value{
+    font-weight: 800;
+    font-size: 16px;
+    height: 40px;
+    line-height: 40px;
+    color: #1e222a;
+}
+
+
