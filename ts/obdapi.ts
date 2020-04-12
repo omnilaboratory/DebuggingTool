@@ -10,6 +10,8 @@ class ObdApi {
 
   private callbackMap: Map<number, Function> = new Map<number, Function>();
 
+  private registerCallbackMap: Map<number, Function> = new Map<number, Function>();
+
   /**
    * register event
    * @param msgType
@@ -24,7 +26,7 @@ class ObdApi {
       callback("msgType is null");
       return;
     }
-    this.callbackMap[msgType] = callback;
+    this.registerCallbackMap[msgType] = callback;
   }
 
   /**
@@ -139,6 +141,12 @@ class ObdApi {
     if (this.globalCallback) {
       this.globalCallback(jsonData);
     }
+
+    let  registerCallback = this.registerCallbackMap[jsonData.type]
+    if(registerCallback){
+      registerCallback(resultData)
+    }
+    
 
     console.info(
       new Date(),

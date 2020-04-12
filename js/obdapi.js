@@ -5,6 +5,7 @@ class ObdApi {
         this.messageType = new MessageType();
         this.defaultAddress = "ws://127.0.0.1:60020/ws";
         this.callbackMap = new Map();
+        this.registerCallbackMap = new Map();
     }
     /**
      * register event
@@ -20,7 +21,7 @@ class ObdApi {
             callback("msgType is null");
             return;
         }
-        this.callbackMap[msgType] = callback;
+        this.registerCallbackMap[msgType] = callback;
     }
     /**
      * connectToServer
@@ -117,6 +118,10 @@ class ObdApi {
         }
         if (this.globalCallback) {
             this.globalCallback(jsonData);
+        }
+        let registerCallback = this.registerCallbackMap[jsonData.type];
+        if (registerCallback) {
+            registerCallback(resultData);
         }
         console.info(new Date(), "----------------------------get msg from server--------------------");
         let fromId = jsonData.from;
