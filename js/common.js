@@ -1246,9 +1246,10 @@ function getUserDataList(goWhere) {
             menuDiv = document.createElement('div');
             menuDiv.setAttribute('class', 'menuItem');
 
-            apiItem = document.createElement('text');
+            apiItem = document.createElement('a');
             apiItem.id = api_id;
-            // apiItem.href = 'javascript:void(0);';
+            apiItem.href = '#';
+            apiItem.setAttribute('class', 'url');
             apiItem.setAttribute('description', description);
             apiItem.setAttribute('onclick', 'displayUserData(this)');
             apiItem.innerText = api_id;
@@ -1313,10 +1314,11 @@ function createLeftSideMenu(jsonFile, divName) {
             menuDiv = document.createElement('div');
             menuDiv.setAttribute('class', 'menuItem');
 
-            apiItem = document.createElement('text');
+            apiItem = document.createElement('a');
             apiItem.id = api_id;
-            // apiItem.href = '#';
+            apiItem.href = '#';
             // apiItem.href = 'javascript:void(0);';
+            apiItem.setAttribute('class', 'url');
             apiItem.setAttribute('type_id', type_id);
             apiItem.setAttribute('description', description);
             apiItem.setAttribute('onclick', 'displayAPIContent(this)');
@@ -1337,7 +1339,7 @@ function displayAPIContent(obj) {
     createRequestDiv(obj);
     createInputParamDiv(obj, 'json/util_list.json');
     createInputParamDiv(obj, 'json/api_list.json');
-    createInvokeAPIButton(obj);
+    // createInvokeAPIButton(obj);
 }
 
 // create 
@@ -1383,6 +1385,14 @@ function createRequestDiv(obj) {
     var value = " type ( " + obj.getAttribute("type_id") + " )";
     createElement(newDiv, 'text', value, cssStyle);
 
+    // create [Send button] element
+    var button = document.createElement('button');
+    button.setAttribute('type_id', obj.getAttribute("type_id"));
+    button.setAttribute('class', 'button');
+    button.setAttribute('onclick', 'invokeAPIs(this)');
+    button.innerText = 'Invoke API';
+    newDiv.append(button);
+
     content_div.append(newDiv);
 }
 
@@ -1410,7 +1420,11 @@ function createInputParamDiv(obj, jsonFile) {
                 var newDiv = document.createElement('div');
                 newDiv.setAttribute('class', 'panelItem');
 
-                createElement(newDiv, 'p', 'Input Parameters:');
+                var title = document.createElement('div');
+                title.setAttribute('class', 'panelTitle');
+                createElement(title, 'h2', 'Input Parameters');
+                newDiv.append(title);
+
                 // Parameters
                 createParamOfAPI(arrParams, newDiv);
 
@@ -1642,6 +1656,7 @@ function createInvokeAPIButton(obj) {
     var button = document.createElement('button');
     // button.id = 'send_button';
     button.setAttribute('type_id', obj.getAttribute("type_id"));
+    button.setAttribute('class', 'button');
     button.setAttribute('onclick', 'invokeAPIs(this)');
     button.innerText = 'Invoke API';
     newDiv.append(button);
@@ -1667,11 +1682,17 @@ function removeNameReqDiv() {
 function createConnectNodeDiv() {
     var content_div = $("#name_req_div");
 
+    var newDiv = document.createElement('div');
+    newDiv.setAttribute('class', 'panelItem');
+
     // create [title] element
-    createElement(content_div, 'h2', 'OBD Node');
+    var title = document.createElement('div');
+    title.setAttribute('class', 'panelTitle');
+    createElement(title, 'h2', 'OBD Node');
+    newDiv.append(title);
 
     // create [input title] element
-    createElement(content_div, 'text', 'Node URL: ', cssStyle);
+    createElement(newDiv, 'text', 'Node URL: ', cssStyle);
 
     // create [input] element
     var node_url = document.createElement('input');
@@ -1679,14 +1700,16 @@ function createConnectNodeDiv() {
     node_url.style = 'width: 50%';
     node_url.placeholder = 'Please input Node URL.';
     node_url.value = 'ws://127.0.0.1:60020/ws';
-    content_div.append(node_url);
+    newDiv.append(node_url);
 
     // create [button] element
     var button = document.createElement('button');
     button.id = 'button_connect';
     button.setAttribute('onclick', 'clickConnectButton()');
     button.innerText = 'Connect';
-    content_div.append(button);
+    newDiv.append(button);
+    
+    content_div.append(newDiv);
 
     // already connected
     if (isConnectToOBD === true) {
@@ -1729,14 +1752,24 @@ function changeConnectButtonStatus() {
 // create OBD Response Div 
 function createOBDResponseDiv(response, msgType) {
 
+    $("#newDiv").remove();
     $("#obd_response_div").remove();
+
+    var newDiv = document.createElement('div');
+    newDiv.id = "newDiv";
+    newDiv.setAttribute('class', 'panelItem');
 
     var obd_response_div = document.createElement('div');
     obd_response_div.id = "obd_response_div";
-    $("#name_req_div").append(obd_response_div);
 
     // create [title] element
-    createElement(obd_response_div, 'h2', 'OBD Response');
+    var title = document.createElement('div');
+    title.setAttribute('class', 'panelTitle');
+    createElement(title, 'h2', 'OBD Response');
+    newDiv.append(title);
+
+    newDiv.append(obd_response_div);
+    $("#name_req_div").append(newDiv);
 
     switch (msgType) {
         case enumMsgType.MsgType_Core_Omni_Getbalance_1200:

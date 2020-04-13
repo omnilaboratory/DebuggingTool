@@ -2,7 +2,7 @@ body{
     padding: 0;
     margin: 0;
     background: #FFF;
-    width: 100vw;
+    /* width: 100vw; */
     height: 200vh;
     min-width: 1180px;
 }
@@ -13,21 +13,47 @@ body{
     display: flex;
 }
 .textareaBG{
+    /* background: #1E222A; */
     height: 110px;
-    background: #1E222A;
-    width: 100%;
+    /* width: 110px; */
+    width: 30%;
+    padding-left: 20px;
+    padding-right: 30px;
     display: flex;
 }
 .textarea{
     flex: 1;
-    height: 90px;
-    padding-left: 280px;
-    padding-right: 30px;
+    /* height: 90px; */
+    padding-left: 60px;
+    /* padding-right: 10px; */
     display: flex;
-    align-items: center;
+    /* align-items: center; */
     justify-content: space-between;
     color: #FFF;
     font-size: 16px;
+}
+.button {
+    background-color: #4CAF50; /* Green */
+    border: none;    
+    color: white;
+    padding: 12px 35px;
+    text-align: center;    
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin-left: 30px;
+}
+.button:hover {
+    cursor: pointer;
+    box-shadow: 0 12px 16px 0 rgba(0,0,0,0.24), 0 17px 50px 0 rgba(0,0,0,0.19);
+}
+.url{
+    color: #26272e;
+    cursor: pointer;
+    height: 25px;
+    line-height: 25px;
+    font-size: 16px;
+    font-weight: 500;
 }
 .topLeft{
     color: #FFF;
@@ -61,15 +87,15 @@ body{
     font-weight: 600;
 }
 .main{
-    height: calc(150vh - 120px);
+    /* height: calc(150vh - 120px); */
     background: #f5f6f8; 
     padding: 30px 30px 30px 20px;
     display: flex;
 }
 .leftSide{
-    height: calc(150vh - 120px);
+    /* height: calc(150vh - 120px); */
     background: #f5f6f8;
-    width: 180px;
+    /* width: 180px; */
     /* padding-right: 30px; */
     padding: 1px 30px 30px 30px;
     /* display: flex; */
@@ -117,7 +143,8 @@ a {
     -webkit-box-shadow: 0 2px 20px 0 rgba(0, 0, 0, 0.05);
     box-shadow: 0 2px 20px 0 rgba(0, 0, 0, 0.05);
     border-radius: 6px;
-    padding: 20px 30px;
+    padding: 5px 30px;
+    padding-bottom: 20px;
     margin-bottom: 20px;
     color: #9195a5;
 }
