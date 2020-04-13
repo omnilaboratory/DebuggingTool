@@ -1385,10 +1385,10 @@ function createRequestDiv(obj) {
     var value = " type ( " + obj.getAttribute("type_id") + " )";
     createElement(newDiv, 'text', value, cssStyle);
 
-    // create [Send button] element
+    // create [Invoke API] element
     var button = document.createElement('button');
     button.setAttribute('type_id', obj.getAttribute("type_id"));
-    button.setAttribute('class', 'button');
+    button.setAttribute('class', 'button button_big');
     button.setAttribute('onclick', 'invokeAPIs(this)');
     button.innerText = 'Invoke API';
     newDiv.append(button);
@@ -1592,11 +1592,15 @@ function createParamOfAPI(arrParams, content_div) {
 
     for (let i = 0; i < arrParams.length; i++) {
         // create [param_title] element
-        createElement(content_div, 'text', arrParams[i].name + ' : ', cssStyle);
+        // var newDiv = document.createElement('div');
+        // newDiv.setAttribute('class', 'param');
+        createElement(content_div, 'text', arrParams[i].name + ' : ', 'param');
+        // content_div.append(newDiv);
 
         // create [input box of param] element
         input_box = document.createElement('input');
         input_box.id = arrParams[i].name;
+        input_box.setAttribute('class', 'input');
         content_div.append(input_box);
 
         createButtonOfParam(arrParams, i, content_div);
@@ -1635,8 +1639,8 @@ function createButtonOfParam(arrParams, index, content_div) {
         // create [button] element
         var button = document.createElement('button');
         button.id = arrParams[index].name + innerText.substring(0, 3);
-        // console.info('button.id = ' + button.id);
         button.innerText = innerText;
+        button.setAttribute('class', 'button button_small');
         button.setAttribute('onclick', invokeFunc);
         content_div.append(button);
     }
@@ -1697,7 +1701,8 @@ function createConnectNodeDiv() {
     // create [input] element
     var node_url = document.createElement('input');
     node_url.id = 'node_url';
-    node_url.style = 'width: 50%';
+    // node_url.style = 'width: 50%';
+    node_url.setAttribute('class', 'input_conn_node');
     node_url.placeholder = 'Please input Node URL.';
     node_url.value = 'ws://127.0.0.1:60020/ws';
     newDiv.append(node_url);
@@ -1705,6 +1710,7 @@ function createConnectNodeDiv() {
     // create [button] element
     var button = document.createElement('button');
     button.id = 'button_connect';
+    button.setAttribute('class', 'button button_small');
     button.setAttribute('onclick', 'clickConnectButton()');
     button.innerText = 'Connect';
     newDiv.append(button);
@@ -1714,7 +1720,8 @@ function createConnectNodeDiv() {
     // already connected
     if (isConnectToOBD === true) {
         changeConnectButtonStatus();
-        createElement(content_div, 'h3', 'Already connected.');
+        createElement(content_div, 'h3', 'Already connected. ' + 
+            'Please refresh the page if you want to connect again.');
     }
 }
 
@@ -1734,7 +1741,8 @@ function clickConnectButton() {
 
         $("#status").text("Connected");
         isConnectToOBD = true; // already connected.
-        createOBDResponseDiv(response);
+
+        createOBDResponseDiv(response, 'connect_node_resp');
         changeConnectButtonStatus();
 
     }, function(globalResponse) {
@@ -1744,9 +1752,10 @@ function clickConnectButton() {
 
 //
 function changeConnectButtonStatus() {
-    var button_connect = $("#button_connect");
-    button_connect.text("Disconnect");
-    button_connect.attr("disabled", "disabled");
+    $("#button_connect").remove();
+    // var button_connect = $("#button_connect");
+    // button_connect.text("Disconnect");
+    // button_connect.attr("disabled", "disabled");
 }
 
 // create OBD Response Div 
@@ -1772,6 +1781,10 @@ function createOBDResponseDiv(response, msgType) {
     $("#name_req_div").append(newDiv);
 
     switch (msgType) {
+        case 'connect_node_resp':
+            var msg = response + '. Please refresh the page if you want to connect again.';
+            createElement(obd_response_div, 'p', msg);
+            break;
         case enumMsgType.MsgType_Core_Omni_Getbalance_1200:
             parseData1200(response);
             break;
@@ -3663,7 +3676,8 @@ function createElement(parent, elementName, myInnerText, cssStyle) {
     }
 
     if (cssStyle) {
-        element.setAttribute('style', cssStyle);
+        // element.setAttribute('style', cssStyle);
+        element.setAttribute('class', cssStyle);
     }
 
     parent.append(element);
