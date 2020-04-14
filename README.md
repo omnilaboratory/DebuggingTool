@@ -33,6 +33,7 @@ Then open the webpage index.html under the DebuggingTool directory.
 2. on the right panel, appears the input box. We depolyed an example OBD node for developers, the address is: ws://62.234.216.108:60030/ws. Just replace the default 127.0.0.1:60020 by 62.234.216.108:60030  
 3. click "connect". wait for several seconds, the status bar on top of the window will show the status "connected".
 
+If you want to build and deploy your own OBD, you shall go through the installation intruction at [obd repository](https://github.com/omnilaboratory/obd#installation).
 
 ## Step 2: signup a new user
 
