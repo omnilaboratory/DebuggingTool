@@ -1243,8 +1243,8 @@ function getUserDataList(goWhere) {
             api_id = result.data[i].id;
             description = result.data[i].description;
 
-            menuDiv = document.createElement('div');
-            menuDiv.setAttribute('class', 'menuItem');
+            // menuDiv = document.createElement('div');
+            // menuDiv.setAttribute('class', 'menuItem');
 
             apiItem = document.createElement('a');
             apiItem.id = api_id;
@@ -1254,8 +1254,8 @@ function getUserDataList(goWhere) {
             apiItem.setAttribute('onclick', 'displayUserData(this)');
             apiItem.innerText = api_id;
 
-            menuDiv.append(apiItem);
-            apiList.append(menuDiv);
+            // menuDiv.append(apiItem);
+            apiList.append(apiItem);
 
             createElement(apiList, 'p');
         }
@@ -1312,7 +1312,7 @@ function createLeftSideMenu(jsonFile, divName) {
             description = result.data[i].description;
 
             menuDiv = document.createElement('div');
-            menuDiv.setAttribute('class', 'menuItem');
+            // menuDiv.setAttribute('class', 'menuItem');
 
             apiItem = document.createElement('a');
             apiItem.id = api_id;
@@ -1600,7 +1600,13 @@ function createParamOfAPI(arrParams, content_div) {
         // create [input box of param] element
         input_box = document.createElement('input');
         input_box.id = arrParams[i].name;
-        input_box.setAttribute('class', 'input');
+
+        if (arrParams[i].name === 'node_url') {
+            input_box.setAttribute('class', 'input_node_url');
+        } else {
+            input_box.setAttribute('class', 'input');
+        }
+
         content_div.append(input_box);
 
         createButtonOfParam(arrParams, i, content_div);
@@ -1704,6 +1710,7 @@ function createConnectNodeDiv() {
     // node_url.style = 'width: 50%';
     node_url.setAttribute('class', 'input_conn_node');
     node_url.placeholder = 'Please input Node URL.';
+    // node_url.value = 'ws://62.234.216.108:60030/ws';
     node_url.value = 'ws://127.0.0.1:60020/ws';
     newDiv.append(node_url);
 
@@ -1901,7 +1908,7 @@ function parseData3(response) {
     ];
 
     for (let i = 0; i < arrData.length; i++) {
-        createElement(obd_response_div, 'p', arrData[i]);
+        createElement(obd_response_div, 'p', arrData[i], 'responseText');
     }
 }
 
@@ -1920,7 +1927,11 @@ function parseData1(response) {
     }
 
     for (let i = 0; i < arrData.length; i++) {
-        createElement(obd_response_div, 'p', arrData[i]);
+        var point   = arrData[i].indexOf(':') + 1;
+        var title   = arrData[i].substring(0, point);
+        var content = arrData[i].substring(point);
+        createElement(obd_response_div, 'text', title);
+        createElement(obd_response_div, 'p', content, 'responseText');
     }
 }
 
@@ -1963,11 +1974,15 @@ function parseData1200(response) {
             'propertyid : ' + response[i].propertyid,
             'reserved : ' + response[i].reserved,
         ];
-
-        createElement(obd_response_div, 'h4', 'NO. ' + (i + 1));
+        
+        createElement(obd_response_div, 'h4', 'NO. ' + (i + 1), 'responseText');
 
         for (let i2 = 0; i2 < arrData.length; i2++) {
-            createElement(obd_response_div, 'p', arrData[i2]);
+            var point   = arrData[i2].indexOf(':') + 1;
+            var title   = arrData[i2].substring(0, point);
+            var content = arrData[i2].substring(point);
+            createElement(obd_response_div, 'text', title);
+            createElement(obd_response_div, 'p', content, 'responseText');
         }
     }
 }
@@ -2012,7 +2027,11 @@ function parseDataN3207(response) {
     ];
 
     for (let i = 0; i < arrData.length; i++) {
-        createElement(obd_response_div, 'p', arrData[i]);
+        var point   = arrData[i].indexOf(':') + 1;
+        var title   = arrData[i].substring(0, point);
+        var content = arrData[i].substring(point);
+        createElement(obd_response_div, 'text', title);
+        createElement(obd_response_div, 'p', content, 'responseText');
     }
 }
 
@@ -2064,7 +2083,11 @@ function parseDataN3202(response) {
         createElement(obd_response_div, 'h4', 'NO. ' + (i + 1));
 
         for (let i2 = 0; i2 < arrData.length; i2++) {
-            createElement(obd_response_div, 'p', arrData[i2]);
+            var point   = arrData[i2].indexOf(':') + 1;
+            var title   = arrData[i2].substring(0, point);
+            var content = arrData[i2].substring(point);
+            createElement(obd_response_div, 'text', title);
+            createElement(obd_response_div, 'p', content, 'responseText');
         }
     }
 }
@@ -2102,7 +2125,11 @@ function parseDataN35109(response) {
         createElement(obd_response_div, 'h4', 'NO. ' + (i + 1));
 
         for (let i2 = 0; i2 < arrData.length; i2++) {
-            createElement(obd_response_div, 'p', arrData[i2]);
+            var point   = arrData[i2].indexOf(':') + 1;
+            var title   = arrData[i2].substring(0, point);
+            var content = arrData[i2].substring(point);
+            createElement(obd_response_div, 'text', title);
+            createElement(obd_response_div, 'p', content, 'responseText');
         }
     }
 }
@@ -2160,7 +2187,11 @@ function parseDataN35101(response) {
         createElement(obd_response_div, 'h4', 'NO. ' + (i + 1));
 
         for (let i2 = 0; i2 < arrData.length; i2++) {
-            createElement(obd_response_div, 'p', arrData[i2]);
+            var point   = arrData[i2].indexOf(':') + 1;
+            var title   = arrData[i2].substring(0, point);
+            var content = arrData[i2].substring(point);
+            createElement(obd_response_div, 'text', title);
+            createElement(obd_response_div, 'p', content, 'responseText');
         }
     }
 }
@@ -2210,7 +2241,11 @@ function parseDataN35104(response) {
     ];
 
     for (let i = 0; i < arrData.length; i++) {
-        createElement(obd_response_div, 'p', arrData[i]);
+        var point   = arrData[i].indexOf(':') + 1;
+        var title   = arrData[i].substring(0, point);
+        var content = arrData[i].substring(point);
+        createElement(obd_response_div, 'text', title);
+        createElement(obd_response_div, 'p', content, 'responseText');
     }
 }
 
@@ -2222,7 +2257,11 @@ function parseDataN39(response) {
     ];
 
     for (let i = 0; i < arrData.length; i++) {
-        createElement(obd_response_div, 'p', arrData[i]);
+        var point   = arrData[i].indexOf(':') + 1;
+        var title   = arrData[i].substring(0, point);
+        var content = arrData[i].substring(point);
+        createElement(obd_response_div, 'text', title);
+        createElement(obd_response_div, 'p', content, 'responseText');
     }
 }
 
@@ -2234,7 +2273,11 @@ function parseDataN38(response) {
     ];
 
     for (let i = 0; i < arrData.length; i++) {
-        createElement(obd_response_div, 'p', arrData[i]);
+        var point   = arrData[i].indexOf(':') + 1;
+        var title   = arrData[i].substring(0, point);
+        var content = arrData[i].substring(point);
+        createElement(obd_response_div, 'text', title);
+        createElement(obd_response_div, 'p', content, 'responseText');
     }
 }
 
@@ -2245,7 +2288,11 @@ function parseDataN49(response) {
     ];
 
     for (let i = 0; i < arrData.length; i++) {
-        createElement(obd_response_div, 'p', arrData[i]);
+        var point   = arrData[i].indexOf(':') + 1;
+        var title   = arrData[i].substring(0, point);
+        var content = arrData[i].substring(point);
+        createElement(obd_response_div, 'text', title);
+        createElement(obd_response_div, 'p', content, 'responseText');
     }
 }
 
@@ -2262,7 +2309,11 @@ function parseDataN48(response) {
     ];
 
     for (let i = 0; i < arrData.length; i++) {
-        createElement(obd_response_div, 'p', arrData[i]);
+        var point   = arrData[i].indexOf(':') + 1;
+        var title   = arrData[i].substring(0, point);
+        var content = arrData[i].substring(point);
+        createElement(obd_response_div, 'text', title);
+        createElement(obd_response_div, 'p', content, 'responseText');
     }
 }
 
@@ -2274,7 +2325,11 @@ function parseDataN47(response) {
     ];
 
     for (let i = 0; i < arrData.length; i++) {
-        createElement(obd_response_div, 'p', arrData[i]);
+        var point   = arrData[i].indexOf(':') + 1;
+        var title   = arrData[i].substring(0, point);
+        var content = arrData[i].substring(point);
+        createElement(obd_response_div, 'text', title);
+        createElement(obd_response_div, 'p', content, 'responseText');
     }
 }
 
@@ -2287,7 +2342,11 @@ function parseDataN46(response) {
     ];
 
     for (let i = 0; i < arrData.length; i++) {
-        createElement(obd_response_div, 'p', arrData[i]);
+        var point   = arrData[i].indexOf(':') + 1;
+        var title   = arrData[i].substring(0, point);
+        var content = arrData[i].substring(point);
+        createElement(obd_response_div, 'text', title);
+        createElement(obd_response_div, 'p', content, 'responseText');
     }
 }
 
@@ -2299,7 +2358,11 @@ function parseDataN45(response) {
     ];
 
     for (let i = 0; i < arrData.length; i++) {
-        createElement(obd_response_div, 'p', arrData[i]);
+        var point   = arrData[i].indexOf(':') + 1;
+        var title   = arrData[i].substring(0, point);
+        var content = arrData[i].substring(point);
+        createElement(obd_response_div, 'text', title);
+        createElement(obd_response_div, 'p', content, 'responseText');
     }
 }
 
@@ -2313,7 +2376,11 @@ function parseDataN44(response) {
     ];
 
     for (let i = 0; i < arrData.length; i++) {
-        createElement(obd_response_div, 'p', arrData[i]);
+        var point   = arrData[i].indexOf(':') + 1;
+        var title   = arrData[i].substring(0, point);
+        var content = arrData[i].substring(point);
+        createElement(obd_response_div, 'text', title);
+        createElement(obd_response_div, 'p', content, 'responseText');
     }
 }
 
@@ -2326,7 +2393,11 @@ function parseDataN42(response) {
     ];
 
     for (let i = 0; i < arrData.length; i++) {
-        createElement(obd_response_div, 'p', arrData[i]);
+        var point   = arrData[i].indexOf(':') + 1;
+        var title   = arrData[i].substring(0, point);
+        var content = arrData[i].substring(point);
+        createElement(obd_response_div, 'text', title);
+        createElement(obd_response_div, 'p', content, 'responseText');
     }
 }
 
@@ -2338,7 +2409,11 @@ function parseDataN43(response) {
     ];
 
     for (let i = 0; i < arrData.length; i++) {
-        createElement(obd_response_div, 'p', arrData[i]);
+        var point   = arrData[i].indexOf(':') + 1;
+        var title   = arrData[i].substring(0, point);
+        var content = arrData[i].substring(point);
+        createElement(obd_response_div, 'text', title);
+        createElement(obd_response_div, 'p', content, 'responseText');
     }
 }
 
@@ -2352,7 +2427,11 @@ function parseDataN40(response) {
     ];
 
     for (let i = 0; i < arrData.length; i++) {
-        createElement(obd_response_div, 'p', arrData[i]);
+        var point   = arrData[i].indexOf(':') + 1;
+        var title   = arrData[i].substring(0, point);
+        var content = arrData[i].substring(point);
+        createElement(obd_response_div, 'text', title);
+        createElement(obd_response_div, 'p', content, 'responseText');
     }
 }
 
@@ -2366,7 +2445,11 @@ function parseDataN4003(response) {
     ];
 
     for (let i = 0; i < arrData.length; i++) {
-        createElement(obd_response_div, 'p', arrData[i]);
+        var point   = arrData[i].indexOf(':') + 1;
+        var title   = arrData[i].substring(0, point);
+        var content = arrData[i].substring(point);
+        createElement(obd_response_div, 'text', title);
+        createElement(obd_response_div, 'p', content, 'responseText');
     }
 }
 
@@ -2417,7 +2500,11 @@ function parseDataN352(response) {
     ];
 
     for (let i = 0; i < arrData.length; i++) {
-        createElement(obd_response_div, 'p', arrData[i]);
+        var point   = arrData[i].indexOf(':') + 1;
+        var title   = arrData[i].substring(0, point);
+        var content = arrData[i].substring(point);
+        createElement(obd_response_div, 'text', title);
+        createElement(obd_response_div, 'p', content, 'responseText');
     }
 }
 
@@ -2442,7 +2529,11 @@ function parseDataN351(response) {
     ];
 
     for (let i = 0; i < arrData.length; i++) {
-        createElement(obd_response_div, 'p', arrData[i]);
+        var point   = arrData[i].indexOf(':') + 1;
+        var title   = arrData[i].substring(0, point);
+        var content = arrData[i].substring(point);
+        createElement(obd_response_div, 'text', title);
+        createElement(obd_response_div, 'p', content, 'responseText');
     }
 }
 
@@ -2457,7 +2548,11 @@ function parseDataN34(response) {
     ];
 
     for (let i = 0; i < arrData.length; i++) {
-        createElement(obd_response_div, 'p', arrData[i]);
+        var point   = arrData[i].indexOf(':') + 1;
+        var title   = arrData[i].substring(0, point);
+        var content = arrData[i].substring(point);
+        createElement(obd_response_div, 'text', title);
+        createElement(obd_response_div, 'p', content, 'responseText');
     }
 }
 
@@ -2471,13 +2566,27 @@ function parseDataN35(response) {
     ];
 
     for (let i = 0; i < arrData.length; i++) {
-        createElement(obd_response_div, 'p', arrData[i]);
+        var point   = arrData[i].indexOf(':') + 1;
+        var title   = arrData[i].substring(0, point);
+        var content = arrData[i].substring(point);
+        createElement(obd_response_div, 'text', title);
+        createElement(obd_response_div, 'p', content, 'responseText');
     }
 }
 
 // parseDataN2001 - 
 function parseData2001(response) {
-    createElement(obd_response_div, 'p', 'HEX: ' + response.hex);
+    var arrData = [
+        'hex : ' + response.hex,
+    ];
+
+    for (let i = 0; i < arrData.length; i++) {
+        var point   = arrData[i].indexOf(':') + 1;
+        var title   = arrData[i].substring(0, point);
+        var content = arrData[i].substring(point);
+        createElement(obd_response_div, 'text', title);
+        createElement(obd_response_div, 'p', content, 'responseText');
+    }
 }
 
 // parseDataN3500 - 
@@ -2498,7 +2607,11 @@ function parseDataN3500(response) {
     ];
 
     for (let i = 0; i < arrData.length; i++) {
-        createElement(obd_response_div, 'p', arrData[i]);
+        var point   = arrData[i].indexOf(':') + 1;
+        var title   = arrData[i].substring(0, point);
+        var content = arrData[i].substring(point);
+        createElement(obd_response_div, 'text', title);
+        createElement(obd_response_div, 'p', content, 'responseText');
     }
 }
 
@@ -2513,7 +2626,11 @@ function parseDataN3400(response) {
     ];
 
     for (let i = 0; i < arrData.length; i++) {
-        createElement(obd_response_div, 'p', arrData[i]);
+        var point   = arrData[i].indexOf(':') + 1;
+        var title   = arrData[i].substring(0, point);
+        var content = arrData[i].substring(point);
+        createElement(obd_response_div, 'text', title);
+        createElement(obd_response_div, 'p', content, 'responseText');
     }
 }
 
@@ -2525,7 +2642,11 @@ function parseData1009(response) {
     ];
 
     for (let i = 0; i < arrData.length; i++) {
-        createElement(obd_response_div, 'p', arrData[i]);
+        var point   = arrData[i].indexOf(':') + 1;
+        var title   = arrData[i].substring(0, point);
+        var content = arrData[i].substring(point);
+        createElement(obd_response_div, 'text', title);
+        createElement(obd_response_div, 'p', content, 'responseText');
     }
 }
 
@@ -2539,8 +2660,11 @@ function parseDataN200(response) {
     ];
 
     for (let i = 0; i < arrData.length; i++) {
-        createElement(obd_response_div, 'p', arrData[i]);
-        // createElement(obd_response_div, 'p');
+        var point   = arrData[i].indexOf(':') + 1;
+        var title   = arrData[i].substring(0, point);
+        var content = arrData[i].substring(point);
+        createElement(obd_response_div, 'text', title);
+        createElement(obd_response_div, 'p', content, 'responseText');
     }
 }
 
@@ -2567,7 +2691,11 @@ function parseDataN32(response) {
     ];
 
     for (let i = 0; i < arrData.length; i++) {
-        createElement(obd_response_div, 'p', arrData[i]);
+        var point   = arrData[i].indexOf(':') + 1;
+        var title   = arrData[i].substring(0, point);
+        var content = arrData[i].substring(point);
+        createElement(obd_response_div, 'text', title);
+        createElement(obd_response_div, 'p', content, 'responseText');
     }
 }
 
@@ -2612,7 +2740,11 @@ function parseDataN33(response) {
     ];
 
     for (let i = 0; i < arrData.length; i++) {
-        createElement(obd_response_div, 'p', arrData[i]);
+        var point   = arrData[i].indexOf(':') + 1;
+        var title   = arrData[i].substring(0, point);
+        var content = arrData[i].substring(point);
+        createElement(obd_response_div, 'text', title);
+        createElement(obd_response_div, 'p', content, 'responseText');
     }
 }
 
@@ -3177,7 +3309,6 @@ function displayMnemonic() {
     // get [name_req_div] div
     var parent = $("#name_req_div");
     var mnemonic = JSON.parse(localStorage.getItem(saveMnemonic));
-    // console.info('localStorage KEY  = ' + addr);
 
     var newDiv = document.createElement('div');
     newDiv.setAttribute('class', 'panelItem');
@@ -3186,7 +3317,7 @@ function displayMnemonic() {
     if (mnemonic) {
         for (let i = 0; i < mnemonic.result.length; i++) {
             createElement(newDiv, 'h4', 'NO. ' + (i + 1));
-            createElement(newDiv, 'text', mnemonic.result[i].mnemonic);
+            createElement(newDiv, 'text', mnemonic.result[i].mnemonic, 'responseText');
         }
     } else { // NO LOCAL STORAGE DATA YET.
         createElement(newDiv, 'h3', 'NO DATA YET. YOU CAN CREATE ONE WITH [signUp].');
@@ -3205,7 +3336,7 @@ function displayAddresses(param) {
 
     // console.info('LOGINED userID = '+userID);
 
-    if (param === inNewHtml) {
+    if (param === inNewHtml) { // New page
         var status = JSON.parse(localStorage.getItem(saveGoWhere));
         if (!status.isLogined) { // Not login.
             createElement(newDiv, 'text', 'NO USER LOGINED.');
@@ -3217,7 +3348,7 @@ function displayAddresses(param) {
 
     } else {
         if (!isLogined) { // Not login.
-            createElement(newDiv, 'text', 'NO USER LOGINED.');
+            createElement(newDiv, 'text', 'NO USER LOGINED.', 'bigText');
             parent.append(newDiv);
             return;
         }
@@ -3230,25 +3361,30 @@ function displayAddresses(param) {
     if (addr) {
         for (let i = 0; i < addr.result.length; i++) {
             if (userID === addr.result[i].userID) {
-                createElement(newDiv, 'text', addr.result[i].userID);
-                createElement(newDiv, 'h2', 'Address List');
+                var bigText = 'User ID : ' + addr.result[i].userID;
+                createElement(newDiv, 'text', bigText, 'bigText');
+                createElement(newDiv, 'h2', 'Address List', 'responseText');
 
                 for (let i2 = 0; i2 < addr.result[i].data.length; i2++) {
-                    createElement(newDiv, 'h4', 'NO. ' + (i2 + 1));
+                    createElement(newDiv, 'h3', 'NO. ' + (i2 + 1), 'responseText');
 
                     var strAddr = addr.result[i].data[i2].address;
                     createBalanceElement(newDiv, strAddr);
 
                     arrData = [
-                        'ADDRESS : ' + addr.result[i].data[i2].address,
-                        'INDEX : ' + addr.result[i].data[i2].index,
-                        'PUB_KEY : ' + addr.result[i].data[i2].pubkey,
+                        'Address : ' + addr.result[i].data[i2].address,
+                        'Index : ' + addr.result[i].data[i2].index,
+                        'PubKey : ' + addr.result[i].data[i2].pubkey,
                         'WIF : ' + addr.result[i].data[i2].wif
                     ];
 
                     for (let i3 = 0; i3 < arrData.length; i3++) {
-                        createElement(newDiv, 'text', arrData[i3]);
-                        createElement(newDiv, 'br');
+                        var point   = arrData[i3].indexOf(':') + 1;
+                        var title   = arrData[i3].substring(0, point);
+                        var content = arrData[i3].substring(point);
+                        createElement(newDiv, 'text', title);
+                        createElement(newDiv, 'text', content, 'responseText');
+                        createElement(newDiv, 'p');
                     }
                 }
 
@@ -3272,17 +3408,18 @@ function createBalanceElement(parent, strAddr) {
     // create [text] element
     var title = document.createElement('text');
     title.id = strAddr;
-    title.innerText = 'BALANCE : ';
+    title.innerText = 'Balance : ';
     parent.append(title);
 
     // create [button] element
     var button = document.createElement('button');
     button.innerText = 'Get Balance';
     var clickFunc = "getBalance('" + strAddr + "')";
+    button.setAttribute('class', 'button button_small');
     button.setAttribute('onclick', clickFunc);
     parent.append(button);
 
-    createElement(parent, 'br');
+    createElement(parent, 'p');
 }
 
 // List of friends who have interacted
@@ -3299,9 +3436,11 @@ function displayFriends() {
     if (list) {
         for (let i = 0; i < list.result.length; i++) {
             // Display list NO.
-            createElement(newDiv, 'h4', 'NO. ' + (i + 1));
-            createElement(newDiv, 'p', 'P2P_Peer_ID: ' + list.result[i].p2pID);
-            createElement(newDiv, 'p', 'Peer_ID: ' + list.result[i].name);
+            createElement(newDiv, 'h3', 'NO. ' + (i + 1), 'responseText');
+            createElement(newDiv, 'p', 'P2P_Peer_ID: ');
+            createElement(newDiv, 'p', list.result[i].p2pID, 'responseText');
+            createElement(newDiv, 'p', 'Peer_ID: ');
+            createElement(newDiv, 'p', list.result[i].name, 'responseText');
         }
     } else { // NO LOCAL STORAGE DATA YET.
         createElement(newDiv, 'h3', 'NO DATA YET.');
@@ -3342,7 +3481,7 @@ function displayChannelCreation(param) {
         for (let i = 0; i < list.result.length; i++) {
             // createElement(parent, 'h4', 'NO. ' + (i + 1) + 
             //     ' - Temp Channel ID is: ' + list.result[i].temporary_channel_id);
-            createElement(newDiv, 'h4', 'NO. ' + (i + 1));
+            createElement(newDiv, 'h2', 'NO. ' + (i + 1), 'responseText');
 
             // Display channel id in creation process.
             channelID(newDiv, list, i);
@@ -3377,12 +3516,12 @@ function channelID(parent, list, i) {
     } catch (error) {}
 
     if (msgType === enumMsgType.MsgType_FundingSign_AssetFundingSigned_N35) {
-        createElement(parent, 'h4', 'DONE - Channel ID : ' +
-            list.result[i].temporary_channel_id);
+        createElement(parent, 'text', 'DONE - Channel ID : ');
     } else {
-        createElement(parent, 'h4', 'TEMP - Channel ID : ' +
-            list.result[i].temporary_channel_id);
+        createElement(parent, 'text', 'TEMP - Channel ID : ');
     }
+
+    createElement(parent, 'p', list.result[i].temporary_channel_id, 'responseText');
 }
 
 // Display channel info.
@@ -3392,7 +3531,12 @@ function partChannelInfo(parent, list, i) {
 
     for (let i2 = 0; i2 < list.result[i].data.length; i2++) {
         var title = list.result[i].data[i2].channelInfo;
-        createElement(parent, 'h5', '--> ' + title);
+        var point   = title.indexOf('-');
+        var title2  = title.substring(0, point);
+        var content = title.substring(point + 1);
+        createElement(parent, 'p', '-----------------------------------------------');
+        createElement(parent, 'text', title2);
+        createElement(parent, 'p', content, 'responseText');
 
         // Construct data will be displayed.
         if (title.substring(0, 6) === 'LAUNCH') {
@@ -3422,8 +3566,11 @@ function partChannelInfo(parent, list, i) {
         }
 
         for (let i3 = 0; i3 < arrData.length; i3++) {
-            createElement(parent, 'text', arrData[i3]);
-            createElement(parent, 'br');
+            var point   = arrData[i3].indexOf(':') + 1;
+            var title   = arrData[i3].substring(0, point);
+            var content = arrData[i3].substring(point);
+            createElement(parent, 'text', title);
+            createElement(parent, 'p', content, 'responseText');
         }
     }
 }
@@ -3434,7 +3581,9 @@ function btcRecord(parent, list, i) {
     var arrData;
 
     if (list.result[i].btc[0]) {
-        createElement(parent, 'h5', '--> DEPOSITING - BTC Record');
+        createElement(parent, 'p', '-----------------------------------------------');
+        createElement(parent, 'h3', 'DEPOSITING - BTC Record', 'responseText');
+
         for (let i2 = 0; i2 < list.result[i].btc.length; i2++) {
             createElement(parent, 'br');
             createElement(parent, 'text', 'NO. ' + (i2 + 1));
@@ -3457,8 +3606,7 @@ function btcRecord(parent, list, i) {
             createElement(parent, 'text', ' -- ' + status);
             createElement(parent, 'text', ' -- ' + list.result[i].btc[i2].date);
             createElement(parent, 'br');
-            createElement(parent, 'text', '---------------------------------------------');
-            createElement(parent, 'br');
+            createElement(parent, 'p', '---------------------------------------------');
 
             arrData = [
                 'from_address : ' + list.result[i].btc[i2].from_address,
@@ -3468,8 +3616,11 @@ function btcRecord(parent, list, i) {
             ];
 
             for (let i3 = 0; i3 < arrData.length; i3++) {
-                createElement(parent, 'text', arrData[i3]);
-                createElement(parent, 'br');
+                var point   = arrData[i3].indexOf(':') + 1;
+                var title   = arrData[i3].substring(0, point);
+                var content = arrData[i3].substring(point);
+                createElement(parent, 'text', title);
+                createElement(parent, 'p', content, 'responseText');
             }
         }
     }
@@ -3481,11 +3632,10 @@ function omniAssetRecord(parent, list, i) {
     var arrData;
 
     if (list.result[i].omniAsset[0]) {
-        createElement(parent, 'h5', '--> DEPOSITING - Omni Asset Record');
-        for (let i2 = 0; i2 < list.result[i].omniAsset.length; i2++) {
-            // createElement(parent, 'br');
-            // createElement(parent, 'text', 'NO. ' + (i4 + 1));
+        createElement(parent, 'p', '-----------------------------------------------');
+        createElement(parent, 'h3', 'DEPOSITING - Omni Asset Record', 'responseText');
 
+        for (let i2 = 0; i2 < list.result[i].omniAsset.length; i2++) {
             var status;
             switch (list.result[i].omniAsset[i2].msgType) {
                 case enumMsgType.MsgType_Core_Omni_FundingAsset_2001:
@@ -3502,8 +3652,7 @@ function omniAssetRecord(parent, list, i) {
             createElement(parent, 'text', ' -- ' + status);
             createElement(parent, 'text', ' -- ' + list.result[i].omniAsset[i2].date);
             createElement(parent, 'br');
-            createElement(parent, 'text', '---------------------------------------------');
-            createElement(parent, 'br');
+            createElement(parent, 'p', '---------------------------------------------');
 
             arrData = [
                 'from_address : ' + list.result[i].omniAsset[i2].from_address,
@@ -3511,21 +3660,24 @@ function omniAssetRecord(parent, list, i) {
                 'property_id : ' + list.result[i].omniAsset[i2].property_id,
                 'hex : ' + list.result[i].omniAsset[i2].hex,
 
-                '(-34) Response: ----------------------',
+                '(-34) Response : ----------------------',
                 'channel_id : ' + list.result[i].omniAsset[i2].channel_id,
                 'funding_omni_hex : ' + list.result[i].omniAsset[i2].funding_omni_hex,
                 'c1a_rsmc_hex : ' + list.result[i].omniAsset[i2].c1a_rsmc_hex,
                 'rsmc_temp_address_pub_key : ' + list.result[i].omniAsset[i2].rsmc_temp_address_pub_key,
                 
-                '(-35) Response: ----------------------',
+                '(-35) Response : ----------------------',
                 'approval : ' + list.result[i].omniAsset[i2].approval,
                 'rd_hex : ' + list.result[i].omniAsset[i2].rd_hex,
                 'rsmc_signed_hex : ' + list.result[i].omniAsset[i2].rsmc_signed_hex,
             ];
 
             for (let i3 = 0; i3 < arrData.length; i3++) {
-                createElement(parent, 'text', arrData[i3]);
-                createElement(parent, 'br');
+                var point   = arrData[i3].indexOf(':') + 1;
+                var title   = arrData[i3].substring(0, point);
+                var content = arrData[i3].substring(point);
+                createElement(parent, 'text', title);
+                createElement(parent, 'p', content, 'responseText');
             }
         }
     }
@@ -3537,7 +3689,9 @@ function rsmcRecord(parent, list, i) {
     var arrData;
 
     if (list.result[i].transfer[0]) {
-        createElement(parent, 'h5', '--> RSMC - transfer in channel');
+        createElement(parent, 'p', '-----------------------------------------------');
+        createElement(parent, 'h3', 'RSMC - transfer in channel', 'responseText');
+
         for (let i2 = 0; i2 < list.result[i].transfer.length; i2++) {
             createElement(parent, 'br');
             createElement(parent, 'text', 'NO. ' + (i2 + 1));
@@ -3555,8 +3709,7 @@ function rsmcRecord(parent, list, i) {
             createElement(parent, 'text', ' -- ' + status);
             createElement(parent, 'text', ' -- ' + list.result[i].transfer[i2].date);
             createElement(parent, 'br');
-            createElement(parent, 'text', '---------------------------------------------');
-            createElement(parent, 'br');
+            createElement(parent, 'p', '---------------------------------------------');
 
             arrData = [
                 'channelId : ' + list.result[i].transfer[i2].channelId,
@@ -3569,8 +3722,11 @@ function rsmcRecord(parent, list, i) {
             ];
 
             for (let i3 = 0; i3 < arrData.length; i3++) {
-                createElement(parent, 'text', arrData[i3]);
-                createElement(parent, 'br');
+                var point   = arrData[i3].indexOf(':') + 1;
+                var title   = arrData[i3].substring(0, point);
+                var content = arrData[i3].substring(point);
+                createElement(parent, 'text', title);
+                createElement(parent, 'p', content, 'responseText');
             }
         }
     }
@@ -3582,7 +3738,9 @@ function htlcRecord(parent, list, i) {
     var arrData;
 
     if (list.result[i].htlc[0]) {
-        createElement(parent, 'h5', '--> HTLC - transfer in channel');
+        createElement(parent, 'p', '-----------------------------------------------');
+        createElement(parent, 'h3', 'HTLC - transfer in channel', 'responseText');
+
         for (let i2 = 0; i2 < list.result[i].htlc.length; i2++) {
             createElement(parent, 'br');
             createElement(parent, 'text', 'NO. ' + (i2 + 1));
@@ -3615,8 +3773,7 @@ function htlcRecord(parent, list, i) {
             createElement(parent, 'text', ' -- ' + status);
             createElement(parent, 'text', ' -- ' + list.result[i].htlc[i2].date);
             createElement(parent, 'br');
-            createElement(parent, 'text', '---------------------------------------------');
-            createElement(parent, 'br');
+            createElement(parent, 'p', '---------------------------------------------');
 
             switch (list.result[i].htlc[i2].msgType) {
                 case enumMsgType.MsgType_HTLC_RequestCloseCurrTx_N48:
@@ -3648,8 +3805,11 @@ function htlcRecord(parent, list, i) {
 
 
             for (let i3 = 0; i3 < arrData.length; i3++) {
-                createElement(parent, 'text', arrData[i3]);
-                createElement(parent, 'br');
+                var point   = arrData[i3].indexOf(':') + 1;
+                var title   = arrData[i3].substring(0, point);
+                var content = arrData[i3].substring(point);
+                createElement(parent, 'text', title);
+                createElement(parent, 'p', content, 'responseText');
             }
         }
     }

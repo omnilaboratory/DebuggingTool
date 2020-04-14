@@ -41,12 +41,21 @@ body{
     /* text-align: left; */
     vertical-align: right;
 }
+
 .input {
     width:  160px;
     height: 25px;
     font-size: 15px;
     margin-left: 10px;
 }
+
+.input_node_url {
+    width:  380px;
+    height: 25px;
+    font-size: 15px;
+    margin-left: 10px;
+}
+
 .input_conn_node {
     width:  260px;
     height: 25px;
@@ -82,14 +91,25 @@ body{
     cursor: pointer;
 }
 
-.url{
+.url {
     color: #26272e;
-    cursor: pointer;
     height: 25px;
     line-height: 25px;
     font-size: 16px;
     font-weight: 500;
+    padding-top: 5px;
+    padding-bottom: 5px;
+    padding-left: 10px;
+    padding-right: 10px;
 }
+
+.url:hover {
+    background-color: rgb(65, 165, 247);
+    /* border: 1px solid #e9ebf0; */
+    color: white;
+    /* cursor: pointer; */
+}
+
 .topLeft{
     color: #FFF;
     height: 60px;
@@ -131,11 +151,12 @@ body{
     /* height: calc(150vh - 120px); */
     background: #f5f6f8;
     /* width: 180px; */
-    /* padding-right: 30px; */
-    padding: 1px 30px 30px 30px;
+    /* padding: 1px 3px 3px 30px; */
+    padding-left: 30px;
     /* display: flex; */
     overflow-y: auto;
 }
+
 /* .menuListItem{ */
     /* margin: 50px 0; */
     /* padding-top: 10px; */
@@ -143,6 +164,34 @@ body{
 
 a {
     text-decoration: none;
+}
+
+/* .label {
+    color: #9195a5;
+} */
+
+.copyright {
+    color: #eeeff5;
+    line-height: 50px;
+    font-size: 20px;
+    font-weight: 500;
+}
+
+.bigText {
+    color: #26272e;
+    line-height: 30px;
+    font-size: 16px;
+    font-weight: 500;
+}
+
+.responseText {
+    color: #26272e;
+    /* height: 25px; */
+    line-height: 25px;
+    /* font-size: 16px; */
+    font-weight: 500;
+    /* padding-top: 20px; */
+    /* text-decoration: none; */
 }
 
 .menuTitle{
@@ -153,8 +202,8 @@ a {
     padding-top: 30px;
     padding-bottom: 10px;
 }
-/* .menu{} */
-.menuItem{
+
+/* .menuItem{
     color: #26272e;
     cursor: pointer;
     height: 25px;
@@ -162,10 +211,8 @@ a {
     font-size: 16px;
     font-weight: 500;
     text-decoration: none;
-}
-.menuItem.active{
-    color: #1e222a;
-}
+} */
+
 .contain{
     flex: 1;
     /* height: calc(100vh - 120px); */

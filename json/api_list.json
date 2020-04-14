@@ -135,7 +135,7 @@
                             "onclick": "displayUserDataInNewHtml('Addresses')"
                         },
                         {
-                            "innerText": "Bitcoin Testnet Faucet",
+                            "innerText": "Bitcoin Faucet",
                             "onclick": "openTestnetFaucet()"
                         }
                     ]

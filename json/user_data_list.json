@@ -6,7 +6,7 @@
         },
         {
             "id": "Addresses",
-            "description": "Addresses created with mnemonic from USER: "
+            "description": "Addresses created with mnemonic."
         },
         {
             "id": "Friends",
