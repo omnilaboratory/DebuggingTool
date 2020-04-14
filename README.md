@@ -15,12 +15,12 @@ OmniBOLT Daemon Debugging Tool. This is a graphic user interface for developers.
 git clone https://github.com/omnilaboratory/DebuggingTool
 ```
 
-Chrome must run by disabling web security stratigy. For example, if you are in Windows terminal:
+Chrome must run with argument `disable-web-security` to disable web security stratigy. For example, if you are in Windows terminal:
 ```
-chrome.exe --args --disable-web-security --user-data-dir=/any_temp_direcory_for_chrome_data
+chrome.exe --args --disable-web-security --user-data-dir=/any_temp_directory_for_chrome_data
 ```
 
-Then open the webpage index.html under the DebuggingTool directory.
+Then open index.html under the DebuggingTool directory.
 
 
 ## Step 1: connect to an OBD node
