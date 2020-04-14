@@ -1,18 +1,87 @@
 # DebuggingTool
-OmniBOLT Daemon Debugging Tool
+[![](https://img.shields.io/badge/license-MIT-blue)](https://github.com/omnilaboratory/obd/blob/master/LICENSE) [![](https://img.shields.io/badge/standard%20readme-OK-brightgreen)](https://github.com/omnilaboratory/obd/blob/master/README.md) [![](https://img.shields.io/badge/golang-%3E%3D1.9.0-orange)](https://golang.org/dl/) [![](https://img.shields.io/badge/protocol-OmniBOLT-brightgreen)](https://github.com/omnilaboratory/OmniBOLT-spec) 
+[![](https://img.shields.io/badge/API%20V0.3-Document-blue)](https://api.omnilab.online) 
+
+
+OmniBOLT Daemon Debugging Tool. This is a graphic user interface for developers. Every API on the left navigation tree has been defined in [api.omnilab.online](https://api.omnilab.online)
 
 <p align="center">
   <img width="500" alt="Debugging Tool Screenshot" src="https://github.com/omnilaboratory/DebuggingTool/blob/master/img/image_screen.png">
 </p>
 
-# Step 1: connect to an OBD node
+## Step 0: clone this project and run it by Chrome
+
+```
+git clone https://github.com/omnilaboratory/DebuggingTool
+```
+
+Chrome must run by disabling web security stratigy. For example, if you are in Windows terminal:
+```
+chrome.exe --args --disable-web-security --user-data-dir=/any_temp_direcory_for_chrome_data
+```
+
+Then open the webpage index.html under the DebuggingTool directory.
+
+
+## Step 1: connect to an OBD node
 
 <p align="center">
-  <img width="750" alt="Debugging Tool Screenshot" src="https://github.com/omnilaboratory/DebuggingTool/blob/master/doc/img/connect.png">
+  <img width="750" alt="Connect Screenshot" src="https://github.com/omnilaboratory/DebuggingTool/blob/master/doc/img/connect.png">
 </p>
 
-1. click "Connect to OBD node";
-2. on the right panel, appears the input box. We depolyed an example OBD node for developers, the address is: ws://62.234.216.108:60030/ws. Just replace the default 127.0.0.1 by 62.234.216.108 and 
+1. click "Connect to OBD node";  
+2. on the right panel, appears the input box. We depolyed an example OBD node for developers, the address is: ws://62.234.216.108:60030/ws. Just replace the default 127.0.0.1:60020 by 62.234.216.108:60030  
 3. click "connect". wait for several seconds, the status bar on top of the window will show the status "connected".
+
+
+## Step 2: signup a new user
+
+<p align="center">
+  <img width="750" alt="SignUp" src="https://github.com/omnilaboratory/DebuggingTool/blob/master/doc/img/signup.png">
+</p>
+
+1. click "signUp";  
+2. click "invoke API";  
+3. OBD responses the new set of mnemonic words for the currently connected new user. The mnemonic words is the identity to carry out all the following operations in obd network; Record this mnemonic words in somewhere safe. For example, write it down on a paper.  
+
+
+## Step 3: Login using mnemonic words
+
+<p align="center">
+  <img width="750" alt="SignUp" src="https://github.com/omnilaboratory/DebuggingTool/blob/master/doc/img/login.png">
+</p>
+
+1. click "login";  
+2. in the input box of "Input Parameters", past the mnemonic words generated in step 2, and  
+3. click "invoke API";  
+4. OBD responses 3 arguments, telling user where and who he is:  
+
+```
+p2pNodeAddress : /ip4/62.234.216.108/tcp/3001/p2p/QmP1mQMzDRV2bKWdhwvPWFubSAz1gqJY44RjdYm3G5DFeF
+```
+`p2pNodeAddress` is the node location of the OBD server you connected. In this tutorial, it is the node "ws://62.234.216.108:60030/ws" you connected in step 1.  
+
+```
+p2pNodePeerId : QmP1mQMzDRV2bKWdhwvPWFubSAz1gqJY44RjdYm3G5DFeF
+``` 
+`p2pNodePeerId` is part of the complete `p2pNodeAddress`. Because on one server, there can be thousans of OBD running on it, every OBD has a unique `p2pNodePeerId` to be identified.  
+
+```
+userPeerId : 30dfbc0e1b42c4cb50410b7a08186ce405a92fff235480608425bf4b0207e5ad
+```
+This is the user id, which is used together with `p2pNodeAddress` to tell someone else that "i'm here, please connect me by connectP2PNode".  
+
+
+## Step 4: connect another user
+
+Open another browser window, open index.html, and signup another user to get his `p2pNodeAddress` and `userPeerId`.  
+
+<p align="center">
+  <img width="750" alt="SignUp" src="https://github.com/omnilaboratory/DebuggingTool/blob/master/doc/img/connectNode.png">
+</p>
+
+1. click "connectP2PNode";  
+2. input the `p2pNodeAddress` into the "node_url" input box;  
+3. click "invoke API";  
 
 
