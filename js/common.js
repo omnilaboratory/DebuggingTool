@@ -3564,8 +3564,7 @@ function displayFriends() {
 // List of OBD node that have interacted
 function displayOBDConnectHistory() {
 
-    // removeNameReqDiv();
-
+    var item;
     var parent = $("#name_req_div");
     var list = JSON.parse(localStorage.getItem(saveOBDList));
 
@@ -3577,15 +3576,25 @@ function displayOBDConnectHistory() {
     // If has data
     if (list) {
         for (let i = 0; i < list.result.length; i++) {
-            // Display list NO.
             // createElement(newDiv, 'h4', 'NO. ' + (i + 1));
-            createElement(newDiv, 'p', list.result[i].name, 'responseText');
+            item = document.createElement('a');
+            item.href = '#';
+            item.innerText = list.result[i].name;
+            item.setAttribute('onclick', 'clickConnectionHistory(this)');
+            // item.setAttribute('class', 'url');
+            newDiv.append(item);
+            createElement(newDiv, 'p');
         }
     } else { // NO LOCAL STORAGE DATA YET.
         createElement(newDiv, 'h4', 'NO CONNECTION HISTORY.');
     }
 
     parent.append(newDiv);
+}
+
+//
+function clickConnectionHistory(obj) {
+    $("#node_url").val(obj.innerText);
 }
 
 // List of channel creation process records.
