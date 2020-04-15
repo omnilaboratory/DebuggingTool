@@ -224,6 +224,7 @@ class MessageType {
   MsgType_Core_Omni_RevokeUnitsOfManagedToken_1204 = 1204;
   MsgType_Core_Omni_ListProperties_1205 = 1205;
   MsgType_Core_Omni_GetTransaction_1206 = 1206;
+  MsgType_Core_Omni_GetAssetName_1207 = 1207;
 
   MsgType_Core_Omni_FundingAsset_2001 = 2001;
 

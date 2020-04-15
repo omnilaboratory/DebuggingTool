@@ -133,6 +133,17 @@
                     ]
                 }
             ]
+        },
+        {
+            "id": "GetAssetNameByID",
+            "type_id": 1207,
+            "description": "GetAssetNameByID is used to get omni asset name by asset id (Property Id) .",
+            "parameters": [
+                {
+                    "name": "PropertyID",
+                    "buttons": []
+                }
+            ]
         }
     ]
 }

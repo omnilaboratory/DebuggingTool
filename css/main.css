@@ -184,6 +184,17 @@ a {
     font-weight: 500;
 }
 
+.funcText {
+    color: #26272e;
+    /* height: 25px; */
+    line-height: 25px;
+    font-size: 18px;
+    font-weight: 600;
+    padding-left: 15px;
+    padding-right: 15px;
+    /* text-decoration: none; */
+}
+
 .responseText {
     color: #26272e;
     /* height: 25px; */

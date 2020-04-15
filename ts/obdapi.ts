@@ -1355,6 +1355,23 @@ class ObdApi {
   public onOmniGetAllBalancesForAddress(jsonData: any) {}
 
   /**
+   * MsgType_Core_Omni_GetAssetName_1207
+   * @param propertyId string
+   * @param callback function
+   */
+  public omniGetAssetNameByID(propertyId: string, callback: Function) {
+    if (this.isNotString(propertyId)) {
+      alert("empty propertyId");
+      return;
+    }
+    let msg = new Message();
+    msg.type = this.messageType.MsgType_Core_Omni_GetAssetName_1207;
+    msg.data["propertyId"] = propertyId;
+    this.sendData(msg, callback);
+  }
+  public onOmniGetAssetNameByID(jsonData: any) {}
+
+  /**
    * MsgType_Core_BalanceByAddress_1008
    * @param address string
    * @param callback function

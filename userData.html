@@ -31,9 +31,8 @@
 
     // 
     function connectOBD() {
-        var node_url = 'ws://127.0.0.1:60020/ws';
-        // console.info('node url = ' + node_url);
-
+        var node_url = getNewestConnOBD();
+        console.info('node url = ' + node_url);
         obdApi.connectToServer(node_url, function(response) {
             // console.info('OBD Response = ' + response);
         }, function(globalResponse) {

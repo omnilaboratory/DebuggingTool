@@ -32,6 +32,9 @@ var saveAddr = 'addr';
 var saveFriends = 'friends';
 
 //
+var saveOBDList = 'obd_list';
+
+//
 var saveMnemonic = 'mnemonic';
 
 //
@@ -567,6 +570,21 @@ function getBalanceForOmni(msgType) {
 }
 
 /** 
+ * 1207 getAssetNameByID API at local.
+ * @param msgType
+ */
+function getAssetNameByID(msgType) {
+
+    var propertyId = $("#PropertyID").val();
+
+    // OBD API
+    obdApi.omniGetAssetNameByID(propertyId, function(e) {
+        console.info('1207 getAssetNameByID - OBD Response = ' + JSON.stringify(e));
+        createOBDResponseDiv(e, msgType);
+    });
+}
+
+/** 
  * -35109 getAllBRTx API at local.
  * @param msgType
  */
@@ -965,6 +983,9 @@ function invokeAPIs(objSelf) {
         case enumMsgType.MsgType_Core_Omni_Getbalance_1200:
             getBalanceForOmni(msgType);
             break;
+        case enumMsgType.MsgType_Core_Omni_GetAssetName_1207:
+            getAssetNameByID(msgType);
+            break;
         case enumMsgType.MsgType_CommitmentTx_AllBRByChanId_N35109:
             getAllBRTx(msgType);
             break;
@@ -1112,6 +1133,7 @@ function displayOBDMessages(content) {
         case enumMsgType.MsgType_Core_BalanceByAddress_1008:
         case enumMsgType.MsgType_Core_FundingBTC_1009:
         case enumMsgType.MsgType_Core_Omni_Getbalance_1200:
+        case enumMsgType.MsgType_Core_Omni_GetAssetName_1207:
         case enumMsgType.MsgType_Core_Omni_FundingAsset_2001:
         case enumMsgType.MsgType_HTLC_Invoice_N4003:
         case enumMsgType.MsgType_CommitmentTx_LatestCommitmentTxByChanId_N35104:
@@ -1376,14 +1398,14 @@ function createRequestDiv(obj) {
     // createElement(content_div, 'h2', 'Request');
 
     // create [func_title] element
-    createElement(newDiv, 'text', 'func: ', cssStyle);
+    createElement(newDiv, 'text', 'func: ');
 
     // create [func_name] element: id = JS function name.
-    createElement(newDiv, 'text', obj.getAttribute("id"));
+    createElement(newDiv, 'text', obj.getAttribute("id"), 'funcText');
 
     // create [type_id] element
     var value = " type ( " + obj.getAttribute("type_id") + " )";
-    createElement(newDiv, 'text', value, cssStyle);
+    createElement(newDiv, 'text', value);
 
     // create [Invoke API] element
     var button = document.createElement('button');
@@ -1675,7 +1697,7 @@ function createInvokeAPIButton(obj) {
 
 //----------------------------------------------------------------
 // For test to show Connect to OBD html page.
-function connectNode() {
+function displayConnectOBD() {
     removeNameReqDiv();
     createConnectNodeDiv();
 }
@@ -1688,7 +1710,7 @@ function removeNameReqDiv() {
     $("#content").append(name_req_div);
 }
 
-// create ConnectNodeDiv
+// create Div
 function createConnectNodeDiv() {
     var content_div = $("#name_req_div");
 
@@ -1702,7 +1724,7 @@ function createConnectNodeDiv() {
     newDiv.append(title);
 
     // create [input title] element
-    createElement(newDiv, 'text', 'Node URL: ', cssStyle);
+    createElement(newDiv, 'text', 'Node URL: ');
 
     // create [input] element
     var node_url = document.createElement('input');
@@ -1710,15 +1732,17 @@ function createConnectNodeDiv() {
     // node_url.style = 'width: 50%';
     node_url.setAttribute('class', 'input_conn_node');
     node_url.placeholder = 'Please input Node URL.';
+
+    node_url.value = getNewestConnOBD();
     // node_url.value = 'ws://62.234.216.108:60030/ws';
-    node_url.value = 'ws://127.0.0.1:60020/ws';
+    // node_url.value = 'ws://127.0.0.1:60020/ws';
     newDiv.append(node_url);
 
     // create [button] element
     var button = document.createElement('button');
     button.id = 'button_connect';
     button.setAttribute('class', 'button button_small');
-    button.setAttribute('onclick', 'clickConnectButton()');
+    button.setAttribute('onclick', 'connectOBD()');
     button.innerText = 'Connect';
     newDiv.append(button);
     
@@ -1729,14 +1753,16 @@ function createConnectNodeDiv() {
         changeConnectButtonStatus();
         createElement(content_div, 'h3', 'Already connected. ' + 
             'Please refresh the page if you want to connect again.');
+    } else {
+        displayOBDConnectHistory();
     }
 }
 
 // 
-function clickConnectButton() {
+function connectOBD() {
     // get [node_url] input box value.
     var node_url = $("#node_url").val();
-    console.info('node url = ' + node_url);
+    // console.info('node url = ' + node_url);
 
     if (node_url.trim().length === 0) {
         alert('Please input Node URL.');
@@ -1744,13 +1770,14 @@ function clickConnectButton() {
     }
 
     obdApi.connectToServer(node_url, function(response) {
-        console.info('OBD Response = ' + response);
+        console.info('connectOBD - OBD Response = ' + response);
 
         $("#status").text("Connected");
         isConnectToOBD = true; // already connected.
 
         createOBDResponseDiv(response, 'connect_node_resp');
         changeConnectButtonStatus();
+        saveOBDConnectHistory(node_url);
 
     }, function(globalResponse) {
         displayOBDMessages(globalResponse);
@@ -1794,6 +1821,9 @@ function createOBDResponseDiv(response, msgType) {
             break;
         case enumMsgType.MsgType_Core_Omni_Getbalance_1200:
             parseData1200(response);
+            break;
+        case enumMsgType.MsgType_Core_Omni_GetAssetName_1207:
+            parseData1207(response);
             break;
         case enumMsgType.MsgType_CommitmentTx_AllBRByChanId_N35109:
             parseDataN35109(response);
@@ -1984,6 +2014,32 @@ function parseData1200(response) {
             createElement(obd_response_div, 'text', title);
             createElement(obd_response_div, 'p', content, 'responseText');
         }
+    }
+}
+
+// parseData1207 - 
+function parseData1207(response) {
+    var arrData = [
+        'propertyid : ' + response.propertyid,
+        'name : ' + response.name,
+        'totaltokens : ' + response.totaltokens,
+        'issuer : ' + response.issuer,
+        'category : ' + response.category,
+        'subcategory : ' + response.subcategory,
+        'creationtxid : ' + response.creationtxid,
+        'data : ' + response.data,
+        'divisible : ' + response.divisible,
+        'fixedissuance : ' + response.fixedissuance,
+        'managedissuance : ' + response.managedissuance,
+        'url : ' + response.url,
+    ];
+
+    for (let i = 0; i < arrData.length; i++) {
+        var point   = arrData[i].indexOf(':') + 1;
+        var title   = arrData[i].substring(0, point);
+        var content = arrData[i].substring(point);
+        createElement(obd_response_div, 'text', title);
+        createElement(obd_response_div, 'p', content, 'responseText');
     }
 }
 
@@ -2214,7 +2270,7 @@ function parseDataN35104(response) {
         'htlc_redeem_script : ' + response.htlc_redeem_script,
         'htlc_sender : ' + response.htlc_sender,
         'htlc_temp_address_pub_key : ' + response.htlc_temp_address_pub_key,
-        'htlc_tx_hash : ' + response.htlc_tx_hash,
+        'htlc_tx_hex : ' + response.htlc_tx_hex,
         'htlc_txid : ' + response.htlc_txid,
         'id : ' + response.id,
         'input_amount : ' + response.input_amount,
@@ -2231,11 +2287,11 @@ function parseDataN35104(response) {
         'rsmc_multi_address_script_pub_key : ' + response.rsmc_multi_address_script_pub_key,
         'rsmc_redeem_script : ' + response.rsmc_redeem_script,
         'rsmc_temp_address_pub_key : ' + response.rsmc_temp_address_pub_key,
-        'rsmc_tx_hash : ' + response.rsmc_tx_hash,
+        'rsmc_tx_hex : ' + response.rsmc_tx_hex,
         'rsmc_txid : ' + response.rsmc_txid,
         'send_at : ' + response.send_at,
         'sign_at : ' + response.sign_at,
-        'to_other_tx_hash : ' + response.to_other_tx_hash,
+        'to_other_tx_hex : ' + response.to_other_tx_hex,
         'to_other_txid : ' + response.to_other_txid,
         'tx_type : ' + response.tx_type,
     ];
@@ -3181,6 +3237,62 @@ function saveMnemonicData(response) {
     }
 }
 
+// 
+function getNewestConnOBD() {
+    var node_url;
+    var list = JSON.parse(localStorage.getItem(saveOBDList));
+    // If has data
+    if (list) {
+        for (let i = 0; i < list.result.length; i++) {
+            if (list.result[i].newest === 'yes') {
+                node_url = list.result[i].name;
+                return node_url;
+            }
+        }
+    } else { // NO LOCAL STORAGE DATA YET.
+        return node_url = 'ws://127.0.0.1:60020/ws';
+    }
+}
+
+// List of OBD node that have interacted
+function saveOBDConnectHistory(name) {
+
+    var list = JSON.parse(localStorage.getItem(saveOBDList));
+
+    // If has data.
+    if (list) {
+        // console.info('HAS DATA');
+        for (let i = 0; i < list.result.length; i++) {
+            list.result[i].newest = '';
+        }
+
+        for (let i = 0; i < list.result.length; i++) {
+            if (list.result[i].name === name) {
+                list.result[i].newest = 'yes';
+                localStorage.setItem(saveOBDList, JSON.stringify(list));
+                return;
+            }
+        }
+
+        let new_data = {
+            name:  name,
+            newest: 'yes'
+        }
+        list.result.push(new_data);
+        localStorage.setItem(saveOBDList, JSON.stringify(list));
+
+    } else {
+        // console.info('FIRST DATA');
+        let data = {
+            result: [{
+                name:  name,
+                newest: 'yes'
+            }]
+        }
+        localStorage.setItem(saveOBDList, JSON.stringify(data));
+    }
+}
+
 // List of friends who have interacted
 function saveFriendsList(name, p2pID) {
 
@@ -3232,7 +3344,7 @@ function getBalance(strAddr) {
         result = JSON.stringify(e);
         result = result.replace("\"", "").replace("\"", "");
         result = parseFloat(result);
-        result = 'BALANCE : ' + result + ' BTC ';
+        result = 'Balance : ' + result + ' BTC ';
         $("#" + strAddr).text(result);
     });
 
@@ -3444,6 +3556,33 @@ function displayFriends() {
         }
     } else { // NO LOCAL STORAGE DATA YET.
         createElement(newDiv, 'h3', 'NO DATA YET.');
+    }
+
+    parent.append(newDiv);
+}
+
+// List of OBD node that have interacted
+function displayOBDConnectHistory() {
+
+    // removeNameReqDiv();
+
+    var parent = $("#name_req_div");
+    var list = JSON.parse(localStorage.getItem(saveOBDList));
+
+    var newDiv = document.createElement('div');
+    newDiv.setAttribute('class', 'panelItem');
+
+    createElement(newDiv, 'h3', 'Connection History');
+
+    // If has data
+    if (list) {
+        for (let i = 0; i < list.result.length; i++) {
+            // Display list NO.
+            // createElement(newDiv, 'h4', 'NO. ' + (i + 1));
+            createElement(newDiv, 'p', list.result[i].name, 'responseText');
+        }
+    } else { // NO LOCAL STORAGE DATA YET.
+        createElement(newDiv, 'h4', 'NO CONNECTION HISTORY.');
     }
 
     parent.append(newDiv);

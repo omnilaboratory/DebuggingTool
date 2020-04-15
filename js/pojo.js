@@ -252,6 +252,7 @@ class MessageType {
         this.MsgType_Core_Omni_RevokeUnitsOfManagedToken_1204 = 1204;
         this.MsgType_Core_Omni_ListProperties_1205 = 1205;
         this.MsgType_Core_Omni_GetTransaction_1206 = 1206;
+        this.MsgType_Core_Omni_GetAssetName_1207 = 1207;
         this.MsgType_Core_Omni_FundingAsset_2001 = 2001;
         this.MsgType_GetMnemonic_101 = 101;
         this.MsgType_Mnemonic_CreateAddress_N200 = -200;
