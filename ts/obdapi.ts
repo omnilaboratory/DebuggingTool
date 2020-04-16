@@ -29,6 +29,41 @@ class ObdApi {
   }
 
   /**
+   * Send custom request
+   * @param msg
+   * @param callback
+   */
+  public sendJsonData(msg: string, callback: Function) {
+    if (this.isConnectToOBD == false) {
+      alert("please try to connect obd again");
+      return;
+    }
+
+    if (this.isNotString(msg)) {
+      alert("error request content.");
+      return;
+    }
+
+    // if (msg.type < 0 && this.isLogin == false) {
+    //   alert("please login");
+    //   return;
+    // }
+
+    console.info(
+      new Date(),
+      "------send json msg------"
+    );
+    console.info(msg);
+
+    // if (callback != null) {
+    //   this.callbackMap[msg.type] = callback;
+    // }
+
+    this.ws.send(msg);
+    // this.ws.send(JSON.stringify(msg));
+  }
+
+  /**
    * connectToServer
    * @param address string
    * @param callback function

@@ -54,7 +54,10 @@
             <div class="leftSide" id="menu">
                 <div class="menuTitle">Start</div>
                 <a href="#" class="url" onclick="displayConnectOBD()">Connect to OBD node</a>
-
+                
+                <div class="menuTitle">Customize Mode</div>
+                <a href="#" class="url" onclick="displayCustomMode()">Debugging APIs</a>
+                
                 <!-- USER DATA LIST - Dynamic create -->
                 <div class="menuTitle">User Data</div>
                 <div id="user_data_list"></div>
@@ -69,17 +72,19 @@
             </div>
 
             <!-- API invoked area, click left side menu to display. -->
-            <div id="content" style="width:600px;float:left;">
+            <div id="content" style="width:700px;float:left;">
             <!-- <div class="contain" id="content"> -->
                 <!-- Dynamic create in 'common.js' -->
             </div>
 
             <!-- OBD messages display area -->
-            <!-- <div class=""> -->
+            <div>
                 <!-- <div><text>OBD Messages</text></div> -->
-                <div class="textarea"><textarea id="obd_messages" cols="80" rows="7" 
-                    readonly="yes" resize="none"></textarea></div>
-            <!-- </div> -->
+                <div><button class="button button_clear" 
+                    onclick="clearOBDMsg()">Clear OBD Messages</button></div>
+                <div class="textarea"><textarea id="obd_messages" cols="80" rows="50" 
+                    readonly="yes" resize="none" class="obd_msg"></textarea></div>
+            </div>
         </div>
 
         <!-- Footer for display copyright info, etc. -->

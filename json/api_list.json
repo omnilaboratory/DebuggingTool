@@ -7,17 +7,6 @@
             "parameters": []
         },
         {
-            "id": "connectP2PNode",
-            "type_id": 3,
-            "description": "connectP2PNode is a temp func for development phrase. It connects to a p2p node.",
-            "parameters": [
-                {
-                    "name": "node_url",
-                    "buttons": []
-                }
-            ]
-        },
-        {
             "id": "logIn",
             "type_id": 1,
             "description": "LogIn is used to login to OBD.",
@@ -34,6 +23,17 @@
                             "onclick": "autoCreateMnemonic()"
                         }
                     ]
+                }
+            ]
+        },
+        {
+            "id": "connectP2PNode",
+            "type_id": 3,
+            "description": "connectP2PNode is a temp func for development phrase. It connects to a p2p node.",
+            "parameters": [
+                {
+                    "name": "node_url",
+                    "buttons": []
                 }
             ]
         },
@@ -146,10 +146,6 @@
                         {
                             "innerText": "Get It",
                             "onclick": "displayUserDataInNewHtml('Addresses')"
-                        },
-                        {
-                            "innerText": "Auto Create Addr and Privkey",
-                            "onclick": "autoCreateFundingPubkey(0)"
                         }
                     ]
                 },
@@ -301,10 +297,6 @@
                         {
                             "innerText": "Get It",
                             "onclick": "displayUserDataInNewHtml('Addresses')"
-                        },
-                        {
-                            "innerText": "Auto Create Addr and Privkey",
-                            "onclick": "autoCreateFundingPubkey(0)"
                         }
                     ]
                 },

@@ -21,6 +21,7 @@ body{
     padding-right: 30px;
     display: flex;
 }
+
 .textarea{
     flex: 1;
     /* height: 90px; */
@@ -30,8 +31,16 @@ body{
     /* align-items: center; */
     justify-content: space-between;
     color: #FFF;
-    font-size: 16px;
+    /* font-size: 16px; */
 }
+
+.obd_msg{
+    font-size: 12px;
+    width: 88%;
+    padding-left: 20px;
+    padding-right: 20px;
+}
+
 .param {
     /* width:  160px;
     height: 25px;
@@ -40,6 +49,17 @@ body{
     /* margin-right: 20px; */
     /* text-align: left; */
     vertical-align: right;
+}
+
+.request_title {
+    font-size: 22px;
+    font-weight: 550;
+    margin-top: 80px;
+    margin-bottom: 50px;
+}
+
+.custom_textarea {
+    font-size: 15px;
 }
 
 .input {
@@ -81,6 +101,22 @@ body{
     padding: 8px 25px;
     font-size: 16px;
     margin-left: 30px;
+}
+
+.button_clear {
+    padding: 7px 30px;
+    font-size: 15px;
+    /* margin-top: 15px; */
+    margin-bottom: 20px;
+    margin-left: 60px;
+}
+
+.button_request {
+    padding: 8px 35px;
+    font-size: 16px;
+    margin-top: 15px;
+    margin-bottom: 30px;
+    /* margin-left: 30px; */
 }
 
 .button:hover {

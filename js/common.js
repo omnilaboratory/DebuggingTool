@@ -15,6 +15,7 @@ var cssStyle = 'color:gray';
 
 // save OBD messages
 var obdMessages = '';
+var arrObdMsg = [];
 
 // mnemonic using for login
 var mnemonicWithLogined = '';
@@ -1124,6 +1125,10 @@ function invokeAPIs(objSelf) {
 function displayOBDMessages(content) {
     console.info("broadcast info:", JSON.stringify(content));
 
+    var msgHead;
+    var fullMsg = JSON.stringify(content);
+    var msgTime = new Date().toLocaleString();
+
     switch (Number(content.type)) {
         case enumMsgType.MsgType_Error_0:
         case enumMsgType.MsgType_Core_GetNewAddress_1001:
@@ -1144,13 +1149,18 @@ function displayOBDMessages(content) {
             return;
         case enumMsgType.MsgType_UserLogin_1:
             content.result = 'Logged In - ' + content.from;
+            msgHead = msgTime +  '  - Logged In.';
             break;
         case enumMsgType.MsgType_p2p_ConnectServer_3:
             content.result = 'Connect to P2P Node success.';
+            msgHead = msgTime+  '  - Connect to P2P Node success.';
             break;
         case enumMsgType.MsgType_ChannelOpen_N32:
             content.result = 'LAUNCH - ' + content.from +
                 ' - launch an Open Channel request. ';
+
+            msgHead = msgTime +  '  - launch an Open Channel request.';
+
             // 'The [temporary_channel_id] is : ' + 
             // content.result.temporary_channel_id;
             break;
@@ -1160,6 +1170,9 @@ function displayOBDMessages(content) {
                     ' - accept Open Channel request. ';
                 // 'The [temporary_channel_id] is : ' + 
                 // content.result.temporary_channel_id;
+
+                msgHead = msgTime +  '  - accept Open Channel request.';
+
             } else if (content.result.curr_state === 30) { // Not Accept
                 content.result = 'DECLINE - ' + content.from +
                     ' - decline Open Channel request. ';
@@ -1234,6 +1247,9 @@ function displayOBDMessages(content) {
         case enumMsgType.MsgType_Atomic_Swap_Accept_N81:
             content.result = 'N81 Response Atomic Swap from - ' + content.from;
             break;
+        default:
+            msgHead = msgTime;
+            break;
     }
 
     content = JSON.stringify(content.result);
@@ -1246,8 +1262,21 @@ function displayOBDMessages(content) {
     // Some case do not need displayed.
     if (content === 'already login' || content === 'undefined') return;
 
-    obdMessages += content + '\n\n';
-    $("#obd_messages").val(obdMessages);
+    // obdMessages += content + '\n\n';
+    // obdMessages += msgHead + fullMsg + '\n\n';
+
+    arrObdMsg.push(fullMsg);
+    arrObdMsg.push(msgHead);
+    
+    var showMsg = '';
+    for (let i = arrObdMsg.length - 1; i >= 0; i--) {
+        showMsg += arrObdMsg[i] + '\n\n';
+    }
+    
+    // console.info('arrObdMsg 1  = ' + arrObdMsg[1]);
+    // console.info('showMsg = ' + showMsg);
+
+    $("#obd_messages").val(showMsg);
 }
 
 // getUserDataList
@@ -1696,7 +1725,13 @@ function createInvokeAPIButton(obj) {
 }
 
 //----------------------------------------------------------------
-// For test to show Connect to OBD html page.
+// 
+function displayCustomMode() {
+    removeNameReqDiv();
+    createCustomModeDiv();
+}
+
+// 
 function displayConnectOBD() {
     removeNameReqDiv();
     createConnectNodeDiv();
@@ -1756,6 +1791,66 @@ function createConnectNodeDiv() {
     } else {
         displayOBDConnectHistory();
     }
+}
+
+// create Div
+function createCustomModeDiv() {
+    var content_div = $("#name_req_div");
+
+    var newDiv = document.createElement('div');
+    newDiv.setAttribute('class', 'panelItem');
+
+    // create [title] element
+    var title = document.createElement('div');
+    title.setAttribute('class', 'panelTitle');
+    // createElement(title, 'h2', 'Custom Mode');
+    createElement(title, 'h2', 'Request');
+    newDiv.append(title);
+
+    // create [send button] element
+    var button = document.createElement('button');
+    button.setAttribute('class', 'button button_request');
+    button.setAttribute('onclick', 'sendCustomRequest()');
+    button.innerText = 'Send';
+    newDiv.append(button);
+
+    //
+    var request = document.createElement('textarea');
+    request.id = 'custom_request';
+    request.setAttribute('class', 'custom_textarea');
+    request.setAttribute('cols', '70');
+    request.setAttribute('rows', '20');
+    request.placeholder = 'Input custom request infomation. (type protocol)';
+    newDiv.append(request);
+
+    content_div.append(newDiv);
+
+    // create [input title] element
+    // createElement(newDiv, 'text', 'OBD Node URL: ');
+
+    // create [input] element
+    // var node_url = document.createElement('input');
+    // node_url.id = 'node_url';
+    // node_url.setAttribute('class', 'input_conn_node');
+    // node_url.placeholder = 'Please input Node URL.';
+    // node_url.value = getNewestConnOBD();
+    // newDiv.append(node_url);
+
+    // create [button] element
+    // var button = document.createElement('button');
+    // button.id = 'button_connect';
+    // button.setAttribute('class', 'button button_small');
+    // button.setAttribute('onclick', 'connectOBD()');
+    // button.innerText = 'Connect';
+    // newDiv.append(button);
+    
+    // displayOBDConnectHistory();
+    // displayCustomRequest();
+}
+
+// 
+function clearOBDMsg() {
+    $("#obd_messages").val("");
 }
 
 // 
@@ -2256,9 +2351,15 @@ function parseDataN35101(response) {
 function parseDataN35104(response) {
     var arrData = [
         'channel_id : ' + response.channel_id,
-        'amount_to_htlc : ' + response.amount_to_htlc,
-        'amount_to_other : ' + response.amount_to_other,
+        'id : ' + response.id,
+        'property_id : ' + response.property_id,
+        'input_amount : ' + response.input_amount,
         'amount_to_rsmc : ' + response.amount_to_rsmc,
+        'amount_to_other : ' + response.amount_to_other,
+        'amount_to_htlc : ' + response.amount_to_htlc,
+        'owner : ' + response.owner,
+        'peer_id_a : ' + response.peer_id_a,
+        'peer_id_b : ' + response.peer_id_b,
         'create_at : ' + response.create_at,
         'create_by : ' + response.create_by,
         'curr_hash : ' + response.curr_hash,
@@ -2272,17 +2373,11 @@ function parseDataN35104(response) {
         'htlc_temp_address_pub_key : ' + response.htlc_temp_address_pub_key,
         'htlc_tx_hex : ' + response.htlc_tx_hex,
         'htlc_txid : ' + response.htlc_txid,
-        'id : ' + response.id,
-        'input_amount : ' + response.input_amount,
         'input_txid : ' + response.input_txid,
         'input_vout : ' + response.input_vout,
         'last_commitment_tx_id : ' + response.last_commitment_tx_id,
         'last_edit_time : ' + response.last_edit_time,
         'last_hash : ' + response.last_hash,
-        'owner : ' + response.owner,
-        'peer_id_a : ' + response.peer_id_a,
-        'peer_id_b : ' + response.peer_id_b,
-        'property_id : ' + response.property_id,
         'rsmc_multi_address : ' + response.rsmc_multi_address,
         'rsmc_multi_address_script_pub_key : ' + response.rsmc_multi_address_script_pub_key,
         'rsmc_redeem_script : ' + response.rsmc_redeem_script,
@@ -2514,10 +2609,15 @@ function parseDataN352(response) {
 
     var arrData = [
         'channel_id : ' + response.latestCcommitmentTxInfo.channel_id,
+        'id : ' + response.latestCcommitmentTxInfo.id,
         'property_id : ' + response.latestCcommitmentTxInfo.property_id,
-        'amount_to_htlc : ' + response.latestCcommitmentTxInfo.amount_to_htlc,
-        'amount_to_other : ' + response.latestCcommitmentTxInfo.amount_to_other,
+        'input_amount : ' + response.latestCcommitmentTxInfo.input_amount,
         'amount_to_rsmc : ' + response.latestCcommitmentTxInfo.amount_to_rsmc,
+        'amount_to_other : ' + response.latestCcommitmentTxInfo.amount_to_other,
+        'amount_to_htlc : ' + response.latestCcommitmentTxInfo.amount_to_htlc,
+        'owner : ' + response.latestCcommitmentTxInfo.owner,
+        'peer_id_a : ' + response.latestCcommitmentTxInfo.peer_id_a,
+        'peer_id_b : ' + response.latestCcommitmentTxInfo.peer_id_b,
         'create_at : ' + response.latestCcommitmentTxInfo.create_at,
         'create_by : ' + response.latestCcommitmentTxInfo.create_by,
         'curr_hash : ' + response.latestCcommitmentTxInfo.curr_hash,
@@ -2531,16 +2631,11 @@ function parseDataN352(response) {
         'htlc_temp_address_pub_key : ' + response.latestCcommitmentTxInfo.htlc_temp_address_pub_key,
         'htlc_tx_hex : ' + response.latestCcommitmentTxInfo.htlc_tx_hex,
         'htlc_txid : ' + response.latestCcommitmentTxInfo.htlc_txid,
-        'id : ' + response.latestCcommitmentTxInfo.id,
-        'input_amount : ' + response.latestCcommitmentTxInfo.input_amount,
         'input_txid : ' + response.latestCcommitmentTxInfo.input_txid,
         'input_vout : ' + response.latestCcommitmentTxInfo.input_vout,
         'last_commitment_tx_id : ' + response.latestCcommitmentTxInfo.last_commitment_tx_id,
         'last_edit_time : ' + response.latestCcommitmentTxInfo.last_edit_time,
         'last_hash : ' + response.latestCcommitmentTxInfo.last_hash,
-        'owner : ' + response.latestCcommitmentTxInfo.owner,
-        'peer_id_a : ' + response.latestCcommitmentTxInfo.peer_id_a,
-        'peer_id_b : ' + response.latestCcommitmentTxInfo.peer_id_b,
         'rsmc_input_txid : ' + response.latestCcommitmentTxInfo.rsmc_input_txid,
         'rsmc_multi_address : ' + response.latestCcommitmentTxInfo.rsmc_multi_address,
         'rsmc_multi_address_script_pub_key : ' + response.latestCcommitmentTxInfo.rsmc_multi_address_script_pub_key,
@@ -3590,6 +3685,58 @@ function displayOBDConnectHistory() {
     }
 
     parent.append(newDiv);
+}
+
+// 
+function displayCustomRequest() {
+
+    var parent = $("#name_req_div");
+
+    var newDiv = document.createElement('div');
+    newDiv.setAttribute('class', 'panelItem');
+
+    createElement(newDiv, 'text', 'Request', 'request_title');
+
+    // create [button] element
+    var button = document.createElement('button');
+    // button.id = 'button_connect';
+    button.setAttribute('class', 'button button_request');
+    button.setAttribute('onclick', 'sendCustomRequest()');
+    button.innerText = 'Send';
+    newDiv.append(button);
+
+    //
+    var request = document.createElement('textarea');
+    request.id = 'custom_request';
+    request.setAttribute('class', 'custom_textarea');
+    request.setAttribute('cols', '70');
+    request.setAttribute('rows', '10');
+    request.placeholder = 'Input custom request infomation. (type protocol)';
+    newDiv.append(request);
+
+    parent.append(newDiv);
+}
+
+//
+function sendCustomRequest() {
+
+    var custom_request  = $("#custom_request").val();
+
+    // if (name.trim() === '' || pubkey.trim() === '') {
+    //     alert('Please input complete data.');
+    //     return;
+    // }
+
+    // OBD API
+    obdApi.sendJsonData(custom_request, function(e) {
+        console.info('sendCustomRequest - OBD Response = ' + JSON.stringify(e));
+
+        // Save List of friends who have interacted.
+        // saveFriendsList(name, p2pID);
+        // Save Non-finalized channel information.
+        // saveChannelCreation(e);
+        // createOBDResponseDiv(e, msgType);
+    });
 }
 
 //
