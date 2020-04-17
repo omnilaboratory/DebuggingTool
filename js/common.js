@@ -36,6 +36,9 @@ var saveFriends = 'friends';
 var saveOBDList = 'obd_list';
 
 //
+var invokeHistory = 'invoke_history';
+
+//
 var saveMnemonic = 'mnemonic';
 
 //
@@ -1126,27 +1129,27 @@ function displayOBDMessages(content) {
     console.info("broadcast info:", JSON.stringify(content));
 
     var msgHead;
-    var fullMsg = JSON.stringify(content);
+    var fullMsg = JSON.stringify(content, null, 4);
     var msgTime = new Date().toLocaleString();
 
     switch (Number(content.type)) {
-        case enumMsgType.MsgType_Error_0:
-        case enumMsgType.MsgType_Core_GetNewAddress_1001:
-        case enumMsgType.MsgType_Mnemonic_CreateAddress_N200:
-        case enumMsgType.MsgType_Mnemonic_GetAddressByIndex_201:
-        case enumMsgType.MsgType_GetMnemonic_101:
-        case enumMsgType.MsgType_Core_BalanceByAddress_1008:
-        case enumMsgType.MsgType_Core_FundingBTC_1009:
-        case enumMsgType.MsgType_Core_Omni_Getbalance_1200:
-        case enumMsgType.MsgType_Core_Omni_GetAssetName_1207:
-        case enumMsgType.MsgType_Core_Omni_FundingAsset_2001:
-        case enumMsgType.MsgType_HTLC_Invoice_N4003:
-        case enumMsgType.MsgType_CommitmentTx_LatestCommitmentTxByChanId_N35104:
-        case enumMsgType.MsgType_CommitmentTx_ItemsByChanId_N35101:
-        case enumMsgType.MsgType_ChannelOpen_AllItem_N3202:
-        case enumMsgType.MsgType_GetChannelInfoByChanId_N3207:
-        case enumMsgType.MsgType_CommitmentTx_AllBRByChanId_N35109:
-            return;
+        // case enumMsgType.MsgType_Error_0:
+        // case enumMsgType.MsgType_Core_GetNewAddress_1001:
+        // case enumMsgType.MsgType_Mnemonic_CreateAddress_N200:
+        // case enumMsgType.MsgType_Mnemonic_GetAddressByIndex_201:
+        // case enumMsgType.MsgType_GetMnemonic_101:
+        // case enumMsgType.MsgType_Core_BalanceByAddress_1008:
+        // case enumMsgType.MsgType_Core_FundingBTC_1009:
+        // case enumMsgType.MsgType_Core_Omni_Getbalance_1200:
+        // case enumMsgType.MsgType_Core_Omni_GetAssetName_1207:
+        // case enumMsgType.MsgType_Core_Omni_FundingAsset_2001:
+        // case enumMsgType.MsgType_HTLC_Invoice_N4003:
+        // case enumMsgType.MsgType_CommitmentTx_LatestCommitmentTxByChanId_N35104:
+        // case enumMsgType.MsgType_CommitmentTx_ItemsByChanId_N35101:
+        // case enumMsgType.MsgType_ChannelOpen_AllItem_N3202:
+        // case enumMsgType.MsgType_GetChannelInfoByChanId_N3207:
+        // case enumMsgType.MsgType_CommitmentTx_AllBRByChanId_N35109:
+        //     return;
         case enumMsgType.MsgType_UserLogin_1:
             content.result = 'Logged In - ' + content.from;
             msgHead = msgTime +  '  - Logged In.';
@@ -1176,6 +1179,9 @@ function displayOBDMessages(content) {
             } else if (content.result.curr_state === 30) { // Not Accept
                 content.result = 'DECLINE - ' + content.from +
                     ' - decline Open Channel request. ';
+
+                msgHead = msgTime +  '  - decline Open Channel request.';
+
                 // 'The [temporary_channel_id] is : ' + 
                 // content.result.temporary_channel_id;
             }
@@ -1183,69 +1189,87 @@ function displayOBDMessages(content) {
         case enumMsgType.MsgType_FundingCreate_BtcCreate_N3400:
             content.result = 'Notification - ' + content.from +
                 ' - depositing BTC in Channel.';
+            msgHead = msgTime +  '  - Notification: depositing BTC in Channel.';
             break;
         case enumMsgType.MsgType_FundingSign_BtcSign_N3500:
             content.result = 'Reply - ' + content.from +
                 ' - depositing BTC message.';
+            msgHead = msgTime +  '  - Reply: depositing BTC message.';
             break;
         case enumMsgType.MsgType_FundingCreate_AssetFundingCreated_N34:
             content.result = 'Notification - ' + content.from +
                 ' - depositing Omni Asset in Channel.';
+            msgHead = msgTime +  '  - Notification: depositing Omni Asset in Channel.';
             break;
         case enumMsgType.MsgType_FundingSign_AssetFundingSigned_N35:
             content.result = 'Reply - ' + content.from +
                 ' - depositing Omni Asset message.';
+            msgHead = msgTime +  '  - Reply: depositing Omni Asset message.';
             break;
         case enumMsgType.MsgType_CommitmentTx_CommitmentTransactionCreated_N351:
             content.result = 'RSMC transfer - ' + content.from +
                 ' - launch a transfer.';
+            msgHead = msgTime +  '  - RSMC: launch a transfer.';
             break;
         case enumMsgType.MsgType_CommitmentTxSigned_RevokeAndAcknowledgeCommitmentTransaction_N352:
             content.result = 'RSMC transfer - ' + content.from +
                 ' - accept a transfer.';
+            msgHead = msgTime +  '  - RSMC: accept a transfer.';
             break;
         case enumMsgType.MsgType_HTLC_FindPathAndSendH_N42:
             content.result = 'HTLC - ' + content.from +
                 ' - launch a HTLC transfer.';
+            msgHead = msgTime +  '  - HTLC: launch a HTLC transfer.';
             break;
         case enumMsgType.MsgType_HTLC_SendH_N43:
             content.result = 'HTLC - ' + content.from +
                 ' - send H to next node.';
+            msgHead = msgTime +  '  - HTLC: send H to next node.';
             break;
         case enumMsgType.MsgType_HTLC_SignGetH_N44:
             content.result = 'HTLC - ' + content.from +
                 ' - accept a HTLC transfer.';
+            msgHead = msgTime +  '  - HTLC: accept a HTLC transfer.';
             break;
         case enumMsgType.MsgType_HTLC_CreateCommitmentTx_N45:
             content.result = 'HTLC - ' + content.from +
                 ' - had create HTLC commitment transactions.';
+            msgHead = msgTime +  '  - HTLC: had create HTLC commitment transactions.';
             break;
         case enumMsgType.MsgType_HTLC_SendR_N46:
             content.result = 'HTLC - ' + content.from +
                 ' - Sent R.';
+            msgHead = msgTime +  '  - HTLC: Sent R.';
             break;
         case enumMsgType.MsgType_HTLC_VerifyR_N47:
             content.result = 'HTLC - ' + content.from +
                 ' - Verify R.';
+            msgHead = msgTime +  '  - HTLC: Verify R.';
             break;
         case enumMsgType.MsgType_HTLC_RequestCloseCurrTx_N48:
             content.result = 'HTLC - ' + content.from +
                 ' - Request Close.';
+            msgHead = msgTime +  '  - HTLC: Request Close.';
             break;
         case enumMsgType.MsgType_HTLC_CloseSigned_N49:
             content.result = 'HTLC - ' + content.result.msg;
+            msgHead = msgTime +  '  - HTLC: Closed.';
             break;
         case enumMsgType.MsgType_CloseChannelRequest_N38:
             content.result = 'N38 Request Close Channel from - ' + content.from;
+            msgHead = msgTime +  '  - Request Close Channel.';
             break;
         case enumMsgType.MsgType_CloseChannelSign_N39:
             content.result = 'N39 Response Close Channel from - ' + content.from;
+            msgHead = msgTime +  '  - Response Close Channel.';
             break;
         case enumMsgType.MsgType_Atomic_Swap_N80:
             content.result = 'N80 Request Atomic Swap from - ' + content.from;
+            msgHead = msgTime +  '  - Request Atomic Swap.';
             break;
         case enumMsgType.MsgType_Atomic_Swap_Accept_N81:
             content.result = 'N81 Response Atomic Swap from - ' + content.from;
+            msgHead = msgTime +  '  - Response Atomic Swap.';
             break;
         default:
             msgHead = msgTime;
@@ -1728,7 +1752,8 @@ function createInvokeAPIButton(obj) {
 // 
 function displayCustomMode() {
     removeNameReqDiv();
-    createCustomModeDiv();
+    // createCustomModeDiv();
+    displayInvokeHistoryInNewHtml();
 }
 
 // 
@@ -1795,7 +1820,8 @@ function createConnectNodeDiv() {
 
 // create Div
 function createCustomModeDiv() {
-    var content_div = $("#name_req_div");
+    // var content_div = $("#name_req_div");
+    var content_div = $("#content");
 
     var newDiv = document.createElement('div');
     newDiv.setAttribute('class', 'panelItem');
@@ -1819,37 +1845,16 @@ function createCustomModeDiv() {
     request.id = 'custom_request';
     request.setAttribute('class', 'custom_textarea');
     request.setAttribute('cols', '70');
-    request.setAttribute('rows', '20');
+    request.setAttribute('rows', '26');
     request.placeholder = 'Input custom request infomation. (type protocol)';
     newDiv.append(request);
-
     content_div.append(newDiv);
-
-    // create [input title] element
-    // createElement(newDiv, 'text', 'OBD Node URL: ');
-
-    // create [input] element
-    // var node_url = document.createElement('input');
-    // node_url.id = 'node_url';
-    // node_url.setAttribute('class', 'input_conn_node');
-    // node_url.placeholder = 'Please input Node URL.';
-    // node_url.value = getNewestConnOBD();
-    // newDiv.append(node_url);
-
-    // create [button] element
-    // var button = document.createElement('button');
-    // button.id = 'button_connect';
-    // button.setAttribute('class', 'button button_small');
-    // button.setAttribute('onclick', 'connectOBD()');
-    // button.innerText = 'Connect';
-    // newDiv.append(button);
-    
-    // displayOBDConnectHistory();
-    // displayCustomRequest();
 }
 
 // 
 function clearOBDMsg() {
+    // Clear array
+    arrObdMsg.splice(0, arrObdMsg.length);
     $("#obd_messages").val("");
 }
 
@@ -3388,6 +3393,31 @@ function saveOBDConnectHistory(name) {
     }
 }
 
+// Save APIs invoked history in customize mode.
+function saveInvokeHistory(name) {
+
+    var list = JSON.parse(localStorage.getItem(invokeHistory));
+
+    // If has data.
+    if (list) {
+        // console.info('HAS DATA');
+        let new_data = {
+            name:  name,
+        }
+        list.result.push(new_data);
+        localStorage.setItem(invokeHistory, JSON.stringify(list));
+
+    } else {
+        // console.info('FIRST DATA');
+        let data = {
+            result: [{
+                name:  name,
+            }]
+        }
+        localStorage.setItem(invokeHistory, JSON.stringify(data));
+    }
+}
+
 // List of friends who have interacted
 function saveFriendsList(name, p2pID) {
 
@@ -3687,6 +3717,40 @@ function displayOBDConnectHistory() {
     parent.append(newDiv);
 }
 
+
+// List of APIs invoked history in customize mode.
+function displayInvokeHistory() {
+
+    var item;
+    var parent = $("#invoke_history");
+    var list = JSON.parse(localStorage.getItem(invokeHistory));
+
+    // var newDiv = document.createElement('div');
+    // newDiv.setAttribute('class', 'panelItem');
+
+    createElement(parent, 'h3', 'Invoked History');
+
+    // If has data
+    if (list) {
+        // console.info('has data');
+        for (let i = 0; i < list.result.length; i++) {
+            // createElement(newDiv, 'h4', 'NO. ' + (i + 1));
+            item = document.createElement('a');
+            item.href = '#';
+            item.innerText = list.result[i].name;
+            item.setAttribute('onclick', 'clickInvokeHistory(this)');
+            // item.setAttribute('class', 'url');
+            parent.append(item);
+            createElement(parent, 'p');
+        }
+    } else { // NO LOCAL STORAGE DATA YET.
+        // console.info('no data');
+        createElement(parent, 'h4', 'Has not invoked history yet.');
+    }
+
+    // parent.append(item);
+}
+
 // 
 function displayCustomRequest() {
 
@@ -3722,19 +3786,26 @@ function sendCustomRequest() {
 
     var custom_request  = $("#custom_request").val();
 
+    try {
+        var list = JSON.parse(custom_request);
+    } catch (error) {
+        alert("error input content.");
+        return;
+    }
+
+    // var list = JSON.parse(custom_request);
+    var type = list.type;
+    var saveVal = 'type : ' + type;
+
     // if (name.trim() === '' || pubkey.trim() === '') {
     //     alert('Please input complete data.');
     //     return;
     // }
 
     // OBD API
-    obdApi.sendJsonData(custom_request, function(e) {
+    obdApi.sendJsonData(custom_request, Number(type), function(e) {
         console.info('sendCustomRequest - OBD Response = ' + JSON.stringify(e));
-
-        // Save List of friends who have interacted.
-        // saveFriendsList(name, p2pID);
-        // Save Non-finalized channel information.
-        // saveChannelCreation(e);
+        saveInvokeHistory(saveVal);
         // createOBDResponseDiv(e, msgType);
     });
 }
@@ -3742,6 +3813,11 @@ function sendCustomRequest() {
 //
 function clickConnectionHistory(obj) {
     $("#node_url").val(obj.innerText);
+}
+
+//
+function clickInvokeHistory(obj) {
+    $("#custom_request").val(obj.innerText);
 }
 
 // List of channel creation process records.
@@ -4142,6 +4218,13 @@ function createElement(parent, elementName, myInnerText, cssStyle) {
 function displayUserDataInNewHtml(goWhere) {
     saveGoWhereData(goWhere);
     window.open('userData.html', 'data', 'height=600, width=800, top=150, ' +
+        'left=500, toolbar=no, menubar=no, scrollbars=no, resizable=no, ' +
+        'location=no, status=no');
+}
+
+//
+function displayInvokeHistoryInNewHtml() {
+    window.open('invokeHistory.html', 'data', 'top=150, ' +
         'left=500, toolbar=no, menubar=no, scrollbars=no, resizable=no, ' +
         'location=no, status=no');
 }

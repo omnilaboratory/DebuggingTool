@@ -21,7 +21,6 @@
 </script>
 
 <body>
-    <!-- <div id="container" style="width:device-width"> -->
     <div id="container">
         <!-- Header -->
         <div class="content" id="header">
@@ -41,16 +40,10 @@
                     </div> -->
                 </div>
             </div>
-
-            <!-- <div class="textareaBG">
-                <div><text>OBD Messages</text></div>
-                <div class="textarea"><textarea id="obd_messages" cols="80" rows="7" 
-                    readonly="yes" resize="none"></textarea></div>
-            </div> -->
         </div>
 
-        <!-- Left Side Menu -->
         <div class="main">
+            <!-- Left Side Menu -->
             <div class="leftSide" id="menu">
                 <div class="menuTitle">Start</div>
                 <a href="#" class="url" onclick="displayConnectOBD()">Connect to OBD node</a>
@@ -73,13 +66,11 @@
 
             <!-- API invoked area, click left side menu to display. -->
             <div id="content" style="width:700px;float:left;">
-            <!-- <div class="contain" id="content"> -->
                 <!-- Dynamic create in 'common.js' -->
             </div>
 
             <!-- OBD messages display area -->
             <div>
-                <!-- <div><text>OBD Messages</text></div> -->
                 <div><button class="button button_clear" 
                     onclick="clearOBDMsg()">Clear OBD Messages</button></div>
                 <div class="textarea"><textarea id="obd_messages" cols="80" rows="50" 

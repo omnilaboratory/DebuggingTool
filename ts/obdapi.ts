@@ -31,9 +31,10 @@ class ObdApi {
   /**
    * Send custom request
    * @param msg
+   * @param type
    * @param callback
    */
-  public sendJsonData(msg: string, callback: Function) {
+  public sendJsonData(msg: string, type: number, callback: Function) {
     if (this.isConnectToOBD == false) {
       alert("please try to connect obd again");
       return;
@@ -55,9 +56,9 @@ class ObdApi {
     );
     console.info(msg);
 
-    // if (callback != null) {
-    //   this.callbackMap[msg.type] = callback;
-    // }
+    if (callback != null) {
+      this.callbackMap[type] = callback;
+    }
 
     this.ws.send(msg);
     // this.ws.send(JSON.stringify(msg));

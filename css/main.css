@@ -62,6 +62,12 @@ body{
     font-size: 15px;
 }
 
+.custom_request_div{
+    width: 600px;
+    /* padding-left: 30px; */
+    /* padding-right: 50px; */
+}
+
 .input {
     width:  160px;
     height: 25px;
@@ -183,12 +189,14 @@ body{
     padding: 30px 30px 30px 20px;
     display: flex;
 }
+
 .leftSide{
     /* height: calc(150vh - 120px); */
     background: #f5f6f8;
     /* width: 180px; */
     /* padding: 1px 3px 3px 30px; */
     padding-left: 30px;
+    padding-right: 50px;
     /* display: flex; */
     overflow-y: auto;
 }
