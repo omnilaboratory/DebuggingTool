@@ -29,6 +29,42 @@ class ObdApi {
   }
 
   /**
+   * Send custom request
+   * @param msg
+   * @param type
+   * @param callback
+   */
+  public sendJsonData(msg: string, type: number, callback: Function) {
+    if (this.isConnectToOBD == false) {
+      alert("please try to connect obd again");
+      return;
+    }
+
+    if (this.isNotString(msg)) {
+      alert("error request content.");
+      return;
+    }
+
+    // if (msg.type < 0 && this.isLogin == false) {
+    //   alert("please login");
+    //   return;
+    // }
+
+    console.info(
+      new Date(),
+      "------send json msg------"
+    );
+    console.info(msg);
+
+    if (callback != null) {
+      this.callbackMap[type] = callback;
+    }
+
+    this.ws.send(msg);
+    // this.ws.send(JSON.stringify(msg));
+  }
+
+  /**
    * connectToServer
    * @param address string
    * @param callback function
@@ -136,7 +172,7 @@ class ObdApi {
       tempData.type = jsonData.type;
       tempData.result = jsonData.data;
       tempData.sender_peer_id = jsonData.sender_peer_id;
-      tempData.recipient_peer_id = jsonData.recipient_peer_id;
+      tempData.recipient_user_peer_id = jsonData.recipient_user_peer_id;
       jsonData = tempData;
     }
     if (this.globalCallback) {
@@ -377,24 +413,24 @@ class ObdApi {
 
   /**
    * MsgType_FundingCreate_BtcCreate_N3400
-   * @param recipient_p2p_peer_id string
-   * @param recipient_peer_id string
+   * @param recipient_node_peer_id string
+   * @param recipient_user_peer_id string
    * @param info  FundingBtcCreated
    * @param callback  Function
    */
   public btcFundingCreated(
-    recipient_p2p_peer_id: string,
-    recipient_peer_id: string,
+    recipient_node_peer_id: string,
+    recipient_user_peer_id: string,
     info: FundingBtcCreated,
     callback: Function
   ) {
-    if (this.isNotString(recipient_p2p_peer_id)) {
-      alert("error recipient_p2p_peer_id");
+    if (this.isNotString(recipient_node_peer_id)) {
+      alert("error recipient_node_peer_id");
       return;
     }
 
-    if (this.isNotString(recipient_peer_id)) {
-      alert("error recipient_peer_id");
+    if (this.isNotString(recipient_user_peer_id)) {
+      alert("error recipient_user_peer_id");
       return;
     }
 
@@ -413,32 +449,32 @@ class ObdApi {
 
     let msg = new Message();
     msg.type = this.messageType.MsgType_FundingCreate_BtcCreate_N3400;
-    msg.recipient_peer_id = recipient_peer_id;
-    msg.recipient_p2p_peer_id = recipient_p2p_peer_id;
+    msg.recipient_user_peer_id = recipient_user_peer_id;
+    msg.recipient_node_peer_id = recipient_node_peer_id;
     msg.data = info;
     this.sendData(msg, callback);
   }
 
   /**
    * MsgType_FundingSign_BtcSign_N3500
-   * @param recipient_p2p_peer_id string
-   * @param recipient_peer_id string
+   * @param recipient_node_peer_id string
+   * @param recipient_user_peer_id string
    * @param info FundingBtcSigned
    * @param callback  Function
    */
   public btcFundingSigned(
-    recipient_p2p_peer_id: string,
-    recipient_peer_id: string,
+    recipient_node_peer_id: string,
+    recipient_user_peer_id: string,
     info: FundingBtcSigned,
     callback: Function
   ) {
-    if (this.isNotString(recipient_p2p_peer_id)) {
-      alert("error recipient_p2p_peer_id");
+    if (this.isNotString(recipient_node_peer_id)) {
+      alert("error recipient_node_peer_id");
       return;
     }
 
-    if (this.isNotString(recipient_peer_id)) {
-      alert("error recipient_peer_id");
+    if (this.isNotString(recipient_user_peer_id)) {
+      alert("error recipient_user_peer_id");
       return;
     }
 
@@ -460,8 +496,8 @@ class ObdApi {
 
     let msg = new Message();
     msg.type = this.messageType.MsgType_FundingSign_BtcSign_N3500;
-    msg.recipient_peer_id = recipient_peer_id;
-    msg.recipient_p2p_peer_id = recipient_p2p_peer_id;
+    msg.recipient_user_peer_id = recipient_user_peer_id;
+    msg.recipient_node_peer_id = recipient_node_peer_id;
     msg.data = info;
     this.sendData(msg, callback);
   }
@@ -547,14 +583,14 @@ class ObdApi {
   /**
    * MsgType_ChannelOpen_N32
    * @param funding_pubkey string
-   * @param recipient_peer_id string
-   * @param recipient_p2p_peer_id string
+   * @param recipient_user_peer_id string
+   * @param recipient_node_peer_id string
    * @param callback function
    */
   public openChannel(
     funding_pubkey: string,
-    recipient_peer_id: string,
-    recipient_p2p_peer_id: string,
+    recipient_user_peer_id: string,
+    recipient_node_peer_id: string,
     callback: Function
   ) {
     if (this.isNotString(funding_pubkey)) {
@@ -562,45 +598,45 @@ class ObdApi {
       return;
     }
 
-    if (this.isNotString(recipient_peer_id)) {
-      alert("error recipient_peer_id");
+    if (this.isNotString(recipient_user_peer_id)) {
+      alert("error recipient_user_peer_id");
       return;
     }
 
-    if (this.isNotString(recipient_p2p_peer_id)) {
-      alert("error recipient_p2p_peer_id");
+    if (this.isNotString(recipient_node_peer_id)) {
+      alert("error recipient_node_peer_id");
       return;
     }
 
     let msg = new Message();
     msg.type = this.messageType.MsgType_ChannelOpen_N32;
     msg.data["funding_pubkey"] = funding_pubkey;
-    msg.recipient_peer_id = recipient_peer_id;
-    msg.recipient_p2p_peer_id = recipient_p2p_peer_id;
+    msg.recipient_user_peer_id = recipient_user_peer_id;
+    msg.recipient_node_peer_id = recipient_node_peer_id;
     this.sendData(msg, callback);
   }
   public onOpenChannel(jsonData: any) {}
 
   /**
    * MsgType_ChannelAccept_N33
-   * @param recipient_p2p_peer_id string
-   * @param recipient_peer_id string
+   * @param recipient_node_peer_id string
+   * @param recipient_user_peer_id string
    * @param info AcceptChannelInfo
    * @param callback function
    */
   public acceptChannel(
-    recipient_p2p_peer_id: string,
-    recipient_peer_id: string,
+    recipient_node_peer_id: string,
+    recipient_user_peer_id: string,
     info: AcceptChannelInfo,
     callback: Function
   ) {
-    if (this.isNotString(recipient_p2p_peer_id)) {
-      alert("error recipient_p2p_peer_id");
+    if (this.isNotString(recipient_node_peer_id)) {
+      alert("error recipient_node_peer_id");
       return;
     }
 
-    if (this.isNotString(recipient_peer_id)) {
-      alert("error recipient_peer_id");
+    if (this.isNotString(recipient_user_peer_id)) {
+      alert("error recipient_user_peer_id");
       return;
     }
 
@@ -622,8 +658,8 @@ class ObdApi {
 
     let msg = new Message();
     msg.type = this.messageType.MsgType_ChannelAccept_N33;
-    msg.recipient_peer_id = recipient_peer_id;
-    msg.recipient_p2p_peer_id = recipient_p2p_peer_id;
+    msg.recipient_user_peer_id = recipient_user_peer_id;
+    msg.recipient_node_peer_id = recipient_node_peer_id;
     msg.data = info;
     this.sendData(msg, callback);
   }
@@ -631,24 +667,24 @@ class ObdApi {
 
   /**
    * MsgType_FundingCreate_AssetFundingCreated_N34
-   * @param recipient_p2p_peer_id string
-   * @param recipient_peer_id string
+   * @param recipient_node_peer_id string
+   * @param recipient_user_peer_id string
    * @param info ChannelFundingCreatedInfo
    * @param callback function
    */
   public channelFundingCreated(
-    recipient_p2p_peer_id: string,
-    recipient_peer_id: string,
+    recipient_node_peer_id: string,
+    recipient_user_peer_id: string,
     info: ChannelFundingCreatedInfo,
     callback: Function
   ) {
-    if (this.isNotString(recipient_p2p_peer_id)) {
-      alert("error recipient_p2p_peer_id");
+    if (this.isNotString(recipient_node_peer_id)) {
+      alert("error recipient_node_peer_id");
       return;
     }
 
-    if (this.isNotString(recipient_peer_id)) {
-      alert("error recipient_peer_id");
+    if (this.isNotString(recipient_user_peer_id)) {
+      alert("error recipient_user_peer_id");
       return;
     }
 
@@ -675,8 +711,8 @@ class ObdApi {
 
     let msg = new Message();
     msg.type = this.messageType.MsgType_FundingCreate_AssetFundingCreated_N34;
-    msg.recipient_peer_id = recipient_peer_id;
-    msg.recipient_p2p_peer_id = recipient_p2p_peer_id;
+    msg.recipient_user_peer_id = recipient_user_peer_id;
+    msg.recipient_node_peer_id = recipient_node_peer_id;
     msg.data = info;
     this.sendData(msg, callback);
   }
@@ -684,24 +720,24 @@ class ObdApi {
 
   /**
    * MsgType_FundingSign_AssetFundingSigned_N35
-   * @param recipient_p2p_peer_id string
-   * @param recipient_peer_id string
+   * @param recipient_node_peer_id string
+   * @param recipient_user_peer_id string
    * @param info ChannelFundingSignedInfo
    * @param callback function
    */
   public channelFundingSigned(
-    recipient_p2p_peer_id: string,
-    recipient_peer_id: string,
+    recipient_node_peer_id: string,
+    recipient_user_peer_id: string,
     info: ChannelFundingSignedInfo,
     callback: Function
   ) {
-    if (this.isNotString(recipient_p2p_peer_id)) {
-      alert("error recipient_p2p_peer_id");
+    if (this.isNotString(recipient_node_peer_id)) {
+      alert("error recipient_node_peer_id");
       return;
     }
 
-    if (this.isNotString(recipient_peer_id)) {
-      alert("error recipient_peer_id");
+    if (this.isNotString(recipient_user_peer_id)) {
+      alert("error recipient_user_peer_id");
       return;
     }
 
@@ -721,8 +757,8 @@ class ObdApi {
 
     let msg = new Message();
     msg.type = this.messageType.MsgType_FundingSign_AssetFundingSigned_N35;
-    msg.recipient_peer_id = recipient_peer_id;
-    msg.recipient_p2p_peer_id = recipient_p2p_peer_id;
+    msg.recipient_user_peer_id = recipient_user_peer_id;
+    msg.recipient_node_peer_id = recipient_node_peer_id;
     msg.data = info;
     this.sendData(msg, callback);
   }
@@ -730,24 +766,24 @@ class ObdApi {
 
   /**
    * MsgType_CommitmentTx_CommitmentTransactionCreated_N351
-   * @param recipient_p2p_peer_id string
-   * @param recipient_peer_id string
+   * @param recipient_node_peer_id string
+   * @param recipient_user_peer_id string
    * @param info CommitmentTx
    * @param callback function
    */
   public commitmentTransactionCreated(
-    recipient_p2p_peer_id: string,
-    recipient_peer_id: string,
+    recipient_node_peer_id: string,
+    recipient_user_peer_id: string,
     info: CommitmentTx,
     callback: Function
   ) {
-    if (this.isNotString(recipient_p2p_peer_id)) {
-      alert("error recipient_p2p_peer_id");
+    if (this.isNotString(recipient_node_peer_id)) {
+      alert("error recipient_node_peer_id");
       return;
     }
 
-    if (this.isNotString(recipient_peer_id)) {
-      alert("error recipient_peer_id");
+    if (this.isNotString(recipient_user_peer_id)) {
+      alert("error recipient_user_peer_id");
       return;
     }
 
@@ -777,8 +813,8 @@ class ObdApi {
     }
     let msg = new Message();
     msg.type = this.messageType.MsgType_CommitmentTx_CommitmentTransactionCreated_N351;
-    msg.recipient_peer_id = recipient_peer_id;
-    msg.recipient_p2p_peer_id = recipient_p2p_peer_id;
+    msg.recipient_user_peer_id = recipient_user_peer_id;
+    msg.recipient_node_peer_id = recipient_node_peer_id;
     msg.data = info;
     this.sendData(msg, callback);
   }
@@ -786,24 +822,24 @@ class ObdApi {
 
   /**
    * MsgType_CommitmentTxSigned_RevokeAndAcknowledgeCommitmentTransaction_N352
-   * @param recipient_p2p_peer_id string
-   * @param recipient_peer_id string
+   * @param recipient_node_peer_id string
+   * @param recipient_user_peer_id string
    * @param info CommitmentTxSigned
    * @param callback function
    */
   public revokeAndAcknowledgeCommitmentTransaction(
-    recipient_p2p_peer_id: string,
-    recipient_peer_id: string,
+    recipient_node_peer_id: string,
+    recipient_user_peer_id: string,
     info: CommitmentTxSigned,
     callback: Function
   ) {
-    if (this.isNotString(recipient_p2p_peer_id)) {
-      alert("error recipient_p2p_peer_id");
+    if (this.isNotString(recipient_node_peer_id)) {
+      alert("error recipient_node_peer_id");
       return;
     }
 
-    if (this.isNotString(recipient_peer_id)) {
-      alert("error recipient_peer_id");
+    if (this.isNotString(recipient_user_peer_id)) {
+      alert("error recipient_user_peer_id");
       return;
     }
 
@@ -837,8 +873,8 @@ class ObdApi {
 
     let msg = new Message();
     msg.type = this.messageType.MsgType_CommitmentTxSigned_RevokeAndAcknowledgeCommitmentTransaction_N352;
-    msg.recipient_peer_id = recipient_peer_id;
-    msg.recipient_p2p_peer_id = recipient_p2p_peer_id;
+    msg.recipient_user_peer_id = recipient_user_peer_id;
+    msg.recipient_node_peer_id = recipient_node_peer_id;
     msg.data = info;
     this.sendData(msg, callback);
   }
@@ -850,8 +886,8 @@ class ObdApi {
    * @param callback function
    */
   public htlcInvoice(info: HtlcHInfo, callback: Function) {
-    if (this.isNotString(info.recipient_peer_id)) {
-      alert("empty recipient_peer_id");
+    if (this.isNotString(info.recipient_user_peer_id)) {
+      alert("empty recipient_user_peer_id");
       return;
     }
     if (info.property_id == null || info.property_id <= 0) {
@@ -876,8 +912,8 @@ class ObdApi {
    * @param callback function
    */
   public addHtlc(info: HtlcHInfo, callback: Function) {
-    if (this.isNotString(info.recipient_peer_id)) {
-      alert("empty recipient_peer_id");
+    if (this.isNotString(info.recipient_user_peer_id)) {
+      alert("empty recipient_user_peer_id");
       return;
     }
     if (info.property_id == null || info.property_id <= 0) {
@@ -908,12 +944,12 @@ class ObdApi {
       alert("empty h");
       return;
     }
-    if (this.isNotString(info.recipient_peer_id)) {
-      alert("empty recipient_peer_id");
+    if (this.isNotString(info.recipient_user_peer_id)) {
+      alert("empty recipient_user_peer_id");
       return;
     }
     if (info.property_id <= 0) {
-      alert("wrong recipient_peer_id");
+      alert("wrong recipient_user_peer_id");
       return;
     }
     if (info.amount <= 0) {
@@ -1355,6 +1391,23 @@ class ObdApi {
   public onOmniGetAllBalancesForAddress(jsonData: any) {}
 
   /**
+   * MsgType_Core_Omni_GetAssetName_1207
+   * @param propertyId string
+   * @param callback function
+   */
+  public omniGetAssetNameByID(propertyId: string, callback: Function) {
+    if (this.isNotString(propertyId)) {
+      alert("empty propertyId");
+      return;
+    }
+    let msg = new Message();
+    msg.type = this.messageType.MsgType_Core_Omni_GetAssetName_1207;
+    msg.data["propertyId"] = propertyId;
+    this.sendData(msg, callback);
+  }
+  public onOmniGetAssetNameByID(jsonData: any) {}
+
+  /**
    * MsgType_Core_BalanceByAddress_1008
    * @param address string
    * @param callback function
@@ -1682,8 +1735,8 @@ class ObdApi {
       alert("empty channel_id_to");
       return;
     }
-    if (this.isNotString(info.recipient_peer_id)) {
-      alert("empty recipient_peer_id");
+    if (this.isNotString(info.recipient_user_peer_id)) {
+      alert("empty recipient_user_peer_id");
       return;
     }
     if (this.isNotString(info.transaction_id)) {
@@ -1727,8 +1780,8 @@ class ObdApi {
       alert("empty channel_id_to");
       return;
     }
-    if (this.isNotString(info.recipient_peer_id)) {
-      alert("empty recipient_peer_id");
+    if (this.isNotString(info.recipient_user_peer_id)) {
+      alert("empty recipient_user_peer_id");
       return;
     }
     if (this.isNotString(info.transaction_id)) {

@@ -31,18 +31,16 @@
 
     // 
     function connectOBD() {
-        var node_url = 'ws://127.0.0.1:60020/ws';
-        // console.info('node url = ' + node_url);
-
-        obdApi.connectToServer(node_url, function(response) {
+        var nodeAddress = getNewestConnOBD();
+        obdApi.connectToServer(nodeAddress, function(response) {
             // console.info('OBD Response = ' + response);
         }, function(globalResponse) {
         });
     }
 
     //
-    if (data.goWhere === 'Addresses') {
-        console.info('IS from Addresses');
+    if (data.goWhere === 'MyAddresses') {
+        console.info('IS from MyAddresses');
         connectOBD();
     }
 </script>

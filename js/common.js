@@ -15,6 +15,7 @@ var cssStyle = 'color:gray';
 
 // save OBD messages
 var obdMessages = '';
+var arrObdMsg = [];
 
 // mnemonic using for login
 var mnemonicWithLogined = '';
@@ -23,13 +24,19 @@ var mnemonicWithLogined = '';
 var inNewHtml = 'in_new_html';
 
 //
-var saveTempCI = 'channel_reation';
+var saveChannelList = 'channel_list';
 
 //
 var saveAddr = 'addr';
 
 //
-var saveFriends = 'friends';
+var saveCounterparties = 'counterparties';
+
+//
+var saveOBDList = 'obd_list';
+
+//
+var invokeHistory = 'invoke_history';
 
 //
 var saveMnemonic = 'mnemonic';
@@ -37,7 +44,7 @@ var saveMnemonic = 'mnemonic';
 //
 var saveGoWhere = 'go_where';
 
-// the info save to local storage [ChannelCreation].
+// the info save to local storage [ChannelList].
 var channelInfo;
 
 // word wrap code.
@@ -147,8 +154,7 @@ function logIn(msgType) {
         createOBDResponseDiv(e, msgType);
         isLogined = true;
 
-        // save friends list
-        saveFriendsList(userID, e.p2pNodePeerId);
+        saveCounterpartiesList(userID, e.nodePeerId);
 
     });
 }
@@ -156,10 +162,10 @@ function logIn(msgType) {
 // 3 connectP2PNode API at local.
 function connectP2PNode(msgType) {
 
-    var node_url  = $("#node_url").val();
+    var nodeAddress  = $("#NodeAddress").val();
 
     // OBD API
-    obdApi.connectP2PNode(node_url, function(e) {
+    obdApi.connectP2PNode(nodeAddress, function(e) {
         console.info('connectP2PNode - OBD Response = ' + JSON.stringify(e));
         createOBDResponseDiv(e, msgType);
     });
@@ -168,22 +174,13 @@ function connectP2PNode(msgType) {
 // -32 openChannel API at local.
 function openChannel(msgType) {
 
-    var p2pID  = $("#recipient_p2p_peer_id").val();
-    var name   = $("#recipient_peer_id").val();
+    var p2pID  = $("#recipient_node_peer_id").val();
+    var name   = $("#recipient_user_peer_id").val();
     var pubkey = $("#funding_pubkey").val();
-
-    // if (name.trim() === '' || pubkey.trim() === '') {
-    //     alert('Please input complete data.');
-    //     return;
-    // }
 
     // OBD API
     obdApi.openChannel(pubkey, name, p2pID, function(e) {
         console.info('openChannel - OBD Response = ' + JSON.stringify(e));
-
-        // Save List of friends who have interacted.
-        // saveFriendsList(name, p2pID);
-        // Save Non-finalized channel information.
         saveChannelCreation(e);
         createOBDResponseDiv(e, msgType);
     });
@@ -192,8 +189,8 @@ function openChannel(msgType) {
 // -33 accept Channel API at local.
 function acceptChannel(msgType) {
 
-    var p2pID    = $("#recipient_p2p_peer_id").val();
-    var name     = $("#recipient_peer_id").val();
+    var p2pID    = $("#recipient_node_peer_id").val();
+    var name     = $("#recipient_user_peer_id").val();
     var temp_cid = $("#temporary_channel_id").val();
     var pubkey   = $("#funding_pubkey").val();
     var approval = $("#checkbox_n33").prop("checked");
@@ -277,7 +274,7 @@ function createHtlcCTx(msgType) {
 
     // Get channel_id with request_hash.
     var tempChID;
-    var list = JSON.parse(localStorage.getItem(saveTempCI));
+    var list = JSON.parse(localStorage.getItem(saveChannelList));
     for (let i = 0; i < list.result.length; i++) {
         for (let i2 = 0; i2 < list.result[i].htlc.length; i2++) {
             if (request_hash === list.result[i].htlc[i2].request_hash) {
@@ -315,7 +312,7 @@ function htlcSendR(msgType) {
 
     // Get channel_id with request_hash.
     var tempChID;
-    var list = JSON.parse(localStorage.getItem(saveTempCI));
+    var list = JSON.parse(localStorage.getItem(saveChannelList));
     for (let i = 0; i < list.result.length; i++) {
         for (let i2 = 0; i2 < list.result[i].htlc.length; i2++) {
             if (request_hash === list.result[i].htlc[i2].request_hash) {
@@ -349,7 +346,7 @@ function htlcVerifyR(msgType) {
 
     // Get channel_id with request_hash.
     var tempChID;
-    var list = JSON.parse(localStorage.getItem(saveTempCI));
+    var list = JSON.parse(localStorage.getItem(saveChannelList));
     for (let i = 0; i < list.result.length; i++) {
         for (let i2 = 0; i2 < list.result[i].htlc.length; i2++) {
             if (request_hash === list.result[i].htlc[i2].request_hash) {
@@ -422,7 +419,7 @@ function closeHtlcTxSigned(msgType) {
 
     // Get channel_id with request_hash.
     var channel_id;
-    var list = JSON.parse(localStorage.getItem(saveTempCI));
+    var list = JSON.parse(localStorage.getItem(saveChannelList));
     for (let i = 0; i < list.result.length; i++) {
         for (let i2 = 0; i2 < list.result[i].htlc.length; i2++) {
             if (request_close_htlc_hash === list.result[i].htlc[i2].request_hash) {
@@ -447,7 +444,7 @@ function atomicSwap(msgType) {
 
     var channel_id_from = $("#channel_id_from").val();
     var channel_id_to = $("#channel_id_to").val();
-    var recipient_peer_id = $("#recipient_peer_id").val();
+    var recipient_user_peer_id = $("#recipient_user_peer_id").val();
     var property_sent = $("#property_sent").val();
     var amount = $("#amount").val();
     var exchange_rate = $("#exchange_rate").val();
@@ -459,7 +456,7 @@ function atomicSwap(msgType) {
     let info = new AtomicSwapRequest();
     info.channel_id_from = channel_id_from;
     info.channel_id_to = channel_id_to;
-    info.recipient_peer_id = recipient_peer_id;
+    info.recipient_user_peer_id = recipient_user_peer_id;
     info.property_sent = Number(property_sent);
     info.amount = Number(amount);
     info.exchange_rate = Number(exchange_rate);
@@ -483,7 +480,7 @@ function atomicSwapAccepted(msgType) {
 
     var channel_id_from = $("#channel_id_from").val();
     var channel_id_to = $("#channel_id_to").val();
-    var recipient_peer_id = $("#recipient_peer_id").val();
+    var recipient_user_peer_id = $("#recipient_user_peer_id").val();
     var property_sent = $("#property_sent").val();
     var amount = $("#amount").val();
     var exchange_rate = $("#exchange_rate").val();
@@ -495,7 +492,7 @@ function atomicSwapAccepted(msgType) {
     let info = new AtomicSwapAccepted();
     info.channel_id_from = channel_id_from;
     info.channel_id_to = channel_id_to;
-    info.recipient_peer_id = recipient_peer_id;
+    info.recipient_user_peer_id = recipient_user_peer_id;
     info.property_sent = Number(property_sent);
     info.amount = Number(amount);
     info.exchange_rate = Number(exchange_rate);
@@ -562,6 +559,21 @@ function getBalanceForOmni(msgType) {
     // OBD API
     obdApi.omniGetAllBalancesForAddress(address, function(e) {
         console.info('1200 getBalanceForOmni - OBD Response = ' + JSON.stringify(e));
+        createOBDResponseDiv(e, msgType);
+    });
+}
+
+/** 
+ * 1207 getAssetNameByID API at local.
+ * @param msgType
+ */
+function getAssetNameByID(msgType) {
+
+    var propertyId = $("#PropertyID").val();
+
+    // OBD API
+    obdApi.omniGetAssetNameByID(propertyId, function(e) {
+        console.info('1207 getAssetNameByID - OBD Response = ' + JSON.stringify(e));
         createOBDResponseDiv(e, msgType);
     });
 }
@@ -641,8 +653,8 @@ function getLatestCommitmentTx(msgType) {
 // BTC Funding Created -3400 API at local.
 function btcFundingCreated(msgType) {
 
-    var p2pID    = $("#recipient_p2p_peer_id").val();
-    var name     = $("#recipient_peer_id").val();
+    var p2pID    = $("#recipient_node_peer_id").val();
+    var name     = $("#recipient_user_peer_id").val();
     var temp_cid = $("#temporary_channel_id").val();
     var privkey  = $("#channel_address_private_key").val();
     var tx_hex   = $("#funding_tx_hex").val();
@@ -666,8 +678,8 @@ function btcFundingCreated(msgType) {
 // BTC Funding Signed -3500 API at local.
 function btcFundingSigned(msgType) {
 
-    var p2pID    = $("#recipient_p2p_peer_id").val();
-    var name     = $("#recipient_peer_id").val();
+    var p2pID    = $("#recipient_node_peer_id").val();
+    var name     = $("#recipient_user_peer_id").val();
     var temp_cid = $("#temporary_channel_id").val();
     var privkey  = $("#channel_address_private_key").val();
     var tx_id    = $("#funding_txid").val();
@@ -693,8 +705,8 @@ function btcFundingSigned(msgType) {
 // Omni Asset Funding Created -34 API at local.
 function assetFundingCreated(msgType) {
 
-    var p2pID    = $("#recipient_p2p_peer_id").val();
-    var name     = $("#recipient_peer_id").val();
+    var p2pID    = $("#recipient_node_peer_id").val();
+    var name     = $("#recipient_user_peer_id").val();
     var temp_cid = $("#temporary_channel_id").val();
     var t_ad_pbk = $("#temp_address_pub_key").val();
     var t_ad_prk = $("#temp_address_private_key").val();
@@ -722,8 +734,8 @@ function assetFundingCreated(msgType) {
 // Omni Asset Funding Signed -35 API at local.
 function assetFundingSigned(msgType) {
 
-    var p2pID      = $("#recipient_p2p_peer_id").val();
-    var name       = $("#recipient_peer_id").val();
+    var p2pID      = $("#recipient_node_peer_id").val();
+    var name       = $("#recipient_user_peer_id").val();
     var channel_id = $("#channel_id").val();
     var privkey    = $("#fundee_channel_address_private_key").val();
     var approval   = $("#checkbox_n35").prop("checked");
@@ -766,7 +778,7 @@ function fundingBTC(msgType) {
 
     // Get temporary_channel_id with channel_address.
     var tempChID;
-    var list = JSON.parse(localStorage.getItem(saveTempCI));
+    var list = JSON.parse(localStorage.getItem(saveChannelList));
     for (let i = 0; i < list.result.length; i++) {
         for (let i2 = 0; i2 < list.result[i].data.length; i2++) {
             if (to_address === list.result[i].data[i2].channel_address) {
@@ -801,7 +813,7 @@ function fundingAsset(msgType) {
 
     // Get temporary_channel_id with channel_address.
     var tempChID;
-    var list = JSON.parse(localStorage.getItem(saveTempCI));
+    var list = JSON.parse(localStorage.getItem(saveChannelList));
     for (let i = 0; i < list.result.length; i++) {
         for (let i2 = 0; i2 < list.result[i].data.length; i2++) {
             if (to_address === list.result[i].data[i2].channel_address) {
@@ -823,12 +835,12 @@ function createInvoice(msgType) {
 
     var property_id = $("#property_id").val();
     var amount = $("#amount").val();
-    var recipient_peer_id = $("#recipient_peer_id").val();
+    var recipient_user_peer_id = $("#recipient_user_peer_id").val();
 
     let info = new HtlcHInfo();
     info.property_id = Number(property_id);
     info.amount = Number(amount);
-    info.recipient_peer_id = recipient_peer_id;
+    info.recipient_user_peer_id = recipient_user_peer_id;
 
     // OBD API
     obdApi.htlcInvoice(info, function(e) {
@@ -843,14 +855,14 @@ function htlcFindPathAndSendH(msgType) {
 
     var property_id = $("#property_id").val();
     var amount = $("#amount").val();
-    var recipient_peer_id = $("#recipient_peer_id").val();
+    var recipient_user_peer_id = $("#recipient_user_peer_id").val();
     var h = $("#h").val();
     var memo = $("#memo").val();
 
     let info = new HtlcRequestFindPathAndSendH();
     info.property_id = Number(property_id);
     info.amount = Number(amount);
-    info.recipient_peer_id = recipient_peer_id;
+    info.recipient_user_peer_id = recipient_user_peer_id;
     info.h = h;
     info.memo = memo;
 
@@ -881,12 +893,12 @@ function WillBeUpdatedHTLCFindPath(msgType) {
 
     var property_id = $("#property_id").val();
     var amount = $("#amount").val();
-    var recipient_peer_id = $("#recipient_peer_id").val();
+    var recipient_user_peer_id = $("#recipient_user_peer_id").val();
 
     let info = new HtlcHInfo();
     info.property_id = Number(property_id);
     info.amount = Number(amount);
-    info.recipient_peer_id = recipient_peer_id;
+    info.recipient_user_peer_id = recipient_user_peer_id;
 
     // OBD API
     obdApi.addHtlc(info, function(e) {
@@ -899,8 +911,8 @@ function WillBeUpdatedHTLCFindPath(msgType) {
 // Commitment Transaction Created -351 API at local.
 function RSMCCTxCreated(msgType) {
 
-    var p2pID    = $("#recipient_p2p_peer_id").val();
-    var name     = $("#recipient_peer_id").val();
+    var p2pID    = $("#recipient_node_peer_id").val();
+    var name     = $("#recipient_user_peer_id").val();
     var channel_id = $("#channel_id").val();
     var amount = $("#amount").val();
     var curr_temp_address_pub_key = $("#curr_temp_address_pub_key").val();
@@ -927,8 +939,8 @@ function RSMCCTxCreated(msgType) {
 // Revoke and Acknowledge Commitment Transaction -352 API at local.
 function RSMCCTxSigned(msgType) {
 
-    var p2pID    = $("#recipient_p2p_peer_id").val();
-    var name     = $("#recipient_peer_id").val();
+    var p2pID    = $("#recipient_node_peer_id").val();
+    var name     = $("#recipient_user_peer_id").val();
     var channel_id = $("#channel_id").val();
     var curr_temp_address_pub_key = $("#curr_temp_address_pub_key").val();
     var curr_temp_address_private_key = $("#curr_temp_address_private_key").val();
@@ -964,6 +976,9 @@ function invokeAPIs(objSelf) {
         // Util APIs.
         case enumMsgType.MsgType_Core_Omni_Getbalance_1200:
             getBalanceForOmni(msgType);
+            break;
+        case enumMsgType.MsgType_Core_Omni_GetAssetName_1207:
+            getAssetNameByID(msgType);
             break;
         case enumMsgType.MsgType_CommitmentTx_AllBRByChanId_N35109:
             getAllBRTx(msgType);
@@ -1103,32 +1118,42 @@ function invokeAPIs(objSelf) {
 function displayOBDMessages(content) {
     console.info("broadcast info:", JSON.stringify(content));
 
+    var msgHead;
+    var fullMsg = JSON.stringify(content, null, 4);
+    var msgTime = new Date().toLocaleString();
+
     switch (Number(content.type)) {
-        case enumMsgType.MsgType_Error_0:
-        case enumMsgType.MsgType_Core_GetNewAddress_1001:
-        case enumMsgType.MsgType_Mnemonic_CreateAddress_N200:
-        case enumMsgType.MsgType_Mnemonic_GetAddressByIndex_201:
-        case enumMsgType.MsgType_GetMnemonic_101:
-        case enumMsgType.MsgType_Core_BalanceByAddress_1008:
-        case enumMsgType.MsgType_Core_FundingBTC_1009:
-        case enumMsgType.MsgType_Core_Omni_Getbalance_1200:
-        case enumMsgType.MsgType_Core_Omni_FundingAsset_2001:
-        case enumMsgType.MsgType_HTLC_Invoice_N4003:
-        case enumMsgType.MsgType_CommitmentTx_LatestCommitmentTxByChanId_N35104:
-        case enumMsgType.MsgType_CommitmentTx_ItemsByChanId_N35101:
-        case enumMsgType.MsgType_ChannelOpen_AllItem_N3202:
-        case enumMsgType.MsgType_GetChannelInfoByChanId_N3207:
-        case enumMsgType.MsgType_CommitmentTx_AllBRByChanId_N35109:
-            return;
+        // case enumMsgType.MsgType_Error_0:
+        // case enumMsgType.MsgType_Core_GetNewAddress_1001:
+        // case enumMsgType.MsgType_Mnemonic_CreateAddress_N200:
+        // case enumMsgType.MsgType_Mnemonic_GetAddressByIndex_201:
+        // case enumMsgType.MsgType_GetMnemonic_101:
+        // case enumMsgType.MsgType_Core_BalanceByAddress_1008:
+        // case enumMsgType.MsgType_Core_FundingBTC_1009:
+        // case enumMsgType.MsgType_Core_Omni_Getbalance_1200:
+        // case enumMsgType.MsgType_Core_Omni_GetAssetName_1207:
+        // case enumMsgType.MsgType_Core_Omni_FundingAsset_2001:
+        // case enumMsgType.MsgType_HTLC_Invoice_N4003:
+        // case enumMsgType.MsgType_CommitmentTx_LatestCommitmentTxByChanId_N35104:
+        // case enumMsgType.MsgType_CommitmentTx_ItemsByChanId_N35101:
+        // case enumMsgType.MsgType_ChannelOpen_AllItem_N3202:
+        // case enumMsgType.MsgType_GetChannelInfoByChanId_N3207:
+        // case enumMsgType.MsgType_CommitmentTx_AllBRByChanId_N35109:
+        //     return;
         case enumMsgType.MsgType_UserLogin_1:
             content.result = 'Logged In - ' + content.from;
+            msgHead = msgTime +  '  - Logged In.';
             break;
         case enumMsgType.MsgType_p2p_ConnectServer_3:
             content.result = 'Connect to P2P Node success.';
+            msgHead = msgTime+  '  - Connect to P2P Node success.';
             break;
         case enumMsgType.MsgType_ChannelOpen_N32:
             content.result = 'LAUNCH - ' + content.from +
                 ' - launch an Open Channel request. ';
+
+            msgHead = msgTime +  '  - launch an Open Channel request.';
+
             // 'The [temporary_channel_id] is : ' + 
             // content.result.temporary_channel_id;
             break;
@@ -1138,9 +1163,15 @@ function displayOBDMessages(content) {
                     ' - accept Open Channel request. ';
                 // 'The [temporary_channel_id] is : ' + 
                 // content.result.temporary_channel_id;
+
+                msgHead = msgTime +  '  - accept Open Channel request.';
+
             } else if (content.result.curr_state === 30) { // Not Accept
                 content.result = 'DECLINE - ' + content.from +
                     ' - decline Open Channel request. ';
+
+                msgHead = msgTime +  '  - decline Open Channel request.';
+
                 // 'The [temporary_channel_id] is : ' + 
                 // content.result.temporary_channel_id;
             }
@@ -1148,69 +1179,90 @@ function displayOBDMessages(content) {
         case enumMsgType.MsgType_FundingCreate_BtcCreate_N3400:
             content.result = 'Notification - ' + content.from +
                 ' - depositing BTC in Channel.';
+            msgHead = msgTime +  '  - Notification: depositing BTC in Channel.';
             break;
         case enumMsgType.MsgType_FundingSign_BtcSign_N3500:
             content.result = 'Reply - ' + content.from +
                 ' - depositing BTC message.';
+            msgHead = msgTime +  '  - Reply: depositing BTC message.';
             break;
         case enumMsgType.MsgType_FundingCreate_AssetFundingCreated_N34:
             content.result = 'Notification - ' + content.from +
                 ' - depositing Omni Asset in Channel.';
+            msgHead = msgTime +  '  - Notification: depositing Omni Asset in Channel.';
             break;
         case enumMsgType.MsgType_FundingSign_AssetFundingSigned_N35:
             content.result = 'Reply - ' + content.from +
                 ' - depositing Omni Asset message.';
+            msgHead = msgTime +  '  - Reply: depositing Omni Asset message.';
             break;
         case enumMsgType.MsgType_CommitmentTx_CommitmentTransactionCreated_N351:
             content.result = 'RSMC transfer - ' + content.from +
                 ' - launch a transfer.';
+            msgHead = msgTime +  '  - RSMC: launch a transfer.';
             break;
         case enumMsgType.MsgType_CommitmentTxSigned_RevokeAndAcknowledgeCommitmentTransaction_N352:
             content.result = 'RSMC transfer - ' + content.from +
                 ' - accept a transfer.';
+            msgHead = msgTime +  '  - RSMC: accept a transfer.';
             break;
         case enumMsgType.MsgType_HTLC_FindPathAndSendH_N42:
             content.result = 'HTLC - ' + content.from +
                 ' - launch a HTLC transfer.';
+            msgHead = msgTime +  '  - HTLC: launch a HTLC transfer.';
             break;
         case enumMsgType.MsgType_HTLC_SendH_N43:
             content.result = 'HTLC - ' + content.from +
                 ' - send H to next node.';
+            msgHead = msgTime +  '  - HTLC: send H to next node.';
             break;
         case enumMsgType.MsgType_HTLC_SignGetH_N44:
             content.result = 'HTLC - ' + content.from +
                 ' - accept a HTLC transfer.';
+            msgHead = msgTime +  '  - HTLC: accept a HTLC transfer.';
             break;
         case enumMsgType.MsgType_HTLC_CreateCommitmentTx_N45:
             content.result = 'HTLC - ' + content.from +
                 ' - had create HTLC commitment transactions.';
+            msgHead = msgTime +  '  - HTLC: had create HTLC commitment transactions.';
             break;
         case enumMsgType.MsgType_HTLC_SendR_N46:
             content.result = 'HTLC - ' + content.from +
                 ' - Sent R.';
+            msgHead = msgTime +  '  - HTLC: Sent R.';
             break;
         case enumMsgType.MsgType_HTLC_VerifyR_N47:
             content.result = 'HTLC - ' + content.from +
                 ' - Verify R.';
+            msgHead = msgTime +  '  - HTLC: Verify R.';
             break;
         case enumMsgType.MsgType_HTLC_RequestCloseCurrTx_N48:
             content.result = 'HTLC - ' + content.from +
                 ' - Request Close.';
+            msgHead = msgTime +  '  - HTLC: Request Close.';
             break;
         case enumMsgType.MsgType_HTLC_CloseSigned_N49:
             content.result = 'HTLC - ' + content.result.msg;
+            msgHead = msgTime +  '  - HTLC: Closed.';
             break;
         case enumMsgType.MsgType_CloseChannelRequest_N38:
             content.result = 'N38 Request Close Channel from - ' + content.from;
+            msgHead = msgTime +  '  - Request Close Channel.';
             break;
         case enumMsgType.MsgType_CloseChannelSign_N39:
             content.result = 'N39 Response Close Channel from - ' + content.from;
+            msgHead = msgTime +  '  - Response Close Channel.';
             break;
         case enumMsgType.MsgType_Atomic_Swap_N80:
             content.result = 'N80 Request Atomic Swap from - ' + content.from;
+            msgHead = msgTime +  '  - Request Atomic Swap.';
             break;
         case enumMsgType.MsgType_Atomic_Swap_Accept_N81:
             content.result = 'N81 Response Atomic Swap from - ' + content.from;
+            msgHead = msgTime +  '  - Response Atomic Swap.';
+            break;
+        default:
+            msgHead = msgTime;
             break;
     }
 
@@ -1218,14 +1270,27 @@ function displayOBDMessages(content) {
     content = content.replace("\"", "").replace("\"", "");
     console.info("OBD DIS - content = ", content);
 
-    // the info save to local storage [ChannelCreation].
+    // the info save to local storage [ChannelList].
     channelInfo = content;
 
     // Some case do not need displayed.
     if (content === 'already login' || content === 'undefined') return;
 
-    obdMessages += content + '\n\n';
-    $("#obd_messages").val(obdMessages);
+    // obdMessages += content + '\n\n';
+    // obdMessages += msgHead + fullMsg + '\n\n';
+
+    arrObdMsg.push(fullMsg);
+    arrObdMsg.push(msgHead);
+    
+    var showMsg = '';
+    for (let i = arrObdMsg.length - 1; i >= 0; i--) {
+        showMsg += arrObdMsg[i] + '\n\n';
+    }
+    
+    // console.info('arrObdMsg 1  = ' + arrObdMsg[1]);
+    // console.info('showMsg = ' + showMsg);
+
+    $("#obd_messages").val(showMsg);
 }
 
 // getUserDataList
@@ -1267,14 +1332,14 @@ function getUserDataList(goWhere) {
             case 'MnemonicWords':
                 displayUserData(MnemonicWords);
                 break;
-            case 'Addresses':
-                displayUserData(Addresses, inNewHtml);
+            case 'MyAddresses':
+                displayUserData(MyAddresses, inNewHtml);
                 break;
-            case 'Friends':
-                displayUserData(Friends);
+            case 'Counterparties':
+                displayUserData(Counterparties);
                 break;
-            case 'ChannelCreation':
-                displayUserData(ChannelCreation, inNewHtml);
+            case 'ChannelList':
+                displayUserData(ChannelList, inNewHtml);
                 break;
         }
     });
@@ -1376,14 +1441,14 @@ function createRequestDiv(obj) {
     // createElement(content_div, 'h2', 'Request');
 
     // create [func_title] element
-    createElement(newDiv, 'text', 'func: ', cssStyle);
+    createElement(newDiv, 'text', 'func: ');
 
     // create [func_name] element: id = JS function name.
-    createElement(newDiv, 'text', obj.getAttribute("id"));
+    createElement(newDiv, 'text', obj.getAttribute("id"), 'funcText');
 
     // create [type_id] element
     var value = " type ( " + obj.getAttribute("type_id") + " )";
-    createElement(newDiv, 'text', value, cssStyle);
+    createElement(newDiv, 'text', value);
 
     // create [Invoke API] element
     var button = document.createElement('button');
@@ -1601,7 +1666,7 @@ function createParamOfAPI(arrParams, content_div) {
         input_box = document.createElement('input');
         input_box.id = arrParams[i].name;
 
-        if (arrParams[i].name === 'node_url') {
+        if (arrParams[i].name === 'NodeAddress') {
             input_box.setAttribute('class', 'input_node_url');
         } else {
             input_box.setAttribute('class', 'input');
@@ -1674,8 +1739,15 @@ function createInvokeAPIButton(obj) {
 }
 
 //----------------------------------------------------------------
-// For test to show Connect to OBD html page.
-function connectNode() {
+// 
+function displayCustomMode() {
+    removeNameReqDiv();
+    // createCustomModeDiv();
+    displayInvokeHistoryInNewHtml();
+}
+
+// 
+function displayConnectOBD() {
     removeNameReqDiv();
     createConnectNodeDiv();
 }
@@ -1688,7 +1760,7 @@ function removeNameReqDiv() {
     $("#content").append(name_req_div);
 }
 
-// create ConnectNodeDiv
+// create Div
 function createConnectNodeDiv() {
     var content_div = $("#name_req_div");
 
@@ -1702,23 +1774,21 @@ function createConnectNodeDiv() {
     newDiv.append(title);
 
     // create [input title] element
-    createElement(newDiv, 'text', 'Node URL: ', cssStyle);
+    createElement(newDiv, 'text', 'Node Address: ');
 
     // create [input] element
-    var node_url = document.createElement('input');
-    node_url.id = 'node_url';
-    // node_url.style = 'width: 50%';
-    node_url.setAttribute('class', 'input_conn_node');
-    node_url.placeholder = 'Please input Node URL.';
-    // node_url.value = 'ws://62.234.216.108:60030/ws';
-    node_url.value = 'ws://127.0.0.1:60020/ws';
-    newDiv.append(node_url);
+    var nodeAddress = document.createElement('input');
+    nodeAddress.id = 'NodeAddress';
+    nodeAddress.setAttribute('class', 'input_conn_node');
+    nodeAddress.placeholder = 'Please input Node URL.';
+    nodeAddress.value = getNewestConnOBD();
+    newDiv.append(nodeAddress);
 
     // create [button] element
     var button = document.createElement('button');
     button.id = 'button_connect';
     button.setAttribute('class', 'button button_small');
-    button.setAttribute('onclick', 'clickConnectButton()');
+    button.setAttribute('onclick', 'connectOBD()');
     button.innerText = 'Connect';
     newDiv.append(button);
     
@@ -1729,28 +1799,69 @@ function createConnectNodeDiv() {
         changeConnectButtonStatus();
         createElement(content_div, 'h3', 'Already connected. ' + 
             'Please refresh the page if you want to connect again.');
+    } else {
+        displayOBDConnectHistory();
     }
 }
 
-// 
-function clickConnectButton() {
-    // get [node_url] input box value.
-    var node_url = $("#node_url").val();
-    console.info('node url = ' + node_url);
+// create Div
+function createCustomModeDiv() {
+    // var content_div = $("#name_req_div");
+    var content_div = $("#content");
 
-    if (node_url.trim().length === 0) {
-        alert('Please input Node URL.');
+    var newDiv = document.createElement('div');
+    newDiv.setAttribute('class', 'panelItem');
+
+    // create [title] element
+    var title = document.createElement('div');
+    title.setAttribute('class', 'panelTitle');
+    // createElement(title, 'h2', 'Custom Mode');
+    createElement(title, 'h2', 'Request');
+    newDiv.append(title);
+
+    // create [send button] element
+    var button = document.createElement('button');
+    button.setAttribute('class', 'button button_request');
+    button.setAttribute('onclick', 'sendCustomRequest()');
+    button.innerText = 'Send';
+    newDiv.append(button);
+
+    //
+    var request = document.createElement('textarea');
+    request.id = 'custom_request';
+    request.setAttribute('class', 'custom_textarea');
+    request.setAttribute('cols', '70');
+    request.setAttribute('rows', '26');
+    request.placeholder = 'Input custom request infomation. (type protocol)';
+    newDiv.append(request);
+    content_div.append(newDiv);
+}
+
+// 
+function clearOBDMsg() {
+    // Clear array
+    arrObdMsg.splice(0, arrObdMsg.length);
+    $("#obd_messages").val("");
+}
+
+// 
+function connectOBD() {
+    var nodeAddress = $("#NodeAddress").val();
+
+    if (nodeAddress.trim().length === 0) {
+        alert('Please input Node Address.');
         return;
     }
 
-    obdApi.connectToServer(node_url, function(response) {
-        console.info('OBD Response = ' + response);
+    obdApi.connectToServer(nodeAddress, function(response) {
+        console.info('connectOBD - OBD Response = ' + response);
 
         $("#status").text("Connected");
         isConnectToOBD = true; // already connected.
 
         createOBDResponseDiv(response, 'connect_node_resp');
         changeConnectButtonStatus();
+        saveOBDConnectHistory(nodeAddress);
 
     }, function(globalResponse) {
         displayOBDMessages(globalResponse);
@@ -1794,6 +1905,9 @@ function createOBDResponseDiv(response, msgType) {
             break;
         case enumMsgType.MsgType_Core_Omni_Getbalance_1200:
             parseData1200(response);
+            break;
+        case enumMsgType.MsgType_Core_Omni_GetAssetName_1207:
+            parseData1207(response);
             break;
         case enumMsgType.MsgType_CommitmentTx_AllBRByChanId_N35109:
             parseDataN35109(response);
@@ -1920,9 +2034,9 @@ function parseData1(response) {
         ];
     } else {
         var arrData = [
-            'p2pNodeAddress : ' + response.p2pNodeAddress,
-            'p2pNodePeerId : '  + response.p2pNodePeerId,
-            'userPeerId : '     + response.userPeerId,
+            'NodeAddress : ' + response.nodeAddress,
+            'NodePeerID : '  + response.nodePeerId,
+            'UserPeerID : '     + response.userPeerId,
         ];
     }
 
@@ -1984,6 +2098,32 @@ function parseData1200(response) {
             createElement(obd_response_div, 'text', title);
             createElement(obd_response_div, 'p', content, 'responseText');
         }
+    }
+}
+
+// parseData1207 - 
+function parseData1207(response) {
+    var arrData = [
+        'propertyid : ' + response.propertyid,
+        'name : ' + response.name,
+        'totaltokens : ' + response.totaltokens,
+        'issuer : ' + response.issuer,
+        'category : ' + response.category,
+        'subcategory : ' + response.subcategory,
+        'creationtxid : ' + response.creationtxid,
+        'data : ' + response.data,
+        'divisible : ' + response.divisible,
+        'fixedissuance : ' + response.fixedissuance,
+        'managedissuance : ' + response.managedissuance,
+        'url : ' + response.url,
+    ];
+
+    for (let i = 0; i < arrData.length; i++) {
+        var point   = arrData[i].indexOf(':') + 1;
+        var title   = arrData[i].substring(0, point);
+        var content = arrData[i].substring(point);
+        createElement(obd_response_div, 'text', title);
+        createElement(obd_response_div, 'p', content, 'responseText');
     }
 }
 
@@ -2145,7 +2285,7 @@ function parseDataN35101(response) {
         arrData = [
             'channel_id : ' + response.body[i].channel_id,
             'amount_to_htlc : ' + response.body[i].amount_to_htlc,
-            'amount_to_other : ' + response.body[i].amount_to_other,
+            'amount_to_counterparty : ' + response.body[i].amount_to_counterparty,
             'amount_to_rsmc : ' + response.body[i].amount_to_rsmc,
             'create_at : ' + response.body[i].create_at,
             'create_by : ' + response.body[i].create_by,
@@ -2200,9 +2340,15 @@ function parseDataN35101(response) {
 function parseDataN35104(response) {
     var arrData = [
         'channel_id : ' + response.channel_id,
-        'amount_to_htlc : ' + response.amount_to_htlc,
-        'amount_to_other : ' + response.amount_to_other,
+        'id : ' + response.id,
+        'property_id : ' + response.property_id,
+        'input_amount : ' + response.input_amount,
         'amount_to_rsmc : ' + response.amount_to_rsmc,
+        'amount_to_counterparty : ' + response.amount_to_counterparty,
+        'amount_to_htlc : ' + response.amount_to_htlc,
+        'owner : ' + response.owner,
+        'peer_id_a : ' + response.peer_id_a,
+        'peer_id_b : ' + response.peer_id_b,
         'create_at : ' + response.create_at,
         'create_by : ' + response.create_by,
         'curr_hash : ' + response.curr_hash,
@@ -2214,28 +2360,22 @@ function parseDataN35104(response) {
         'htlc_redeem_script : ' + response.htlc_redeem_script,
         'htlc_sender : ' + response.htlc_sender,
         'htlc_temp_address_pub_key : ' + response.htlc_temp_address_pub_key,
-        'htlc_tx_hash : ' + response.htlc_tx_hash,
+        'htlc_tx_hex : ' + response.htlc_tx_hex,
         'htlc_txid : ' + response.htlc_txid,
-        'id : ' + response.id,
-        'input_amount : ' + response.input_amount,
         'input_txid : ' + response.input_txid,
         'input_vout : ' + response.input_vout,
         'last_commitment_tx_id : ' + response.last_commitment_tx_id,
         'last_edit_time : ' + response.last_edit_time,
         'last_hash : ' + response.last_hash,
-        'owner : ' + response.owner,
-        'peer_id_a : ' + response.peer_id_a,
-        'peer_id_b : ' + response.peer_id_b,
-        'property_id : ' + response.property_id,
         'rsmc_multi_address : ' + response.rsmc_multi_address,
         'rsmc_multi_address_script_pub_key : ' + response.rsmc_multi_address_script_pub_key,
         'rsmc_redeem_script : ' + response.rsmc_redeem_script,
         'rsmc_temp_address_pub_key : ' + response.rsmc_temp_address_pub_key,
-        'rsmc_tx_hash : ' + response.rsmc_tx_hash,
+        'rsmc_tx_hex : ' + response.rsmc_tx_hex,
         'rsmc_txid : ' + response.rsmc_txid,
         'send_at : ' + response.send_at,
         'sign_at : ' + response.sign_at,
-        'to_other_tx_hash : ' + response.to_other_tx_hash,
+        'to_other_tx_hex : ' + response.to_other_tx_hex,
         'to_other_txid : ' + response.to_other_txid,
         'tx_type : ' + response.tx_type,
     ];
@@ -2420,7 +2560,7 @@ function parseDataN43(response) {
 // parseDataN40 - 
 function parseDataN40(response) {
     var arrData = [
-        'recipient_peer_id : ' + response.recipient_peer_id,
+        'recipient_user_peer_id : ' + response.recipient_user_peer_id,
         'amount : ' + response.amount,
         'property_id : ' + response.propertyId,
         'msg : ' + response.msg,
@@ -2438,7 +2578,7 @@ function parseDataN40(response) {
 // parseDataN4003 - 
 function parseDataN4003(response) {
     var arrData = [
-        'recipient_peer_id : ' + response.recipient_peer_id,
+        'recipient_user_peer_id : ' + response.recipient_user_peer_id,
         'amount : ' + response.amount,
         'property_id : ' + response.propertyId,
         'msg : ' + response.msg,
@@ -2458,10 +2598,15 @@ function parseDataN352(response) {
 
     var arrData = [
         'channel_id : ' + response.latestCcommitmentTxInfo.channel_id,
+        'id : ' + response.latestCcommitmentTxInfo.id,
         'property_id : ' + response.latestCcommitmentTxInfo.property_id,
-        'amount_to_htlc : ' + response.latestCcommitmentTxInfo.amount_to_htlc,
-        'amount_to_other : ' + response.latestCcommitmentTxInfo.amount_to_other,
+        'input_amount : ' + response.latestCcommitmentTxInfo.input_amount,
         'amount_to_rsmc : ' + response.latestCcommitmentTxInfo.amount_to_rsmc,
+        'amount_to_counterparty : ' + response.latestCcommitmentTxInfo.amount_to_counterparty,
+        'amount_to_htlc : ' + response.latestCcommitmentTxInfo.amount_to_htlc,
+        'owner : ' + response.latestCcommitmentTxInfo.owner,
+        'peer_id_a : ' + response.latestCcommitmentTxInfo.peer_id_a,
+        'peer_id_b : ' + response.latestCcommitmentTxInfo.peer_id_b,
         'create_at : ' + response.latestCcommitmentTxInfo.create_at,
         'create_by : ' + response.latestCcommitmentTxInfo.create_by,
         'curr_hash : ' + response.latestCcommitmentTxInfo.curr_hash,
@@ -2475,16 +2620,11 @@ function parseDataN352(response) {
         'htlc_temp_address_pub_key : ' + response.latestCcommitmentTxInfo.htlc_temp_address_pub_key,
         'htlc_tx_hex : ' + response.latestCcommitmentTxInfo.htlc_tx_hex,
         'htlc_txid : ' + response.latestCcommitmentTxInfo.htlc_txid,
-        'id : ' + response.latestCcommitmentTxInfo.id,
-        'input_amount : ' + response.latestCcommitmentTxInfo.input_amount,
         'input_txid : ' + response.latestCcommitmentTxInfo.input_txid,
         'input_vout : ' + response.latestCcommitmentTxInfo.input_vout,
         'last_commitment_tx_id : ' + response.latestCcommitmentTxInfo.last_commitment_tx_id,
         'last_edit_time : ' + response.latestCcommitmentTxInfo.last_edit_time,
         'last_hash : ' + response.latestCcommitmentTxInfo.last_hash,
-        'owner : ' + response.latestCcommitmentTxInfo.owner,
-        'peer_id_a : ' + response.latestCcommitmentTxInfo.peer_id_a,
-        'peer_id_b : ' + response.latestCcommitmentTxInfo.peer_id_b,
         'rsmc_input_txid : ' + response.latestCcommitmentTxInfo.rsmc_input_txid,
         'rsmc_multi_address : ' + response.latestCcommitmentTxInfo.rsmc_multi_address,
         'rsmc_multi_address_script_pub_key : ' + response.latestCcommitmentTxInfo.rsmc_multi_address_script_pub_key,
@@ -2936,7 +3076,7 @@ function updateRsmcData(response, data, msgType) {
     data.date = new Date().toLocaleString();
 
     // data.amount_to_htlc = response.amount_to_htlc;
-    // data.amount_to_other = response.amount_to_other;
+    // data.amount_to_counterparty = response.amount_to_counterparty;
     // data.amount_to_rsmc = response.amount_to_rsmc;
     // data.rsmc_multi_address = response.rsmc_multi_address;
     // data.rsmc_txid = response.rsmc_txid;
@@ -3002,7 +3142,7 @@ function dataConstruct(response, tempChID, msgType) {
 // Non-finalized channel information.
 function saveChannelCreation(response, channelID, msgType, info) {
     var chID;
-    var list = JSON.parse(localStorage.getItem(saveTempCI));
+    var list = JSON.parse(localStorage.getItem(saveChannelList));
 
     if (response.temporary_channel_id) {
         chID = response.temporary_channel_id;
@@ -3120,21 +3260,21 @@ function saveChannelCreation(response, channelID, msgType, info) {
                         break;
                 }
 
-                localStorage.setItem(saveTempCI, JSON.stringify(list));
+                localStorage.setItem(saveChannelList, JSON.stringify(list));
                 return;
             }
         }
 
         // A new 
         list.result.push(dataConstruct(response, chID, msgType));
-        localStorage.setItem(saveTempCI, JSON.stringify(list));
+        localStorage.setItem(saveChannelList, JSON.stringify(list));
 
     } else {
         // console.info('FIRST DATA');
         let data = {
             result: [dataConstruct(response, chID, msgType)]
         }
-        localStorage.setItem(saveTempCI, JSON.stringify(data));
+        localStorage.setItem(saveChannelList, JSON.stringify(data));
     }
 }
 
@@ -3181,11 +3321,91 @@ function saveMnemonicData(response) {
     }
 }
 
-// List of friends who have interacted
-function saveFriendsList(name, p2pID) {
+// 
+function getNewestConnOBD() {
+    var nodeAddress;
+    var list = JSON.parse(localStorage.getItem(saveOBDList));
+    // If has data
+    if (list) {
+        for (let i = 0; i < list.result.length; i++) {
+            if (list.result[i].newest === 'yes') {
+                nodeAddress = list.result[i].name;
+                return nodeAddress;
+            }
+        }
+    } else { // NO LOCAL STORAGE DATA YET.
+        return nodeAddress = 'ws://127.0.0.1:60020/ws';
+    }
+}
 
-    // var name = $("#recipient_peer_id").val();
-    var list = JSON.parse(localStorage.getItem(saveFriends));
+// List of OBD node that have interacted
+function saveOBDConnectHistory(name) {
+
+    var list = JSON.parse(localStorage.getItem(saveOBDList));
+
+    // If has data.
+    if (list) {
+        // console.info('HAS DATA');
+        for (let i = 0; i < list.result.length; i++) {
+            list.result[i].newest = '';
+        }
+
+        for (let i = 0; i < list.result.length; i++) {
+            if (list.result[i].name === name) {
+                list.result[i].newest = 'yes';
+                localStorage.setItem(saveOBDList, JSON.stringify(list));
+                return;
+            }
+        }
+
+        let new_data = {
+            name:  name,
+            newest: 'yes'
+        }
+        list.result.push(new_data);
+        localStorage.setItem(saveOBDList, JSON.stringify(list));
+
+    } else {
+        // console.info('FIRST DATA');
+        let data = {
+            result: [{
+                name:  name,
+                newest: 'yes'
+            }]
+        }
+        localStorage.setItem(saveOBDList, JSON.stringify(data));
+    }
+}
+
+// Save APIs invoked history in customize mode.
+function saveInvokeHistory(name) {
+
+    var list = JSON.parse(localStorage.getItem(invokeHistory));
+
+    // If has data.
+    if (list) {
+        // console.info('HAS DATA');
+        let new_data = {
+            name:  name,
+        }
+        list.result.push(new_data);
+        localStorage.setItem(invokeHistory, JSON.stringify(list));
+
+    } else {
+        // console.info('FIRST DATA');
+        let data = {
+            result: [{
+                name:  name,
+            }]
+        }
+        localStorage.setItem(invokeHistory, JSON.stringify(data));
+    }
+}
+
+// List of Counterparties who have interacted
+function saveCounterpartiesList(name, p2pID) {
+
+    var list = JSON.parse(localStorage.getItem(saveCounterparties));
 
     // If has data.
     if (list) {
@@ -3193,7 +3413,7 @@ function saveFriendsList(name, p2pID) {
         for (let i = 0; i < list.result.length; i++) {
             if (list.result[i].name === name) {
                 list.result[i].p2pID = p2pID;
-                localStorage.setItem(saveFriends, JSON.stringify(list));
+                localStorage.setItem(saveCounterparties, JSON.stringify(list));
                 return;
             }
         }
@@ -3203,7 +3423,7 @@ function saveFriendsList(name, p2pID) {
             p2pID: p2pID
         }
         list.result.push(new_data);
-        localStorage.setItem(saveFriends, JSON.stringify(list));
+        localStorage.setItem(saveCounterparties, JSON.stringify(list));
 
     } else {
         // console.info('FIRST DATA');
@@ -3213,7 +3433,7 @@ function saveFriendsList(name, p2pID) {
                 p2pID: p2pID
             }]
         }
-        localStorage.setItem(saveFriends, JSON.stringify(data));
+        localStorage.setItem(saveCounterparties, JSON.stringify(data));
     }
 }
 
@@ -3232,7 +3452,7 @@ function getBalance(strAddr) {
         result = JSON.stringify(e);
         result = result.replace("\"", "").replace("\"", "");
         result = parseFloat(result);
-        result = 'BALANCE : ' + result + ' BTC ';
+        result = 'Balance : ' + result + ' BTC ';
         $("#" + strAddr).text(result);
     });
 
@@ -3292,13 +3512,13 @@ function displayUserData(obj, param) {
         case 'MnemonicWords':
             displayMnemonic();
             break;
-        case 'Addresses':
+        case 'MyAddresses':
             displayAddresses(param);
             break;
-        case 'Friends':
-            displayFriends();
+        case 'Counterparties':
+            displayCounterparties();
             break;
-        case 'ChannelCreation':
+        case 'ChannelList':
             displayChannelCreation(param);
             break;
     }
@@ -3422,12 +3642,12 @@ function createBalanceElement(parent, strAddr) {
     createElement(parent, 'p');
 }
 
-// List of friends who have interacted
-function displayFriends() {
+// List of Counterparties who have interacted
+function displayCounterparties() {
     // get [name_req_div] div
     var parent = $("#name_req_div");
 
-    var list = JSON.parse(localStorage.getItem(saveFriends));
+    var list = JSON.parse(localStorage.getItem(saveCounterparties));
 
     var newDiv = document.createElement('div');
     newDiv.setAttribute('class', 'panelItem');
@@ -3437,9 +3657,9 @@ function displayFriends() {
         for (let i = 0; i < list.result.length; i++) {
             // Display list NO.
             createElement(newDiv, 'h3', 'NO. ' + (i + 1), 'responseText');
-            createElement(newDiv, 'p', 'P2P_Peer_ID: ');
+            createElement(newDiv, 'p', 'NodePeerID: ');
             createElement(newDiv, 'p', list.result[i].p2pID, 'responseText');
-            createElement(newDiv, 'p', 'Peer_ID: ');
+            createElement(newDiv, 'p', 'UserPeerID: ');
             createElement(newDiv, 'p', list.result[i].name, 'responseText');
         }
     } else { // NO LOCAL STORAGE DATA YET.
@@ -3447,6 +3667,140 @@ function displayFriends() {
     }
 
     parent.append(newDiv);
+}
+
+// List of OBD node that have interacted
+function displayOBDConnectHistory() {
+
+    var item;
+    var parent = $("#name_req_div");
+    var list = JSON.parse(localStorage.getItem(saveOBDList));
+
+    var newDiv = document.createElement('div');
+    newDiv.setAttribute('class', 'panelItem');
+
+    createElement(newDiv, 'h3', 'Connection History');
+
+    // If has data
+    if (list) {
+        for (let i = 0; i < list.result.length; i++) {
+            // createElement(newDiv, 'h4', 'NO. ' + (i + 1));
+            item = document.createElement('a');
+            item.href = '#';
+            item.innerText = list.result[i].name;
+            item.setAttribute('onclick', 'clickConnectionHistory(this)');
+            // item.setAttribute('class', 'url');
+            newDiv.append(item);
+            createElement(newDiv, 'p');
+        }
+    } else { // NO LOCAL STORAGE DATA YET.
+        createElement(newDiv, 'h4', 'NO CONNECTION HISTORY.');
+    }
+
+    parent.append(newDiv);
+}
+
+
+// List of APIs invoked history in customize mode.
+function displayInvokeHistory() {
+
+    var item;
+    var parent = $("#invoke_history");
+    var list = JSON.parse(localStorage.getItem(invokeHistory));
+
+    // var newDiv = document.createElement('div');
+    // newDiv.setAttribute('class', 'panelItem');
+
+    createElement(parent, 'h3', 'Invoked History');
+
+    // If has data
+    if (list) {
+        // console.info('has data');
+        for (let i = 0; i < list.result.length; i++) {
+            // createElement(newDiv, 'h4', 'NO. ' + (i + 1));
+            item = document.createElement('a');
+            item.href = '#';
+            item.innerText = list.result[i].name;
+            item.setAttribute('onclick', 'clickInvokeHistory(this)');
+            // item.setAttribute('class', 'url');
+            parent.append(item);
+            createElement(parent, 'p');
+        }
+    } else { // NO LOCAL STORAGE DATA YET.
+        // console.info('no data');
+        createElement(parent, 'h4', 'Has not invoked history yet.');
+    }
+
+    // parent.append(item);
+}
+
+// 
+function displayCustomRequest() {
+
+    var parent = $("#name_req_div");
+
+    var newDiv = document.createElement('div');
+    newDiv.setAttribute('class', 'panelItem');
+
+    createElement(newDiv, 'text', 'Request', 'request_title');
+
+    // create [button] element
+    var button = document.createElement('button');
+    // button.id = 'button_connect';
+    button.setAttribute('class', 'button button_request');
+    button.setAttribute('onclick', 'sendCustomRequest()');
+    button.innerText = 'Send';
+    newDiv.append(button);
+
+    //
+    var request = document.createElement('textarea');
+    request.id = 'custom_request';
+    request.setAttribute('class', 'custom_textarea');
+    request.setAttribute('cols', '70');
+    request.setAttribute('rows', '10');
+    request.placeholder = 'Input custom request infomation. (type protocol)';
+    newDiv.append(request);
+
+    parent.append(newDiv);
+}
+
+//
+function sendCustomRequest() {
+
+    var custom_request  = $("#custom_request").val();
+
+    try {
+        var list = JSON.parse(custom_request);
+    } catch (error) {
+        alert("error input content.");
+        return;
+    }
+
+    // var list = JSON.parse(custom_request);
+    var type = list.type;
+    var saveVal = 'type : ' + type;
+
+    // if (name.trim() === '' || pubkey.trim() === '') {
+    //     alert('Please input complete data.');
+    //     return;
+    // }
+
+    // OBD API
+    obdApi.sendJsonData(custom_request, Number(type), function(e) {
+        console.info('sendCustomRequest - OBD Response = ' + JSON.stringify(e));
+        saveInvokeHistory(saveVal);
+        // createOBDResponseDiv(e, msgType);
+    });
+}
+
+//
+function clickConnectionHistory(obj) {
+    $("#NodeAddress").val(obj.innerText);
+}
+
+//
+function clickInvokeHistory(obj) {
+    $("#custom_request").val(obj.innerText);
 }
 
 // List of channel creation process records.
@@ -3475,7 +3829,7 @@ function displayChannelCreation(param) {
     }
     */
 
-    var list = JSON.parse(localStorage.getItem(saveTempCI));
+    var list = JSON.parse(localStorage.getItem(saveChannelList));
 
     if (list) {
         for (let i = 0; i < list.result.length; i++) {
@@ -3847,6 +4201,13 @@ function createElement(parent, elementName, myInnerText, cssStyle) {
 function displayUserDataInNewHtml(goWhere) {
     saveGoWhereData(goWhere);
     window.open('userData.html', 'data', 'height=600, width=800, top=150, ' +
+        'left=500, toolbar=no, menubar=no, scrollbars=no, resizable=no, ' +
+        'location=no, status=no');
+}
+
+//
+function displayInvokeHistoryInNewHtml() {
+    window.open('invokeHistory.html', 'data', 'top=150, ' +
         'left=500, toolbar=no, menubar=no, scrollbars=no, resizable=no, ' +
         'location=no, status=no');
 }

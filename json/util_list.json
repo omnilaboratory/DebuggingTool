@@ -32,8 +32,8 @@
                     "name": "property_id",
                     "buttons": [
                         {
-                            "innerText": "Get It",
-                            "onclick": "displayUserDataInNewHtml('Addresses')"
+                            "innerText": "Display",
+                            "onclick": "displayUserDataInNewHtml('MyAddresses')"
                         }
                     ]
                 },
@@ -42,11 +42,11 @@
                     "buttons": []
                 },
                 {
-                    "name": "recipient_peer_id",
+                    "name": "recipient_user_peer_id",
                     "buttons": [
                         {
-                            "innerText": "Friends",
-                            "onclick": "displayUserDataInNewHtml('Friends')"
+                            "innerText": "Counterparties",
+                            "onclick": "displayUserDataInNewHtml('Counterparties')"
                         }
                     ]
                 }
@@ -79,8 +79,8 @@
                     "name": "channel_id",
                     "buttons": [
                         {
-                            "innerText": "Get It",
-                            "onclick": "displayUserDataInNewHtml('ChannelCreation')"
+                            "innerText": "Select",
+                            "onclick": "displayUserDataInNewHtml('ChannelList')"
                         }
                     ]
                 }
@@ -95,8 +95,8 @@
                     "name": "channel_id",
                     "buttons": [
                         {
-                            "innerText": "Get It",
-                            "onclick": "displayUserDataInNewHtml('ChannelCreation')"
+                            "innerText": "Select",
+                            "onclick": "displayUserDataInNewHtml('ChannelList')"
                         }
                     ]
                 }
@@ -111,8 +111,8 @@
                     "name": "channel_id",
                     "buttons": [
                         {
-                            "innerText": "Get It",
-                            "onclick": "displayUserDataInNewHtml('ChannelCreation')"
+                            "innerText": "Select",
+                            "onclick": "displayUserDataInNewHtml('ChannelList')"
                         }
                     ]
                 }
@@ -127,10 +127,21 @@
                     "name": "address",
                     "buttons": [
                         {
-                            "innerText": "Get It",
-                            "onclick": "displayUserDataInNewHtml('Addresses')"
+                            "innerText": "Select",
+                            "onclick": "displayUserDataInNewHtml('MyAddresses')"
                         }
                     ]
+                }
+            ]
+        },
+        {
+            "id": "GetAssetNameByID",
+            "type_id": 1207,
+            "description": "GetAssetNameByID is used to get omni asset name by asset id (Property Id) .",
+            "parameters": [
+                {
+                    "name": "PropertyID",
+                    "buttons": []
                 }
             ]
         }

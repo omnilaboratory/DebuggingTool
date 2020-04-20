@@ -58,31 +58,31 @@ If you want to build and deploy your own OBD, you shall go through the installat
 4. OBD responses 3 arguments, telling user where and who he is:  
 
 ```
-p2pNodeAddress : /ip4/62.234.216.108/tcp/3001/p2p/QmP1mQMzDRV2bKWdhwvPWFubSAz1gqJY44RjdYm3G5DFeF
+nodeAddress : /ip4/62.234.216.108/tcp/3001/p2p/QmP1mQMzDRV2bKWdhwvPWFubSAz1gqJY44RjdYm3G5DFeF
 ```
-`p2pNodeAddress` is the node location of the OBD server you connected. In this tutorial, it is the node "ws://62.234.216.108:60030/ws" you connected in step 1.  
+`nodeAddress` is the node location of the OBD server you connected. In this tutorial, it is the node "ws://62.234.216.108:60030/ws" you connected in step 1.  
 
 ```
-p2pNodePeerId : QmP1mQMzDRV2bKWdhwvPWFubSAz1gqJY44RjdYm3G5DFeF
+nodePeerId : QmP1mQMzDRV2bKWdhwvPWFubSAz1gqJY44RjdYm3G5DFeF
 ``` 
-`p2pNodePeerId` is part of the complete `p2pNodeAddress`. Because on one server, there can be thousans of OBD running on it, every OBD has a unique `p2pNodePeerId` to be identified.  
+`nodePeerId` is part of the complete `nodeAddress`. Because on one server, there can be thousans of OBD running on it, every OBD has a unique `nodePeerId` to be identified.  
 
 ```
 userPeerId : 30dfbc0e1b42c4cb50410b7a08186ce405a92fff235480608425bf4b0207e5ad
 ```
-This is the user id, which is used together with `p2pNodeAddress` to tell someone else that "i'm here, please connect me by connectP2PNode".  
+This is the user id, which is used together with `nodeAddress` to tell someone else that "i'm here, please connect me by connectP2PNode".  
 
 
 ## Step 4: connect another user
 
-Open another browser window, open index.html, and signup another user to get his `p2pNodeAddress` and `userPeerId`.  
+Open another browser window, open index.html, and signup another user to get his `nodeAddress` and `userPeerId`.  
 
 <p align="center">
   <img width="750" alt="SignUp" src="https://github.com/omnilaboratory/DebuggingTool/blob/master/doc/img/connectNode.png">
 </p>
 
 1. click "connectP2PNode";  
-2. input the `p2pNodeAddress` into the "node_url" input box;  
+2. input the `nodeAddress` into the "NodeAddress" input box;  
 3. click "invoke API";  
 
 ## Step 5: open channel

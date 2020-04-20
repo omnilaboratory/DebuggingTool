@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Customize mode APIs invoked history</title>
+    <link rel="stylesheet" href="css/main.css">
+    <script src="https://lib.sinaapp.com/js/jquery/2.0.2/jquery-2.0.2.min.js"></script>
+    <script src="js/btctool.js"></script>
+    <script src="js/pojo.js"></script>
+    <script src="js/obdapi.js"></script>
+    <script src="js/common.js"></script>
+</head>
+
+<body>
+    <!-- <div id="container">
+        <div id="content">
+            <div id="invoke_history"></div>
+        </div>
+    </div> -->
+
+    <!-- Header -->
+    <div class="content" id="header">
+        <div class="top">
+            <div class="topLeft">OBD Debug Tool</div>
+            <div class="topRight">
+                <div class="topData">
+                    <div class="topDataKey">Status:</div>
+                    <div class="topDataVal" id="status">Not Connected</div>
+                    <div class="topDataKey">Logged In:</div>
+                    <div class="topDataVal" id="logined">No One</div>
+                </div>
+                
+                <!-- <div class="topData">
+                    <div class="topDataKey">Balance:</div>
+                    <div class="topDataVal" id="balance">&nbsp;0.00&nbsp;USDT&nbsp;/&nbsp;0.00&nbsp;BTC</div>
+                </div> -->
+            </div>
+        </div>
+    </div>
+
+    <div class="main">
+        <!-- Left Side -->
+        <div class="leftSide" id="menu">
+            <div id="invoke_history"></div>
+        </div>
+
+        <!-- API invoked area, click left side menu to display. -->
+        <!-- <div id="content" style="width:600px;float:left;"> -->
+        <div id="content" class="custom_request_div">
+            <!-- Dynamic create in 'common.js' -->
+        </div>
+
+        <!-- OBD messages display area -->
+        <div>
+            <div><button class="button button_clear" 
+                onclick="clearOBDMsg()">Clear OBD Messages</button></div>
+            <div class="textarea"><textarea id="obd_messages" cols="70" rows="40" 
+                readonly="yes" resize="none" class="obd_msg"></textarea></div>
+        </div>
+    </div>
+</body>
+
+<script>
+
+    // 
+    function connectOBD() {
+        var nodeAddress = getNewestConnOBD();
+        obdApi.connectToServer(nodeAddress, function(response) {
+            // console.info('OBD Response = ' + response);
+        }, function(globalResponse) {
+            displayOBDMessages(globalResponse);
+        });
+    }
+
+    connectOBD();
+    displayInvokeHistory();
+    createCustomModeDiv();
+</script>
+
+</html>
