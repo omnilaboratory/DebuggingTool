@@ -85,4 +85,8 @@ Open another browser window, open index.html, and signup another user to get his
 2. input the `p2pNodeAddress` into the "node_url" input box;  
 3. click "invoke API";  
 
+## Step 5: open channel
+
+
+
 
