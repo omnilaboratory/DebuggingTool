@@ -89,8 +89,9 @@ Switch back to Alice's window, we shall input Bob's `nodeAddress` and `userPeerI
 3. input the `nodeAddress` into the "NodeAddress" input box;  
 4. click "invoke API";  
 
-## Step 5: open channel
 
+## Step 5: open channel
+After successfully connecting Bob, Alice is able to open a channel with him.
 
 
 
