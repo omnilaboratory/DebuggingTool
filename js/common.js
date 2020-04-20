@@ -10,9 +10,6 @@ var isLogined = false;
 // Save userID of a user already logined.
 var userID;
 
-// cssStyle
-var cssStyle = 'color:gray';
-
 // save OBD messages
 var obdMessages = '';
 var arrObdMsg = [];
@@ -24,25 +21,25 @@ var mnemonicWithLogined = '';
 var inNewHtml = 'in_new_html';
 
 //
-var saveChannelList = 'channel_list';
+var itemChannelList = 'channel_list';
 
 //
-var saveAddr = 'addr';
+var itemAddr = 'addr';
 
 //
-var saveCounterparties = 'counterparties';
+var itemCounterparties = 'counterparties';
 
 //
-var saveOBDList = 'obd_list';
+var itemOBDList = 'obd_list';
 
 //
 var invokeHistory = 'invoke_history';
 
 //
-var saveMnemonic = 'mnemonic';
+var itemMnemonic = 'mnemonic';
 
 //
-var saveGoWhere = 'go_where';
+var itemGoWhere = 'go_where';
 
 // the info save to local storage [ChannelList].
 var channelInfo;
@@ -63,7 +60,7 @@ var strTempChID;
 
 // Get name of saveGoWhere variable.
 function getSaveName() {
-    return saveGoWhere;
+    return itemGoWhere;
 }
 
 // getNewAddressWithMnemonic by local js library
@@ -115,7 +112,7 @@ function getAddressInfo() {
 function listeningN351(e, msgType) {
     console.info('listeningN351 = ' + JSON.stringify(e));
 
-    saveChannelCreation(e, e.channelId, msgType);
+    saveChannelList(e, e.channelId, msgType);
     // createOBDResponseDiv(e, msgType);
 }
 
@@ -153,9 +150,6 @@ function logIn(msgType) {
         // $("#logined").text(userID.substring(0, 10) + '...');
         createOBDResponseDiv(e, msgType);
         isLogined = true;
-
-        saveCounterpartiesList(userID, e.nodePeerId);
-
     });
 }
 
@@ -181,7 +175,8 @@ function openChannel(msgType) {
     // OBD API
     obdApi.openChannel(pubkey, name, p2pID, function(e) {
         console.info('openChannel - OBD Response = ' + JSON.stringify(e));
-        saveChannelCreation(e);
+        saveChannelList(e);
+        saveCounterparties(name, p2pID);
         createOBDResponseDiv(e, msgType);
     });
 }
@@ -206,8 +201,8 @@ function acceptChannel(msgType) {
     // OBD API
     obdApi.acceptChannel(p2pID, name, info, function(e) {
         console.info('-33 acceptChannel - OBD Response = ' + JSON.stringify(e));
-        // Save Non-finalized channel information.
-        saveChannelCreation(e);
+        saveChannelList(e);
+        saveCounterparties(name, p2pID);
         createOBDResponseDiv(e, msgType);
     });
 }
@@ -240,7 +235,7 @@ function htlcSignGetH(msgType) {
     // OBD API
     obdApi.htlcSignGetH(info, function(e) {
         console.info('-44 htlcSignGetH - OBD Response = ' + JSON.stringify(e));
-        saveChannelCreation(e, e.channelId, msgType);
+        saveChannelList(e, e.channelId, msgType);
         createOBDResponseDiv(e, msgType);
     });
 }
@@ -274,7 +269,7 @@ function createHtlcCTx(msgType) {
 
     // Get channel_id with request_hash.
     var tempChID;
-    var list = JSON.parse(localStorage.getItem(saveChannelList));
+    var list = JSON.parse(localStorage.getItem(itemChannelList));
     for (let i = 0; i < list.result.length; i++) {
         for (let i2 = 0; i2 < list.result[i].htlc.length; i2++) {
             if (request_hash === list.result[i].htlc[i2].request_hash) {
@@ -286,7 +281,7 @@ function createHtlcCTx(msgType) {
     // OBD API
     obdApi.htlcCreateCommitmentTx(info, function(e) {
         console.info('-45 htlcCreateCommitmentTx - OBD Response = ' + JSON.stringify(e));
-        saveChannelCreation(e, tempChID, msgType);
+        saveChannelList(e, tempChID, msgType);
         createOBDResponseDiv(e, msgType);
     });
 }
@@ -312,7 +307,7 @@ function htlcSendR(msgType) {
 
     // Get channel_id with request_hash.
     var tempChID;
-    var list = JSON.parse(localStorage.getItem(saveChannelList));
+    var list = JSON.parse(localStorage.getItem(itemChannelList));
     for (let i = 0; i < list.result.length; i++) {
         for (let i2 = 0; i2 < list.result[i].htlc.length; i2++) {
             if (request_hash === list.result[i].htlc[i2].request_hash) {
@@ -324,7 +319,7 @@ function htlcSendR(msgType) {
     // OBD API
     obdApi.htlcSendR(info, function(e) {
         console.info('-46 htlcSendR - OBD Response = ' + JSON.stringify(e));
-        saveChannelCreation(e, tempChID, msgType);
+        saveChannelList(e, tempChID, msgType);
         createOBDResponseDiv(e, msgType);
     });
 }
@@ -346,7 +341,7 @@ function htlcVerifyR(msgType) {
 
     // Get channel_id with request_hash.
     var tempChID;
-    var list = JSON.parse(localStorage.getItem(saveChannelList));
+    var list = JSON.parse(localStorage.getItem(itemChannelList));
     for (let i = 0; i < list.result.length; i++) {
         for (let i2 = 0; i2 < list.result[i].htlc.length; i2++) {
             if (request_hash === list.result[i].htlc[i2].request_hash) {
@@ -358,7 +353,7 @@ function htlcVerifyR(msgType) {
     // OBD API
     obdApi.htlcVerifyR(info, function(e) {
         console.info('-47 htlcVerifyR - OBD Response = ' + JSON.stringify(e));
-        saveChannelCreation(e, tempChID, msgType);
+        saveChannelList(e, tempChID, msgType);
         createOBDResponseDiv(e, msgType);
     });
 }
@@ -389,7 +384,7 @@ function closeHtlcTx(msgType) {
     // OBD API
     obdApi.closeHtlcTx(info, function(e) {
         console.info('-48 closeHtlcTx - OBD Response = ' + JSON.stringify(e));
-        saveChannelCreation(e, channel_id, msgType);
+        saveChannelList(e, channel_id, msgType);
         createOBDResponseDiv(e, msgType);
     });
 }
@@ -419,7 +414,7 @@ function closeHtlcTxSigned(msgType) {
 
     // Get channel_id with request_hash.
     var channel_id;
-    var list = JSON.parse(localStorage.getItem(saveChannelList));
+    var list = JSON.parse(localStorage.getItem(itemChannelList));
     for (let i = 0; i < list.result.length; i++) {
         for (let i2 = 0; i2 < list.result[i].htlc.length; i2++) {
             if (request_close_htlc_hash === list.result[i].htlc[i2].request_hash) {
@@ -431,7 +426,7 @@ function closeHtlcTxSigned(msgType) {
     // OBD API
     obdApi.closeHtlcTxSigned(info, function(e) {
         console.info('-49 closeHtlcTxSigned - OBD Response = ' + JSON.stringify(e));
-        saveChannelCreation(e, channel_id, msgType);
+        saveChannelList(e, channel_id, msgType);
         createOBDResponseDiv(e, msgType);
     });
 }
@@ -520,7 +515,7 @@ function closeChannel(msgType) {
     // OBD API
     obdApi.closeChannel(channel_id, function(e) {
         console.info('-38 closeChannel - OBD Response = ' + JSON.stringify(e));
-        saveChannelCreation(e, channel_id, msgType);
+        saveChannelList(e, channel_id, msgType);
         createOBDResponseDiv(e, msgType);
     });
 }
@@ -543,7 +538,7 @@ function closeChannelSigned(msgType) {
     // OBD API
     obdApi.closeChannelSign(info, function(e) {
         console.info('-39 closeChannelSign - OBD Response = ' + JSON.stringify(e));
-        saveChannelCreation(e, channel_id, msgType);
+        saveChannelList(e, channel_id, msgType);
         createOBDResponseDiv(e, msgType);
     });
 }
@@ -670,7 +665,7 @@ function btcFundingCreated(msgType) {
     // OBD API
     obdApi.btcFundingCreated(p2pID, name, info, function(e) {
         console.info('btcFundingCreated - OBD Response = ' + JSON.stringify(e));
-        saveChannelCreation(e, temp_cid, msgType);
+        saveChannelList(e, temp_cid, msgType);
         createOBDResponseDiv(e, msgType);
     });
 }
@@ -697,7 +692,7 @@ function btcFundingSigned(msgType) {
     // OBD API
     obdApi.btcFundingSigned(p2pID, name, info, function(e) {
         console.info('btcFundingSigned - OBD Response = ' + JSON.stringify(e));
-        saveChannelCreation(e, temp_cid, msgType);
+        saveChannelList(e, temp_cid, msgType);
         createOBDResponseDiv(e, msgType);
     });
 }
@@ -726,7 +721,7 @@ function assetFundingCreated(msgType) {
     // OBD API
     obdApi.channelFundingCreated(p2pID, name, info, function(e) {
         console.info('N34 - OBD Response = ' + JSON.stringify(e));
-        saveChannelCreation(e, temp_cid, msgType);
+        saveChannelList(e, temp_cid, msgType);
         createOBDResponseDiv(e, msgType);
     });
 }
@@ -748,7 +743,7 @@ function assetFundingSigned(msgType) {
     // OBD API
     obdApi.channelFundingSigned(p2pID, name, info, function(e) {
         console.info('N35 - OBD Response = ' + JSON.stringify(e));
-        saveChannelCreation(e, channel_id, msgType);
+        saveChannelList(e, channel_id, msgType);
         createOBDResponseDiv(e, msgType);
     });
 }
@@ -778,7 +773,7 @@ function fundingBTC(msgType) {
 
     // Get temporary_channel_id with channel_address.
     var tempChID;
-    var list = JSON.parse(localStorage.getItem(saveChannelList));
+    var list = JSON.parse(localStorage.getItem(itemChannelList));
     for (let i = 0; i < list.result.length; i++) {
         for (let i2 = 0; i2 < list.result[i].data.length; i2++) {
             if (to_address === list.result[i].data[i2].channel_address) {
@@ -790,7 +785,7 @@ function fundingBTC(msgType) {
     // OBD API
     obdApi.fundingBTC(info, function(e) {
         console.info('fundingBTC - OBD Response = ' + JSON.stringify(e));
-        saveChannelCreation(e, tempChID, msgType);
+        saveChannelList(e, tempChID, msgType);
         createOBDResponseDiv(e, msgType);
     });
 }
@@ -813,7 +808,7 @@ function fundingAsset(msgType) {
 
     // Get temporary_channel_id with channel_address.
     var tempChID;
-    var list = JSON.parse(localStorage.getItem(saveChannelList));
+    var list = JSON.parse(localStorage.getItem(itemChannelList));
     for (let i = 0; i < list.result.length; i++) {
         for (let i2 = 0; i2 < list.result[i].data.length; i2++) {
             if (to_address === list.result[i].data[i2].channel_address) {
@@ -825,7 +820,7 @@ function fundingAsset(msgType) {
     // OBD API
     obdApi.fundingAssetOfOmni(info, function(e) {
         console.info('fundingAssetOfOmni - OBD Response = ' + JSON.stringify(e));
-        saveChannelCreation(e, tempChID, msgType);
+        saveChannelList(e, tempChID, msgType);
         createOBDResponseDiv(e, msgType);
     });
 }
@@ -869,7 +864,7 @@ function htlcFindPathAndSendH(msgType) {
     // OBD API
     obdApi.htlcFindPathAndSendH(info, function(e) {
         console.info('-42 htlcFindPathAndSendH - OBD Response = ' + JSON.stringify(e));
-        saveChannelCreation(e, e.channelId, msgType, info);
+        saveChannelList(e, e.channelId, msgType, info);
         createOBDResponseDiv(e, msgType);
     });
 }
@@ -961,7 +956,7 @@ function RSMCCTxSigned(msgType) {
     // OBD API
     obdApi.revokeAndAcknowledgeCommitmentTransaction(p2pID, name, info, function(e) {
         console.info('RSMCCTxSigned - OBD Response = ' + JSON.stringify(e));
-        saveChannelCreation(e, channel_id, msgType);
+        saveChannelList(e, channel_id, msgType);
         createOBDResponseDiv(e, msgType);
     });
 }
@@ -1004,7 +999,7 @@ function invokeAPIs(objSelf) {
         case enumMsgType.MsgType_Mnemonic_CreateAddress_N200:
             var result = getNewAddressWithMnemonic();
             if (result === '') return;
-            saveAddrData(result);
+            saveAddresses(result);
             createOBDResponseDiv(result, msgType);
             break;
         case enumMsgType.MsgType_Mnemonic_GetAddressByIndex_201:
@@ -1024,7 +1019,7 @@ function invokeAPIs(objSelf) {
             // Generate mnemonic by local js library.
             // This is equal OBD api signUp.
             var mnemonic = btctool.generateMnemonic(128);
-            saveMnemonicData(mnemonic);
+            saveMnemonic(mnemonic);
             createOBDResponseDiv(mnemonic);
             break;
         case enumMsgType.MsgType_Core_FundingBTC_1009:
@@ -1336,7 +1331,7 @@ function getUserDataList(goWhere) {
                 displayUserData(MyAddresses, inNewHtml);
                 break;
             case 'Counterparties':
-                displayUserData(Counterparties);
+                displayUserData(Counterparties, inNewHtml);
                 break;
             case 'ChannelList':
                 displayUserData(ChannelList, inNewHtml);
@@ -1492,8 +1487,8 @@ function createInputParamDiv(obj, jsonFile) {
 
                 // Parameters
                 createParamOfAPI(arrParams, newDiv);
-
                 content_div.append(newDiv);
+                autoFillValue(arrParams);
             }
         }
 
@@ -1513,6 +1508,27 @@ function createInputParamDiv(obj, jsonFile) {
             }
         }
     });
+}
+
+//
+function autoFillValue(arrParams) {
+    // auto fill
+    if (arrParams[0].name === 'temporary_channel_id') {
+        if (strTempChID) {
+            $("#temporary_channel_id").val(strTempChID);
+        }
+    }
+
+    // Only for fundingBTC api.
+    if (arrParams[0].name === 'from_address') {
+        if (btcFromAddr) {
+            $("#from_address").val(btcFromAddr);
+            $("#from_address_private_key").val(btcFromAddrPrivKey);
+            $("#to_address").val(btcToAddr);
+            $("#amount").val(btcAmount);
+            $("#miner_fee").val(btcMinerFee);
+        }
+    }
 }
 
 // display Approval Checkbox
@@ -1657,10 +1673,7 @@ function createParamOfAPI(arrParams, content_div) {
 
     for (let i = 0; i < arrParams.length; i++) {
         // create [param_title] element
-        // var newDiv = document.createElement('div');
-        // newDiv.setAttribute('class', 'param');
         createElement(content_div, 'text', arrParams[i].name + ' : ', 'param');
-        // content_div.append(newDiv);
 
         // create [input box of param] element
         input_box = document.createElement('input');
@@ -1673,27 +1686,8 @@ function createParamOfAPI(arrParams, content_div) {
         }
 
         content_div.append(input_box);
-
         createButtonOfParam(arrParams, i, content_div);
         createElement(content_div, 'p');
-    }
-
-    // auto fill
-    if (arrParams[0].name = 'temporary_channel_id') {
-        if (strTempChID) {
-            $("#temporary_channel_id").val(strTempChID);
-        }
-    }
-
-    // Only for fundingBTC api.
-    if (arrParams[0].name = 'from_address') {
-        if (btcFromAddr) {
-            $("#from_address").val(btcFromAddr);
-            $("#from_address_private_key").val(btcFromAddrPrivKey);
-            $("#to_address").val(btcToAddr);
-            $("#amount").val(btcAmount);
-            $("#miner_fee").val(btcMinerFee);
-        }
     }
 }
 
@@ -2891,7 +2885,7 @@ function parseDataN33(response) {
 // get a new index of address
 function getNewAddrIndex() {
 
-    var addr = JSON.parse(localStorage.getItem(saveAddr));
+    var addr = JSON.parse(localStorage.getItem(itemAddr));
     // console.info('localStorage KEY  = ' + addr);
 
     // If has data.
@@ -2915,10 +2909,9 @@ function getNewAddrIndex() {
 }
 
 // Address data generated with mnemonic save to local storage.
-function saveAddrData(response) {
+function saveAddresses(response) {
 
-    var addr = JSON.parse(localStorage.getItem(saveAddr));
-    // console.info('localStorage KEY  = ' + addr);
+    var addr = JSON.parse(localStorage.getItem(itemAddr));
 
     // If has data.
     if (addr) {
@@ -2933,7 +2926,7 @@ function saveAddrData(response) {
                     wif: response.result.wif
                 }
                 addr.result[i].data.push(new_data);
-                localStorage.setItem(saveAddr, JSON.stringify(addr));
+                localStorage.setItem(itemAddr, JSON.stringify(addr));
                 return;
             }
         }
@@ -2949,7 +2942,7 @@ function saveAddrData(response) {
             }]
         }
         addr.result.push(new_data);
-        localStorage.setItem(saveAddr, JSON.stringify(addr));
+        localStorage.setItem(itemAddr, JSON.stringify(addr));
 
     } else {
         // console.info('FIRST DATA');
@@ -2964,7 +2957,7 @@ function saveAddrData(response) {
                 }]
             }]
         }
-        localStorage.setItem(saveAddr, JSON.stringify(data));
+        localStorage.setItem(itemAddr, JSON.stringify(data));
     }
 }
 
@@ -3139,10 +3132,10 @@ function dataConstruct(response, tempChID, msgType) {
     return data;
 }
 
-// Non-finalized channel information.
-function saveChannelCreation(response, channelID, msgType, info) {
+// 
+function saveChannelList(response, channelID, msgType, info) {
     var chID;
-    var list = JSON.parse(localStorage.getItem(saveChannelList));
+    var list = JSON.parse(localStorage.getItem(itemChannelList));
 
     if (response.temporary_channel_id) {
         chID = response.temporary_channel_id;
@@ -3260,21 +3253,21 @@ function saveChannelCreation(response, channelID, msgType, info) {
                         break;
                 }
 
-                localStorage.setItem(saveChannelList, JSON.stringify(list));
+                localStorage.setItem(itemChannelList, JSON.stringify(list));
                 return;
             }
         }
 
         // A new 
         list.result.push(dataConstruct(response, chID, msgType));
-        localStorage.setItem(saveChannelList, JSON.stringify(list));
+        localStorage.setItem(itemChannelList, JSON.stringify(list));
 
     } else {
         // console.info('FIRST DATA');
         let data = {
             result: [dataConstruct(response, chID, msgType)]
         }
-        localStorage.setItem(saveChannelList, JSON.stringify(data));
+        localStorage.setItem(itemChannelList, JSON.stringify(data));
     }
 }
 
@@ -3296,10 +3289,10 @@ function updateOmniAssetData(response, data, msgType) {
 }
 
 // mnemonic words generated with signUp api save to local storage.
-function saveMnemonicData(response) {
+function saveMnemonic(response) {
 
-    var mnemonic = JSON.parse(localStorage.getItem(saveMnemonic));
-    // console.info('localStorage KEY  = ' + addr);
+    var mnemonic = JSON.parse(sessionStorage.getItem(itemMnemonic));
+    // var mnemonic = JSON.parse(localStorage.getItem(saveMnemonic));
 
     // If has data.
     if (mnemonic) {
@@ -3308,7 +3301,8 @@ function saveMnemonicData(response) {
             mnemonic: response,
         }
         mnemonic.result.push(new_data);
-        localStorage.setItem(saveMnemonic, JSON.stringify(mnemonic));
+        sessionStorage.setItem(itemMnemonic, JSON.stringify(mnemonic));
+        // localStorage.setItem(saveMnemonic, JSON.stringify(mnemonic));
 
     } else {
         // console.info('FIRST DATA');
@@ -3317,14 +3311,15 @@ function saveMnemonicData(response) {
                 mnemonic: response
             }]
         }
-        localStorage.setItem(saveMnemonic, JSON.stringify(data));
+        sessionStorage.setItem(itemMnemonic, JSON.stringify(data));
+        // localStorage.setItem(saveMnemonic, JSON.stringify(data));
     }
 }
 
 // 
 function getNewestConnOBD() {
     var nodeAddress;
-    var list = JSON.parse(localStorage.getItem(saveOBDList));
+    var list = JSON.parse(localStorage.getItem(itemOBDList));
     // If has data
     if (list) {
         for (let i = 0; i < list.result.length; i++) {
@@ -3341,7 +3336,7 @@ function getNewestConnOBD() {
 // List of OBD node that have interacted
 function saveOBDConnectHistory(name) {
 
-    var list = JSON.parse(localStorage.getItem(saveOBDList));
+    var list = JSON.parse(localStorage.getItem(itemOBDList));
 
     // If has data.
     if (list) {
@@ -3353,7 +3348,7 @@ function saveOBDConnectHistory(name) {
         for (let i = 0; i < list.result.length; i++) {
             if (list.result[i].name === name) {
                 list.result[i].newest = 'yes';
-                localStorage.setItem(saveOBDList, JSON.stringify(list));
+                localStorage.setItem(itemOBDList, JSON.stringify(list));
                 return;
             }
         }
@@ -3363,7 +3358,7 @@ function saveOBDConnectHistory(name) {
             newest: 'yes'
         }
         list.result.push(new_data);
-        localStorage.setItem(saveOBDList, JSON.stringify(list));
+        localStorage.setItem(itemOBDList, JSON.stringify(list));
 
     } else {
         // console.info('FIRST DATA');
@@ -3373,7 +3368,7 @@ function saveOBDConnectHistory(name) {
                 newest: 'yes'
             }]
         }
-        localStorage.setItem(saveOBDList, JSON.stringify(data));
+        localStorage.setItem(itemOBDList, JSON.stringify(data));
     }
 }
 
@@ -3403,37 +3398,59 @@ function saveInvokeHistory(name) {
 }
 
 // List of Counterparties who have interacted
-function saveCounterpartiesList(name, p2pID) {
+function saveCounterparties(name, p2pID) {
 
-    var list = JSON.parse(localStorage.getItem(saveCounterparties));
+    var list = JSON.parse(localStorage.getItem(itemCounterparties));
 
     // If has data.
     if (list) {
         // console.info('HAS DATA');
         for (let i = 0; i < list.result.length; i++) {
-            if (list.result[i].name === name) {
-                list.result[i].p2pID = p2pID;
-                localStorage.setItem(saveCounterparties, JSON.stringify(list));
+            // same userID
+            if (userID === list.result[i].userID) {
+                for (let i2 = 0; i2 < list.result[i].data.length; i2++) {
+                    // if UserPeerID is same, then NodePeerID is updated.
+                    if (list.result[i].data[i2].name === name) {
+                        list.result[i].data[i2].p2pID = p2pID;
+                        localStorage.setItem(itemCounterparties, JSON.stringify(list));
+                        return;
+                    }
+                }
+
+                // Add a new data to the userID
+                let new_data = {
+                    name:  name,
+                    p2pID: p2pID
+                }
+                list.result[i].data.push(new_data);
+                localStorage.setItem(itemCounterparties, JSON.stringify(list));
                 return;
             }
         }
 
+        // A new User ID.
         let new_data = {
-            name:  name,
-            p2pID: p2pID
+            userID: userID,
+            data: [{
+                name:  name,
+                p2pID: p2pID
+            }]
         }
         list.result.push(new_data);
-        localStorage.setItem(saveCounterparties, JSON.stringify(list));
+        localStorage.setItem(itemCounterparties, JSON.stringify(list));
 
     } else {
         // console.info('FIRST DATA');
         let data = {
             result: [{
-                name:  name,
-                p2pID: p2pID
+                userID: userID,
+                data: [{
+                    name:  name,
+                    p2pID: p2pID
+                }]
             }]
         }
-        localStorage.setItem(saveCounterparties, JSON.stringify(data));
+        localStorage.setItem(itemCounterparties, JSON.stringify(data));
     }
 }
 
@@ -3475,7 +3492,7 @@ function autoCreateMnemonic() {
     // Generate mnemonic by local js library.
     var mnemonic = btctool.generateMnemonic(128);
     $("#mnemonic").val(mnemonic);
-    saveMnemonicData(mnemonic);
+    saveMnemonic(mnemonic);
 }
 
 // Generate a new pub key of an address.
@@ -3494,7 +3511,7 @@ function autoCreateFundingPubkey(param) {
             break;
     }
 
-    saveAddrData(result);
+    saveAddresses(result);
 }
 
 // auto Calculation Miner Fee
@@ -3516,7 +3533,7 @@ function displayUserData(obj, param) {
             displayAddresses(param);
             break;
         case 'Counterparties':
-            displayCounterparties();
+            displayCounterparties(param);
             break;
         case 'ChannelList':
             displayChannelCreation(param);
@@ -3528,7 +3545,8 @@ function displayUserData(obj, param) {
 function displayMnemonic() {
     // get [name_req_div] div
     var parent = $("#name_req_div");
-    var mnemonic = JSON.parse(localStorage.getItem(saveMnemonic));
+    var mnemonic = JSON.parse(sessionStorage.getItem(itemMnemonic));
+    // var mnemonic = JSON.parse(localStorage.getItem(saveMnemonic));
 
     var newDiv = document.createElement('div');
     newDiv.setAttribute('class', 'panelItem');
@@ -3548,18 +3566,14 @@ function displayMnemonic() {
 
 //
 function displayAddresses(param) {
-    // get [name_req_div] div
     var parent = $("#name_req_div");
-
     var newDiv = document.createElement('div');
     newDiv.setAttribute('class', 'panelItem');
 
-    // console.info('LOGINED userID = '+userID);
-
     if (param === inNewHtml) { // New page
-        var status = JSON.parse(localStorage.getItem(saveGoWhere));
+        var status = JSON.parse(localStorage.getItem(itemGoWhere));
         if (!status.isLogined) { // Not login.
-            createElement(newDiv, 'text', 'NO USER LOGINED.');
+            createElement(newDiv, 'h3', 'NO USER LOGINED.');
             parent.append(newDiv);
             return;
         } else {
@@ -3568,26 +3582,27 @@ function displayAddresses(param) {
 
     } else {
         if (!isLogined) { // Not login.
-            createElement(newDiv, 'text', 'NO USER LOGINED.', 'bigText');
+            createElement(newDiv, 'h3', 'NO USER LOGINED.');
             parent.append(newDiv);
             return;
         }
     }
 
     var arrData;
-    var addr = JSON.parse(localStorage.getItem(saveAddr));
+    var addr = JSON.parse(localStorage.getItem(itemAddr));
 
     // If has data
     if (addr) {
         for (let i = 0; i < addr.result.length; i++) {
             if (userID === addr.result[i].userID) {
-                var bigText = 'User ID : ' + addr.result[i].userID;
-                createElement(newDiv, 'text', bigText, 'bigText');
-                createElement(newDiv, 'h2', 'Address List', 'responseText');
+                // var bigText = 'User ID : ' + addr.result[i].userID;
+                // createElement(newDiv, 'text', bigText, 'bigText');
+                // createElement(newDiv, 'h2', 'Address List', 'responseText');
 
                 for (let i2 = 0; i2 < addr.result[i].data.length; i2++) {
                     createElement(newDiv, 'h3', 'NO. ' + (i2 + 1), 'responseText');
 
+                    // Get balance of an address.
                     var strAddr = addr.result[i].data[i2].address;
                     createBalanceElement(newDiv, strAddr);
 
@@ -3614,11 +3629,11 @@ function displayAddresses(param) {
         }
 
         // The user has not create address yet.
-        displayNoData(newDiv);
+        createElement(newDiv, 'h3', 'NO DATA YET.');
         parent.append(newDiv);
 
     } else { // NO LOCAL STORAGE DATA YET.
-        displayNoData(newDiv);
+        createElement(newDiv, 'h3', 'NO DATA YET.');
         parent.append(newDiv);
     }
 }
@@ -3643,30 +3658,65 @@ function createBalanceElement(parent, strAddr) {
 }
 
 // List of Counterparties who have interacted
-function displayCounterparties() {
-    // get [name_req_div] div
+function displayCounterparties(param) {
+    var arrData;
     var parent = $("#name_req_div");
-
-    var list = JSON.parse(localStorage.getItem(saveCounterparties));
-
+    var list   = JSON.parse(localStorage.getItem(itemCounterparties));
     var newDiv = document.createElement('div');
     newDiv.setAttribute('class', 'panelItem');
+
+    if (param === inNewHtml) { // New page
+        var status = JSON.parse(localStorage.getItem(itemGoWhere));
+        if (!status.isLogined) { // Not login.
+            createElement(newDiv, 'h3', 'NO USER LOGINED.');
+            parent.append(newDiv);
+            return;
+        } else {
+            userID = status.userID;
+        }
+
+    } else {
+        if (!isLogined) { // Not login.
+            createElement(newDiv, 'h3', 'NO USER LOGINED.');
+            parent.append(newDiv);
+            return;
+        }
+    }
 
     // If has data
     if (list) {
         for (let i = 0; i < list.result.length; i++) {
-            // Display list NO.
-            createElement(newDiv, 'h3', 'NO. ' + (i + 1), 'responseText');
-            createElement(newDiv, 'p', 'NodePeerID: ');
-            createElement(newDiv, 'p', list.result[i].p2pID, 'responseText');
-            createElement(newDiv, 'p', 'UserPeerID: ');
-            createElement(newDiv, 'p', list.result[i].name, 'responseText');
+            if (userID === list.result[i].userID) {
+                for (let i2 = 0; i2 < list.result[i].data.length; i2++) {
+                    createElement(newDiv, 'h3', 'NO. ' + (i2 + 1), 'responseText');
+                    arrData = [
+                        'NodePeerID : ' + list.result[i].data[i2].p2pID,
+                        'UserPeerID : ' + list.result[i].data[i2].name,
+                    ];
+
+                    for (let i3 = 0; i3 < arrData.length; i3++) {
+                        var point   = arrData[i3].indexOf(':') + 1;
+                        var title   = arrData[i3].substring(0, point);
+                        var content = arrData[i3].substring(point);
+                        createElement(newDiv, 'text', title);
+                        createElement(newDiv, 'text', content, 'responseText');
+                        createElement(newDiv, 'p');
+                    }
+                }
+
+                parent.append(newDiv);
+                return;
+            }
         }
+
+        // The user has not counterparty yet.
+        createElement(newDiv, 'h3', 'NO DATA YET.');
+        parent.append(newDiv);
+
     } else { // NO LOCAL STORAGE DATA YET.
         createElement(newDiv, 'h3', 'NO DATA YET.');
+        parent.append(newDiv);
     }
-
-    parent.append(newDiv);
 }
 
 // List of OBD node that have interacted
@@ -3674,7 +3724,7 @@ function displayOBDConnectHistory() {
 
     var item;
     var parent = $("#name_req_div");
-    var list = JSON.parse(localStorage.getItem(saveOBDList));
+    var list = JSON.parse(localStorage.getItem(itemOBDList));
 
     var newDiv = document.createElement('div');
     newDiv.setAttribute('class', 'panelItem');
@@ -3829,7 +3879,7 @@ function displayChannelCreation(param) {
     }
     */
 
-    var list = JSON.parse(localStorage.getItem(saveChannelList));
+    var list = JSON.parse(localStorage.getItem(itemChannelList));
 
     if (list) {
         for (let i = 0; i < list.result.length; i++) {
@@ -4169,19 +4219,11 @@ function htlcRecord(parent, list, i) {
     }
 }
 
-// 
-function displayNoData(parent) {
-    // userID
-    createElement(parent, 'text', userID);
-    // title
-    createElement(parent, 'h3', 'NO DATA YET.');
-}
-
 //----------------------------------------------------------------
 // Functions of Common Util.
 
 // create html elements
-function createElement(parent, elementName, myInnerText, cssStyle) {
+function createElement(parent, elementName, myInnerText, css) {
 
     var element = document.createElement(elementName);
 
@@ -4189,9 +4231,8 @@ function createElement(parent, elementName, myInnerText, cssStyle) {
         element.innerText = myInnerText;
     }
 
-    if (cssStyle) {
-        // element.setAttribute('style', cssStyle);
-        element.setAttribute('class', cssStyle);
+    if (css) {
+        element.setAttribute('class', css);
     }
 
     parent.append(element);
@@ -4199,7 +4240,7 @@ function createElement(parent, elementName, myInnerText, cssStyle) {
 
 //
 function displayUserDataInNewHtml(goWhere) {
-    saveGoWhereData(goWhere);
+    saveGoWhere(goWhere);
     window.open('userData.html', 'data', 'height=600, width=800, top=150, ' +
         'left=500, toolbar=no, menubar=no, scrollbars=no, resizable=no, ' +
         'location=no, status=no');
@@ -4213,13 +4254,13 @@ function displayInvokeHistoryInNewHtml() {
 }
 
 //
-function saveGoWhereData(goWhere) {
+function saveGoWhere(goWhere) {
     let data = {
         goWhere: goWhere,
         isLogined: isLogined,
         userID: userID
     }
-    localStorage.setItem(saveGoWhere, JSON.stringify(data));
+    localStorage.setItem(itemGoWhere, JSON.stringify(data));
 }
 
 // Bitcoin Testnet Faucet
