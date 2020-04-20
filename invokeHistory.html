@@ -66,9 +66,8 @@
 
     // 
     function connectOBD() {
-        var node_url = getNewestConnOBD();
-        console.info('node url = ' + node_url);
-        obdApi.connectToServer(node_url, function(response) {
+        var nodeAddress = getNewestConnOBD();
+        obdApi.connectToServer(nodeAddress, function(response) {
             // console.info('OBD Response = ' + response);
         }, function(globalResponse) {
             displayOBDMessages(globalResponse);

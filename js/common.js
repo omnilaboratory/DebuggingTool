@@ -44,7 +44,7 @@ var saveMnemonic = 'mnemonic';
 //
 var saveGoWhere = 'go_where';
 
-// the info save to local storage [ChannelCreation].
+// the info save to local storage [ChannelList].
 var channelInfo;
 
 // word wrap code.
@@ -163,10 +163,10 @@ function logIn(msgType) {
 // 3 connectP2PNode API at local.
 function connectP2PNode(msgType) {
 
-    var node_url  = $("#node_url").val();
+    var nodeAddress  = $("#NodeAddress").val();
 
     // OBD API
-    obdApi.connectP2PNode(node_url, function(e) {
+    obdApi.connectP2PNode(nodeAddress, function(e) {
         console.info('connectP2PNode - OBD Response = ' + JSON.stringify(e));
         createOBDResponseDiv(e, msgType);
     });
@@ -175,8 +175,8 @@ function connectP2PNode(msgType) {
 // -32 openChannel API at local.
 function openChannel(msgType) {
 
-    var p2pID  = $("#recipient_p2p_peer_id").val();
-    var name   = $("#recipient_peer_id").val();
+    var p2pID  = $("#recipient_node_peer_id").val();
+    var name   = $("#recipient_user_peer_id").val();
     var pubkey = $("#funding_pubkey").val();
 
     // if (name.trim() === '' || pubkey.trim() === '') {
@@ -199,8 +199,8 @@ function openChannel(msgType) {
 // -33 accept Channel API at local.
 function acceptChannel(msgType) {
 
-    var p2pID    = $("#recipient_p2p_peer_id").val();
-    var name     = $("#recipient_peer_id").val();
+    var p2pID    = $("#recipient_node_peer_id").val();
+    var name     = $("#recipient_user_peer_id").val();
     var temp_cid = $("#temporary_channel_id").val();
     var pubkey   = $("#funding_pubkey").val();
     var approval = $("#checkbox_n33").prop("checked");
@@ -454,7 +454,7 @@ function atomicSwap(msgType) {
 
     var channel_id_from = $("#channel_id_from").val();
     var channel_id_to = $("#channel_id_to").val();
-    var recipient_peer_id = $("#recipient_peer_id").val();
+    var recipient_user_peer_id = $("#recipient_user_peer_id").val();
     var property_sent = $("#property_sent").val();
     var amount = $("#amount").val();
     var exchange_rate = $("#exchange_rate").val();
@@ -466,7 +466,7 @@ function atomicSwap(msgType) {
     let info = new AtomicSwapRequest();
     info.channel_id_from = channel_id_from;
     info.channel_id_to = channel_id_to;
-    info.recipient_peer_id = recipient_peer_id;
+    info.recipient_user_peer_id = recipient_user_peer_id;
     info.property_sent = Number(property_sent);
     info.amount = Number(amount);
     info.exchange_rate = Number(exchange_rate);
@@ -490,7 +490,7 @@ function atomicSwapAccepted(msgType) {
 
     var channel_id_from = $("#channel_id_from").val();
     var channel_id_to = $("#channel_id_to").val();
-    var recipient_peer_id = $("#recipient_peer_id").val();
+    var recipient_user_peer_id = $("#recipient_user_peer_id").val();
     var property_sent = $("#property_sent").val();
     var amount = $("#amount").val();
     var exchange_rate = $("#exchange_rate").val();
@@ -502,7 +502,7 @@ function atomicSwapAccepted(msgType) {
     let info = new AtomicSwapAccepted();
     info.channel_id_from = channel_id_from;
     info.channel_id_to = channel_id_to;
-    info.recipient_peer_id = recipient_peer_id;
+    info.recipient_user_peer_id = recipient_user_peer_id;
     info.property_sent = Number(property_sent);
     info.amount = Number(amount);
     info.exchange_rate = Number(exchange_rate);
@@ -663,8 +663,8 @@ function getLatestCommitmentTx(msgType) {
 // BTC Funding Created -3400 API at local.
 function btcFundingCreated(msgType) {
 
-    var p2pID    = $("#recipient_p2p_peer_id").val();
-    var name     = $("#recipient_peer_id").val();
+    var p2pID    = $("#recipient_node_peer_id").val();
+    var name     = $("#recipient_user_peer_id").val();
     var temp_cid = $("#temporary_channel_id").val();
     var privkey  = $("#channel_address_private_key").val();
     var tx_hex   = $("#funding_tx_hex").val();
@@ -688,8 +688,8 @@ function btcFundingCreated(msgType) {
 // BTC Funding Signed -3500 API at local.
 function btcFundingSigned(msgType) {
 
-    var p2pID    = $("#recipient_p2p_peer_id").val();
-    var name     = $("#recipient_peer_id").val();
+    var p2pID    = $("#recipient_node_peer_id").val();
+    var name     = $("#recipient_user_peer_id").val();
     var temp_cid = $("#temporary_channel_id").val();
     var privkey  = $("#channel_address_private_key").val();
     var tx_id    = $("#funding_txid").val();
@@ -715,8 +715,8 @@ function btcFundingSigned(msgType) {
 // Omni Asset Funding Created -34 API at local.
 function assetFundingCreated(msgType) {
 
-    var p2pID    = $("#recipient_p2p_peer_id").val();
-    var name     = $("#recipient_peer_id").val();
+    var p2pID    = $("#recipient_node_peer_id").val();
+    var name     = $("#recipient_user_peer_id").val();
     var temp_cid = $("#temporary_channel_id").val();
     var t_ad_pbk = $("#temp_address_pub_key").val();
     var t_ad_prk = $("#temp_address_private_key").val();
@@ -744,8 +744,8 @@ function assetFundingCreated(msgType) {
 // Omni Asset Funding Signed -35 API at local.
 function assetFundingSigned(msgType) {
 
-    var p2pID      = $("#recipient_p2p_peer_id").val();
-    var name       = $("#recipient_peer_id").val();
+    var p2pID      = $("#recipient_node_peer_id").val();
+    var name       = $("#recipient_user_peer_id").val();
     var channel_id = $("#channel_id").val();
     var privkey    = $("#fundee_channel_address_private_key").val();
     var approval   = $("#checkbox_n35").prop("checked");
@@ -845,12 +845,12 @@ function createInvoice(msgType) {
 
     var property_id = $("#property_id").val();
     var amount = $("#amount").val();
-    var recipient_peer_id = $("#recipient_peer_id").val();
+    var recipient_user_peer_id = $("#recipient_user_peer_id").val();
 
     let info = new HtlcHInfo();
     info.property_id = Number(property_id);
     info.amount = Number(amount);
-    info.recipient_peer_id = recipient_peer_id;
+    info.recipient_user_peer_id = recipient_user_peer_id;
 
     // OBD API
     obdApi.htlcInvoice(info, function(e) {
@@ -865,14 +865,14 @@ function htlcFindPathAndSendH(msgType) {
 
     var property_id = $("#property_id").val();
     var amount = $("#amount").val();
-    var recipient_peer_id = $("#recipient_peer_id").val();
+    var recipient_user_peer_id = $("#recipient_user_peer_id").val();
     var h = $("#h").val();
     var memo = $("#memo").val();
 
     let info = new HtlcRequestFindPathAndSendH();
     info.property_id = Number(property_id);
     info.amount = Number(amount);
-    info.recipient_peer_id = recipient_peer_id;
+    info.recipient_user_peer_id = recipient_user_peer_id;
     info.h = h;
     info.memo = memo;
 
@@ -903,12 +903,12 @@ function WillBeUpdatedHTLCFindPath(msgType) {
 
     var property_id = $("#property_id").val();
     var amount = $("#amount").val();
-    var recipient_peer_id = $("#recipient_peer_id").val();
+    var recipient_user_peer_id = $("#recipient_user_peer_id").val();
 
     let info = new HtlcHInfo();
     info.property_id = Number(property_id);
     info.amount = Number(amount);
-    info.recipient_peer_id = recipient_peer_id;
+    info.recipient_user_peer_id = recipient_user_peer_id;
 
     // OBD API
     obdApi.addHtlc(info, function(e) {
@@ -921,8 +921,8 @@ function WillBeUpdatedHTLCFindPath(msgType) {
 // Commitment Transaction Created -351 API at local.
 function RSMCCTxCreated(msgType) {
 
-    var p2pID    = $("#recipient_p2p_peer_id").val();
-    var name     = $("#recipient_peer_id").val();
+    var p2pID    = $("#recipient_node_peer_id").val();
+    var name     = $("#recipient_user_peer_id").val();
     var channel_id = $("#channel_id").val();
     var amount = $("#amount").val();
     var curr_temp_address_pub_key = $("#curr_temp_address_pub_key").val();
@@ -949,8 +949,8 @@ function RSMCCTxCreated(msgType) {
 // Revoke and Acknowledge Commitment Transaction -352 API at local.
 function RSMCCTxSigned(msgType) {
 
-    var p2pID    = $("#recipient_p2p_peer_id").val();
-    var name     = $("#recipient_peer_id").val();
+    var p2pID    = $("#recipient_node_peer_id").val();
+    var name     = $("#recipient_user_peer_id").val();
     var channel_id = $("#channel_id").val();
     var curr_temp_address_pub_key = $("#curr_temp_address_pub_key").val();
     var curr_temp_address_private_key = $("#curr_temp_address_private_key").val();
@@ -1280,7 +1280,7 @@ function displayOBDMessages(content) {
     content = content.replace("\"", "").replace("\"", "");
     console.info("OBD DIS - content = ", content);
 
-    // the info save to local storage [ChannelCreation].
+    // the info save to local storage [ChannelList].
     channelInfo = content;
 
     // Some case do not need displayed.
@@ -1345,11 +1345,11 @@ function getUserDataList(goWhere) {
             case 'Addresses':
                 displayUserData(Addresses, inNewHtml);
                 break;
-            case 'Friends':
-                displayUserData(Friends);
+            case 'Counterparties':
+                displayUserData(Counterparties);
                 break;
-            case 'ChannelCreation':
-                displayUserData(ChannelCreation, inNewHtml);
+            case 'ChannelList':
+                displayUserData(ChannelList, inNewHtml);
                 break;
         }
     });
@@ -1676,7 +1676,7 @@ function createParamOfAPI(arrParams, content_div) {
         input_box = document.createElement('input');
         input_box.id = arrParams[i].name;
 
-        if (arrParams[i].name === 'node_url') {
+        if (arrParams[i].name === 'NodeAddress') {
             input_box.setAttribute('class', 'input_node_url');
         } else {
             input_box.setAttribute('class', 'input');
@@ -1784,19 +1784,15 @@ function createConnectNodeDiv() {
     newDiv.append(title);
 
     // create [input title] element
-    createElement(newDiv, 'text', 'Node URL: ');
+    createElement(newDiv, 'text', 'Node Address: ');
 
     // create [input] element
-    var node_url = document.createElement('input');
-    node_url.id = 'node_url';
-    // node_url.style = 'width: 50%';
-    node_url.setAttribute('class', 'input_conn_node');
-    node_url.placeholder = 'Please input Node URL.';
-
-    node_url.value = getNewestConnOBD();
-    // node_url.value = 'ws://62.234.216.108:60030/ws';
-    // node_url.value = 'ws://127.0.0.1:60020/ws';
-    newDiv.append(node_url);
+    var nodeAddress = document.createElement('input');
+    nodeAddress.id = 'NodeAddress';
+    nodeAddress.setAttribute('class', 'input_conn_node');
+    nodeAddress.placeholder = 'Please input Node URL.';
+    nodeAddress.value = getNewestConnOBD();
+    newDiv.append(nodeAddress);
 
     // create [button] element
     var button = document.createElement('button');
@@ -1860,16 +1856,14 @@ function clearOBDMsg() {
 
 // 
 function connectOBD() {
-    // get [node_url] input box value.
-    var node_url = $("#node_url").val();
-    // console.info('node url = ' + node_url);
+    var nodeAddress = $("#NodeAddress").val();
 
-    if (node_url.trim().length === 0) {
-        alert('Please input Node URL.');
+    if (nodeAddress.trim().length === 0) {
+        alert('Please input Node Address.');
         return;
     }
 
-    obdApi.connectToServer(node_url, function(response) {
+    obdApi.connectToServer(nodeAddress, function(response) {
         console.info('connectOBD - OBD Response = ' + response);
 
         $("#status").text("Connected");
@@ -1877,7 +1871,7 @@ function connectOBD() {
 
         createOBDResponseDiv(response, 'connect_node_resp');
         changeConnectButtonStatus();
-        saveOBDConnectHistory(node_url);
+        saveOBDConnectHistory(nodeAddress);
 
     }, function(globalResponse) {
         displayOBDMessages(globalResponse);
@@ -2050,9 +2044,9 @@ function parseData1(response) {
         ];
     } else {
         var arrData = [
-            'p2pNodeAddress : ' + response.p2pNodeAddress,
-            'p2pNodePeerId : '  + response.p2pNodePeerId,
-            'userPeerId : '     + response.userPeerId,
+            'NodeAddress : ' + response.nodeAddress,
+            'NodePeerID : '  + response.nodePeerId,
+            'UserPeerID : '     + response.userPeerId,
         ];
     }
 
@@ -2301,7 +2295,7 @@ function parseDataN35101(response) {
         arrData = [
             'channel_id : ' + response.body[i].channel_id,
             'amount_to_htlc : ' + response.body[i].amount_to_htlc,
-            'amount_to_other : ' + response.body[i].amount_to_other,
+            'amount_to_counterparty : ' + response.body[i].amount_to_counterparty,
             'amount_to_rsmc : ' + response.body[i].amount_to_rsmc,
             'create_at : ' + response.body[i].create_at,
             'create_by : ' + response.body[i].create_by,
@@ -2360,7 +2354,7 @@ function parseDataN35104(response) {
         'property_id : ' + response.property_id,
         'input_amount : ' + response.input_amount,
         'amount_to_rsmc : ' + response.amount_to_rsmc,
-        'amount_to_other : ' + response.amount_to_other,
+        'amount_to_counterparty : ' + response.amount_to_counterparty,
         'amount_to_htlc : ' + response.amount_to_htlc,
         'owner : ' + response.owner,
         'peer_id_a : ' + response.peer_id_a,
@@ -2576,7 +2570,7 @@ function parseDataN43(response) {
 // parseDataN40 - 
 function parseDataN40(response) {
     var arrData = [
-        'recipient_peer_id : ' + response.recipient_peer_id,
+        'recipient_user_peer_id : ' + response.recipient_user_peer_id,
         'amount : ' + response.amount,
         'property_id : ' + response.propertyId,
         'msg : ' + response.msg,
@@ -2594,7 +2588,7 @@ function parseDataN40(response) {
 // parseDataN4003 - 
 function parseDataN4003(response) {
     var arrData = [
-        'recipient_peer_id : ' + response.recipient_peer_id,
+        'recipient_user_peer_id : ' + response.recipient_user_peer_id,
         'amount : ' + response.amount,
         'property_id : ' + response.propertyId,
         'msg : ' + response.msg,
@@ -2618,7 +2612,7 @@ function parseDataN352(response) {
         'property_id : ' + response.latestCcommitmentTxInfo.property_id,
         'input_amount : ' + response.latestCcommitmentTxInfo.input_amount,
         'amount_to_rsmc : ' + response.latestCcommitmentTxInfo.amount_to_rsmc,
-        'amount_to_other : ' + response.latestCcommitmentTxInfo.amount_to_other,
+        'amount_to_counterparty : ' + response.latestCcommitmentTxInfo.amount_to_counterparty,
         'amount_to_htlc : ' + response.latestCcommitmentTxInfo.amount_to_htlc,
         'owner : ' + response.latestCcommitmentTxInfo.owner,
         'peer_id_a : ' + response.latestCcommitmentTxInfo.peer_id_a,
@@ -3092,7 +3086,7 @@ function updateRsmcData(response, data, msgType) {
     data.date = new Date().toLocaleString();
 
     // data.amount_to_htlc = response.amount_to_htlc;
-    // data.amount_to_other = response.amount_to_other;
+    // data.amount_to_counterparty = response.amount_to_counterparty;
     // data.amount_to_rsmc = response.amount_to_rsmc;
     // data.rsmc_multi_address = response.rsmc_multi_address;
     // data.rsmc_txid = response.rsmc_txid;
@@ -3339,18 +3333,18 @@ function saveMnemonicData(response) {
 
 // 
 function getNewestConnOBD() {
-    var node_url;
+    var nodeAddress;
     var list = JSON.parse(localStorage.getItem(saveOBDList));
     // If has data
     if (list) {
         for (let i = 0; i < list.result.length; i++) {
             if (list.result[i].newest === 'yes') {
-                node_url = list.result[i].name;
-                return node_url;
+                nodeAddress = list.result[i].name;
+                return nodeAddress;
             }
         }
     } else { // NO LOCAL STORAGE DATA YET.
-        return node_url = 'ws://127.0.0.1:60020/ws';
+        return nodeAddress = 'ws://127.0.0.1:60020/ws';
     }
 }
 
@@ -3421,7 +3415,7 @@ function saveInvokeHistory(name) {
 // List of friends who have interacted
 function saveFriendsList(name, p2pID) {
 
-    // var name = $("#recipient_peer_id").val();
+    // var name = $("#recipient_user_peer_id").val();
     var list = JSON.parse(localStorage.getItem(saveFriends));
 
     // If has data.
@@ -3532,10 +3526,10 @@ function displayUserData(obj, param) {
         case 'Addresses':
             displayAddresses(param);
             break;
-        case 'Friends':
+        case 'Counterparties':
             displayFriends();
             break;
-        case 'ChannelCreation':
+        case 'ChannelList':
             displayChannelCreation(param);
             break;
     }
@@ -3674,9 +3668,9 @@ function displayFriends() {
         for (let i = 0; i < list.result.length; i++) {
             // Display list NO.
             createElement(newDiv, 'h3', 'NO. ' + (i + 1), 'responseText');
-            createElement(newDiv, 'p', 'P2P_Peer_ID: ');
+            createElement(newDiv, 'p', 'NodePeerID: ');
             createElement(newDiv, 'p', list.result[i].p2pID, 'responseText');
-            createElement(newDiv, 'p', 'Peer_ID: ');
+            createElement(newDiv, 'p', 'UserPeerID: ');
             createElement(newDiv, 'p', list.result[i].name, 'responseText');
         }
     } else { // NO LOCAL STORAGE DATA YET.
@@ -3812,7 +3806,7 @@ function sendCustomRequest() {
 
 //
 function clickConnectionHistory(obj) {
-    $("#node_url").val(obj.innerText);
+    $("#NodeAddress").val(obj.innerText);
 }
 
 //

@@ -2,18 +2,18 @@
     "data": [
         {
             "id": "MnemonicWords",
-            "description": "Mnemonic Words is used to login to OBD."
+            "description": "Mnemonic words are used for login your OBD."
         },
         {
-            "id": "Addresses",
+            "id": "My Addresses",
             "description": "Addresses created with mnemonic."
         },
         {
-            "id": "Friends",
+            "id": "Counterparties",
             "description": "List of friends who have interacted."
         },
         {
-            "id": "ChannelCreation",
+            "id": "ChannelList",
             "description": "List of channel creation process records."
         }
     ]

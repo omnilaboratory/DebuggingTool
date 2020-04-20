@@ -1,8 +1,8 @@
 class Message {
   type: number;
   data: Object = new Object();
-  recipient_peer_id: string = "";
-  recipient_p2p_peer_id: string = "";
+  recipient_user_peer_id: string = "";
+  recipient_node_peer_id: string = "";
 }
 
 class BtcFundingInfo {
@@ -76,14 +76,14 @@ class CommitmentTxSigned {
 class HtlcHInfo {
   property_id: number = 0;
   amount: number = 0;
-  recipient_peer_id: string = "";
+  recipient_user_peer_id: string = "";
 }
 
 class HtlcRequestFindPathAndSendH{
   h: string = "";
   property_id: number = 0;
   amount: number = 0;
-  recipient_peer_id: string = "";
+  recipient_user_peer_id: string = "";
   memo: string = "";
 }
 
@@ -184,7 +184,7 @@ class CloseChannelSign {
 class AtomicSwapRequest{
   channel_id_from: string = "";
   channel_id_to: string = "";
-  recipient_peer_id: string = "";
+  recipient_user_peer_id: string = "";
   property_sent: number = 0;
   amount: number = 0;
   exchange_rate: number = 0;

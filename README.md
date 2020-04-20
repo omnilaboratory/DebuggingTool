@@ -82,7 +82,7 @@ Open another browser window, open index.html, and signup another user to get his
 </p>
 
 1. click "connectP2PNode";  
-2. input the `p2pNodeAddress` into the "node_url" input box;  
+2. input the `p2pNodeAddress` into the "NodeAddress" input box;  
 3. click "invoke API";  
 
 

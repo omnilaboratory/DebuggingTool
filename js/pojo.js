@@ -1,8 +1,8 @@
 class Message {
     constructor() {
         this.data = new Object();
-        this.recipient_peer_id = "";
-        this.recipient_p2p_peer_id = "";
+        this.recipient_user_peer_id = "";
+        this.recipient_node_peer_id = "";
     }
 }
 class BtcFundingInfo {
@@ -87,7 +87,7 @@ class HtlcHInfo {
     constructor() {
         this.property_id = 0;
         this.amount = 0;
-        this.recipient_peer_id = "";
+        this.recipient_user_peer_id = "";
     }
 }
 class HtlcRequestFindPathAndSendH {
@@ -95,7 +95,7 @@ class HtlcRequestFindPathAndSendH {
         this.h = "";
         this.property_id = 0;
         this.amount = 0;
-        this.recipient_peer_id = "";
+        this.recipient_user_peer_id = "";
         this.memo = "";
     }
 }
@@ -210,7 +210,7 @@ class AtomicSwapRequest {
     constructor() {
         this.channel_id_from = "";
         this.channel_id_to = "";
-        this.recipient_peer_id = "";
+        this.recipient_user_peer_id = "";
         this.property_sent = 0;
         this.amount = 0;
         this.exchange_rate = 0;

@@ -15,11 +15,11 @@
                     "name": "mnemonic",
                     "buttons": [
                         {
-                            "innerText": "Get It",
+                            "innerText": "Select",
                             "onclick": "displayUserDataInNewHtml('MnemonicWords')"
                         },
                         {
-                            "innerText": "Auto Create",
+                            "innerText": "Create",
                             "onclick": "autoCreateMnemonic()"
                         }
                     ]
@@ -29,10 +29,10 @@
         {
             "id": "connectP2PNode",
             "type_id": 3,
-            "description": "connectP2PNode is a temp func for development phrase. It connects to a p2p node.",
+            "description": "connectP2PNode is a temp func in debugging mode. It connects to a p2p node.",
             "parameters": [
                 {
-                    "name": "node_url",
+                    "name": "NodeAddress",
                     "buttons": []
                 }
             ]
@@ -43,20 +43,20 @@
             "description": "OpenChannel is used to request to create a channel with someone.",
             "parameters": [
                 {
-                    "name": "recipient_p2p_peer_id",
+                    "name": "recipient_node_peer_id",
                     "buttons": [
                         {
-                            "innerText": "Friends",
-                            "onclick": "displayUserDataInNewHtml('Friends')"
+                            "innerText": "Counterparties",
+                            "onclick": "displayUserDataInNewHtml('Counterparties')"
                         }
                     ]
                 },
                 {
-                    "name": "recipient_peer_id",
+                    "name": "recipient_user_peer_id",
                     "buttons": [
                         {
-                            "innerText": "Friends",
-                            "onclick": "displayUserDataInNewHtml('Friends')"
+                            "innerText": "Counterparties",
+                            "onclick": "displayUserDataInNewHtml('Counterparties')"
                         }
                     ]
                 },
@@ -64,11 +64,11 @@
                     "name": "funding_pubkey",
                     "buttons": [
                         {
-                            "innerText": "Get It",
+                            "innerText": "Select",
                             "onclick": "displayUserDataInNewHtml('Addresses')"
                         },
                         {
-                            "innerText": "Auto Create",
+                            "innerText": "Create",
                             "onclick": "autoCreateFundingPubkey()"
                         }
                     ]
@@ -81,20 +81,20 @@
             "description": "AcceptChannel is used to response to request of creating channel. Bob replies to accept, his OBD completes his message and routes it to Alice's OBD. Then Alice sees the response of acceptance.",
             "parameters": [
                 {
-                    "name": "recipient_p2p_peer_id",
+                    "name": "recipient_node_peer_id",
                     "buttons": [
                         {
-                            "innerText": "Friends",
-                            "onclick": "displayUserDataInNewHtml('Friends')"
+                            "innerText": "Counterparties",
+                            "onclick": "displayUserDataInNewHtml('Counterparties')"
                         }
                     ]
                 },
                 {
-                    "name": "recipient_peer_id",
+                    "name": "recipient_user_peer_id",
                     "buttons": [
                         {
-                            "innerText": "Friends",
-                            "onclick": "displayUserDataInNewHtml('Friends')"
+                            "innerText": "Counterparties",
+                            "onclick": "displayUserDataInNewHtml('Counterparties')"
                         }
                     ]
                 },
@@ -102,8 +102,8 @@
                     "name": "temporary_channel_id",
                     "buttons": [
                         {
-                            "innerText": "Get It",
-                            "onclick": "displayUserDataInNewHtml('ChannelCreation')"
+                            "innerText": "Display",
+                            "onclick": "displayUserDataInNewHtml('ChannelList')"
                         }
                     ]
                 },
@@ -111,11 +111,11 @@
                     "name": "funding_pubkey",
                     "buttons": [
                         {
-                            "innerText": "Get It",
+                            "innerText": "Select",
                             "onclick": "displayUserDataInNewHtml('Addresses')"
                         },
                         {
-                            "innerText": "Auto Create",
+                            "innerText": "Create",
                             "onclick": "autoCreateFundingPubkey()"
                         }
                     ]
@@ -131,7 +131,7 @@
                     "name": "from_address",
                     "buttons": [
                         {
-                            "innerText": "Get It",
+                            "innerText": "Select",
                             "onclick": "displayUserDataInNewHtml('Addresses')"
                         },
                         {
@@ -144,7 +144,7 @@
                     "name": "from_address_private_key",
                     "buttons": [
                         {
-                            "innerText": "Get It",
+                            "innerText": "Select",
                             "onclick": "displayUserDataInNewHtml('Addresses')"
                         }
                     ]
@@ -153,8 +153,8 @@
                     "name": "to_address",
                     "buttons": [
                         {
-                            "innerText": "Get It (Channel Addr)",
-                            "onclick": "displayUserDataInNewHtml('ChannelCreation')"
+                            "innerText": "Display (Channel Addr)",
+                            "onclick": "displayUserDataInNewHtml('ChannelList')"
                         }
                     ]
                 },
@@ -179,20 +179,20 @@
             "description": "BTCFundingCreated is used to notify the success of funding BTC to the counterpart of the channel. Alice tells her OBD to notify Bob that she created the funding transaction by payloads packed in this message -3400.",
             "parameters": [
                 {
-                    "name": "recipient_p2p_peer_id",
+                    "name": "recipient_node_peer_id",
                     "buttons": [
                         {
-                            "innerText": "Friends",
-                            "onclick": "displayUserDataInNewHtml('Friends')"
+                            "innerText": "Counterparties",
+                            "onclick": "displayUserDataInNewHtml('Counterparties')"
                         }
                     ]
                 },
                 {
-                    "name": "recipient_peer_id",
+                    "name": "recipient_user_peer_id",
                     "buttons": [
                         {
-                            "innerText": "Friends",
-                            "onclick": "displayUserDataInNewHtml('Friends')"
+                            "innerText": "Counterparties",
+                            "onclick": "displayUserDataInNewHtml('Counterparties')"
                         }
                     ]
                 },
@@ -200,8 +200,8 @@
                     "name": "temporary_channel_id",
                     "buttons": [
                         {
-                            "innerText": "Get It",
-                            "onclick": "displayUserDataInNewHtml('ChannelCreation')"
+                            "innerText": "Display",
+                            "onclick": "displayUserDataInNewHtml('ChannelList')"
                         }
                     ]
                 },
@@ -209,7 +209,7 @@
                     "name": "channel_address_private_key",
                     "buttons": [
                         {
-                            "innerText": "Get It",
+                            "innerText": "Display",
                             "onclick": "displayUserDataInNewHtml('Addresses')"
                         }
                     ]
@@ -218,8 +218,8 @@
                     "name": "funding_tx_hex",
                     "buttons": [
                         {
-                            "innerText": "Get It",
-                            "onclick": "displayUserDataInNewHtml('ChannelCreation')"
+                            "innerText": "Display",
+                            "onclick": "displayUserDataInNewHtml('ChannelList')"
                         }
                     ]
                 }
@@ -231,20 +231,20 @@
             "description": "BTCFundingSigned is used to response the transfering bitcoin event by the partner of the channel. Bob tells his OBD to reply Alice that he knows the funding by message -3500.",
             "parameters": [
                 {
-                    "name": "recipient_p2p_peer_id",
+                    "name": "recipient_node_peer_id",
                     "buttons": [
                         {
-                            "innerText": "Friends",
-                            "onclick": "displayUserDataInNewHtml('Friends')"
+                            "innerText": "Counterparties",
+                            "onclick": "displayUserDataInNewHtml('Counterparties')"
                         }
                     ]
                 },
                 {
-                    "name": "recipient_peer_id",
+                    "name": "recipient_user_peer_id",
                     "buttons": [
                         {
-                            "innerText": "Friends",
-                            "onclick": "displayUserDataInNewHtml('Friends')"
+                            "innerText": "Counterparties",
+                            "onclick": "displayUserDataInNewHtml('Counterparties')"
                         }
                     ]
                 },
@@ -252,8 +252,8 @@
                     "name": "temporary_channel_id",
                     "buttons": [
                         {
-                            "innerText": "Get It",
-                            "onclick": "displayUserDataInNewHtml('ChannelCreation')"
+                            "innerText": "Display",
+                            "onclick": "displayUserDataInNewHtml('ChannelList')"
                         }
                     ]
                 },
@@ -261,7 +261,7 @@
                     "name": "channel_address_private_key",
                     "buttons": [
                         {
-                            "innerText": "Get It",
+                            "innerText": "Display",
                             "onclick": "displayUserDataInNewHtml('Addresses')"
                         }
                     ]
@@ -270,8 +270,8 @@
                     "name": "funding_txid",
                     "buttons": [
                         {
-                            "innerText": "Get It",
-                            "onclick": "displayUserDataInNewHtml('ChannelCreation')"
+                            "innerText": "Display",
+                            "onclick": "displayUserDataInNewHtml('ChannelList')"
                         }
                     ]
                 }
@@ -286,7 +286,7 @@
                     "name": "from_address",
                     "buttons": [
                         {
-                            "innerText": "Get It",
+                            "innerText": "Select",
                             "onclick": "displayUserDataInNewHtml('Addresses')"
                         }
                     ]
@@ -295,7 +295,7 @@
                     "name": "from_address_private_key",
                     "buttons": [
                         {
-                            "innerText": "Get It",
+                            "innerText": "Select",
                             "onclick": "displayUserDataInNewHtml('Addresses')"
                         }
                     ]
@@ -304,8 +304,8 @@
                     "name": "to_address",
                     "buttons": [
                         {
-                            "innerText": "Get It (Channel Addr)",
-                            "onclick": "displayUserDataInNewHtml('ChannelCreation')"
+                            "innerText": "Display (Channel Addr)",
+                            "onclick": "displayUserDataInNewHtml('ChannelList')"
                         }
                     ]
                 },
@@ -317,7 +317,7 @@
                     "name": "property_id",
                     "buttons": [
                         {
-                            "innerText": "Get It",
+                            "innerText": "Display",
                             "onclick": "displayUserDataInNewHtml('Addresses')"
                         }
                     ]
@@ -330,20 +330,20 @@
             "description": "AssetFundingCreated is used to notify the success of omni asset funding transaction to the counter partner of the channel.",
             "parameters": [
                 {
-                    "name": "recipient_p2p_peer_id",
+                    "name": "recipient_node_peer_id",
                     "buttons": [
                         {
-                            "innerText": "Friends",
-                            "onclick": "displayUserDataInNewHtml('Friends')"
+                            "innerText": "Counterparties",
+                            "onclick": "displayUserDataInNewHtml('Counterparties')"
                         }
                     ]
                 },
                 {
-                    "name": "recipient_peer_id",
+                    "name": "recipient_user_peer_id",
                     "buttons": [
                         {
-                            "innerText": "Friends",
-                            "onclick": "displayUserDataInNewHtml('Friends')"
+                            "innerText": "Counterparties",
+                            "onclick": "displayUserDataInNewHtml('Counterparties')"
                         }
                     ]
                 },
@@ -351,8 +351,8 @@
                     "name": "temporary_channel_id",
                     "buttons": [
                         {
-                            "innerText": "Get It",
-                            "onclick": "displayUserDataInNewHtml('ChannelCreation')"
+                            "innerText": "Display",
+                            "onclick": "displayUserDataInNewHtml('ChannelList')"
                         }
                     ]
                 },
@@ -360,7 +360,7 @@
                     "name": "temp_address_pub_key",
                     "buttons": [
                         {
-                            "innerText": "Get It",
+                            "innerText": "Select",
                             "onclick": "displayUserDataInNewHtml('Addresses')"
                         }
                     ]
@@ -369,7 +369,7 @@
                     "name": "temp_address_private_key",
                     "buttons": [
                         {
-                            "innerText": "Get It",
+                            "innerText": "Select",
                             "onclick": "displayUserDataInNewHtml('Addresses')"
                         }
                     ]
@@ -378,7 +378,7 @@
                     "name": "channel_address_private_key",
                     "buttons": [
                         {
-                            "innerText": "Get It",
+                            "innerText": "Display",
                             "onclick": "displayUserDataInNewHtml('Addresses')"
                         }
                     ]
@@ -387,8 +387,8 @@
                     "name": "funding_tx_hex",
                     "buttons": [
                         {
-                            "innerText": "Get It",
-                            "onclick": "displayUserDataInNewHtml('ChannelCreation')"
+                            "innerText": "Display",
+                            "onclick": "displayUserDataInNewHtml('ChannelList')"
                         }
                     ]
                 }
@@ -400,20 +400,20 @@
             "description": "AssetFundingSigned is used to response the transfering omni asset event by the partner of the channel. Bob tells his OBD to reply Alice that he knows the funding by message -35, and OBD will creat commitment transactions (C1a & RD1a).",
             "parameters": [
                 {
-                    "name": "recipient_p2p_peer_id",
+                    "name": "recipient_node_peer_id",
                     "buttons": [
                         {
-                            "innerText": "Friends",
-                            "onclick": "displayUserDataInNewHtml('Friends')"
+                            "innerText": "Counterparties",
+                            "onclick": "displayUserDataInNewHtml('Counterparties')"
                         }
                     ]
                 },
                 {
-                    "name": "recipient_peer_id",
+                    "name": "recipient_user_peer_id",
                     "buttons": [
                         {
-                            "innerText": "Friends",
-                            "onclick": "displayUserDataInNewHtml('Friends')"
+                            "innerText": "Counterparties",
+                            "onclick": "displayUserDataInNewHtml('Counterparties')"
                         }
                     ]
                 },
@@ -421,8 +421,8 @@
                     "name": "channel_id",
                     "buttons": [
                         {
-                            "innerText": "Get It",
-                            "onclick": "displayUserDataInNewHtml('ChannelCreation')"
+                            "innerText": "Display",
+                            "onclick": "displayUserDataInNewHtml('ChannelList')"
                         }
                     ]
                 },
@@ -430,7 +430,7 @@
                     "name": "fundee_channel_address_private_key",
                     "buttons": [
                         {
-                            "innerText": "Get It",
+                            "innerText": "Display",
                             "onclick": "displayUserDataInNewHtml('Addresses')"
                         }
                     ]
@@ -443,20 +443,20 @@
             "description": "RSMC Commitment Transaction Created is used for paying omni assets by Revocable Sequence Maturity Contract(RSMC) within a channel. After creating a channel and funding the channel by BTC and assets, Alice/Bob then is able to use this channel to pay to the counterpart. OBD constructs commitment transaction for each payment between the two counterparts. The i-th commitment transaction will be invalidated after creating the (i+1)-th commitment transaction. [These temp addresses] are some data generated by OBD used in contructing temporary multi-sig addresses and temporary transactions for i-th commitment transaction. You shall find your corresponding temporary data within the responses of your OBD.",
             "parameters": [
                 {
-                    "name": "recipient_p2p_peer_id",
+                    "name": "recipient_node_peer_id",
                     "buttons": [
                         {
-                            "innerText": "Friends",
-                            "onclick": "displayUserDataInNewHtml('Friends')"
+                            "innerText": "Counterparties",
+                            "onclick": "displayUserDataInNewHtml('Counterparties')"
                         }
                     ]
                 },
                 {
-                    "name": "recipient_peer_id",
+                    "name": "recipient_user_peer_id",
                     "buttons": [
                         {
-                            "innerText": "Friends",
-                            "onclick": "displayUserDataInNewHtml('Friends')"
+                            "innerText": "Counterparties",
+                            "onclick": "displayUserDataInNewHtml('Counterparties')"
                         }
                     ]
                 },
@@ -464,8 +464,8 @@
                     "name": "channel_id",
                     "buttons": [
                         {
-                            "innerText": "Get It",
-                            "onclick": "displayUserDataInNewHtml('ChannelCreation')"
+                            "innerText": "Display",
+                            "onclick": "displayUserDataInNewHtml('ChannelList')"
                         }
                     ]
                 },
@@ -473,7 +473,7 @@
                     "name": "curr_temp_address_pub_key",
                     "buttons": [
                         {
-                            "innerText": "Get It",
+                            "innerText": "Select",
                             "onclick": "displayUserDataInNewHtml('Addresses')"
                         }
                     ]
@@ -482,7 +482,7 @@
                     "name": "curr_temp_address_private_key",
                     "buttons": [
                         {
-                            "innerText": "Get It",
+                            "innerText": "Select",
                             "onclick": "displayUserDataInNewHtml('Addresses')"
                         }
                     ]
@@ -491,7 +491,7 @@
                     "name": "channel_address_private_key",
                     "buttons": [
                         {
-                            "innerText": "Get It",
+                            "innerText": "Display",
                             "onclick": "displayUserDataInNewHtml('Addresses')"
                         }
                     ]
@@ -500,7 +500,7 @@
                     "name": "last_temp_address_private_key",
                     "buttons": [
                         {
-                            "innerText": "Get It",
+                            "innerText": "Display",
                             "onclick": "displayUserDataInNewHtml('Addresses')"
                         }
                     ]
@@ -517,20 +517,20 @@
             "description": "RSMC revokeAndAcknowledgeCommitmentTransaction is used for Receiver revoke the previous commitment transaction and ackonwledge the new transaction.",
             "parameters": [
                 {
-                    "name": "recipient_p2p_peer_id",
+                    "name": "recipient_node_peer_id",
                     "buttons": [
                         {
-                            "innerText": "Friends",
-                            "onclick": "displayUserDataInNewHtml('Friends')"
+                            "innerText": "Counterparties",
+                            "onclick": "displayUserDataInNewHtml('Counterparties')"
                         }
                     ]
                 },
                 {
-                    "name": "recipient_peer_id",
+                    "name": "recipient_user_peer_id",
                     "buttons": [
                         {
-                            "innerText": "Friends",
-                            "onclick": "displayUserDataInNewHtml('Friends')"
+                            "innerText": "Counterparties",
+                            "onclick": "displayUserDataInNewHtml('Counterparties')"
                         }
                     ]
                 },
@@ -538,8 +538,8 @@
                     "name": "channel_id",
                     "buttons": [
                         {
-                            "innerText": "Get It",
-                            "onclick": "displayUserDataInNewHtml('ChannelCreation')"
+                            "innerText": "Display",
+                            "onclick": "displayUserDataInNewHtml('ChannelList')"
                         }
                     ]
                 },
@@ -547,7 +547,7 @@
                     "name": "curr_temp_address_pub_key",
                     "buttons": [
                         {
-                            "innerText": "Get It",
+                            "innerText": "Select",
                             "onclick": "displayUserDataInNewHtml('Addresses')"
                         }
                     ]
@@ -556,7 +556,7 @@
                     "name": "curr_temp_address_private_key",
                     "buttons": [
                         {
-                            "innerText": "Get It",
+                            "innerText": "Select",
                             "onclick": "displayUserDataInNewHtml('Addresses')"
                         }
                     ]
@@ -565,7 +565,7 @@
                     "name": "channel_address_private_key",
                     "buttons": [
                         {
-                            "innerText": "Get It",
+                            "innerText": "Display",
                             "onclick": "displayUserDataInNewHtml('Addresses')"
                         }
                     ]
@@ -574,7 +574,7 @@
                     "name": "last_temp_address_private_key",
                     "buttons": [
                         {
-                            "innerText": "Get It",
+                            "innerText": "Display",
                             "onclick": "displayUserDataInNewHtml('Addresses')"
                         }
                     ]
@@ -583,8 +583,8 @@
                     "name": "request_commitment_hash",
                     "buttons": [
                         {
-                            "innerText": "Get It",
-                            "onclick": "displayUserDataInNewHtml('ChannelCreation')"
+                            "innerText": "Display",
+                            "onclick": "displayUserDataInNewHtml('ChannelList')"
                         }
                     ]
                 }
@@ -599,7 +599,7 @@
                     "name": "property_id",
                     "buttons": [
                         {
-                            "innerText": "Get It",
+                            "innerText": "Display",
                             "onclick": "displayUserDataInNewHtml('Addresses')"
                         }
                     ]
@@ -609,11 +609,11 @@
                     "buttons": []
                 },
                 {
-                    "name": "recipient_peer_id",
+                    "name": "recipient_user_peer_id",
                     "buttons": [
                         {
-                            "innerText": "Friends",
-                            "onclick": "displayUserDataInNewHtml('Friends')"
+                            "innerText": "Counterparties",
+                            "onclick": "displayUserDataInNewHtml('Counterparties')"
                         }
                     ]
                 }
@@ -628,7 +628,7 @@
                     "name": "h",
                     "buttons": [
                         {
-                            "innerText": "Get It",
+                            "innerText": "Display",
                             "onclick": "displayUserDataInNewHtml('Addresses')"
                         }
                     ]
@@ -641,7 +641,7 @@
                     "name": "property_id",
                     "buttons": [
                         {
-                            "innerText": "Get It",
+                            "innerText": "Display",
                             "onclick": "displayUserDataInNewHtml('Addresses')"
                         }
                     ]
@@ -651,11 +651,11 @@
                     "buttons": []
                 },
                 {
-                    "name": "recipient_peer_id",
+                    "name": "recipient_user_peer_id",
                     "buttons": [
                         {
-                            "innerText": "Friends",
-                            "onclick": "displayUserDataInNewHtml('Friends')"
+                            "innerText": "Counterparties",
+                            "onclick": "displayUserDataInNewHtml('Counterparties')"
                         }
                     ]
                 }
@@ -670,8 +670,8 @@
                     "name": "h",
                     "buttons": [
                         {
-                            "innerText": "Get It",
-                            "onclick": "displayUserDataInNewHtml('ChannelCreation')"
+                            "innerText": "Display",
+                            "onclick": "displayUserDataInNewHtml('ChannelList')"
                         }
                     ]
                 },
@@ -679,8 +679,8 @@
                     "name": "request_hash",
                     "buttons": [
                         {
-                            "innerText": "Get It",
-                            "onclick": "displayUserDataInNewHtml('ChannelCreation')"
+                            "innerText": "Display",
+                            "onclick": "displayUserDataInNewHtml('ChannelList')"
                         }
                     ]
                 }
@@ -695,8 +695,8 @@
                     "name": "request_hash",
                     "buttons": [
                         {
-                            "innerText": "Get It",
-                            "onclick": "displayUserDataInNewHtml('ChannelCreation')"
+                            "innerText": "Display",
+                            "onclick": "displayUserDataInNewHtml('ChannelList')"
                         }
                     ]
                 },
@@ -704,7 +704,7 @@
                     "name": "channel_address_private_key",
                     "buttons": [
                         {
-                            "innerText": "Get It",
+                            "innerText": "Display",
                             "onclick": "displayUserDataInNewHtml('Addresses')"
                         }
                     ]
@@ -713,7 +713,7 @@
                     "name": "last_temp_address_private_key",
                     "buttons": [
                         {
-                            "innerText": "Get It",
+                            "innerText": "Display",
                             "onclick": "displayUserDataInNewHtml('Addresses')"
                         }
                     ]
@@ -722,7 +722,7 @@
                     "name": "curr_rsmc_temp_address_pub_key",
                     "buttons": [
                         {
-                            "innerText": "Get It",
+                            "innerText": "Select",
                             "onclick": "displayUserDataInNewHtml('Addresses')"
                         }
                     ]
@@ -731,7 +731,7 @@
                     "name": "curr_rsmc_temp_address_private_key",
                     "buttons": [
                         {
-                            "innerText": "Get It",
+                            "innerText": "Select",
                             "onclick": "displayUserDataInNewHtml('Addresses')"
                         }
                     ]
@@ -740,7 +740,7 @@
                     "name": "curr_htlc_temp_address_pub_key",
                     "buttons": [
                         {
-                            "innerText": "Get It",
+                            "innerText": "Select",
                             "onclick": "displayUserDataInNewHtml('Addresses')"
                         }
                     ]
@@ -749,7 +749,7 @@
                     "name": "curr_htlc_temp_address_private_key",
                     "buttons": [
                         {
-                            "innerText": "Get It",
+                            "innerText": "Select",
                             "onclick": "displayUserDataInNewHtml('Addresses')"
                         }
                     ]
@@ -765,8 +765,8 @@
                     "name": "request_hash",
                     "buttons": [
                         {
-                            "innerText": "Get It",
-                            "onclick": "displayUserDataInNewHtml('ChannelCreation')"
+                            "innerText": "Display",
+                            "onclick": "displayUserDataInNewHtml('ChannelList')"
                         }
                     ]
                 },
@@ -774,7 +774,7 @@
                     "name": "channel_address_private_key",
                     "buttons": [
                         {
-                            "innerText": "Get It",
+                            "innerText": "Display",
                             "onclick": "displayUserDataInNewHtml('Addresses')"
                         }
                     ]
@@ -783,7 +783,7 @@
                     "name": "last_temp_address_private_key",
                     "buttons": [
                         {
-                            "innerText": "Get It",
+                            "innerText": "Display",
                             "onclick": "displayUserDataInNewHtml('Addresses')"
                         }
                     ]
@@ -792,7 +792,7 @@
                     "name": "curr_rsmc_temp_address_pub_key",
                     "buttons": [
                         {
-                            "innerText": "Get It",
+                            "innerText": "Select",
                             "onclick": "displayUserDataInNewHtml('Addresses')"
                         }
                     ]
@@ -801,7 +801,7 @@
                     "name": "curr_rsmc_temp_address_private_key",
                     "buttons": [
                         {
-                            "innerText": "Get It",
+                            "innerText": "Select",
                             "onclick": "displayUserDataInNewHtml('Addresses')"
                         }
                     ]
@@ -810,7 +810,7 @@
                     "name": "curr_htlc_temp_address_pub_key",
                     "buttons": [
                         {
-                            "innerText": "Get It",
+                            "innerText": "Select",
                             "onclick": "displayUserDataInNewHtml('Addresses')"
                         }
                     ]
@@ -819,7 +819,7 @@
                     "name": "curr_htlc_temp_address_private_key",
                     "buttons": [
                         {
-                            "innerText": "Get It",
+                            "innerText": "Select",
                             "onclick": "displayUserDataInNewHtml('Addresses')"
                         }
                     ]
@@ -828,7 +828,7 @@
                     "name": "curr_htlc_temp_address_for_ht1a_pub_key",
                     "buttons": [
                         {
-                            "innerText": "Get It",
+                            "innerText": "Select",
                             "onclick": "displayUserDataInNewHtml('Addresses')"
                         }
                     ]
@@ -837,7 +837,7 @@
                     "name": "curr_htlc_temp_address_for_ht1a_private_key",
                     "buttons": [
                         {
-                            "innerText": "Get It",
+                            "innerText": "Select",
                             "onclick": "displayUserDataInNewHtml('Addresses')"
                         }
                     ]
@@ -853,8 +853,8 @@
                     "name": "request_hash",
                     "buttons": [
                         {
-                            "innerText": "Get It",
-                            "onclick": "displayUserDataInNewHtml('ChannelCreation')"
+                            "innerText": "Display",
+                            "onclick": "displayUserDataInNewHtml('ChannelList')"
                         }
                     ]
                 },
@@ -862,7 +862,7 @@
                     "name": "r",
                     "buttons": [
                         {
-                            "innerText": "Get It",
+                            "innerText": "Display",
                             "onclick": "displayUserDataInNewHtml('Addresses')"
                         }
                     ]
@@ -871,7 +871,7 @@
                     "name": "channel_address_private_key",
                     "buttons": [
                         {
-                            "innerText": "Get It",
+                            "innerText": "Display",
                             "onclick": "displayUserDataInNewHtml('Addresses')"
                         }
                     ]
@@ -880,7 +880,7 @@
                     "name": "curr_htlc_temp_address_for_he1b_pub_key",
                     "buttons": [
                         {
-                            "innerText": "Get It",
+                            "innerText": "Select",
                             "onclick": "displayUserDataInNewHtml('Addresses')"
                         }
                     ]
@@ -889,7 +889,7 @@
                     "name": "curr_htlc_temp_address_for_he1b_private_key",
                     "buttons": [
                         {
-                            "innerText": "Get It",
+                            "innerText": "Select",
                             "onclick": "displayUserDataInNewHtml('Addresses')"
                         }
                     ]
@@ -905,8 +905,8 @@
                     "name": "request_hash",
                     "buttons": [
                         {
-                            "innerText": "Get It",
-                            "onclick": "displayUserDataInNewHtml('ChannelCreation')"
+                            "innerText": "Display",
+                            "onclick": "displayUserDataInNewHtml('ChannelList')"
                         }
                     ]
                 },
@@ -914,7 +914,7 @@
                     "name": "r",
                     "buttons": [
                         {
-                            "innerText": "Get It",
+                            "innerText": "Display",
                             "onclick": "displayUserDataInNewHtml('Addresses')"
                         }
                     ]
@@ -923,7 +923,7 @@
                     "name": "channel_address_private_key",
                     "buttons": [
                         {
-                            "innerText": "Get It",
+                            "innerText": "Display",
                             "onclick": "displayUserDataInNewHtml('Addresses')"
                         }
                     ]
@@ -939,8 +939,8 @@
                     "name": "channel_id",
                     "buttons": [
                         {
-                            "innerText": "Get It",
-                            "onclick": "displayUserDataInNewHtml('ChannelCreation')"
+                            "innerText": "Display",
+                            "onclick": "displayUserDataInNewHtml('ChannelList')"
                         }
                     ]
                 },
@@ -948,7 +948,7 @@
                     "name": "channel_address_private_key",
                     "buttons": [
                         {
-                            "innerText": "Get It",
+                            "innerText": "Display",
                             "onclick": "displayUserDataInNewHtml('Addresses')"
                         }
                     ]
@@ -957,7 +957,7 @@
                     "name": "last_rsmc_temp_address_private_key",
                     "buttons": [
                         {
-                            "innerText": "Get It",
+                            "innerText": "Display",
                             "onclick": "displayUserDataInNewHtml('Addresses')"
                         }
                     ]
@@ -966,7 +966,7 @@
                     "name": "last_htlc_temp_address_private_key",
                     "buttons": [
                         {
-                            "innerText": "Get It",
+                            "innerText": "Display",
                             "onclick": "displayUserDataInNewHtml('Addresses')"
                         }
                     ]
@@ -975,7 +975,7 @@
                     "name": "last_htlc_temp_address_for_htnx_private_key",
                     "buttons": [
                         {
-                            "innerText": "Get It",
+                            "innerText": "Display",
                             "onclick": "displayUserDataInNewHtml('Addresses')"
                         }
                     ]
@@ -984,7 +984,7 @@
                     "name": "curr_rsmc_temp_address_pub_key",
                     "buttons": [
                         {
-                            "innerText": "Get It",
+                            "innerText": "Select",
                             "onclick": "displayUserDataInNewHtml('Addresses')"
                         }
                     ]
@@ -993,7 +993,7 @@
                     "name": "curr_rsmc_temp_address_private_key",
                     "buttons": [
                         {
-                            "innerText": "Get It",
+                            "innerText": "Select",
                             "onclick": "displayUserDataInNewHtml('Addresses')"
                         }
                     ]
@@ -1009,8 +1009,8 @@
                     "name": "request_close_htlc_hash",
                     "buttons": [
                         {
-                            "innerText": "Get It",
-                            "onclick": "displayUserDataInNewHtml('ChannelCreation')"
+                            "innerText": "Display",
+                            "onclick": "displayUserDataInNewHtml('ChannelList')"
                         }
                     ]
                 },
@@ -1018,7 +1018,7 @@
                     "name": "channel_address_private_key",
                     "buttons": [
                         {
-                            "innerText": "Get It",
+                            "innerText": "Display",
                             "onclick": "displayUserDataInNewHtml('Addresses')"
                         }
                     ]
@@ -1027,7 +1027,7 @@
                     "name": "last_rsmc_temp_address_private_key",
                     "buttons": [
                         {
-                            "innerText": "Get It",
+                            "innerText": "Display",
                             "onclick": "displayUserDataInNewHtml('Addresses')"
                         }
                     ]
@@ -1036,7 +1036,7 @@
                     "name": "last_htlc_temp_address_private_key",
                     "buttons": [
                         {
-                            "innerText": "Get It",
+                            "innerText": "Display",
                             "onclick": "displayUserDataInNewHtml('Addresses')"
                         }
                     ]
@@ -1045,7 +1045,7 @@
                     "name": "last_htlc_temp_address_for_htnx_private_key",
                     "buttons": [
                         {
-                            "innerText": "Get It",
+                            "innerText": "Display",
                             "onclick": "displayUserDataInNewHtml('Addresses')"
                         }
                     ]
@@ -1054,7 +1054,7 @@
                     "name": "curr_rsmc_temp_address_pub_key",
                     "buttons": [
                         {
-                            "innerText": "Get It",
+                            "innerText": "Select",
                             "onclick": "displayUserDataInNewHtml('Addresses')"
                         }
                     ]
@@ -1063,7 +1063,7 @@
                     "name": "curr_rsmc_temp_address_private_key",
                     "buttons": [
                         {
-                            "innerText": "Get It",
+                            "innerText": "Select",
                             "onclick": "displayUserDataInNewHtml('Addresses')"
                         }
                     ]
@@ -1079,8 +1079,8 @@
                     "name": "channel_id",
                     "buttons": [
                         {
-                            "innerText": "Get It",
-                            "onclick": "displayUserDataInNewHtml('ChannelCreation')"
+                            "innerText": "Display",
+                            "onclick": "displayUserDataInNewHtml('ChannelList')"
                         }
                     ]
                 }
@@ -1095,8 +1095,8 @@
                     "name": "channel_id",
                     "buttons": [
                         {
-                            "innerText": "Get It",
-                            "onclick": "displayUserDataInNewHtml('ChannelCreation')"
+                            "innerText": "Display",
+                            "onclick": "displayUserDataInNewHtml('ChannelList')"
                         }
                     ]
                 },
@@ -1104,8 +1104,8 @@
                     "name": "request_close_channel_hash",
                     "buttons": [
                         {
-                            "innerText": "Get It",
-                            "onclick": "displayUserDataInNewHtml('ChannelCreation')"
+                            "innerText": "Display",
+                            "onclick": "displayUserDataInNewHtml('ChannelList')"
                         }
                     ]
                 }
@@ -1120,8 +1120,8 @@
                     "name": "channel_id_from",
                     "buttons": [
                         {
-                            "innerText": "Get It",
-                            "onclick": "displayUserDataInNewHtml('ChannelCreation')"
+                            "innerText": "Select",
+                            "onclick": "displayUserDataInNewHtml('ChannelList')"
                         }
                     ]
                 },
@@ -1129,17 +1129,17 @@
                     "name": "channel_id_to",
                     "buttons": [
                         {
-                            "innerText": "Get It",
-                            "onclick": "displayUserDataInNewHtml('ChannelCreation')"
+                            "innerText": "Select",
+                            "onclick": "displayUserDataInNewHtml('ChannelList')"
                         }
                     ]
                 },
                 {
-                    "name": "recipient_peer_id",
+                    "name": "recipient_user_peer_id",
                     "buttons": [
                         {
-                            "innerText": "Friends",
-                            "onclick": "displayUserDataInNewHtml('Friends')"
+                            "innerText": "Counterparties",
+                            "onclick": "displayUserDataInNewHtml('Counterparties')"
                         }
                     ]
                 },
@@ -1184,8 +1184,8 @@
                     "name": "channel_id_from",
                     "buttons": [
                         {
-                            "innerText": "Get It",
-                            "onclick": "displayUserDataInNewHtml('ChannelCreation')"
+                            "innerText": "Select",
+                            "onclick": "displayUserDataInNewHtml('ChannelList')"
                         }
                     ]
                 },
@@ -1193,17 +1193,17 @@
                     "name": "channel_id_to",
                     "buttons": [
                         {
-                            "innerText": "Get It",
-                            "onclick": "displayUserDataInNewHtml('ChannelCreation')"
+                            "innerText": "Select",
+                            "onclick": "displayUserDataInNewHtml('ChannelList')"
                         }
                     ]
                 },
                 {
-                    "name": "recipient_peer_id",
+                    "name": "recipient_user_peer_id",
                     "buttons": [
                         {
-                            "innerText": "Friends",
-                            "onclick": "displayUserDataInNewHtml('Friends')"
+                            "innerText": "Counterparties",
+                            "onclick": "displayUserDataInNewHtml('Counterparties')"
                         }
                     ]
                 },

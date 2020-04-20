@@ -32,7 +32,7 @@
                     "name": "property_id",
                     "buttons": [
                         {
-                            "innerText": "Get It",
+                            "innerText": "Display",
                             "onclick": "displayUserDataInNewHtml('Addresses')"
                         }
                     ]
@@ -42,11 +42,11 @@
                     "buttons": []
                 },
                 {
-                    "name": "recipient_peer_id",
+                    "name": "recipient_user_peer_id",
                     "buttons": [
                         {
-                            "innerText": "Friends",
-                            "onclick": "displayUserDataInNewHtml('Friends')"
+                            "innerText": "Counterparties",
+                            "onclick": "displayUserDataInNewHtml('Counterparties')"
                         }
                     ]
                 }
@@ -79,8 +79,8 @@
                     "name": "channel_id",
                     "buttons": [
                         {
-                            "innerText": "Get It",
-                            "onclick": "displayUserDataInNewHtml('ChannelCreation')"
+                            "innerText": "Select",
+                            "onclick": "displayUserDataInNewHtml('ChannelList')"
                         }
                     ]
                 }
@@ -95,8 +95,8 @@
                     "name": "channel_id",
                     "buttons": [
                         {
-                            "innerText": "Get It",
-                            "onclick": "displayUserDataInNewHtml('ChannelCreation')"
+                            "innerText": "Select",
+                            "onclick": "displayUserDataInNewHtml('ChannelList')"
                         }
                     ]
                 }
@@ -111,8 +111,8 @@
                     "name": "channel_id",
                     "buttons": [
                         {
-                            "innerText": "Get It",
-                            "onclick": "displayUserDataInNewHtml('ChannelCreation')"
+                            "innerText": "Select",
+                            "onclick": "displayUserDataInNewHtml('ChannelList')"
                         }
                     ]
                 }
@@ -127,7 +127,7 @@
                     "name": "address",
                     "buttons": [
                         {
-                            "innerText": "Get It",
+                            "innerText": "Select",
                             "onclick": "displayUserDataInNewHtml('Addresses')"
                         }
                     ]
