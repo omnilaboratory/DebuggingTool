@@ -65,7 +65,7 @@
                     "buttons": [
                         {
                             "innerText": "Select",
-                            "onclick": "displayUserDataInNewHtml('Addresses')"
+                            "onclick": "displayUserDataInNewHtml('MyAddresses')"
                         },
                         {
                             "innerText": "Create",
@@ -112,7 +112,7 @@
                     "buttons": [
                         {
                             "innerText": "Select",
-                            "onclick": "displayUserDataInNewHtml('Addresses')"
+                            "onclick": "displayUserDataInNewHtml('MyAddresses')"
                         },
                         {
                             "innerText": "Create",
@@ -132,7 +132,7 @@
                     "buttons": [
                         {
                             "innerText": "Select",
-                            "onclick": "displayUserDataInNewHtml('Addresses')"
+                            "onclick": "displayUserDataInNewHtml('MyAddresses')"
                         },
                         {
                             "innerText": "Bitcoin Faucet",
@@ -145,7 +145,7 @@
                     "buttons": [
                         {
                             "innerText": "Select",
-                            "onclick": "displayUserDataInNewHtml('Addresses')"
+                            "onclick": "displayUserDataInNewHtml('MyAddresses')"
                         }
                     ]
                 },
@@ -210,7 +210,7 @@
                     "buttons": [
                         {
                             "innerText": "Display",
-                            "onclick": "displayUserDataInNewHtml('Addresses')"
+                            "onclick": "displayUserDataInNewHtml('MyAddresses')"
                         }
                     ]
                 },
@@ -262,7 +262,7 @@
                     "buttons": [
                         {
                             "innerText": "Display",
-                            "onclick": "displayUserDataInNewHtml('Addresses')"
+                            "onclick": "displayUserDataInNewHtml('MyAddresses')"
                         }
                     ]
                 },
@@ -287,7 +287,7 @@
                     "buttons": [
                         {
                             "innerText": "Select",
-                            "onclick": "displayUserDataInNewHtml('Addresses')"
+                            "onclick": "displayUserDataInNewHtml('MyAddresses')"
                         }
                     ]
                 },
@@ -296,7 +296,7 @@
                     "buttons": [
                         {
                             "innerText": "Select",
-                            "onclick": "displayUserDataInNewHtml('Addresses')"
+                            "onclick": "displayUserDataInNewHtml('MyAddresses')"
                         }
                     ]
                 },
@@ -318,7 +318,7 @@
                     "buttons": [
                         {
                             "innerText": "Display",
-                            "onclick": "displayUserDataInNewHtml('Addresses')"
+                            "onclick": "displayUserDataInNewHtml('MyAddresses')"
                         }
                     ]
                 }
@@ -361,7 +361,7 @@
                     "buttons": [
                         {
                             "innerText": "Select",
-                            "onclick": "displayUserDataInNewHtml('Addresses')"
+                            "onclick": "displayUserDataInNewHtml('MyAddresses')"
                         }
                     ]
                 },
@@ -370,7 +370,7 @@
                     "buttons": [
                         {
                             "innerText": "Select",
-                            "onclick": "displayUserDataInNewHtml('Addresses')"
+                            "onclick": "displayUserDataInNewHtml('MyAddresses')"
                         }
                     ]
                 },
@@ -379,7 +379,7 @@
                     "buttons": [
                         {
                             "innerText": "Display",
-                            "onclick": "displayUserDataInNewHtml('Addresses')"
+                            "onclick": "displayUserDataInNewHtml('MyAddresses')"
                         }
                     ]
                 },
@@ -431,7 +431,7 @@
                     "buttons": [
                         {
                             "innerText": "Display",
-                            "onclick": "displayUserDataInNewHtml('Addresses')"
+                            "onclick": "displayUserDataInNewHtml('MyAddresses')"
                         }
                     ]
                 }
@@ -474,7 +474,7 @@
                     "buttons": [
                         {
                             "innerText": "Select",
-                            "onclick": "displayUserDataInNewHtml('Addresses')"
+                            "onclick": "displayUserDataInNewHtml('MyAddresses')"
                         }
                     ]
                 },
@@ -483,7 +483,7 @@
                     "buttons": [
                         {
                             "innerText": "Select",
-                            "onclick": "displayUserDataInNewHtml('Addresses')"
+                            "onclick": "displayUserDataInNewHtml('MyAddresses')"
                         }
                     ]
                 },
@@ -492,7 +492,7 @@
                     "buttons": [
                         {
                             "innerText": "Display",
-                            "onclick": "displayUserDataInNewHtml('Addresses')"
+                            "onclick": "displayUserDataInNewHtml('MyAddresses')"
                         }
                     ]
                 },
@@ -501,7 +501,7 @@
                     "buttons": [
                         {
                             "innerText": "Display",
-                            "onclick": "displayUserDataInNewHtml('Addresses')"
+                            "onclick": "displayUserDataInNewHtml('MyAddresses')"
                         }
                     ]
                 },
@@ -548,7 +548,7 @@
                     "buttons": [
                         {
                             "innerText": "Select",
-                            "onclick": "displayUserDataInNewHtml('Addresses')"
+                            "onclick": "displayUserDataInNewHtml('MyAddresses')"
                         }
                     ]
                 },
@@ -557,7 +557,7 @@
                     "buttons": [
                         {
                             "innerText": "Select",
-                            "onclick": "displayUserDataInNewHtml('Addresses')"
+                            "onclick": "displayUserDataInNewHtml('MyAddresses')"
                         }
                     ]
                 },
@@ -566,7 +566,7 @@
                     "buttons": [
                         {
                             "innerText": "Display",
-                            "onclick": "displayUserDataInNewHtml('Addresses')"
+                            "onclick": "displayUserDataInNewHtml('MyAddresses')"
                         }
                     ]
                 },
@@ -575,7 +575,7 @@
                     "buttons": [
                         {
                             "innerText": "Display",
-                            "onclick": "displayUserDataInNewHtml('Addresses')"
+                            "onclick": "displayUserDataInNewHtml('MyAddresses')"
                         }
                     ]
                 },
@@ -600,7 +600,7 @@
                     "buttons": [
                         {
                             "innerText": "Display",
-                            "onclick": "displayUserDataInNewHtml('Addresses')"
+                            "onclick": "displayUserDataInNewHtml('MyAddresses')"
                         }
                     ]
                 },
@@ -629,7 +629,7 @@
                     "buttons": [
                         {
                             "innerText": "Display",
-                            "onclick": "displayUserDataInNewHtml('Addresses')"
+                            "onclick": "displayUserDataInNewHtml('MyAddresses')"
                         }
                     ]
                 },
@@ -642,7 +642,7 @@
                     "buttons": [
                         {
                             "innerText": "Display",
-                            "onclick": "displayUserDataInNewHtml('Addresses')"
+                            "onclick": "displayUserDataInNewHtml('MyAddresses')"
                         }
                     ]
                 },
@@ -705,7 +705,7 @@
                     "buttons": [
                         {
                             "innerText": "Display",
-                            "onclick": "displayUserDataInNewHtml('Addresses')"
+                            "onclick": "displayUserDataInNewHtml('MyAddresses')"
                         }
                     ]
                 },
@@ -714,7 +714,7 @@
                     "buttons": [
                         {
                             "innerText": "Display",
-                            "onclick": "displayUserDataInNewHtml('Addresses')"
+                            "onclick": "displayUserDataInNewHtml('MyAddresses')"
                         }
                     ]
                 },
@@ -723,7 +723,7 @@
                     "buttons": [
                         {
                             "innerText": "Select",
-                            "onclick": "displayUserDataInNewHtml('Addresses')"
+                            "onclick": "displayUserDataInNewHtml('MyAddresses')"
                         }
                     ]
                 },
@@ -732,7 +732,7 @@
                     "buttons": [
                         {
                             "innerText": "Select",
-                            "onclick": "displayUserDataInNewHtml('Addresses')"
+                            "onclick": "displayUserDataInNewHtml('MyAddresses')"
                         }
                     ]
                 },
@@ -741,7 +741,7 @@
                     "buttons": [
                         {
                             "innerText": "Select",
-                            "onclick": "displayUserDataInNewHtml('Addresses')"
+                            "onclick": "displayUserDataInNewHtml('MyAddresses')"
                         }
                     ]
                 },
@@ -750,7 +750,7 @@
                     "buttons": [
                         {
                             "innerText": "Select",
-                            "onclick": "displayUserDataInNewHtml('Addresses')"
+                            "onclick": "displayUserDataInNewHtml('MyAddresses')"
                         }
                     ]
                 }
@@ -775,7 +775,7 @@
                     "buttons": [
                         {
                             "innerText": "Display",
-                            "onclick": "displayUserDataInNewHtml('Addresses')"
+                            "onclick": "displayUserDataInNewHtml('MyAddresses')"
                         }
                     ]
                 },
@@ -784,7 +784,7 @@
                     "buttons": [
                         {
                             "innerText": "Display",
-                            "onclick": "displayUserDataInNewHtml('Addresses')"
+                            "onclick": "displayUserDataInNewHtml('MyAddresses')"
                         }
                     ]
                 },
@@ -793,7 +793,7 @@
                     "buttons": [
                         {
                             "innerText": "Select",
-                            "onclick": "displayUserDataInNewHtml('Addresses')"
+                            "onclick": "displayUserDataInNewHtml('MyAddresses')"
                         }
                     ]
                 },
@@ -802,7 +802,7 @@
                     "buttons": [
                         {
                             "innerText": "Select",
-                            "onclick": "displayUserDataInNewHtml('Addresses')"
+                            "onclick": "displayUserDataInNewHtml('MyAddresses')"
                         }
                     ]
                 },
@@ -811,7 +811,7 @@
                     "buttons": [
                         {
                             "innerText": "Select",
-                            "onclick": "displayUserDataInNewHtml('Addresses')"
+                            "onclick": "displayUserDataInNewHtml('MyAddresses')"
                         }
                     ]
                 },
@@ -820,7 +820,7 @@
                     "buttons": [
                         {
                             "innerText": "Select",
-                            "onclick": "displayUserDataInNewHtml('Addresses')"
+                            "onclick": "displayUserDataInNewHtml('MyAddresses')"
                         }
                     ]
                 },
@@ -829,7 +829,7 @@
                     "buttons": [
                         {
                             "innerText": "Select",
-                            "onclick": "displayUserDataInNewHtml('Addresses')"
+                            "onclick": "displayUserDataInNewHtml('MyAddresses')"
                         }
                     ]
                 },
@@ -838,7 +838,7 @@
                     "buttons": [
                         {
                             "innerText": "Select",
-                            "onclick": "displayUserDataInNewHtml('Addresses')"
+                            "onclick": "displayUserDataInNewHtml('MyAddresses')"
                         }
                     ]
                 }
@@ -863,7 +863,7 @@
                     "buttons": [
                         {
                             "innerText": "Display",
-                            "onclick": "displayUserDataInNewHtml('Addresses')"
+                            "onclick": "displayUserDataInNewHtml('MyAddresses')"
                         }
                     ]
                 },
@@ -872,7 +872,7 @@
                     "buttons": [
                         {
                             "innerText": "Display",
-                            "onclick": "displayUserDataInNewHtml('Addresses')"
+                            "onclick": "displayUserDataInNewHtml('MyAddresses')"
                         }
                     ]
                 },
@@ -881,7 +881,7 @@
                     "buttons": [
                         {
                             "innerText": "Select",
-                            "onclick": "displayUserDataInNewHtml('Addresses')"
+                            "onclick": "displayUserDataInNewHtml('MyAddresses')"
                         }
                     ]
                 },
@@ -890,7 +890,7 @@
                     "buttons": [
                         {
                             "innerText": "Select",
-                            "onclick": "displayUserDataInNewHtml('Addresses')"
+                            "onclick": "displayUserDataInNewHtml('MyAddresses')"
                         }
                     ]
                 }
@@ -915,7 +915,7 @@
                     "buttons": [
                         {
                             "innerText": "Display",
-                            "onclick": "displayUserDataInNewHtml('Addresses')"
+                            "onclick": "displayUserDataInNewHtml('MyAddresses')"
                         }
                     ]
                 },
@@ -924,7 +924,7 @@
                     "buttons": [
                         {
                             "innerText": "Display",
-                            "onclick": "displayUserDataInNewHtml('Addresses')"
+                            "onclick": "displayUserDataInNewHtml('MyAddresses')"
                         }
                     ]
                 }
@@ -949,7 +949,7 @@
                     "buttons": [
                         {
                             "innerText": "Display",
-                            "onclick": "displayUserDataInNewHtml('Addresses')"
+                            "onclick": "displayUserDataInNewHtml('MyAddresses')"
                         }
                     ]
                 },
@@ -958,7 +958,7 @@
                     "buttons": [
                         {
                             "innerText": "Display",
-                            "onclick": "displayUserDataInNewHtml('Addresses')"
+                            "onclick": "displayUserDataInNewHtml('MyAddresses')"
                         }
                     ]
                 },
@@ -967,7 +967,7 @@
                     "buttons": [
                         {
                             "innerText": "Display",
-                            "onclick": "displayUserDataInNewHtml('Addresses')"
+                            "onclick": "displayUserDataInNewHtml('MyAddresses')"
                         }
                     ]
                 },
@@ -976,7 +976,7 @@
                     "buttons": [
                         {
                             "innerText": "Display",
-                            "onclick": "displayUserDataInNewHtml('Addresses')"
+                            "onclick": "displayUserDataInNewHtml('MyAddresses')"
                         }
                     ]
                 },
@@ -985,7 +985,7 @@
                     "buttons": [
                         {
                             "innerText": "Select",
-                            "onclick": "displayUserDataInNewHtml('Addresses')"
+                            "onclick": "displayUserDataInNewHtml('MyAddresses')"
                         }
                     ]
                 },
@@ -994,7 +994,7 @@
                     "buttons": [
                         {
                             "innerText": "Select",
-                            "onclick": "displayUserDataInNewHtml('Addresses')"
+                            "onclick": "displayUserDataInNewHtml('MyAddresses')"
                         }
                     ]
                 }
@@ -1019,7 +1019,7 @@
                     "buttons": [
                         {
                             "innerText": "Display",
-                            "onclick": "displayUserDataInNewHtml('Addresses')"
+                            "onclick": "displayUserDataInNewHtml('MyAddresses')"
                         }
                     ]
                 },
@@ -1028,7 +1028,7 @@
                     "buttons": [
                         {
                             "innerText": "Display",
-                            "onclick": "displayUserDataInNewHtml('Addresses')"
+                            "onclick": "displayUserDataInNewHtml('MyAddresses')"
                         }
                     ]
                 },
@@ -1037,7 +1037,7 @@
                     "buttons": [
                         {
                             "innerText": "Display",
-                            "onclick": "displayUserDataInNewHtml('Addresses')"
+                            "onclick": "displayUserDataInNewHtml('MyAddresses')"
                         }
                     ]
                 },
@@ -1046,7 +1046,7 @@
                     "buttons": [
                         {
                             "innerText": "Display",
-                            "onclick": "displayUserDataInNewHtml('Addresses')"
+                            "onclick": "displayUserDataInNewHtml('MyAddresses')"
                         }
                     ]
                 },
@@ -1055,7 +1055,7 @@
                     "buttons": [
                         {
                             "innerText": "Select",
-                            "onclick": "displayUserDataInNewHtml('Addresses')"
+                            "onclick": "displayUserDataInNewHtml('MyAddresses')"
                         }
                     ]
                 },
@@ -1064,7 +1064,7 @@
                     "buttons": [
                         {
                             "innerText": "Select",
-                            "onclick": "displayUserDataInNewHtml('Addresses')"
+                            "onclick": "displayUserDataInNewHtml('MyAddresses')"
                         }
                     ]
                 }

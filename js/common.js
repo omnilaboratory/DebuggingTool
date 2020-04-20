@@ -24,13 +24,13 @@ var mnemonicWithLogined = '';
 var inNewHtml = 'in_new_html';
 
 //
-var saveTempCI = 'channel_reation';
+var saveChannelList = 'channel_list';
 
 //
 var saveAddr = 'addr';
 
 //
-var saveFriends = 'friends';
+var saveCounterparties = 'counterparties';
 
 //
 var saveOBDList = 'obd_list';
@@ -154,8 +154,7 @@ function logIn(msgType) {
         createOBDResponseDiv(e, msgType);
         isLogined = true;
 
-        // save friends list
-        saveFriendsList(userID, e.p2pNodePeerId);
+        saveCounterpartiesList(userID, e.nodePeerId);
 
     });
 }
@@ -179,18 +178,9 @@ function openChannel(msgType) {
     var name   = $("#recipient_user_peer_id").val();
     var pubkey = $("#funding_pubkey").val();
 
-    // if (name.trim() === '' || pubkey.trim() === '') {
-    //     alert('Please input complete data.');
-    //     return;
-    // }
-
     // OBD API
     obdApi.openChannel(pubkey, name, p2pID, function(e) {
         console.info('openChannel - OBD Response = ' + JSON.stringify(e));
-
-        // Save List of friends who have interacted.
-        // saveFriendsList(name, p2pID);
-        // Save Non-finalized channel information.
         saveChannelCreation(e);
         createOBDResponseDiv(e, msgType);
     });
@@ -284,7 +274,7 @@ function createHtlcCTx(msgType) {
 
     // Get channel_id with request_hash.
     var tempChID;
-    var list = JSON.parse(localStorage.getItem(saveTempCI));
+    var list = JSON.parse(localStorage.getItem(saveChannelList));
     for (let i = 0; i < list.result.length; i++) {
         for (let i2 = 0; i2 < list.result[i].htlc.length; i2++) {
             if (request_hash === list.result[i].htlc[i2].request_hash) {
@@ -322,7 +312,7 @@ function htlcSendR(msgType) {
 
     // Get channel_id with request_hash.
     var tempChID;
-    var list = JSON.parse(localStorage.getItem(saveTempCI));
+    var list = JSON.parse(localStorage.getItem(saveChannelList));
     for (let i = 0; i < list.result.length; i++) {
         for (let i2 = 0; i2 < list.result[i].htlc.length; i2++) {
             if (request_hash === list.result[i].htlc[i2].request_hash) {
@@ -356,7 +346,7 @@ function htlcVerifyR(msgType) {
 
     // Get channel_id with request_hash.
     var tempChID;
-    var list = JSON.parse(localStorage.getItem(saveTempCI));
+    var list = JSON.parse(localStorage.getItem(saveChannelList));
     for (let i = 0; i < list.result.length; i++) {
         for (let i2 = 0; i2 < list.result[i].htlc.length; i2++) {
             if (request_hash === list.result[i].htlc[i2].request_hash) {
@@ -429,7 +419,7 @@ function closeHtlcTxSigned(msgType) {
 
     // Get channel_id with request_hash.
     var channel_id;
-    var list = JSON.parse(localStorage.getItem(saveTempCI));
+    var list = JSON.parse(localStorage.getItem(saveChannelList));
     for (let i = 0; i < list.result.length; i++) {
         for (let i2 = 0; i2 < list.result[i].htlc.length; i2++) {
             if (request_close_htlc_hash === list.result[i].htlc[i2].request_hash) {
@@ -788,7 +778,7 @@ function fundingBTC(msgType) {
 
     // Get temporary_channel_id with channel_address.
     var tempChID;
-    var list = JSON.parse(localStorage.getItem(saveTempCI));
+    var list = JSON.parse(localStorage.getItem(saveChannelList));
     for (let i = 0; i < list.result.length; i++) {
         for (let i2 = 0; i2 < list.result[i].data.length; i2++) {
             if (to_address === list.result[i].data[i2].channel_address) {
@@ -823,7 +813,7 @@ function fundingAsset(msgType) {
 
     // Get temporary_channel_id with channel_address.
     var tempChID;
-    var list = JSON.parse(localStorage.getItem(saveTempCI));
+    var list = JSON.parse(localStorage.getItem(saveChannelList));
     for (let i = 0; i < list.result.length; i++) {
         for (let i2 = 0; i2 < list.result[i].data.length; i2++) {
             if (to_address === list.result[i].data[i2].channel_address) {
@@ -1342,8 +1332,8 @@ function getUserDataList(goWhere) {
             case 'MnemonicWords':
                 displayUserData(MnemonicWords);
                 break;
-            case 'Addresses':
-                displayUserData(Addresses, inNewHtml);
+            case 'MyAddresses':
+                displayUserData(MyAddresses, inNewHtml);
                 break;
             case 'Counterparties':
                 displayUserData(Counterparties);
@@ -3152,7 +3142,7 @@ function dataConstruct(response, tempChID, msgType) {
 // Non-finalized channel information.
 function saveChannelCreation(response, channelID, msgType, info) {
     var chID;
-    var list = JSON.parse(localStorage.getItem(saveTempCI));
+    var list = JSON.parse(localStorage.getItem(saveChannelList));
 
     if (response.temporary_channel_id) {
         chID = response.temporary_channel_id;
@@ -3270,21 +3260,21 @@ function saveChannelCreation(response, channelID, msgType, info) {
                         break;
                 }
 
-                localStorage.setItem(saveTempCI, JSON.stringify(list));
+                localStorage.setItem(saveChannelList, JSON.stringify(list));
                 return;
             }
         }
 
         // A new 
         list.result.push(dataConstruct(response, chID, msgType));
-        localStorage.setItem(saveTempCI, JSON.stringify(list));
+        localStorage.setItem(saveChannelList, JSON.stringify(list));
 
     } else {
         // console.info('FIRST DATA');
         let data = {
             result: [dataConstruct(response, chID, msgType)]
         }
-        localStorage.setItem(saveTempCI, JSON.stringify(data));
+        localStorage.setItem(saveChannelList, JSON.stringify(data));
     }
 }
 
@@ -3412,11 +3402,10 @@ function saveInvokeHistory(name) {
     }
 }
 
-// List of friends who have interacted
-function saveFriendsList(name, p2pID) {
+// List of Counterparties who have interacted
+function saveCounterpartiesList(name, p2pID) {
 
-    // var name = $("#recipient_user_peer_id").val();
-    var list = JSON.parse(localStorage.getItem(saveFriends));
+    var list = JSON.parse(localStorage.getItem(saveCounterparties));
 
     // If has data.
     if (list) {
@@ -3424,7 +3413,7 @@ function saveFriendsList(name, p2pID) {
         for (let i = 0; i < list.result.length; i++) {
             if (list.result[i].name === name) {
                 list.result[i].p2pID = p2pID;
-                localStorage.setItem(saveFriends, JSON.stringify(list));
+                localStorage.setItem(saveCounterparties, JSON.stringify(list));
                 return;
             }
         }
@@ -3434,7 +3423,7 @@ function saveFriendsList(name, p2pID) {
             p2pID: p2pID
         }
         list.result.push(new_data);
-        localStorage.setItem(saveFriends, JSON.stringify(list));
+        localStorage.setItem(saveCounterparties, JSON.stringify(list));
 
     } else {
         // console.info('FIRST DATA');
@@ -3444,7 +3433,7 @@ function saveFriendsList(name, p2pID) {
                 p2pID: p2pID
             }]
         }
-        localStorage.setItem(saveFriends, JSON.stringify(data));
+        localStorage.setItem(saveCounterparties, JSON.stringify(data));
     }
 }
 
@@ -3523,11 +3512,11 @@ function displayUserData(obj, param) {
         case 'MnemonicWords':
             displayMnemonic();
             break;
-        case 'Addresses':
+        case 'MyAddresses':
             displayAddresses(param);
             break;
         case 'Counterparties':
-            displayFriends();
+            displayCounterparties();
             break;
         case 'ChannelList':
             displayChannelCreation(param);
@@ -3653,12 +3642,12 @@ function createBalanceElement(parent, strAddr) {
     createElement(parent, 'p');
 }
 
-// List of friends who have interacted
-function displayFriends() {
+// List of Counterparties who have interacted
+function displayCounterparties() {
     // get [name_req_div] div
     var parent = $("#name_req_div");
 
-    var list = JSON.parse(localStorage.getItem(saveFriends));
+    var list = JSON.parse(localStorage.getItem(saveCounterparties));
 
     var newDiv = document.createElement('div');
     newDiv.setAttribute('class', 'panelItem');
@@ -3840,7 +3829,7 @@ function displayChannelCreation(param) {
     }
     */
 
-    var list = JSON.parse(localStorage.getItem(saveTempCI));
+    var list = JSON.parse(localStorage.getItem(saveChannelList));
 
     if (list) {
         for (let i = 0; i < list.result.length; i++) {

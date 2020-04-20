@@ -33,7 +33,7 @@
                     "buttons": [
                         {
                             "innerText": "Display",
-                            "onclick": "displayUserDataInNewHtml('Addresses')"
+                            "onclick": "displayUserDataInNewHtml('MyAddresses')"
                         }
                     ]
                 },
@@ -128,7 +128,7 @@
                     "buttons": [
                         {
                             "innerText": "Select",
-                            "onclick": "displayUserDataInNewHtml('Addresses')"
+                            "onclick": "displayUserDataInNewHtml('MyAddresses')"
                         }
                     ]
                 }

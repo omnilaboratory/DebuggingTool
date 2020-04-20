@@ -5,12 +5,12 @@
             "description": "Mnemonic words are used for login your OBD."
         },
         {
-            "id": "My Addresses",
+            "id": "MyAddresses",
             "description": "Addresses created with mnemonic."
         },
         {
             "id": "Counterparties",
-            "description": "List of friends who have interacted."
+            "description": "List of counterparties who have interacted."
         },
         {
             "id": "ChannelList",
