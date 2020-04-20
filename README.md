@@ -49,7 +49,7 @@ If you want to build and deploy your own OBD, you shall go through the installat
 ## Step 3: Login using mnemonic words
 
 <p align="center">
-  <img width="750" alt="SignUp" src="https://github.com/omnilaboratory/DebuggingTool/blob/master/doc/img/login.png">
+  <img width="750" alt="login" src="https://github.com/omnilaboratory/DebuggingTool/blob/master/doc/img/login.png">
 </p>
 
 1. click "login";  
@@ -72,18 +72,22 @@ userPeerId : 30dfbc0e1b42c4cb50410b7a08186ce405a92fff235480608425bf4b0207e5ad
 ```
 This is the user id, which is used together with `nodeAddress` to tell someone else that "i'm here, please connect me by connectP2PNode".  
 
+We assume this first window belongs to user Alice.
 
 ## Step 4: connect another user
 
-Open another browser window, open index.html, and signup another user to get his `nodeAddress` and `userPeerId`.  
+Open another browser window, open index.html, and signup another user to get his `nodeAddress` and `userPeerId`. In this tutorial, this second window belongs to user Bob.
+
+Switch back to Alice's window, we shall input Bob's `nodeAddress` and `userPeerId` to build connection with Bob.  
 
 <p align="center">
-  <img width="750" alt="SignUp" src="https://github.com/omnilaboratory/DebuggingTool/blob/master/doc/img/connectNode.png">
+  <img width="750" alt="connectNode" src="https://github.com/omnilaboratory/DebuggingTool/blob/master/doc/img/connectNode.png">
 </p>
 
-1. click "connectP2PNode";  
-2. input the `nodeAddress` into the "NodeAddress" input box;  
-3. click "invoke API";  
+1. switch back to Alice's window;  
+2. click "connectP2PNode";  
+3. input the `nodeAddress` into the "NodeAddress" input box;  
+4. click "invoke API";  
 
 ## Step 5: open channel
 
