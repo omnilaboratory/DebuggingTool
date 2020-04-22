@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Customize mode APIs invoked history</title>
     <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/tooltip.css">
     <script src="https://lib.sinaapp.com/js/jquery/2.0.2/jquery-2.0.2.min.js"></script>
     <script src="js/btctool.js"></script>
     <script src="js/pojo.js"></script>
@@ -14,12 +15,6 @@
 </head>
 
 <body>
-    <!-- <div id="container">
-        <div id="content">
-            <div id="invoke_history"></div>
-        </div>
-    </div> -->
-
     <!-- Header -->
     <div class="content" id="header">
         <div class="top">
@@ -27,7 +22,9 @@
             <div class="topRight">
                 <div class="topData">
                     <div class="topDataKey">Status:</div>
-                    <div class="topDataVal" id="status">Not Connected</div>
+                    <div class="wrapper"><label id="status">Not Connected</label>
+                        <div class="tooltip"><label id="status_tooltip">Not Connected</label></div>
+                    </div>
                     <div class="topDataKey">Logged In:</div>
                     <div class="topDataVal" id="logined">No One</div>
                 </div>
@@ -42,8 +39,8 @@
 
     <div class="main">
         <!-- Left Side -->
-        <div class="leftSide" id="menu">
-            <div id="invoke_history"></div>
+        <div id="menu" class="leftSide leftSide_history">
+            <!-- <div id="invoke_history"></div> -->
         </div>
 
         <!-- API invoked area, click left side menu to display. -->
@@ -63,12 +60,15 @@
 </body>
 
 <script>
-
     // 
     function connectOBD() {
         var nodeAddress = getNewestConnOBD();
+        console.info('nodeAddress = ' + nodeAddress);
         obdApi.connectToServer(nodeAddress, function(response) {
             // console.info('OBD Response = ' + response);
+            $("#status").text("Connected");
+            $("#status_tooltip").text("Connected to " + nodeAddress);
+
         }, function(globalResponse) {
             displayOBDMessages(globalResponse);
         });

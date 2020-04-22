@@ -1754,6 +1754,14 @@ function removeNameReqDiv() {
     $("#content").append(name_req_div);
 }
 
+// 
+function removeInvokeHistoryDiv() {
+    $("#invoke_history").remove();
+    var div = document.createElement('div');
+    div.id = "invoke_history";
+    $("#menu").append(div);
+}
+
 // create Div
 function createConnectNodeDiv() {
     var content_div = $("#name_req_div");
@@ -1851,6 +1859,7 @@ function connectOBD() {
         console.info('connectOBD - OBD Response = ' + response);
 
         $("#status").text("Connected");
+        $("#status_tooltip").text("Connected to " + nodeAddress);
         isConnectToOBD = true; // already connected.
 
         createOBDResponseDiv(response, 'connect_node_resp');
@@ -3373,7 +3382,7 @@ function saveOBDConnectHistory(name) {
 }
 
 // Save APIs invoked history in customize mode.
-function saveInvokeHistory(name) {
+function saveInvokeHistory(name, custom_request) {
 
     var list = JSON.parse(localStorage.getItem(invokeHistory));
 
@@ -3382,6 +3391,7 @@ function saveInvokeHistory(name) {
         // console.info('HAS DATA');
         let new_data = {
             name:  name,
+            content:  custom_request,
         }
         list.result.push(new_data);
         localStorage.setItem(invokeHistory, JSON.stringify(list));
@@ -3391,6 +3401,7 @@ function saveInvokeHistory(name) {
         let data = {
             result: [{
                 name:  name,
+                content:  custom_request,
             }]
         }
         localStorage.setItem(invokeHistory, JSON.stringify(data));
@@ -3750,11 +3761,12 @@ function displayOBDConnectHistory() {
     parent.append(newDiv);
 }
 
-
 // List of APIs invoked history in customize mode.
 function displayInvokeHistory() {
 
-    var item;
+    removeInvokeHistoryDiv();
+
+    var item, del;
     var parent = $("#invoke_history");
     var list = JSON.parse(localStorage.getItem(invokeHistory));
 
@@ -3763,17 +3775,36 @@ function displayInvokeHistory() {
 
     createElement(parent, 'h3', 'Invoked History');
 
+    // create [button] element
+    var button = document.createElement('button');
+    button.setAttribute('class', 'button button_clear_history');
+    button.setAttribute('onclick', 'clearInvokeHistory()');
+    button.innerText = 'Clear';
+    parent.append(button);
+
+    createElement(parent, 'p');
+    
     // If has data
     if (list) {
         // console.info('has data');
-        for (let i = 0; i < list.result.length; i++) {
-            // createElement(newDiv, 'h4', 'NO. ' + (i + 1));
+        for (let i = list.result.length - 1; i >= 0; i--) {
+            // Delete button
+            del = document.createElement('text');
+            del.innerText = 'X';
+            del.setAttribute('onclick', 'deleteOneInvokeHistory(this)');
+            del.setAttribute('class', 'url url_red');
+            del.setAttribute('index', i);
+            parent.append(del);
+
+            // item name
             item = document.createElement('a');
             item.href = '#';
             item.innerText = list.result[i].name;
             item.setAttribute('onclick', 'clickInvokeHistory(this)');
-            // item.setAttribute('class', 'url');
+            item.setAttribute('content', list.result[i].content);
+            item.setAttribute('class', 'url url_blue');
             parent.append(item);
+
             createElement(parent, 'p');
         }
     } else { // NO LOCAL STORAGE DATA YET.
@@ -3782,6 +3813,24 @@ function displayInvokeHistory() {
     }
 
     // parent.append(item);
+}
+
+// 
+function clearInvokeHistory(obj) {
+    localStorage.removeItem(invokeHistory);
+    displayInvokeHistory();
+}
+
+// 
+function deleteOneInvokeHistory(obj) {
+    var list = JSON.parse(localStorage.getItem(invokeHistory));
+    list.result.splice(obj.getAttribute("index"), 1);
+    if (list.result.length === 0) { // no item
+        localStorage.removeItem(invokeHistory);
+    } else {
+        localStorage.setItem(invokeHistory, JSON.stringify(list));
+    }
+    displayInvokeHistory();
 }
 
 // 
@@ -3817,7 +3866,7 @@ function displayCustomRequest() {
 //
 function sendCustomRequest() {
 
-    var custom_request  = $("#custom_request").val();
+    var custom_request  = $("#custom_request").val().trim();
 
     try {
         var list = JSON.parse(custom_request);
@@ -3826,20 +3875,20 @@ function sendCustomRequest() {
         return;
     }
 
-    // var list = JSON.parse(custom_request);
-    var type = list.type;
+    var type    = list.type;
     var saveVal = 'type : ' + type;
-
-    // if (name.trim() === '' || pubkey.trim() === '') {
-    //     alert('Please input complete data.');
-    //     return;
-    // }
 
     // OBD API
     obdApi.sendJsonData(custom_request, Number(type), function(e) {
         console.info('sendCustomRequest - OBD Response = ' + JSON.stringify(e));
-        saveInvokeHistory(saveVal);
+        saveInvokeHistory(saveVal, custom_request);
+        displayInvokeHistory();
         // createOBDResponseDiv(e, msgType);
+
+        // Display user id on screen top.
+        if (Number(type) === 1) {  // Login func
+            $('#logined').text(e.userPeerId);
+        }
     });
 }
 
@@ -3850,7 +3899,7 @@ function clickConnectionHistory(obj) {
 
 //
 function clickInvokeHistory(obj) {
-    $("#custom_request").val(obj.innerText);
+    $("#custom_request").val(obj.getAttribute("content"));
 }
 
 // List of channel creation process records.
