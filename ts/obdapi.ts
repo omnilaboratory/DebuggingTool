@@ -27,6 +27,15 @@ class ObdApi {
     }
     this.callbackMap[msgType] = callback;
   }
+  
+  /**
+   * remove event
+   * @param msgType
+   */
+  public removeEvent(msgType: number) {
+    this.callbackMap.delete(msgType);
+    console.info("----------> removeEvent");
+  }
 
   /**
    * Send custom request

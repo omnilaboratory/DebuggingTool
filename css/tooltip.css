@@ -22,10 +22,12 @@
 }
 
 .wrapper .tooltip {
-    background: #1496bb;
+    /* background: #1496bb; */
+    background: #093c49;
     /*bottom: 100%;*/
     top: 100%;
-    color: #fff;
+    color: rgb(102, 221, 55);
+    /* color: #fff; */
     display: block;
     left: -60px;
     /* margin-bottom: 15px; */
@@ -71,7 +73,8 @@
     border-left: solid transparent 10px;
     border-right: solid transparent 10px;
     /* border-top: solid #1496bb 10px; */
-    border-bottom: solid #1496bb 10px;
+    /* border-bottom: solid #1496bb 10px; */
+    border-bottom: solid #093c49 10px;
     /* bottom: -10px; */
     top: -10px;
     content: " ";

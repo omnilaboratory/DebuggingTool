@@ -1736,14 +1736,14 @@ function createInvokeAPIButton(obj) {
 // 
 function displayCustomMode() {
     removeNameReqDiv();
-    // createCustomModeDiv();
-    displayInvokeHistoryInNewHtml();
+    historyCustomizeInNewHtml();
 }
 
 // 
 function displayConnectOBD() {
     removeNameReqDiv();
     createConnectNodeDiv();
+    afterConnectOBD();
 }
 
 // remove name and request Div
@@ -1762,9 +1762,9 @@ function removeInvokeHistoryDiv() {
     $("#menu").append(div);
 }
 
-// create Div
-function createConnectNodeDiv() {
-    var content_div = $("#name_req_div");
+// 
+function createConnectNodeDiv(isCustomize) {
+    // var content_div = $("#name_req_div");
 
     var newDiv = document.createElement('div');
     newDiv.setAttribute('class', 'panelItem');
@@ -1790,16 +1790,25 @@ function createConnectNodeDiv() {
     var button = document.createElement('button');
     button.id = 'button_connect';
     button.setAttribute('class', 'button button_small');
-    button.setAttribute('onclick', 'connectOBD()');
+
+    if (isCustomize === 'customzie') {
+        button.setAttribute('onclick', 'connectOBDCustomize()');
+    } else {
+        button.setAttribute('onclick', 'connectOBD()');
+    }
+    
     button.innerText = 'Connect';
     newDiv.append(button);
     
-    content_div.append(newDiv);
+    $("#name_req_div").append(newDiv);
+}
 
+// 
+function afterConnectOBD() {
     // already connected
     if (isConnectToOBD === true) {
         changeConnectButtonStatus();
-        createElement(content_div, 'h3', 'Already connected. ' + 
+        createElement($("#name_req_div"), 'h3', 'Already connected. ' + 
             'Please refresh the page if you want to connect again.');
     } else {
         displayOBDConnectHistory();
@@ -1808,8 +1817,6 @@ function createConnectNodeDiv() {
 
 // create Div
 function createCustomModeDiv() {
-    // var content_div = $("#name_req_div");
-    var content_div = $("#content");
 
     var newDiv = document.createElement('div');
     newDiv.setAttribute('class', 'panelItem');
@@ -1817,7 +1824,6 @@ function createCustomModeDiv() {
     // create [title] element
     var title = document.createElement('div');
     title.setAttribute('class', 'panelTitle');
-    // createElement(title, 'h2', 'Custom Mode');
     createElement(title, 'h2', 'Request');
     newDiv.append(title);
 
@@ -1833,10 +1839,11 @@ function createCustomModeDiv() {
     request.id = 'custom_request';
     request.setAttribute('class', 'custom_textarea');
     request.setAttribute('cols', '70');
-    request.setAttribute('rows', '26');
+    request.setAttribute('rows', '21');
     request.placeholder = 'Input custom request infomation. (type protocol)';
     newDiv.append(request);
-    content_div.append(newDiv);
+
+    $("#name_req_div").append(newDiv);
 }
 
 // 
@@ -1865,6 +1872,31 @@ function connectOBD() {
         createOBDResponseDiv(response, 'connect_node_resp');
         changeConnectButtonStatus();
         saveOBDConnectHistory(nodeAddress);
+        $("#history_div").remove();
+
+    }, function(globalResponse) {
+        displayOBDMessages(globalResponse);
+    });
+}
+
+// 
+function connectOBDCustomize() {
+    var nodeAddress = $("#NodeAddress").val();
+    if (nodeAddress.trim().length === 0) {
+        alert('Please input Node Address.');
+        return;
+    }
+
+    obdApi.connectToServer(nodeAddress, function(response) {
+        console.info('connectOBDCustomizeMode - OBD Response = ' + response);
+        $("#status").text("Connected");
+        $("#status_tooltip").text("Connected to " + nodeAddress);
+
+        // isConnectToOBD = true; // already connected.
+        // createOBDResponseDiv(response, 'connect_node_resp');
+        changeConnectButtonStatus();
+        saveOBDConnectHistory(nodeAddress);
+        historyInCustomize();
 
     }, function(globalResponse) {
         displayOBDMessages(globalResponse);
@@ -1873,10 +1905,14 @@ function connectOBD() {
 
 //
 function changeConnectButtonStatus() {
-    $("#button_connect").remove();
-    // var button_connect = $("#button_connect");
-    // button_connect.text("Disconnect");
-    // button_connect.attr("disabled", "disabled");
+    // $("#button_connect").remove();
+    var button = $("#button_connect");
+    button.text("Disconnect");
+    button.attr('class', 'button_small disabled');
+    button.attr("disabled", "disabled");
+
+    $("#NodeAddress").attr("class", "input_conn_node disabled");
+    $("#NodeAddress").attr("disabled", "disabled");
 }
 
 // create OBD Response Div 
@@ -3337,6 +3373,7 @@ function getNewestConnOBD() {
                 return nodeAddress;
             }
         }
+        return nodeAddress = 'ws://127.0.0.1:60020/ws';
     } else { // NO LOCAL STORAGE DATA YET.
         return nodeAddress = 'ws://127.0.0.1:60020/ws';
     }
@@ -3737,7 +3774,9 @@ function displayOBDConnectHistory() {
     var parent = $("#name_req_div");
     var list = JSON.parse(localStorage.getItem(itemOBDList));
 
+    // $("#history_div").remove();
     var newDiv = document.createElement('div');
+    newDiv.id = "history_div";
     newDiv.setAttribute('class', 'panelItem');
 
     createElement(newDiv, 'h3', 'Connection History');
@@ -3761,19 +3800,63 @@ function displayOBDConnectHistory() {
     parent.append(newDiv);
 }
 
-// List of APIs invoked history in customize mode.
-function displayInvokeHistory() {
-
-    removeInvokeHistoryDiv();
-
+// List of OBD connection history in customize mode.
+function connectionHistoryInCustomize() {
     var item, del;
     var parent = $("#invoke_history");
-    var list = JSON.parse(localStorage.getItem(invokeHistory));
+    var list   = JSON.parse(localStorage.getItem(itemOBDList));
 
-    // var newDiv = document.createElement('div');
-    // newDiv.setAttribute('class', 'panelItem');
+    createElement(parent, 'h3', 'Connection History');
 
-    createElement(parent, 'h3', 'Invoked History');
+    // create [button] element
+    var button = document.createElement('button');
+    button.setAttribute('class', 'button button_clear_history');
+    button.setAttribute('onclick', 'clearConnectionHistory()');
+    button.innerText = 'Clear';
+    parent.append(button);
+
+    createElement(parent, 'p');
+
+    // If has data
+    if (list) {
+        for (let i = list.result.length - 1; i >= 0; i--) {
+            // Delete button
+            del = document.createElement('text');
+            del.innerText = 'X';
+            del.setAttribute('onclick', 'deleteOneConnectionHistory(this)');
+            del.setAttribute('class', 'url url_red');
+            del.setAttribute('index', i);
+            parent.append(del);
+
+            // item name
+            item = document.createElement('a');
+            item.href = '#';
+            item.innerText = list.result[i].name;
+            item.setAttribute('onclick', 'clickConnectionHistory(this)');
+            item.setAttribute('class', 'url url_blue');
+            parent.append(item);
+
+            createElement(parent, 'p');
+        }
+    } else { // NO LOCAL STORAGE DATA YET.
+        createElement(parent, 'h4', 'No connection history.');
+    }
+}
+
+// Data history in customize mode.
+function historyInCustomize() {
+    removeInvokeHistoryDiv();
+    connectionHistoryInCustomize();
+    apiInvokeHistoryInCustomize();
+}
+
+// List of APIs invoked history in customize mode.
+function apiInvokeHistoryInCustomize() {
+    var item, del;
+    var parent = $("#invoke_history");
+    var list   = JSON.parse(localStorage.getItem(invokeHistory));
+
+    createElement(parent, 'h3', 'APIs History');
 
     // create [button] element
     var button = document.createElement('button');
@@ -3809,16 +3892,20 @@ function displayInvokeHistory() {
         }
     } else { // NO LOCAL STORAGE DATA YET.
         // console.info('no data');
-        createElement(parent, 'h4', 'Has not invoked history yet.');
+        createElement(parent, 'h4', 'No APIs history.');
     }
-
-    // parent.append(item);
 }
 
 // 
 function clearInvokeHistory(obj) {
     localStorage.removeItem(invokeHistory);
-    displayInvokeHistory();
+    historyInCustomize();
+}
+
+// 
+function clearConnectionHistory(obj) {
+    localStorage.removeItem(itemOBDList);
+    historyInCustomize();
 }
 
 // 
@@ -3830,37 +3917,19 @@ function deleteOneInvokeHistory(obj) {
     } else {
         localStorage.setItem(invokeHistory, JSON.stringify(list));
     }
-    displayInvokeHistory();
+    historyInCustomize();
 }
 
 // 
-function displayCustomRequest() {
-
-    var parent = $("#name_req_div");
-
-    var newDiv = document.createElement('div');
-    newDiv.setAttribute('class', 'panelItem');
-
-    createElement(newDiv, 'text', 'Request', 'request_title');
-
-    // create [button] element
-    var button = document.createElement('button');
-    // button.id = 'button_connect';
-    button.setAttribute('class', 'button button_request');
-    button.setAttribute('onclick', 'sendCustomRequest()');
-    button.innerText = 'Send';
-    newDiv.append(button);
-
-    //
-    var request = document.createElement('textarea');
-    request.id = 'custom_request';
-    request.setAttribute('class', 'custom_textarea');
-    request.setAttribute('cols', '70');
-    request.setAttribute('rows', '10');
-    request.placeholder = 'Input custom request infomation. (type protocol)';
-    newDiv.append(request);
-
-    parent.append(newDiv);
+function deleteOneConnectionHistory(obj) {
+    var list = JSON.parse(localStorage.getItem(itemOBDList));
+    list.result.splice(obj.getAttribute("index"), 1);
+    if (list.result.length === 0) { // no item
+        localStorage.removeItem(itemOBDList);
+    } else {
+        localStorage.setItem(itemOBDList, JSON.stringify(list));
+    }
+    historyInCustomize();
 }
 
 //
@@ -3882,13 +3951,16 @@ function sendCustomRequest() {
     obdApi.sendJsonData(custom_request, Number(type), function(e) {
         console.info('sendCustomRequest - OBD Response = ' + JSON.stringify(e));
         saveInvokeHistory(saveVal, custom_request);
-        displayInvokeHistory();
+        historyInCustomize();
         // createOBDResponseDiv(e, msgType);
 
         // Display user id on screen top.
         if (Number(type) === 1) {  // Login func
-            $('#logined').text(e.userPeerId);
+            $('#cm_logined').text(e.userPeerId);
         }
+
+        //
+        obdApi.removeEvent(Number(type));
     });
 }
 
@@ -4296,10 +4368,11 @@ function displayUserDataInNewHtml(goWhere) {
 }
 
 //
-function displayInvokeHistoryInNewHtml() {
-    window.open('invokeHistory.html', 'data', 'top=150, ' +
-        'left=500, toolbar=no, menubar=no, scrollbars=no, resizable=no, ' +
-        'location=no, status=no');
+function historyCustomizeInNewHtml() {
+    window.open('customize_mode.html');
+    // window.open('customize_mode.html', 'data', 'height=300, width=800, top=150, ' +
+    //     'left=500, toolbar=no, menubar=no, scrollbars=no, resizable=no, ' +
+    //     'location=no, status=no');
 }
 
 //

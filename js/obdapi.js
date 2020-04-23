@@ -23,6 +23,14 @@ class ObdApi {
         this.callbackMap[msgType] = callback;
     }
     /**
+     * remove event
+     * @param msgType
+     */
+    removeEvent(msgType) {
+        this.callbackMap.delete(msgType);
+        console.info("----------> removeEvent");
+    }
+    /**
      * Send custom request
      * @param msg
      * @param type
