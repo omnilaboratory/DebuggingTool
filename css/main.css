@@ -1,4 +1,4 @@
-body{
+body {
     padding: 0;
     margin: 0;
     background: #FFF;
@@ -7,66 +7,55 @@ body{
     min-width: 1180px;
 }
 
+a { text-decoration: none; }
+
 .top{
     height: 60px;
     background: #1E222A;
     width: 100%;
     display: flex;
 }
-.textareaBG{
-    /* background: #1E222A; */
-    height: 110px;
-    /* width: 110px; */
-    width: 30%;
-    padding-left: 20px;
-    padding-right: 30px;
-    display: flex;
-}
 
 .textarea{
     flex: 1;
-    /* height: 90px; */
     padding-left: 60px;
-    /* padding-right: 10px; */
     display: flex;
-    /* align-items: center; */
     justify-content: space-between;
     color: #FFF;
-    /* font-size: 16px; */
+    word-wrap:break-word; 
+    word-break:break-all;
 }
 
-.obd_msg{
-    font-size: 12px;
-    width: 88%;
-    padding-left: 20px;
-    padding-right: 20px;
+/* ----  FOR JSON FORMAT */
+pre {
+    background-color: #FFF;
+    outline: 1px solid #ccc; 
+    padding: 15px; 
+    margin-left: 60px;
+    margin-top: 0px;
+    width: 350px;
+    height: 580px;
+    overflow-y: auto;
+    white-space: pre-wrap;
+    word-wrap: break-word;
 }
 
-.param {
-    /* width:  160px;
-    height: 25px;
-    font-size: 15px; */
-    /* margin-left: 20px; */
-    /* margin-right: 20px; */
-    /* text-align: left; */
-    vertical-align: right;
-}
-
-.request_title {
-    font-size: 22px;
-    font-weight: 550;
-    margin-top: 80px;
-    margin-bottom: 50px;
-}
-
+.string { color: green; }
+.number {color: darkorange; }
+.boolean { color: blue; }
+.null { color: magenta; }
+.key { color: red; font-weight: bold; }
+/* -------------- */
+    
 .custom_textarea {
     font-size: 15px;
 }
 
 .custom_request_div{
-    width: 600px;
+    width: 650px;
     /* padding-left: 30px; */
     /* padding-right: 50px; */
+    margin-left: 50px;
 }
 
 .input {
@@ -119,9 +108,18 @@ body{
 .button_clear {
     padding: 7px 30px;
     font-size: 15px;
-    /* margin-top: 15px; */
     margin-bottom: 20px;
     margin-left: 60px;
+}
+
+.button_clear_history {
+    padding: 6px 25px;
+    font-size: 15px;
+    margin-bottom: 10px;
+}
+
+.button_clear_cq {
+    margin-left: 360px;
 }
 
 .button_request {
@@ -129,14 +127,6 @@ body{
     font-size: 16px;
     margin-top: 5px;
     margin-bottom: 15px;
-    /* margin-left: 30px; */
-}
-
-.button_clear_history {
-    padding: 6px 25px;
-    font-size: 15px;
-    /* margin-top: 5px; */
-    margin-bottom: 10px;
 }
 
 .button:hover {
@@ -163,18 +153,21 @@ body{
     background-color: rgb(65, 165, 247);
     /* border: 1px solid #e9ebf0; */
     color: white;
-    /* cursor: pointer; */
 }
 
 .url_blue {
     color: #4f59a0;
 }
 
+.url_conn_history {
+    color: #4f59a0;
+    font-size: 15px;
+    margin-left: -10px;
+}
+
 .url_red {
     color: #6799b1;
     border: 1px solid #6799b1;
-    /* color: #8b3402;
-    border: 1px solid #8b3402; */
     margin-right: 15px;
 }
 
@@ -194,6 +187,7 @@ body{
     padding-left: 20px;
     padding-right: 30px;
 }
+
 .topRight{
     flex: 1;
     height: 60px;
@@ -205,16 +199,20 @@ body{
     color: #FFF;
     font-size: 16px;
 }
+
 .topData{
     display: flex;
 }
+
 .topDataKey{
     padding-left: 30px;
 }
+
 .topDataVal{
     padding-left: 10px;
     font-weight: 600;
 }
+
 .main{
     background: #f5f6f8; 
     padding: 30px 30px 30px 20px;
@@ -224,32 +222,13 @@ body{
 .leftSide{
     background: #f5f6f8;
     padding-left: 30px;
-    padding-right: 50px;
-    /* display: flex; */
-    overflow-y: auto;
+    padding-right: 30px;
+    width: 180px;
 }
 
-.leftSide_history{
-    background: #f5f6f8;
-    width: 160px;
-    /* padding: 1px 3px 3px 30px; */
-    padding-left: 30px;
-    padding-right: 50px;
-    overflow-y: auto;
-}
-
-/* .menuListItem{ */
-    /* margin: 50px 0; */
-    /* padding-top: 10px; */
+/* .leftSide_history{ */
+    /* width: 160px; */
 /* } */
-
-a {
-    text-decoration: none;
-}
-
-/* .label {
-    color: #9195a5;
-} */
 
 .copyright {
     background-color:#1E222A;
@@ -269,23 +248,17 @@ a {
 
 .funcText {
     color: #26272e;
-    /* height: 25px; */
     line-height: 25px;
     font-size: 18px;
     font-weight: 600;
     padding-left: 15px;
     padding-right: 15px;
-    /* text-decoration: none; */
 }
 
 .responseText {
     color: #26272e;
-    /* height: 25px; */
     line-height: 25px;
-    /* font-size: 16px; */
     font-weight: 500;
-    /* padding-top: 20px; */
-    /* text-decoration: none; */
 }
 
 .menuTitle{
@@ -297,24 +270,7 @@ a {
     padding-bottom: 10px;
 }
 
-/* .menuItem{
-    color: #26272e;
-    cursor: pointer;
-    height: 25px;
-    line-height: 25px;
-    font-size: 16px;
-    font-weight: 500;
-    text-decoration: none;
-} */
-
-.contain{
-    flex: 1;
-    /* height: calc(100vh - 120px); */
-    width: 300px;
-    overflow-y: auto;
-}
 .panelItem{
-/* .panel>.panelItem{ */
     background: #fff;
     -webkit-box-shadow: 0 2px 20px 0 rgba(0, 0, 0, 0.05);
     box-shadow: 0 2px 20px 0 rgba(0, 0, 0, 0.05);
@@ -326,175 +282,9 @@ a {
     word-wrap:break-word; 
     word-break:break-all;
 }
-/* .panel>.panelItem:last-child{
-    margin-bottom: 0px;
-} */
+
 .panelTitle{
-    /* font-size: 18px; */
     color: #45474e;
     font-weight: 600;
     margin-top: -10px;
 }
-.hide{
-    display: none;
-}
-.show{
-    display: block;
-}
-.messageAndConnectedPanelContent{
-    display: flex;
-}
-.message{
-flex: 1;
-margin-right: 10px;
-}
-.message>.toolBar{
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    height: 30px;
-}
-.message>.toolBar>.title{
-    font-size: 16px;
-}
-.message>.toolBar>.action{
-    display: flex;
-    justify-content: flex-end;
-    align-items: center;
-    font-size: 14px;
-}
-.messageContent{
-    border: 1px solid #9195a5;
-    padding: 12px 20px;
-    height: 90px;
-}
-.messageContent>.messageItem{
-    font-size: 14px;
-    line-height: 30px;
-}
-.connected{
-    flex: 1;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-left: 10px;
-    color: #9195a5;
-}
-.connected>.description{
-    font-size: 14px;
-    width: 120px;
-    text-align: center;
-}
-.connectedPeople{
-    width: 40px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-items: center;
-    align-content: center;
-    cursor: pointer;
-    
-}
-.connectedPeople>.headImage{
-    width: 30px;
-    height: 30px;
-    border-radius: 15px;
-    background-color: #000;
-}
-.connectedPeople>.userName{
-    margin-top: 10px;
-}
-.requestPanelContent{
-    position: relative;
-}
-.requestSendContent{
-    position: absolute;
-    right: 0;
-    top: 0;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    height: 60px;
-}
-.requestSendContent>.sendBtn{
-    width: 70px;
-    height: 30px;
-    line-height: 30px;
-    text-align: center;
-    font-weight: 800;
-    font-size: 16px;
-    color: #1e222a;
-    border: 1px solid #1e222a;
-    cursor: pointer;
-    border-radius: 4px;
-    margin-bottom: 10px;
-}
-.requestSendContent>.btnDesc{
-    font-size: 12px;
-}
-.requestContent>.info{
-    display: flex;
-}
-.requestContent>.info>.key{
-    width: 80px;
-    font-size: 14px;
-    height: 30px;
-    line-height: 30px;
-}
-.requestContent>.info>.value{
-    font-weight: 800;
-    font-size: 16px;
-    color: #1e222a;
-    height: 30px;
-    line-height: 30px;
-}
-.requestContent>.info>.status{
-    width: 120px;
-    font-size: 14px;
-    height: 30px;
-    line-height: 30px;
-    text-align: right;
-}
-.requestContent>.paramsContent>.title{
-    font-weight: 800;
-    font-size: 16px;
-    height: 30px;
-    line-height: 30px;
-}
-.requestContent>.paramsContent>.paramsList>.paramsItem{
-    display: flex;
-    align-items: center;
-}
-.requestContent>.paramsContent>.paramsList>.paramsItem>.key{
-    width: 80px;
-    text-align: right;
-    margin-right: 6px;
-}
-.responseContent>.info>.item{
-    display: flex;
-    height: 40px;
-}
-.responseContent>.info>.from{
-    position: relative;
-}
-.responseContent>.info>.from>.fromDesc{
-    position: absolute;
-    top: -10px;
-    left: 560px;
-    font-size: 14px;
-}
-.responseContent>.info>.item>.key{
-    width: 80px;
-    font-size: 14px;
-    line-height: 40px;
-    height: 40px;
-}
-.responseContent>.info>.item>.value{
-    font-weight: 800;
-    font-size: 16px;
-    height: 40px;
-    line-height: 40px;
-    color: #1e222a;
-}
-
-

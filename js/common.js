@@ -1114,8 +1114,9 @@ function displayOBDMessages(content) {
     console.info("broadcast info:", JSON.stringify(content));
 
     var msgHead;
-    var fullMsg = JSON.stringify(content, null, 4);
     var msgTime = new Date().toLocaleString();
+    var fullMsg = JSON.stringify(content, null, 2);
+        fullMsg = jsonFormat(fullMsg);
 
     switch (Number(content.type)) {
         // case enumMsgType.MsgType_Error_0:
@@ -1285,7 +1286,8 @@ function displayOBDMessages(content) {
     // console.info('arrObdMsg 1  = ' + arrObdMsg[1]);
     // console.info('showMsg = ' + showMsg);
 
-    $("#obd_messages").val(showMsg);
+    $("#obd_messages").html(showMsg);
+    // $("#obd_messages").val(showMsg);
 }
 
 // getUserDataList
@@ -1828,11 +1830,18 @@ function createCustomModeDiv() {
     newDiv.append(title);
 
     // create [send button] element
-    var button = document.createElement('button');
-    button.setAttribute('class', 'button button_request');
-    button.setAttribute('onclick', 'sendCustomRequest()');
-    button.innerText = 'Send';
-    newDiv.append(button);
+    var btnSend = document.createElement('button');
+    btnSend.setAttribute('class', 'button button_request');
+    btnSend.setAttribute('onclick', 'sendCustomRequest()');
+    btnSend.innerText = 'Send';
+    newDiv.append(btnSend);
+
+    // create [clear button] element
+    var btnClear = document.createElement('button');
+    btnClear.setAttribute('class', 'button button_request button_clear_cq');
+    btnClear.setAttribute('onclick', 'clearCustomRequest()');
+    btnClear.innerText = 'Clear';
+    newDiv.append(btnClear);
 
     //
     var request = document.createElement('textarea');
@@ -1850,7 +1859,7 @@ function createCustomModeDiv() {
 function clearOBDMsg() {
     // Clear array
     arrObdMsg.splice(0, arrObdMsg.length);
-    $("#obd_messages").val("");
+    $("#obd_messages").html("");
 }
 
 // 
@@ -3833,7 +3842,7 @@ function connectionHistoryInCustomize() {
             item.href = '#';
             item.innerText = list.result[i].name;
             item.setAttribute('onclick', 'clickConnectionHistory(this)');
-            item.setAttribute('class', 'url url_blue');
+            item.setAttribute('class', 'url url_conn_history');
             parent.append(item);
 
             createElement(parent, 'p');
@@ -3930,6 +3939,11 @@ function deleteOneConnectionHistory(obj) {
         localStorage.setItem(itemOBDList, JSON.stringify(list));
     }
     historyInCustomize();
+}
+
+//
+function clearCustomRequest() {
+    $("#custom_request").val("");
 }
 
 //
@@ -4388,4 +4402,27 @@ function saveGoWhere(goWhere) {
 // Bitcoin Testnet Faucet
 function openTestnetFaucet() {
     window.open('https://testnet-faucet.mempool.co/');
+}
+
+
+
+function jsonFormat(json) {
+
+    json = json.replace(/&/g, '&').replace(/</g, '<').replace(/>/g, '>');
+
+    return json.replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g, function (match) {
+        var cls = 'number';
+        if (/^"/.test(match)) {
+            if (/:$/.test(match)) {
+                cls = 'key';
+            } else {
+                cls = 'string';
+            }
+        } else if (/true|false/.test(match)) {
+            cls = 'boolean';
+        } else if (/null/.test(match)) {
+            cls = 'null';
+        }
+        return '<span class="' + cls + '">' + match + '</span>';
+    });
 }

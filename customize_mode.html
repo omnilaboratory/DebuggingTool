@@ -39,7 +39,7 @@
 
     <div class="main">
         <!-- Left Side -->
-        <div id="menu" class="leftSide leftSide_history">
+        <div id="menu" class="leftSide">
             <!-- Dynamic create in 'common.js' -->
         </div>
 
@@ -52,8 +52,7 @@
         <div>
             <div><button class="button button_clear" 
                 onclick="clearOBDMsg()">Clear OBD Messages</button></div>
-            <div class="textarea"><textarea id="obd_messages" cols="70" rows="40" 
-                readonly="yes" resize="none" class="obd_msg"></textarea></div>
+            <div><pre id="obd_messages"></pre></div>
         </div>
     </div>
 
