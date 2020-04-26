@@ -221,6 +221,7 @@ pre {
 
 .leftSide{
     background: #f5f6f8;
+    margin-top: -20px;
     padding-left: 30px;
     padding-right: 30px;
     width: 180px;
@@ -266,7 +267,7 @@ pre {
     line-height: 30px;
     color: #9195a5;
     cursor: default;
-    padding-top: 30px;
+    padding-top: 20px;
     padding-bottom: 10px;
 }
 

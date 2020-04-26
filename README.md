@@ -10,7 +10,7 @@ If you come to this tool in developing modules for OmniBOLT, you must have succe
 In this tutorial, you can connect either your own OBD node, or the node we configured for our community: ws://62.234.216.108:60030/ws, or both.  
 
 <p align="center">
-  <img width="500" alt="Debugging Tool Screenshot" src="https://github.com/omnilaboratory/DebuggingTool/blob/master/img/image_screen.png">
+  <img width="500" alt="Debugging Tool Screenshot" src="https://github.com/omnilaboratory/DebuggingTool/blob/master/doc/img/image_screen.png">
 </p>
 
 ## Step 0: clone this project and run it by Chrome
