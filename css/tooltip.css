@@ -1,20 +1,3 @@
-/*
-.wrapper {
-    text-transform: uppercase;
-    background: #ececec;
-    color: #555;
-    cursor: help;
-    font-family: "Gill Sans", Impact, sans-serif;
-    font-size: 20px;
-    margin: 20px 75px 10px 75px;
-    padding: 15px 20px;
-    position: relative;
-    text-align: center;
-    width: 200px;
-    -webkit-transform: translateZ(0); /* webkit flicker fix */
-    /* -webkit-font-smoothing: antialiased; /* webkit text rendering fix */
-/*} */
-
 .wrapper {
     padding-left: 10px;
     font-weight: 600;
@@ -22,12 +5,10 @@
 }
 
 .wrapper .tooltip {
-    /* background: #1496bb; */
     background: #093c49;
     /*bottom: 100%;*/
     top: 100%;
     color: rgb(102, 221, 55);
-    /* color: #fff; */
     display: block;
     left: -60px;
     /* margin-bottom: 15px; */
@@ -93,4 +74,63 @@
     -ms-transform: translateY(0px);
     -o-transform: translateY(0px);
     transform: translateY(0px);
+}
+
+.wrapper .tooltip_help {
+    background: #093c49;
+    top: 100%;
+    color: rgb(102, 221, 55);
+    display: block;
+    left: -92px;
+    /* margin-top: 15px; */
+    opacity: 0;
+    padding: 20px;
+    pointer-events: none;
+    position: absolute;
+    width: 200px;
+    transform: translateY(10px);
+    transition: all .25s ease-out;
+    box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.28);
+}
+
+/* This bridges the gap so you can mouse into the tooltip without it disappearing */
+.wrapper .tooltip_help:before {
+    top: -20px;
+    content: " ";
+    display: block;
+    height: 20px;
+    left: 0;
+    position: absolute;
+    width: 100%;
+}  
+
+/* CSS Triangles - see Trevor's post */
+.wrapper .tooltip_help:after {
+    border-left: solid transparent 10px;
+    border-right: solid transparent 10px;
+    border-bottom: solid #093c49 10px;
+    top: -10px;
+    content: " ";
+    height: 0;
+    left: 50%;
+    margin-left: -13px;
+    position: absolute;
+    width: 0;
+}
+
+.wrapper:hover .tooltip_help {
+    opacity: 1;
+    pointer-events: auto;
+    transform: translateY(0px);
+}
+
+.parent_div {
+    display: flex;
+}
+
+.btn_help {
+    width: 30px;
+    height: 30px;
+    vertical-align: bottom;
+    padding-right: 10px;
 }

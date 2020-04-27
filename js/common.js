@@ -1672,13 +1672,40 @@ function clickApproval(obj) {
 function createParamOfAPI(arrParams, content_div) {
 
     var input_box;
-
+    
     for (let i = 0; i < arrParams.length; i++) {
+        
+        var parent = document.createElement('div');
+        parent.setAttribute('class', 'parent_div');
+
+        if (arrParams[i].help === 'yes') {
+            var div_help = document.createElement('div');
+            div_help.setAttribute('class', 'wrapper');
+
+            var help = document.createElement('img');
+            help.setAttribute('class', 'btn_help');
+            help.setAttribute('src', 'doc/img/help.png');
+            help.setAttribute('alt', 'help');
+            div_help.append(help);
+
+            var div_tooltip = document.createElement('div');
+            div_tooltip.setAttribute('class', 'tooltip_help');
+
+            var tooltip = document.createElement('label');
+            tooltip.innerText = 'test help content haha';
+            div_tooltip.append(tooltip);
+            
+            div_help.append(div_tooltip);
+            parent.append(div_help);
+        }
+
+        var div_other = document.createElement('div');
+
         // create [param_title] element
-        createElement(content_div, 'text', arrParams[i].name + ' : ', 'param');
+        createElement(div_other, 'text', arrParams[i].name + ' : ', 'param');
 
         // create [input box of param] element
-        input_box = document.createElement('input');
+        input_box = document.createElement('input');    
         input_box.id = arrParams[i].name;
 
         if (arrParams[i].name === 'NodeAddress') {
@@ -1687,9 +1714,11 @@ function createParamOfAPI(arrParams, content_div) {
             input_box.setAttribute('class', 'input');
         }
 
-        content_div.append(input_box);
-        createButtonOfParam(arrParams, i, content_div);
-        createElement(content_div, 'p');
+        div_other.append(input_box);
+        createButtonOfParam(arrParams, i, div_other);
+        createElement(div_other, 'p');
+        parent.append(div_other);
+        content_div.append(parent);
     }
 }
 
@@ -3954,7 +3983,7 @@ function sendCustomRequest() {
     try {
         var list = JSON.parse(custom_request);
     } catch (error) {
-        alert("error input content.");
+        alert("Wrong JSON format!");
         return;
     }
 

@@ -9,13 +9,6 @@ body {
 
 a { text-decoration: none; }
 
-.top{
-    height: 60px;
-    background: #1E222A;
-    width: 100%;
-    display: flex;
-}
-
 .textarea{
     flex: 1;
     padding-left: 60px;
@@ -175,6 +168,13 @@ pre {
     background-color: #8b3402;
     color: white;
     cursor: pointer;
+}
+
+.top{
+    height: 60px;
+    background: #1E222A;
+    width: 100%;
+    display: flex;
 }
 
 .topLeft{
