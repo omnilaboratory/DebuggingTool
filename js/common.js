@@ -1877,7 +1877,7 @@ function createCustomModeDiv() {
     request.id = 'custom_request';
     request.setAttribute('class', 'custom_textarea');
     request.setAttribute('cols', '70');
-    request.setAttribute('rows', '21');
+    request.setAttribute('rows', '20');
     request.placeholder = 'Input custom request infomation. (type protocol)';
     newDiv.append(request);
 

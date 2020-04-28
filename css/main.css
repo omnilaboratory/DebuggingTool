@@ -1,10 +1,13 @@
+html {
+    height: 100%;
+}
+
 body {
     padding: 0;
     margin: 0;
     background: #FFF;
     width: 100%;
-    /* width: 100vw; */
-    /* height: 100vh; */
+    height: 100%;
     /* min-width: 1180px; */
 }
 
@@ -29,7 +32,7 @@ pre {
     margin-top: 0px;
     /* width: 125%; */
     /* width: 350px; */
-    height: 580px;
+    height: 560px;
     overflow-y: auto;
     white-space: pre-wrap;
     word-wrap: break-word;
@@ -44,6 +47,8 @@ pre {
     
 .custom_textarea {
     font-size: 15px;
+    /* width:  160px;
+    height: 225px; */
 }
 
 .input {
@@ -213,6 +218,7 @@ pre {
     padding: 30px 30px 30px 20px;
     display: flex;
     /* width: 100%; */
+    height: 79%;
 }
 
 .leftSide{
@@ -249,6 +255,7 @@ pre {
     font-size: 20px;
     font-weight: 500;
     text-align:center;
+    height: 6%;
 }
 
 .bigText {
