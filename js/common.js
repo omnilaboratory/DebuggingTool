@@ -1572,24 +1572,24 @@ function clickApproval(obj) {
         case 'checkbox_n33':
             if (obj.checked) {
                 $("#funding_pubkey").show();
-                $("#funding_pubkeyGet").show();
-                $("#funding_pubkeyAut").show();
+                $("#funding_pubkeySel").show();
+                $("#funding_pubkeyCre").show();
             } else {
                 $("#funding_pubkey").hide();
-                $("#funding_pubkeyGet").hide();
-                $("#funding_pubkeyAut").hide();
+                $("#funding_pubkeySel").hide();
+                $("#funding_pubkeyCre").hide();
             }
             break;
 
         case 'checkbox_n3500':
             if (obj.checked) {
                 $("#channel_address_private_key").show();
-                $("#channel_address_private_keyGet").show();
+                $("#channel_address_private_keyDis").show();
                 // $("#funding_txid").show();
                 // $("#funding_txidGet").show();
             } else {
                 $("#channel_address_private_key").hide();
-                $("#channel_address_private_keyGet").hide();
+                $("#channel_address_private_keyDis").hide();
                 // $("#funding_txid").hide();
                 // $("#funding_txidGet").hide();
             }
@@ -1598,74 +1598,96 @@ function clickApproval(obj) {
         case 'checkbox_n35':
             if (obj.checked) {
                 $("#fundee_channel_address_private_key").show();
-                $("#fundee_channel_address_private_keyGet").show();
+                $("#fundee_channel_address_private_keyDis").show();
             } else {
                 $("#fundee_channel_address_private_key").hide();
-                $("#fundee_channel_address_private_keyGet").hide();
+                $("#fundee_channel_address_private_keyDis").hide();
             }
             break;
 
         case 'checkbox_n352':
             if (obj.checked) {
                 $("#curr_temp_address_pub_key").show();
-                $("#curr_temp_address_pub_keyGet").show();
+                $("#curr_temp_address_pub_keySel").show();
                 $("#curr_temp_address_private_key").show();
-                $("#curr_temp_address_private_keyGet").show();
+                $("#curr_temp_address_private_keySel").show();
                 $("#last_temp_address_private_key").show();
-                $("#last_temp_address_private_keyGet").show();
+                $("#last_temp_address_private_keyDis").show();
                 $("#channel_address_private_key").show();
-                $("#channel_address_private_keyGet").show();
+                $("#channel_address_private_keyDis").show();
             } else {
                 $("#curr_temp_address_pub_key").hide();
-                $("#curr_temp_address_pub_keyGet").hide();
+                $("#curr_temp_address_pub_keySel").hide();
                 $("#curr_temp_address_private_key").hide();
-                $("#curr_temp_address_private_keyGet").hide();
+                $("#curr_temp_address_private_keySel").hide();
                 $("#last_temp_address_private_key").hide();
-                $("#last_temp_address_private_keyGet").hide();
+                $("#last_temp_address_private_keyDis").hide();
                 $("#channel_address_private_key").hide();
-                $("#channel_address_private_keyGet").hide();
+                $("#channel_address_private_keyDis").hide();
             }
             break;
         case 'checkbox_n44':
             if (obj.checked) {
                 $("#curr_rsmc_temp_address_pub_key").show();
-                $("#curr_rsmc_temp_address_pub_keyGet").show();
+                $("#curr_rsmc_temp_address_pub_keySel").show();
                 $("#curr_rsmc_temp_address_private_key").show();
-                $("#curr_rsmc_temp_address_private_keyGet").show();
+                $("#curr_rsmc_temp_address_private_keySel").show();
                 $("#curr_htlc_temp_address_pub_key").show();
-                $("#curr_htlc_temp_address_pub_keyGet").show();
+                $("#curr_htlc_temp_address_pub_keySel").show();
                 $("#curr_htlc_temp_address_private_key").show();
-                $("#curr_htlc_temp_address_private_keyGet").show();
+                $("#curr_htlc_temp_address_private_keySel").show();
                 $("#last_temp_address_private_key").show();
-                $("#last_temp_address_private_keyGet").show();
+                $("#last_temp_address_private_keyDis").show();
                 $("#channel_address_private_key").show();
-                $("#channel_address_private_keyGet").show();
+                $("#channel_address_private_keyDis").show();
             } else {
                 $("#curr_rsmc_temp_address_pub_key").hide();
-                $("#curr_rsmc_temp_address_pub_keyGet").hide();
+                $("#curr_rsmc_temp_address_pub_keySel").hide();
                 $("#curr_rsmc_temp_address_private_key").hide();
-                $("#curr_rsmc_temp_address_private_keyGet").hide();
+                $("#curr_rsmc_temp_address_private_keySel").hide();
                 $("#curr_htlc_temp_address_pub_key").hide();
-                $("#curr_htlc_temp_address_pub_keyGet").hide();
+                $("#curr_htlc_temp_address_pub_keySel").hide();
                 $("#curr_htlc_temp_address_private_key").hide();
-                $("#curr_htlc_temp_address_private_keyGet").hide();
+                $("#curr_htlc_temp_address_private_keySel").hide();
                 $("#last_temp_address_private_key").hide();
-                $("#last_temp_address_private_keyGet").hide();
+                $("#last_temp_address_private_keyDis").hide();
                 $("#channel_address_private_key").hide();
-                $("#channel_address_private_keyGet").hide();
+                $("#channel_address_private_keyDis").hide();
             }
             break;
 
         case 'checkbox_n39':
             if (obj.checked) {
                 $("#request_close_channel_hash").show();
-                $("#request_close_channel_hashGet").show();
+                $("#request_close_channel_hashDis").show();
             } else {
                 $("#request_close_channel_hash").hide();
-                $("#request_close_channel_hashGet").hide();
+                $("#request_close_channel_hashDis").hide();
             }
             break;
     }
+}
+
+//
+function showTooltip(content, parent) {
+    var div_help = document.createElement('div');
+    div_help.setAttribute('class', 'wrapper');
+
+    var help = document.createElement('img');
+    help.setAttribute('class', 'btn_help');
+    help.setAttribute('src', 'doc/img/help.png');
+    help.setAttribute('alt', 'help');
+    div_help.append(help);
+
+    var div_tooltip = document.createElement('div');
+    div_tooltip.setAttribute('class', 'tooltip_help');
+
+    var tooltip = document.createElement('label');
+    tooltip.innerText = content;
+    div_tooltip.append(tooltip);
+    
+    div_help.append(div_tooltip);
+    parent.append(div_help);
 }
 
 // create parameter of each API.
@@ -1678,25 +1700,9 @@ function createParamOfAPI(arrParams, content_div) {
         var parent = document.createElement('div');
         parent.setAttribute('class', 'parent_div');
 
-        if (arrParams[i].help === 'yes') {
-            var div_help = document.createElement('div');
-            div_help.setAttribute('class', 'wrapper');
-
-            var help = document.createElement('img');
-            help.setAttribute('class', 'btn_help');
-            help.setAttribute('src', 'doc/img/help.png');
-            help.setAttribute('alt', 'help');
-            div_help.append(help);
-
-            var div_tooltip = document.createElement('div');
-            div_tooltip.setAttribute('class', 'tooltip_help');
-
-            var tooltip = document.createElement('label');
-            tooltip.innerText = 'test help content haha';
-            div_tooltip.append(tooltip);
-            
-            div_help.append(div_tooltip);
-            parent.append(div_help);
+        // Show tooltip.
+        if (arrParams[i].help) {
+            showTooltip(arrParams[i].help, parent);
         }
 
         var div_other = document.createElement('div');
@@ -3457,16 +3463,23 @@ function saveOBDConnectHistory(name) {
 }
 
 // Save APIs invoked history in customize mode.
-function saveInvokeHistory(name, custom_request) {
+function saveInvokeHistory(name, content) {
 
     var list = JSON.parse(localStorage.getItem(invokeHistory));
 
     // If has data.
     if (list) {
         // console.info('HAS DATA');
+        // If is same data, return.
+        for (let i = 0; i < list.result.length; i++) {
+            if (list.result[i].name === name && list.result[i].content === content) {
+                return;
+            }
+        }
+
         let new_data = {
-            name:  name,
-            content:  custom_request,
+            name:    name,
+            content: content,
         }
         list.result.push(new_data);
         localStorage.setItem(invokeHistory, JSON.stringify(list));
@@ -3475,8 +3488,8 @@ function saveInvokeHistory(name, custom_request) {
         // console.info('FIRST DATA');
         let data = {
             result: [{
-                name:  name,
-                content:  custom_request,
+                name:    name,
+                content: content,
             }]
         }
         localStorage.setItem(invokeHistory, JSON.stringify(data));

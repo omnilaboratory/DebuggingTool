@@ -10,7 +10,7 @@
     top: 100%;
     color: rgb(102, 221, 55);
     display: block;
-    left: -60px;
+    left: -70px;
     /* margin-bottom: 15px; */
     margin-top: 15px;
     opacity: 0;
@@ -81,13 +81,15 @@
     top: 100%;
     color: rgb(102, 221, 55);
     display: block;
-    left: -92px;
+    left: -20px;
     /* margin-top: 15px; */
     opacity: 0;
     padding: 20px;
     pointer-events: none;
     position: absolute;
-    width: 200px;
+    z-index: 1;
+    width: 300px;
+    word-break: normal;
     transform: translateY(10px);
     transition: all .25s ease-out;
     box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.28);
@@ -112,7 +114,8 @@
     top: -10px;
     content: " ";
     height: 0;
-    left: 50%;
+    left: 47px;
+    /* left: 20%; */
     margin-left: -13px;
     position: absolute;
     width: 0;
