@@ -145,6 +145,7 @@
                 },
                 {
                     "name": "from_address_private_key",
+                    "help": "Why need private key?",
                     "buttons": [
                         {
                             "innerText": "Select",

@@ -3470,10 +3470,10 @@ function saveInvokeHistory(name, content) {
     // If has data.
     if (list) {
         // console.info('HAS DATA');
-        // If is same data, return.
+        // If is same data, delete original and push to array again.
         for (let i = 0; i < list.result.length; i++) {
             if (list.result[i].name === name && list.result[i].content === content) {
-                return;
+                list.result.splice(i, 1);
             }
         }
 
