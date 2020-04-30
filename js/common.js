@@ -1741,7 +1741,7 @@ function createInvokeAPIButton(obj) {
 // 
 function displayCustomMode() {
     removeNameReqDiv();
-    historyCustomizeInNewHtml();
+    historyCustomInNewHtml();
 }
 
 // 
@@ -1768,7 +1768,7 @@ function removeInvokeHistoryDiv() {
 }
 
 // 
-function createConnectNodeDiv(isCustomize) {
+function createConnectNodeDiv(isCustom) {
     // var content_div = $("#name_req_div");
 
     var newDiv = document.createElement('div');
@@ -1796,8 +1796,8 @@ function createConnectNodeDiv(isCustomize) {
     button.id = 'button_connect';
     button.setAttribute('class', 'button button_small');
 
-    if (isCustomize === 'customzie') {
-        button.setAttribute('onclick', 'connectOBDCustomize()');
+    if (isCustom === 'custom') {
+        button.setAttribute('onclick', 'connectOBDCustomMode()');
     } else {
         button.setAttribute('onclick', 'connectOBD()');
     }
@@ -1892,7 +1892,7 @@ function connectOBD() {
 }
 
 // 
-function connectOBDCustomize() {
+function connectOBDInCustomMode() {
     var nodeAddress = $("#NodeAddress").val();
     if (nodeAddress.trim().length === 0) {
         alert('Please input Node Address.');
@@ -1900,7 +1900,7 @@ function connectOBDCustomize() {
     }
 
     obdApi.connectToServer(nodeAddress, function(response) {
-        console.info('connectOBDCustomizeMode - OBD Response = ' + response);
+        console.info('connectOBDInCustomMode - OBD Response = ' + response);
         $("#status").text("Connected");
         $("#status_tooltip").text("Connected to " + nodeAddress);
 
@@ -1908,7 +1908,7 @@ function connectOBDCustomize() {
         // createOBDResponseDiv(response, 'connect_node_resp');
         changeConnectButtonStatus();
         saveOBDConnectHistory(nodeAddress);
-        historyInCustomize();
+        historyInCustom();
 
     }, function(globalResponse) {
         displayOBDMessages(globalResponse);
@@ -3399,7 +3399,7 @@ function saveOBDConnectHistory(name) {
     }
 }
 
-// Save APIs invoked history in customize mode.
+// Save APIs invoked history in custom mode.
 function saveInvokeHistory(name, content) {
 
     var list = JSON.parse(localStorage.getItem(invokeHistory));
@@ -3788,8 +3788,8 @@ function displayOBDConnectHistory() {
     parent.append(newDiv);
 }
 
-// List of OBD connection history in customize mode.
-function connectionHistoryInCustomize() {
+// List of OBD connection history in custom mode.
+function connectionHistoryInCustom() {
     var item, del;
     var parent = $("#invoke_history");
     var list   = JSON.parse(localStorage.getItem(itemOBDList));
@@ -3831,15 +3831,15 @@ function connectionHistoryInCustomize() {
     }
 }
 
-// Data history in customize mode.
-function historyInCustomize() {
+// Data history in custom mode.
+function historyInCustom() {
     removeInvokeHistoryDiv();
-    connectionHistoryInCustomize();
-    apiInvokeHistoryInCustomize();
+    connectionHistoryInCustom();
+    apiInvokeHistoryInCustom();
 }
 
-// List of APIs invoked history in customize mode.
-function apiInvokeHistoryInCustomize() {
+// List of APIs invoked history in custom mode.
+function apiInvokeHistoryInCustom() {
     var item, del;
     var parent = $("#invoke_history");
     var list   = JSON.parse(localStorage.getItem(invokeHistory));
@@ -3887,13 +3887,13 @@ function apiInvokeHistoryInCustomize() {
 // 
 function clearInvokeHistory(obj) {
     localStorage.removeItem(invokeHistory);
-    historyInCustomize();
+    historyInCustom();
 }
 
 // 
 function clearConnectionHistory(obj) {
     localStorage.removeItem(itemOBDList);
-    historyInCustomize();
+    historyInCustom();
 }
 
 // 
@@ -3905,7 +3905,7 @@ function deleteOneInvokeHistory(obj) {
     } else {
         localStorage.setItem(invokeHistory, JSON.stringify(list));
     }
-    historyInCustomize();
+    historyInCustom();
 }
 
 // 
@@ -3917,7 +3917,7 @@ function deleteOneConnectionHistory(obj) {
     } else {
         localStorage.setItem(itemOBDList, JSON.stringify(list));
     }
-    historyInCustomize();
+    historyInCustom();
 }
 
 //
@@ -3944,7 +3944,7 @@ function sendCustomRequest() {
     obdApi.sendJsonData(custom_request, Number(type), function(e) {
         console.info('sendCustomRequest - OBD Response = ' + JSON.stringify(e));
         saveInvokeHistory(saveVal, custom_request);
-        historyInCustomize();
+        historyInCustom();
         // createOBDResponseDiv(e, msgType);
 
         // Display user id on screen top.
@@ -4358,9 +4358,9 @@ function displayUserDataInNewHtml(goWhere) {
 }
 
 //
-function historyCustomizeInNewHtml() {
-    window.open('customize_mode.html');
-    // window.open('customize_mode.html', 'data', 'height=300, width=800, top=150, ' +
+function historyCustomInNewHtml() {
+    window.open('customMode.html');
+    // window.open('customMode.html', 'data', 'height=300, width=800, top=150, ' +
     //     'left=500, toolbar=no, menubar=no, scrollbars=no, resizable=no, ' +
     //     'location=no, status=no');
 }
