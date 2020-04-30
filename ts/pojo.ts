@@ -73,18 +73,39 @@ class CommitmentTxSigned {
   approval: boolean = false;
 }
 
-class HtlcHInfo {
+class HtlcFindPathInfo {
+  recipient_node_peer_id: string = "";
+  recipient_user_peer_id: string = "";
   property_id: number = 0;
   amount: number = 0;
-  recipient_user_peer_id: string = "";
 }
 
-class HtlcRequestFindPathAndSendH{
-  h: string = "";
+class HtlcCreatedInfo {
+  recipient_user_peer_id: string = "";
   property_id: number = 0;
   amount: number = 0;
-  recipient_user_peer_id: string = "";
   memo: string = "";
+  h: string = "";
+  htlc_channel_path: string = "";
+  channel_address_private_key: string = "";
+  last_temp_address_private_key: string = "";
+  curr_rsmc_temp_address_pub_key: string = "";
+  curr_rsmc_temp_address_private_key: string = "";
+  curr_htlc_temp_address_pub_key: string = "";
+  curr_htlc_temp_address_private_key: string = "";
+  curr_htlc_temp_address_for_ht1a_pub_key: string = "";
+  curr_htlc_temp_address_for_ht1a_private_key: string = "";
+}
+
+class HtlcSignedInfo {
+  request_hash: string = "";
+  approval: boolean = false;
+  channel_address_private_key: string = "";
+  last_temp_address_private_key: string = "";
+  curr_rsmc_temp_address_pub_key: string = "";
+  curr_rsmc_temp_address_private_key: string = "";
+  curr_htlc_temp_address_pub_key: string = "";
+  curr_htlc_temp_address_private_key: string = "";
 }
 
 class HtlcHSignInfo {
@@ -119,7 +140,7 @@ class HtlcRequestOpen {
 }
 
 class HtlcSendRInfo {
-  request_hash: string = "";
+  channel_id: string = "";
   r: string = "";
   channel_address_private_key: string = "";
   curr_htlc_temp_address_for_he1b_pub_key: string = "";
@@ -127,6 +148,7 @@ class HtlcSendRInfo {
 }
 
 class HtlcVerifyRInfo {
+  channel_id: string = "";
   request_hash: string = "";
   r: string = "";
   channel_address_private_key: string = "";
@@ -143,7 +165,7 @@ class CloseHtlcTxInfo {
 }
 
 class CloseHtlcTxInfoSigned {
-  request_close_htlc_hash: string = "";
+  request_hash: string = "";
   channel_address_private_key: string = "";
   last_rsmc_temp_address_private_key: string = "";
   last_htlc_temp_address_private_key: string = "";
@@ -279,23 +301,39 @@ class MessageType {
   MsgType_CloseChannelRequest_N38 = -38;
   MsgType_CloseChannelSign_N39 = -39;
 
-  MsgType_HTLC_Invoice_N4003 = -4003;
-  MsgType_HTLC_AddHTLC_N40 = -40;
-  MsgType_HTLC_CreatedRAndHInfoList_N4001 = -4001;
-  MsgType_HTLC_CreatedRAndHInfoItem_N4002 = -4002;
-  MsgType_HTLC_SignedRAndHInfoList_N4101 = -4101;
-  MsgType_HTLC_SignedRAndHInfoItem_N4102 = -4102;
-  MsgType_HTLC_GetRFromLCommitTx_N4103 = -4103;
-  MsgType_HTLC_GetPathInfoByH_N4104 = -4104;
-  MsgType_HTLC_GetRInfoByHOfOwner_N4105 = -4105;
-  MsgType_HTLC_FindPathAndSendH_N42 = -42;
-  MsgType_HTLC_SendH_N43 = -43;
-  MsgType_HTLC_SignGetH_N44 = -44;
-  MsgType_HTLC_CreateCommitmentTx_N45 = -45;
-  MsgType_HTLC_SendR_N46 = -46;
-  MsgType_HTLC_VerifyR_N47 = -47;
-  MsgType_HTLC_RequestCloseCurrTx_N48 = -48;
-  MsgType_HTLC_CloseSigned_N49 = -49;
+  // MsgType_HTLC_Invoice_N4003 = -4003;
+  // MsgType_HTLC_AddHTLC_N40 = -40;
+  // MsgType_HTLC_CreatedRAndHInfoList_N4001 = -4001;
+  // MsgType_HTLC_CreatedRAndHInfoItem_N4002 = -4002;
+  // MsgType_HTLC_SignedRAndHInfoList_N4101 = -4101;
+  // MsgType_HTLC_SignedRAndHInfoItem_N4102 = -4102;
+  // MsgType_HTLC_GetRFromLCommitTx_N4103 = -4103;
+  // MsgType_HTLC_GetPathInfoByH_N4104 = -4104;
+  // MsgType_HTLC_GetRInfoByHOfOwner_N4105 = -4105;
+  // MsgType_HTLC_FindPathAndSendH_N42 = -42;
+  // MsgType_HTLC_SendH_N43 = -43;
+  // MsgType_HTLC_SignGetH_N44 = -44;
+  // MsgType_HTLC_CreateCommitmentTx_N45 = -45;
+  // MsgType_HTLC_SendR_N46 = -46;
+  // MsgType_HTLC_VerifyR_N47 = -47;
+  // MsgType_HTLC_RequestCloseCurrTx_N48 = -48;
+  // MsgType_HTLC_CloseSigned_N49 = -49;
+
+  MsgType_HTLC_FindPath_N4001              = -4001;
+  MsgType_HTLC_Invoice_N4003               = -4003;
+  MsgType_HTLC_AddHTLC_N40                 = -40;
+  MsgType_HTLC_AddHTLCSigned_N41           = -41;
+  MsgType_HTLC_PayerSignC3b_N42            = -42;
+  MsgType_HTLC_PayeeCreateHTRD1a_N43       = -43;
+  MsgType_HTLC_PayerSignHTRD1a_N44         = -44;
+  MsgType_HTLC_SendR_N45                   = -45;
+  MsgType_HTLC_VerifyR_N46                 = -46;
+  MsgType_HTLC_SendHerdHex_N47             = -47;
+  MsgType_HTLC_SignHedHex_N48              = -48;
+  MsgType_HTLC_RequestCloseCurrTx_N49      = -49;
+  MsgType_HTLC_CloseSigned_N50             = -50;
+  MsgType_HTLC_CloseHtlcRequestSignBR_N51  = -51;
+  MsgType_HTLC_CloseHtlcUpdateCnb_N52      = -52;
 
   MsgType_Atomic_Swap_N80         = -80
 	MsgType_Atomic_Swap_Accept_N81  = -81

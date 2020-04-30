@@ -13,7 +13,11 @@ body {
 
 a { text-decoration: none; }
 
-.textarea{
+.api_description {
+    word-break: normal;
+}
+
+.textarea {
     flex: 1;
     padding-left: 60px;
     display: flex;

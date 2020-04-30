@@ -208,162 +208,91 @@ function acceptChannel(msgType) {
 }
 
 /** 
- * -44 htlc Sign GetH API at local.
- * @param msgType
- */
-function htlcSignGetH(msgType) {
-
-    var request_hash = $("#request_hash").val();
-    var channel_address_private_key = $("#channel_address_private_key").val();
-    var last_temp_address_private_key = $("#last_temp_address_private_key").val();
-    var curr_rsmc_temp_address_pub_key = $("#curr_rsmc_temp_address_pub_key").val();
-    var curr_rsmc_temp_address_private_key = $("#curr_rsmc_temp_address_private_key").val();
-    var curr_htlc_temp_address_pub_key = $("#curr_htlc_temp_address_pub_key").val();
-    var curr_htlc_temp_address_private_key = $("#curr_htlc_temp_address_private_key").val();
-    var approval = $("#checkbox_n44").prop("checked");
-
-    let info = new SignGetHInfo();
-    info.request_hash = request_hash;
-    info.channel_address_private_key = channel_address_private_key;
-    info.last_temp_address_private_key = last_temp_address_private_key;
-    info.curr_rsmc_temp_address_pub_key = curr_rsmc_temp_address_pub_key;
-    info.curr_rsmc_temp_address_private_key = curr_rsmc_temp_address_private_key;
-    info.curr_htlc_temp_address_pub_key = curr_htlc_temp_address_pub_key;
-    info.curr_htlc_temp_address_private_key = curr_htlc_temp_address_private_key;
-    info.approval = approval;
-
-    // OBD API
-    obdApi.htlcSignGetH(info, function(e) {
-        console.info('-44 htlcSignGetH - OBD Response = ' + JSON.stringify(e));
-        saveChannelList(e, e.channelId, msgType);
-        createOBDResponseDiv(e, msgType);
-    });
-}
-
-/** 
- * -45 CreateHtlcCTx API at local.
- * @param msgType
- */
-function createHtlcCTx(msgType) {
-
-    var request_hash = $("#request_hash").val();
-    var channel_address_private_key = $("#channel_address_private_key").val();
-    var last_temp_address_private_key = $("#last_temp_address_private_key").val();
-    var curr_rsmc_temp_address_pub_key = $("#curr_rsmc_temp_address_pub_key").val();
-    var curr_rsmc_temp_address_private_key = $("#curr_rsmc_temp_address_private_key").val();
-    var curr_htlc_temp_address_pub_key = $("#curr_htlc_temp_address_pub_key").val();
-    var curr_htlc_temp_address_private_key = $("#curr_htlc_temp_address_private_key").val();
-    var curr_htlc_temp_address_for_ht1a_pub_key = $("#curr_htlc_temp_address_for_ht1a_pub_key").val();
-    var curr_htlc_temp_address_for_ht1a_private_key = $("#curr_htlc_temp_address_for_ht1a_private_key").val();
-
-    let info = new HtlcRequestOpen();
-    info.request_hash = request_hash;
-    info.channel_address_private_key = channel_address_private_key;
-    info.last_temp_address_private_key = last_temp_address_private_key;
-    info.curr_rsmc_temp_address_pub_key = curr_rsmc_temp_address_pub_key;
-    info.curr_rsmc_temp_address_private_key = curr_rsmc_temp_address_private_key;
-    info.curr_htlc_temp_address_pub_key = curr_htlc_temp_address_pub_key;
-    info.curr_htlc_temp_address_private_key = curr_htlc_temp_address_private_key;
-    info.curr_htlc_temp_address_for_ht1a_pub_key = curr_htlc_temp_address_for_ht1a_pub_key;
-    info.curr_htlc_temp_address_for_ht1a_private_key = curr_htlc_temp_address_for_ht1a_private_key;
-
-    // Get channel_id with request_hash.
-    var tempChID;
-    var list = JSON.parse(localStorage.getItem(itemChannelList));
-    for (let i = 0; i < list.result.length; i++) {
-        for (let i2 = 0; i2 < list.result[i].htlc.length; i2++) {
-            if (request_hash === list.result[i].htlc[i2].request_hash) {
-                tempChID = list.result[i].htlc[i2].channelId;
-            }
-        }
-    }
-
-    // OBD API
-    obdApi.htlcCreateCommitmentTx(info, function(e) {
-        console.info('-45 htlcCreateCommitmentTx - OBD Response = ' + JSON.stringify(e));
-        saveChannelList(e, tempChID, msgType);
-        createOBDResponseDiv(e, msgType);
-    });
-}
-
-/** 
- * -46 htlcSendR API at local.
+ * -45 htlcSendR API at local.
  * @param msgType
  */
 function htlcSendR(msgType) {
 
+    var recipient_node_peer_id    = $("#recipient_node_peer_id").val();
+    var recipient_user_peer_id     = $("#recipient_user_peer_id").val();
+    var channel_id = $("#channel_id").val();
     var r = $("#r").val();
-    var request_hash = $("#request_hash").val();
     var channel_address_private_key = $("#channel_address_private_key").val();
     var curr_htlc_temp_address_for_he1b_pub_key = $("#curr_htlc_temp_address_for_he1b_pub_key").val();
     var curr_htlc_temp_address_for_he1b_private_key = $("#curr_htlc_temp_address_for_he1b_private_key").val();
 
     let info = new HtlcSendRInfo();
+    info.channel_id = channel_id;
     info.r = r;
-    info.request_hash = request_hash;
     info.channel_address_private_key = channel_address_private_key;
     info.curr_htlc_temp_address_for_he1b_pub_key = curr_htlc_temp_address_for_he1b_pub_key;
     info.curr_htlc_temp_address_for_he1b_private_key = curr_htlc_temp_address_for_he1b_private_key;
 
     // Get channel_id with request_hash.
-    var tempChID;
-    var list = JSON.parse(localStorage.getItem(itemChannelList));
-    for (let i = 0; i < list.result.length; i++) {
-        for (let i2 = 0; i2 < list.result[i].htlc.length; i2++) {
-            if (request_hash === list.result[i].htlc[i2].request_hash) {
-                tempChID = list.result[i].htlc[i2].channelId;
-            }
-        }
-    }
+    // var tempChID;
+    // var list = JSON.parse(localStorage.getItem(itemChannelList));
+    // for (let i = 0; i < list.result.length; i++) {
+    //     for (let i2 = 0; i2 < list.result[i].htlc.length; i2++) {
+    //         if (request_hash === list.result[i].htlc[i2].request_hash) {
+    //             tempChID = list.result[i].htlc[i2].channelId;
+    //         }
+    //     }
+    // }
 
     // OBD API
-    obdApi.htlcSendR(info, function(e) {
-        console.info('-46 htlcSendR - OBD Response = ' + JSON.stringify(e));
-        saveChannelList(e, tempChID, msgType);
+    obdApi.htlcSendR(recipient_node_peer_id, recipient_user_peer_id, info, function(e) {
+        console.info('-45 htlcSendR - OBD Response = ' + JSON.stringify(e));
+        saveChannelList(e, channel_id, msgType);
         createOBDResponseDiv(e, msgType);
     });
 }
 
 /** 
- * -47 htlcVerifyR API at local.
+ * -46 htlcVerifyR API at local.
  * @param msgType
  */
 function htlcVerifyR(msgType) {
 
+    var recipient_node_peer_id    = $("#recipient_node_peer_id").val();
+    var recipient_user_peer_id    = $("#recipient_user_peer_id").val();
+    var channel_id = $("#channel_id").val();
     var r = $("#r").val();
     var request_hash = $("#request_hash").val();
     var channel_address_private_key = $("#channel_address_private_key").val();
 
     let info = new HtlcVerifyRInfo();
+    info.channel_id = channel_id;
     info.r = r;
     info.request_hash = request_hash;
     info.channel_address_private_key = channel_address_private_key;
 
     // Get channel_id with request_hash.
-    var tempChID;
-    var list = JSON.parse(localStorage.getItem(itemChannelList));
-    for (let i = 0; i < list.result.length; i++) {
-        for (let i2 = 0; i2 < list.result[i].htlc.length; i2++) {
-            if (request_hash === list.result[i].htlc[i2].request_hash) {
-                tempChID = list.result[i].htlc[i2].channelId;
-            }
-        }
-    }
+    // var tempChID;
+    // var list = JSON.parse(localStorage.getItem(itemChannelList));
+    // for (let i = 0; i < list.result.length; i++) {
+    //     for (let i2 = 0; i2 < list.result[i].htlc.length; i2++) {
+    //         if (request_hash === list.result[i].htlc[i2].request_hash) {
+    //             tempChID = list.result[i].htlc[i2].channelId;
+    //         }
+    //     }
+    // }
 
     // OBD API
-    obdApi.htlcVerifyR(info, function(e) {
-        console.info('-47 htlcVerifyR - OBD Response = ' + JSON.stringify(e));
-        saveChannelList(e, tempChID, msgType);
+    obdApi.htlcVerifyR(recipient_node_peer_id, recipient_user_peer_id, info, function(e) {
+        console.info('-46 htlcVerifyR - OBD Response = ' + JSON.stringify(e));
+        saveChannelList(e, channel_id, msgType);
         createOBDResponseDiv(e, msgType);
     });
 }
 
 /** 
- * -48 closeHtlcTx API at local.
+ * -49 closeHTLC API at local.
  * @param msgType
  */
-function closeHtlcTx(msgType) {
+function closeHTLC(msgType) {
 
+    var recipient_node_peer_id    = $("#recipient_node_peer_id").val();
+    var recipient_user_peer_id    = $("#recipient_user_peer_id").val();
     var channel_id = $("#channel_id").val();
     var channel_address_private_key = $("#channel_address_private_key").val();
     var last_rsmc_temp_address_private_key = $("#last_rsmc_temp_address_private_key").val();
@@ -382,20 +311,22 @@ function closeHtlcTx(msgType) {
     info.curr_rsmc_temp_address_private_key = curr_rsmc_temp_address_private_key;
 
     // OBD API
-    obdApi.closeHtlcTx(info, function(e) {
-        console.info('-48 closeHtlcTx - OBD Response = ' + JSON.stringify(e));
+    obdApi.closeHTLC(recipient_node_peer_id, recipient_user_peer_id, info, function(e) {
+        console.info('-49 closeHTLC - OBD Response = ' + JSON.stringify(e));
         saveChannelList(e, channel_id, msgType);
         createOBDResponseDiv(e, msgType);
     });
 }
 
 /** 
- * -49 closeHtlcTxSigned API at local.
+ * -50 closeHTLCSigned API at local.
  * @param msgType
  */
-function closeHtlcTxSigned(msgType) {
+function closeHTLCSigned(msgType) {
 
-    var request_close_htlc_hash = $("#request_close_htlc_hash").val();
+    var recipient_node_peer_id    = $("#recipient_node_peer_id").val();
+    var recipient_user_peer_id    = $("#recipient_user_peer_id").val();
+    var request_hash = $("#request_hash").val();
     var channel_address_private_key = $("#channel_address_private_key").val();
     var last_rsmc_temp_address_private_key = $("#last_rsmc_temp_address_private_key").val();
     var last_htlc_temp_address_private_key = $("#last_htlc_temp_address_private_key").val();
@@ -404,7 +335,7 @@ function closeHtlcTxSigned(msgType) {
     var curr_rsmc_temp_address_private_key = $("#curr_rsmc_temp_address_private_key").val();
 
     let info = new CloseHtlcTxInfoSigned();
-    info.request_close_htlc_hash = request_close_htlc_hash;
+    info.request_hash = request_hash;
     info.channel_address_private_key = channel_address_private_key;
     info.last_rsmc_temp_address_private_key = last_rsmc_temp_address_private_key;
     info.last_htlc_temp_address_private_key = last_htlc_temp_address_private_key;
@@ -424,8 +355,8 @@ function closeHtlcTxSigned(msgType) {
     }
 
     // OBD API
-    obdApi.closeHtlcTxSigned(info, function(e) {
-        console.info('-49 closeHtlcTxSigned - OBD Response = ' + JSON.stringify(e));
+    obdApi.closeHTLCSigned(recipient_node_peer_id, recipient_user_peer_id, info, function(e) {
+        console.info('-50 closeHTLCSigned - OBD Response = ' + JSON.stringify(e));
         saveChannelList(e, channel_id, msgType);
         createOBDResponseDiv(e, msgType);
     });
@@ -845,25 +776,76 @@ function createInvoice(msgType) {
     });
 }
 
-// -42 htlcFindPathAndSendH API at local.
-function htlcFindPathAndSendH(msgType) {
+// -40 htlcCreated API at local.
+function htlcCreated(msgType) {
 
+    var recipient_node_peer_id  = $("#recipient_node_peer_id").val();
+    var recipient_user_peer_id  = $("#recipient_user_peer_id").val();
     var property_id = $("#property_id").val();
-    var amount = $("#amount").val();
-    var recipient_user_peer_id = $("#recipient_user_peer_id").val();
-    var h = $("#h").val();
-    var memo = $("#memo").val();
+    var amount      = $("#amount").val();
+    var memo        = $("#memo").val();
+    var h           = $("#h").val();
+    var htlc_channel_path = $("#htlc_channel_path").val();
+    var channel_address_private_key = $("#channel_address_private_key").val();
+    var last_temp_address_private_key = $("#last_temp_address_private_key").val();
+    var curr_rsmc_temp_address_pub_key = $("#curr_rsmc_temp_address_pub_key").val();
+    var curr_rsmc_temp_address_private_key = $("#curr_rsmc_temp_address_private_key").val();
+    var curr_htlc_temp_address_pub_key = $("#curr_htlc_temp_address_pub_key").val();
+    var curr_htlc_temp_address_private_key = $("#curr_htlc_temp_address_private_key").val();
+    var curr_htlc_temp_address_for_ht1a_pub_key = $("#curr_htlc_temp_address_for_ht1a_pub_key").val();
+    var curr_htlc_temp_address_for_ht1a_private_key = $("#curr_htlc_temp_address_for_ht1a_private_key").val();
 
-    let info = new HtlcRequestFindPathAndSendH();
+    let info = new HtlcCreatedInfo();
+    info.recipient_user_peer_id = recipient_user_peer_id;
     info.property_id = Number(property_id);
     info.amount = Number(amount);
-    info.recipient_user_peer_id = recipient_user_peer_id;
-    info.h = h;
     info.memo = memo;
+    info.h = h;
+    info.htlc_channel_path = htlc_channel_path;
+    info.channel_address_private_key = channel_address_private_key;
+    info.last_temp_address_private_key = last_temp_address_private_key;
+    info.curr_rsmc_temp_address_pub_key = curr_rsmc_temp_address_pub_key;
+    info.curr_rsmc_temp_address_private_key = curr_rsmc_temp_address_private_key;
+    info.curr_htlc_temp_address_pub_key = curr_htlc_temp_address_pub_key;
+    info.curr_htlc_temp_address_private_key = curr_htlc_temp_address_private_key;
+    info.curr_htlc_temp_address_for_ht1a_pub_key = curr_htlc_temp_address_for_ht1a_pub_key;
+    info.curr_htlc_temp_address_for_ht1a_private_key = curr_htlc_temp_address_for_ht1a_private_key;
 
     // OBD API
-    obdApi.htlcFindPathAndSendH(info, function(e) {
-        console.info('-42 htlcFindPathAndSendH - OBD Response = ' + JSON.stringify(e));
+    obdApi.htlcCreated(recipient_node_peer_id, recipient_user_peer_id, info, function(e) {
+        console.info('-40 htlcCreated - OBD Response = ' + JSON.stringify(e));
+        saveChannelList(e, e.channelId, msgType, info);
+        createOBDResponseDiv(e, msgType);
+    });
+}
+
+// -41 htlcSigned API at local.
+function htlcSigned(msgType) {
+
+    var recipient_node_peer_id  = $("#recipient_node_peer_id").val();
+    var recipient_user_peer_id  = $("#recipient_user_peer_id").val();
+    var request_hash = $("#request_hash").val();
+    var channel_address_private_key = $("#channel_address_private_key").val();
+    var last_temp_address_private_key = $("#last_temp_address_private_key").val();
+    var curr_rsmc_temp_address_pub_key = $("#curr_rsmc_temp_address_pub_key").val();
+    var curr_rsmc_temp_address_private_key = $("#curr_rsmc_temp_address_private_key").val();
+    var curr_htlc_temp_address_pub_key = $("#curr_htlc_temp_address_pub_key").val();
+    var curr_htlc_temp_address_private_key = $("#curr_htlc_temp_address_private_key").val();
+    var approval = $("#checkbox_n41").prop("checked");
+
+    let info = new HtlcSignedInfo();
+    info.request_hash = request_hash;
+    info.channel_address_private_key = channel_address_private_key;
+    info.last_temp_address_private_key = last_temp_address_private_key;
+    info.curr_rsmc_temp_address_pub_key = curr_rsmc_temp_address_pub_key;
+    info.curr_rsmc_temp_address_private_key = curr_rsmc_temp_address_private_key;
+    info.curr_htlc_temp_address_pub_key = curr_htlc_temp_address_pub_key;
+    info.curr_htlc_temp_address_private_key = curr_htlc_temp_address_private_key;
+    info.approval = approval;
+
+    // OBD API
+    obdApi.htlcSigned(recipient_node_peer_id, recipient_user_peer_id, info, function(e) {
+        console.info('-41 htlcSigned - OBD Response = ' + JSON.stringify(e));
         saveChannelList(e, e.channelId, msgType, info);
         createOBDResponseDiv(e, msgType);
     });
@@ -883,21 +865,23 @@ function htlcSendH(msgType) {
     });
 }
 
-// add HTLC API at local.
-function WillBeUpdatedHTLCFindPath(msgType) {
+// 
+function htlcFindPath(msgType) {
 
-    var property_id = $("#property_id").val();
-    var amount = $("#amount").val();
+    var recipient_node_peer_id = $("#recipient_node_peer_id").val();
     var recipient_user_peer_id = $("#recipient_user_peer_id").val();
+    var property_id            = $("#property_id").val();
+    var amount                 = $("#amount").val();
 
-    let info = new HtlcHInfo();
-    info.property_id = Number(property_id);
-    info.amount = Number(amount);
+    let info = new HtlcFindPathInfo();
+    info.recipient_node_peer_id = recipient_node_peer_id;
     info.recipient_user_peer_id = recipient_user_peer_id;
+    info.property_id            = Number(property_id);
+    info.amount                 = Number(amount);
 
     // OBD API
-    obdApi.addHtlc(info, function(e) {
-        console.info('addHTLC - OBD Response = ' + JSON.stringify(e));
+    obdApi.htlcFindPath(info, function(e) {
+        console.info('N4001 - htlcFindPath - OBD Response = ' + JSON.stringify(e));
         // saveChannelCreation(e, tempChID, msgType);
         createOBDResponseDiv(e, msgType);
     });
@@ -1061,32 +1045,26 @@ function invokeAPIs(objSelf) {
         case enumMsgType.MsgType_HTLC_Invoice_N4003:
             createInvoice(msgType);
             break;
+        case enumMsgType.MsgType_HTLC_FindPath_N4001:
+            htlcFindPath(msgType);
+            break;
         case enumMsgType.MsgType_HTLC_AddHTLC_N40:
-            WillBeUpdatedHTLCFindPath(msgType);
+            htlcCreated(msgType);
             break;
-        case enumMsgType.MsgType_HTLC_FindPathAndSendH_N42:
-            htlcFindPathAndSendH(msgType);
+        case enumMsgType.MsgType_HTLC_AddHTLCSigned_N41:
+            htlcSigned(msgType);
             break;
-        case enumMsgType.MsgType_HTLC_SendH_N43:
-            htlcSendH(msgType);
-            break;
-        case enumMsgType.MsgType_HTLC_SignGetH_N44:
-            htlcSignGetH(msgType);
-            break;
-        case enumMsgType.MsgType_HTLC_CreateCommitmentTx_N45:
-            createHtlcCTx(msgType);
-            break;
-        case enumMsgType.MsgType_HTLC_SendR_N46:
+        case enumMsgType.MsgType_HTLC_SendR_N45:
             htlcSendR(msgType);
             break;
-        case enumMsgType.MsgType_HTLC_VerifyR_N47:
+        case enumMsgType.MsgType_HTLC_VerifyR_N46:
             htlcVerifyR(msgType);
             break;
-        case enumMsgType.MsgType_HTLC_RequestCloseCurrTx_N48:
-            closeHtlcTx(msgType);
+        case enumMsgType.MsgType_HTLC_RequestCloseCurrTx_N49:
+            closeHTLC(msgType);
             break;
-        case enumMsgType.MsgType_HTLC_CloseSigned_N49:
-            closeHtlcTxSigned(msgType);
+        case enumMsgType.MsgType_HTLC_CloseSigned_N50:
+            closeHTLCSigned(msgType);
             break;
         case enumMsgType.MsgType_CloseChannelRequest_N38:
             closeChannel(msgType);
@@ -1202,42 +1180,32 @@ function displayOBDMessages(content) {
                 ' - accept a transfer.';
             msgHead = msgTime +  '  - RSMC: accept a transfer.';
             break;
-        case enumMsgType.MsgType_HTLC_FindPathAndSendH_N42:
+        case enumMsgType.MsgType_HTLC_AddHTLC_N40:
             content.result = 'HTLC - ' + content.from +
                 ' - launch a HTLC transfer.';
             msgHead = msgTime +  '  - HTLC: launch a HTLC transfer.';
             break;
-        case enumMsgType.MsgType_HTLC_SendH_N43:
-            content.result = 'HTLC - ' + content.from +
-                ' - send H to next node.';
-            msgHead = msgTime +  '  - HTLC: send H to next node.';
-            break;
-        case enumMsgType.MsgType_HTLC_SignGetH_N44:
+        case enumMsgType.MsgType_HTLC_AddHTLCSigned_N41:
             content.result = 'HTLC - ' + content.from +
                 ' - accept a HTLC transfer.';
             msgHead = msgTime +  '  - HTLC: accept a HTLC transfer.';
             break;
-        case enumMsgType.MsgType_HTLC_CreateCommitmentTx_N45:
-            content.result = 'HTLC - ' + content.from +
-                ' - had create HTLC commitment transactions.';
-            msgHead = msgTime +  '  - HTLC: had create HTLC commitment transactions.';
-            break;
-        case enumMsgType.MsgType_HTLC_SendR_N46:
+        case enumMsgType.MsgType_HTLC_SendR_N45:
             content.result = 'HTLC - ' + content.from +
                 ' - Sent R.';
             msgHead = msgTime +  '  - HTLC: Sent R.';
             break;
-        case enumMsgType.MsgType_HTLC_VerifyR_N47:
+        case enumMsgType.MsgType_HTLC_VerifyR_N46:
             content.result = 'HTLC - ' + content.from +
                 ' - Verify R.';
             msgHead = msgTime +  '  - HTLC: Verify R.';
             break;
-        case enumMsgType.MsgType_HTLC_RequestCloseCurrTx_N48:
+        case enumMsgType.MsgType_HTLC_RequestCloseCurrTx_N49:
             content.result = 'HTLC - ' + content.from +
                 ' - Request Close.';
             msgHead = msgTime +  '  - HTLC: Request Close.';
             break;
-        case enumMsgType.MsgType_HTLC_CloseSigned_N49:
+        case enumMsgType.MsgType_HTLC_CloseSigned_N50:
             content.result = 'HTLC - ' + content.result.msg;
             msgHead = msgTime +  '  - HTLC: Closed.';
             break;
@@ -1418,7 +1386,7 @@ function createApiNameDiv(obj) {
     newDiv.append(title);
 
     // create [api_description] element
-    createElement(newDiv, 'text', obj.getAttribute("description"));
+    createElement(newDiv, 'text', obj.getAttribute("description"), 'api_description');
 
     content_div.append(newDiv);
 }
@@ -1502,8 +1470,8 @@ function createInputParamDiv(obj, jsonFile) {
                 case enumMsgType.MsgType_FundingSign_BtcSign_N3500:
                 case enumMsgType.MsgType_FundingSign_AssetFundingSigned_N35:
                 case enumMsgType.MsgType_CommitmentTxSigned_RevokeAndAcknowledgeCommitmentTransaction_N352:
-                case enumMsgType.MsgType_HTLC_SignGetH_N44:
                 case enumMsgType.MsgType_CloseChannelSign_N39:
+                case enumMsgType.MsgType_HTLC_AddHTLCSigned_N41:
                     displayApprovalCheckbox(newDiv, obj, msgType);
                     content_div.append(newDiv);
                     break;
@@ -1551,8 +1519,8 @@ function displayApprovalCheckbox(content_div, obj, msgType) {
         case enumMsgType.MsgType_CommitmentTxSigned_RevokeAndAcknowledgeCommitmentTransaction_N352:
             element.id = 'checkbox_n352';
             break;
-        case enumMsgType.MsgType_HTLC_SignGetH_N44:
-            element.id = 'checkbox_n44';
+        case enumMsgType.MsgType_HTLC_AddHTLCSigned_N41:
+            element.id = 'checkbox_n41';
             break;
         case enumMsgType.MsgType_CloseChannelSign_N39:
             element.id = 'checkbox_n39';
@@ -1626,7 +1594,7 @@ function clickApproval(obj) {
                 $("#channel_address_private_keyDis").hide();
             }
             break;
-        case 'checkbox_n44':
+        case 'checkbox_n41':
             if (obj.checked) {
                 $("#curr_rsmc_temp_address_pub_key").show();
                 $("#curr_rsmc_temp_address_pub_keySel").show();
@@ -2044,32 +2012,26 @@ function createOBDResponseDiv(response, msgType) {
         case enumMsgType.MsgType_HTLC_Invoice_N4003:
             parseDataN4003(response);
             break;
+        case enumMsgType.MsgType_HTLC_FindPath_N4001:
+            parseDataN4001(response);
+            break;
         case enumMsgType.MsgType_HTLC_AddHTLC_N40:
             parseDataN40(response);
             break;
-        case enumMsgType.MsgType_HTLC_FindPathAndSendH_N42:
-            parseDataN42(response);
+        case enumMsgType.MsgType_HTLC_AddHTLCSigned_N41:
+            parseDataN41(response);
             break;
-        case enumMsgType.MsgType_HTLC_SendH_N43:
-            parseDataN43(response);
-            break;
-        case enumMsgType.MsgType_HTLC_SignGetH_N44:
-            parseDataN44(response);
-            break;
-        case enumMsgType.MsgType_HTLC_CreateCommitmentTx_N45:
+        case enumMsgType.MsgType_HTLC_SendR_N45:
             parseDataN45(response);
             break;
-        case enumMsgType.MsgType_HTLC_SendR_N46:
+        case enumMsgType.MsgType_HTLC_VerifyR_N46:
             parseDataN46(response);
             break;
-        case enumMsgType.MsgType_HTLC_VerifyR_N47:
-            parseDataN47(response);
-            break;
-        case enumMsgType.MsgType_HTLC_RequestCloseCurrTx_N48:
-            parseDataN48(response);
-            break;
-        case enumMsgType.MsgType_HTLC_CloseSigned_N49:
+        case enumMsgType.MsgType_HTLC_RequestCloseCurrTx_N49:
             parseDataN49(response);
+            break;
+        case enumMsgType.MsgType_HTLC_CloseSigned_N50:
+            parseDataN50(response);
             break;
         case enumMsgType.MsgType_CloseChannelRequest_N38:
             parseDataN38(response);
@@ -2504,8 +2466,8 @@ function parseDataN38(response) {
     }
 }
 
-// parseDataN49 - 
-function parseDataN49(response) {
+// parseDataN50 - 
+function parseDataN50(response) {
     var arrData = [
         'msg : ' + response.msg,
     ];
@@ -2519,8 +2481,8 @@ function parseDataN49(response) {
     }
 }
 
-// parseDataN48 - 
-function parseDataN48(response) {
+// parseDataN49 - 
+function parseDataN49(response) {
     var arrData = [
         'channel_id : ' + response.channel_id,
         'create_at : ' + response.create_at,
@@ -2540,26 +2502,9 @@ function parseDataN48(response) {
     }
 }
 
-// parseDataN47 - 
-function parseDataN47(response) {
-    var arrData = [
-        'r : ' + response.r,
-        'request_hash : ' + response.request_hash,
-    ];
-
-    for (let i = 0; i < arrData.length; i++) {
-        var point   = arrData[i].indexOf(':') + 1;
-        var title   = arrData[i].substring(0, point);
-        var content = arrData[i].substring(point);
-        createElement(obd_response_div, 'text', title);
-        createElement(obd_response_div, 'p', content, 'responseText');
-    }
-}
-
 // parseDataN46 - 
 function parseDataN46(response) {
     var arrData = [
-        'id : ' + response.id,
         'r : ' + response.r,
         'request_hash : ' + response.request_hash,
     ];
@@ -2589,64 +2534,57 @@ function parseDataN45(response) {
     }
 }
 
-// parseDataN44 - 
-function parseDataN44(response) {
-    var arrData = [
-        'approval : ' + response.approval,
-        'channelId : ' + response.channelId,
-        'request_hash : ' + response.request_hash,
-        'sender : ' + response.sender,
-    ];
-
-    for (let i = 0; i < arrData.length; i++) {
-        var point   = arrData[i].indexOf(':') + 1;
-        var title   = arrData[i].substring(0, point);
-        var content = arrData[i].substring(point);
-        createElement(obd_response_div, 'text', title);
-        createElement(obd_response_div, 'p', content, 'responseText');
-    }
-}
-
-// parseDataN42 - 
-function parseDataN42(response) {
-    var arrData = [
-        'channelId : ' + response.channelId,
-        'h : ' + response.h,
-        'request_hash : ' + response.request_hash,
-    ];
-
-    for (let i = 0; i < arrData.length; i++) {
-        var point   = arrData[i].indexOf(':') + 1;
-        var title   = arrData[i].substring(0, point);
-        var content = arrData[i].substring(point);
-        createElement(obd_response_div, 'text', title);
-        createElement(obd_response_div, 'p', content, 'responseText');
-    }
-}
-
-// parseDataN43 - 
-function parseDataN43(response) {
-    var arrData = [
-        'h : ' + response.h,
-        'request_hash : ' + response.request_hash,
-    ];
-
-    for (let i = 0; i < arrData.length; i++) {
-        var point   = arrData[i].indexOf(':') + 1;
-        var title   = arrData[i].substring(0, point);
-        var content = arrData[i].substring(point);
-        createElement(obd_response_div, 'text', title);
-        createElement(obd_response_div, 'p', content, 'responseText');
-    }
-}
-
 // parseDataN40 - 
 function parseDataN40(response) {
     var arrData = [
-        'recipient_user_peer_id : ' + response.recipient_user_peer_id,
+        'channelId : ' + response.channelId,
         'amount : ' + response.amount,
-        'property_id : ' + response.propertyId,
-        'msg : ' + response.msg,
+        'htlcChannelPath : ' + response.htlcChannelPath,
+        'htlcTxHex : ' + response.htlcTxHex,
+        'msgHash : ' + response.msgHash,
+        'rsmcTxHex : ' + response.rsmcTxHex,
+        'toOtherHex : ' + response.toOtherHex,
+    ];
+
+    for (let i = 0; i < arrData.length; i++) {
+        var point   = arrData[i].indexOf(':') + 1;
+        var title   = arrData[i].substring(0, point);
+        var content = arrData[i].substring(point);
+        createElement(obd_response_div, 'text', title);
+        createElement(obd_response_div, 'p', content, 'responseText');
+    }
+}
+
+// parseDataN41 - 
+function parseDataN41(response) {
+    var arrData = [
+        'channelId : ' + response.channelId,
+        'amount : ' + response.amount,
+        'htlcChannelPath : ' + response.htlcChannelPath,
+        'htlcTxHex : ' + response.htlcTxHex,
+        'msgHash : ' + response.msgHash,
+        'rsmcTxHex : ' + response.rsmcTxHex,
+        'toOtherHex : ' + response.toOtherHex,
+    ];
+
+    for (let i = 0; i < arrData.length; i++) {
+        var point   = arrData[i].indexOf(':') + 1;
+        var title   = arrData[i].substring(0, point);
+        var content = arrData[i].substring(point);
+        createElement(obd_response_div, 'text', title);
+        createElement(obd_response_div, 'p', content, 'responseText');
+    }
+}
+
+// parseDataN4001    - 
+function parseDataN4001(response) {
+    var arrData = [
+        // 'recipient_user_peer_id : ' + response.recipient_user_peer_id,
+        // 'amount : ' + response.amount,
+        // 'property_id : ' + response.propertyId,
+        // 'msg : ' + response.msg,
+        'channelPath : '    + response.channelPath,
+        'nextNodePeerId : ' + response.nextNodePeerId,
     ];
 
     for (let i = 0; i < arrData.length; i++) {
@@ -3236,27 +3174,17 @@ function saveChannelList(response, channelID, msgType, info) {
         for (let i = 0; i < list.result.length; i++) {
             if (chID === list.result[i].temporary_channel_id) {
                 switch (msgType) {
-                    case enumMsgType.MsgType_HTLC_FindPathAndSendH_N42:
+                    case enumMsgType.MsgType_HTLC_AddHTLC_N40:
                         list.result[i].htlc.push(htlcData(response, msgType, info));
                         break;
-                    case enumMsgType.MsgType_HTLC_SignGetH_N44:
+                    case enumMsgType.MsgType_HTLC_AddHTLCSigned_N41:
                         for (let i2 = 0; i2 < list.result[i].htlc.length; i2++) {
                             if ($("#request_hash").val() === list.result[i].htlc[i2].request_hash) {
                                 updateHtlcData(response, list.result[i].htlc[i2], msgType);
                             }
                         }
                         break;
-                    case enumMsgType.MsgType_HTLC_CreateCommitmentTx_N45:
-                    case enumMsgType.MsgType_HTLC_VerifyR_N47:
-                        for (let i2 = 0; i2 < list.result[i].htlc.length; i2++) {
-                            if ($("#request_hash").val() === list.result[i].htlc[i2].request_hash) {
-                                list.result[i].htlc[i2].request_hash = response.request_hash;
-                                list.result[i].htlc[i2].msgType = msgType;
-                                list.result[i].htlc[i2].date = new Date().toLocaleString();
-                            }
-                        }
-                        break;
-                    case enumMsgType.MsgType_HTLC_SendR_N46:
+                    case enumMsgType.MsgType_HTLC_SendR_N45:
                         for (let i2 = 0; i2 < list.result[i].htlc.length; i2++) {
                             if ($("#request_hash").val() === list.result[i].htlc[i2].request_hash) {
                                 list.result[i].htlc[i2].r = response.r;
@@ -3266,12 +3194,21 @@ function saveChannelList(response, channelID, msgType, info) {
                             }
                         }
                         break;
-                    case enumMsgType.MsgType_HTLC_RequestCloseCurrTx_N48:
+                    case enumMsgType.MsgType_HTLC_VerifyR_N46:
+                        for (let i2 = 0; i2 < list.result[i].htlc.length; i2++) {
+                            if ($("#request_hash").val() === list.result[i].htlc[i2].request_hash) {
+                                list.result[i].htlc[i2].request_hash = response.request_hash;
+                                list.result[i].htlc[i2].msgType = msgType;
+                                list.result[i].htlc[i2].date = new Date().toLocaleString();
+                            }
+                        }
+                        break;
+                    case enumMsgType.MsgType_HTLC_RequestCloseCurrTx_N49:
                         list.result[i].htlc.push(htlcData(response, msgType));
                         break;
-                    case enumMsgType.MsgType_HTLC_CloseSigned_N49:
+                    case enumMsgType.MsgType_HTLC_CloseSigned_N50:
                         for (let i2 = 0; i2 < list.result[i].htlc.length; i2++) {
-                            if ($("#request_close_htlc_hash").val() === list.result[i].htlc[i2].request_hash) {
+                            if ($("#request_hash").val() === list.result[i].htlc[i2].request_hash) {
                                 list.result[i].htlc[i2].msgType = msgType;
                                 list.result[i].htlc[i2].date = new Date().toLocaleString();
                             }
@@ -4328,26 +4265,23 @@ function htlcRecord(parent, list, i) {
 
             var status;
             switch (list.result[i].htlc[i2].msgType) {
-                case enumMsgType.MsgType_HTLC_FindPathAndSendH_N42:
-                    status = 'FindPathAndSendH (-42)';
+                case enumMsgType.MsgType_HTLC_AddHTLC_N40:
+                    status = 'HTLC-Created (-40)';
                     break;
-                case enumMsgType.MsgType_HTLC_SignGetH_N44:
-                    status = 'H-Signed (-44)';
+                case enumMsgType.MsgType_HTLC_AddHTLCSigned_N41:
+                    status = 'HTLC-Signed (-41)';
                     break;
-                case enumMsgType.MsgType_HTLC_CreateCommitmentTx_N45:
-                    status = 'CreateCTx (-45)';
+                case enumMsgType.MsgType_HTLC_SendR_N45:
+                    status = 'Send R (-45)';
                     break;
-                case enumMsgType.MsgType_HTLC_SendR_N46:
-                    status = 'Send R (-46)';
+                case enumMsgType.MsgType_HTLC_VerifyR_N46:
+                    status = 'Verify R (-46)';
                     break;
-                case enumMsgType.MsgType_HTLC_VerifyR_N47:
-                    status = 'Verify R (-47)';
+                case enumMsgType.MsgType_HTLC_RequestCloseCurrTx_N49:
+                    status = 'Request Close (-49)';
                     break;
-                case enumMsgType.MsgType_HTLC_RequestCloseCurrTx_N48:
-                    status = 'Request Close (-48)';
-                    break;
-                case enumMsgType.MsgType_HTLC_CloseSigned_N49:
-                    status = 'Closed (-49)';
+                case enumMsgType.MsgType_HTLC_CloseSigned_N50:
+                    status = 'Closed (-50)';
                     break;
             }
 
@@ -4357,8 +4291,8 @@ function htlcRecord(parent, list, i) {
             createElement(parent, 'p', '---------------------------------------------');
 
             switch (list.result[i].htlc[i2].msgType) {
-                case enumMsgType.MsgType_HTLC_RequestCloseCurrTx_N48:
-                case enumMsgType.MsgType_HTLC_CloseSigned_N49:
+                case enumMsgType.MsgType_HTLC_RequestCloseCurrTx_N49:
+                case enumMsgType.MsgType_HTLC_CloseSigned_N50:
                     arrData = [
                         'channel_id : ' + list.result[i].htlc[i2].channel_id,
                         'create_at : ' + list.result[i].htlc[i2].create_at,

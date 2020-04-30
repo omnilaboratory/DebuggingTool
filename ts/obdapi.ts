@@ -265,32 +265,26 @@ class ObdApi {
       case this.messageType.MsgType_HTLC_Invoice_N4003:
         this.onHtlcInvoice(resultData);
         break;
+      case this.messageType.MsgType_HTLC_FindPath_N4001:
+        this.onHtlcFindPath(resultData);
+        break;
       case this.messageType.MsgType_HTLC_AddHTLC_N40:
-        this.onAddHtlc(resultData);
+        this.onHtlcCreated(resultData);
         break;
-      case this.messageType.MsgType_HTLC_FindPathAndSendH_N42:
-        this.onHtlcFindPathAndSendH(resultData);
+      case this.messageType.MsgType_HTLC_AddHTLCSigned_N41:
+        this.onHtlcSigned(resultData);
         break;
-      case this.messageType.MsgType_HTLC_SendH_N43:
-        this.onHtlcSendH(resultData);
-        break;
-      case this.messageType.MsgType_HTLC_SignGetH_N44:
-        this.onHtlcSignGetH(resultData);
-        break;
-      case this.messageType.MsgType_HTLC_CreateCommitmentTx_N45:
-        this.onHtlcCreateCommitmentTx(resultData);
-        break;
-      case this.messageType.MsgType_HTLC_SendR_N46:
+      case this.messageType.MsgType_HTLC_SendR_N45:
         this.onHtlcSendR(resultData);
         break;
-      case this.messageType.MsgType_HTLC_VerifyR_N47:
+      case this.messageType.MsgType_HTLC_VerifyR_N46:
         this.onHtlcVerifyR(resultData);
         break;
-      case this.messageType.MsgType_HTLC_RequestCloseCurrTx_N48:
-        this.onCloseHtlcTx(resultData);
+      case this.messageType.MsgType_HTLC_RequestCloseCurrTx_N49:
+        this.onCloseHTLC(resultData);
         break;
-      case this.messageType.MsgType_HTLC_CloseSigned_N49:
-        this.onCloseHtlcTxSigned(resultData);
+      case this.messageType.MsgType_HTLC_CloseSigned_N50:
+        this.onCloseHTLCSigned(resultData);
         break;
 
       case this.messageType.MsgType_Core_Omni_GetTransaction_1206:
@@ -891,10 +885,10 @@ class ObdApi {
 
   /**
    * MsgType_HTLC_Invoice_N4003
-   * @param info HtlcHInfo
+   * @param info HtlcFindPathInfo
    * @param callback function
    */
-  public htlcInvoice(info: HtlcHInfo, callback: Function) {
+  public htlcInvoice(info: HtlcFindPathInfo, callback: Function) {
     if (this.isNotString(info.recipient_user_peer_id)) {
       alert("empty recipient_user_peer_id");
       return;
@@ -916,11 +910,15 @@ class ObdApi {
   public onHtlcInvoice(jsonData: any) {}
 
   /**
-   * MsgType_HTLC_AddHTLC_N40
+   * MsgType_HTLC_FindPath_N4001
    * @param info HtlcHInfo
    * @param callback function
    */
-  public addHtlc(info: HtlcHInfo, callback: Function) {
+  public htlcFindPath(info: HtlcFindPathInfo, callback: Function) {
+    if (this.isNotString(info.recipient_node_peer_id)) {
+      alert("empty recipient_node_peer_id");
+      return;
+    }
     if (this.isNotString(info.recipient_user_peer_id)) {
       alert("empty recipient_user_peer_id");
       return;
@@ -934,31 +932,41 @@ class ObdApi {
       return;
     }
     let msg = new Message();
-    msg.type = this.messageType.MsgType_HTLC_AddHTLC_N40;
+    msg.type = this.messageType.MsgType_HTLC_FindPath_N4001;
     msg.data = info;
     this.sendData(msg, callback);
   }
-  public onAddHtlc(jsonData: any) {}
+  public onHtlcFindPath(jsonData: any) {}
 
   /**
-   * MsgType_HTLC_FindPathAndSendH_N42
-   * @param h string
+   * MsgType_HTLC_AddHTLC_N40
+   * @param recipient_node_peer_id string 
+   * @param recipient_user_peer_id string 
+   * @param info HtlcCreatedInfo
    * @param callback function
    */
-  public htlcFindPathAndSendH(
-    info: HtlcRequestFindPathAndSendH,
-    callback: Function
-  ) {
+  public htlcCreated(
+    recipient_node_peer_id: string,
+    recipient_user_peer_id: string,
+    info: HtlcCreatedInfo, 
+    callback: Function) {
+
+    if (this.isNotString(recipient_node_peer_id)) {
+      alert("error recipient_node_peer_id");
+      return;
+    }
+    
+    if (this.isNotString(recipient_user_peer_id)) {
+      alert("error recipient_user_peer_id");
+      return;
+    }
+
     if (this.isNotString(info.h)) {
       alert("empty h");
       return;
     }
-    if (this.isNotString(info.recipient_user_peer_id)) {
-      alert("empty recipient_user_peer_id");
-      return;
-    }
     if (info.property_id <= 0) {
-      alert("wrong recipient_user_peer_id");
+      alert("wrong property_id");
       return;
     }
     if (info.amount <= 0) {
@@ -969,90 +977,12 @@ class ObdApi {
     if (this.isNotString(info.memo)) {
       info.memo = "";
     }
-    let msg = new Message();
-    msg.type = this.messageType.MsgType_HTLC_FindPathAndSendH_N42;
-    msg.data = info;
-    this.sendData(msg, callback);
-  }
-  public onHtlcFindPathAndSendH(jsonData: any) {}
 
-  /**
-   * MsgType_HTLC_SendH_N43
-   * @param h string
-   * @param request_hash string
-   * @param callback function
-   */
-  public htlcSendH(h: string, request_hash: string, callback: Function) {
-    if (this.isNotString(h)) {
-      alert("empty h");
-      return;
-    }
-    if (this.isNotString(request_hash)) {
-      alert("empty request_hash");
-      return;
-    }
-    let msg = new Message();
-    msg.type = this.messageType.MsgType_HTLC_SendH_N43;
-    msg.data["h"] = h;
-    msg.data["h_and_r_info_request_hash"] = request_hash;
-    this.sendData(msg, callback);
-  }
-  public onHtlcSendH(jsonData: any) {}
-
-  /**
-   * MsgType_HTLC_SignGetH_N44
-   * @param info SignGetHInfo
-   * @param callback function
-   */
-  public htlcSignGetH(info: SignGetHInfo, callback: Function) {
-    if (this.isNotString(info.request_hash)) {
-      alert("empty request_hash");
+    if (this.isNotString(info.htlc_channel_path)) {
+      alert("empty htlc_channel_path");
       return;
     }
 
-    if (info.approval == null) {
-      info.approval = false;
-    }
-    if (info.approval == true) {
-      if (this.isNotString(info.channel_address_private_key)) {
-        alert("empty channel_address_private_key");
-        return;
-      }
-      if (this.isNotString(info.curr_rsmc_temp_address_pub_key)) {
-        alert("empty curr_rsmc_temp_address_pub_key");
-        return;
-      }
-      if (this.isNotString(info.curr_rsmc_temp_address_private_key)) {
-        alert("empty curr_rsmc_temp_address_private_key");
-        return;
-      }
-      if (this.isNotString(info.curr_htlc_temp_address_pub_key)) {
-        alert("empty curr_htlc_temp_address_pub_key");
-        return;
-      }
-      if (this.isNotString(info.curr_htlc_temp_address_private_key)) {
-        alert("empty curr_htlc_temp_address_private_key");
-        return;
-      }
-    }
-
-    let msg = new Message();
-    msg.type = this.messageType.MsgType_HTLC_SignGetH_N44;
-    msg.data = info;
-    this.sendData(msg, callback);
-  }
-  public onHtlcSignGetH(jsonData: any) {}
-
-  /**
-   * MsgType_HTLC_CreateCommitmentTx_N45
-   * @param info HtlcRequestOpen
-   * @param callback function
-   */
-  public htlcCreateCommitmentTx(info: HtlcRequestOpen, callback: Function) {
-    if (this.isNotString(info.request_hash)) {
-      alert("empty request_hash");
-      return;
-    }
     if (this.isNotString(info.channel_address_private_key)) {
       alert("empty channel_address_private_key");
       return;
@@ -1087,70 +1017,188 @@ class ObdApi {
     }
 
     let msg = new Message();
-    msg.type = this.messageType.MsgType_HTLC_CreateCommitmentTx_N45;
+    msg.type = this.messageType.MsgType_HTLC_AddHTLC_N40;
     msg.data = info;
+    msg.recipient_user_peer_id = recipient_user_peer_id;
+    msg.recipient_node_peer_id = recipient_node_peer_id;
     this.sendData(msg, callback);
   }
-  public onHtlcCreateCommitmentTx(jsonData: any) {}
+  public onHtlcCreated(jsonData: any) {}
 
-  /* ***************** backward R begin*****************/
   /**
-   * MsgType_HTLC_SendR_N46
-   * @param info HtlcSendRInfo
+   * MsgType_HTLC_AddHTLCSigned_N41
+   * @param recipient_node_peer_id string 
+   * @param recipient_user_peer_id string 
+   * @param info HtlcSignedInfo
    * @param callback function
    */
-  public htlcSendR(info: HtlcSendRInfo, callback: Function) {
+  public htlcSigned(
+    recipient_node_peer_id: string,
+    recipient_user_peer_id: string,
+    info: HtlcSignedInfo, 
+    callback: Function) {
+
+    if (this.isNotString(recipient_node_peer_id)) {
+      alert("error recipient_node_peer_id");
+      return;
+    }
+    
+    if (this.isNotString(recipient_user_peer_id)) {
+      alert("error recipient_user_peer_id");
+      return;
+    }
+
     if (this.isNotString(info.request_hash)) {
       alert("empty request_hash");
       return;
     }
+
+    if (info.approval == null) {
+      info.approval = false;
+    }
+
+    if (info.approval == true) {
+      if (this.isNotString(info.channel_address_private_key)) {
+        alert("empty channel_address_private_key");
+        return;
+      }
+      if (this.isNotString(info.last_temp_address_private_key)) {
+        alert("empty last_temp_address_private_key");
+        return;
+      }
+      if (this.isNotString(info.curr_rsmc_temp_address_pub_key)) {
+        alert("empty curr_rsmc_temp_address_pub_key");
+        return;
+      }
+      if (this.isNotString(info.curr_rsmc_temp_address_private_key)) {
+        alert("empty curr_rsmc_temp_address_private_key");
+        return;
+      }
+      if (this.isNotString(info.curr_htlc_temp_address_pub_key)) {
+        alert("empty curr_htlc_temp_address_pub_key");
+        return;
+      }
+      if (this.isNotString(info.curr_htlc_temp_address_private_key)) {
+        alert("empty curr_htlc_temp_address_private_key");
+        return;
+      }
+    }
+
+    let msg = new Message();
+    msg.type = this.messageType.MsgType_HTLC_AddHTLCSigned_N41;
+    msg.data = info;
+    msg.recipient_user_peer_id = recipient_user_peer_id;
+    msg.recipient_node_peer_id = recipient_node_peer_id;
+    this.sendData(msg, callback);
+  }
+  public onHtlcSigned(jsonData: any) {}
+
+  /* ***************** backward R begin*****************/
+  /**
+   * MsgType_HTLC_SendR_N45
+   * @param recipient_node_peer_id string 
+   * @param recipient_user_peer_id string 
+   * @param info HtlcSendRInfo
+   * @param callback function
+   */
+  public htlcSendR(
+    recipient_node_peer_id: string,
+    recipient_user_peer_id: string,
+    info: HtlcSendRInfo, 
+    callback: Function) {
+
+    if (this.isNotString(recipient_node_peer_id)) {
+      alert("error recipient_node_peer_id");
+      return;
+    }
+    
+    if (this.isNotString(recipient_user_peer_id)) {
+      alert("error recipient_user_peer_id");
+      return;
+    }
+
+    if (this.isNotString(info.channel_id)) {
+      alert("empty channel_id");
+      return;
+    }
+
     if (this.isNotString(info.r)) {
       alert("empty r");
       return;
     }
+
     if (this.isNotString(info.channel_address_private_key)) {
-      alert(
-        "empty channel_address_private_keycurr_htlc_temp_address_he1b_ofh_private_key"
-      );
+      alert("empty channel_address_private_key");
       return;
     }
+
     if (this.isNotString(info.curr_htlc_temp_address_for_he1b_pub_key)) {
       alert("empty curr_htlc_temp_address_for_he1b_pub_key");
       return;
     }
+
     if (this.isNotString(info.curr_htlc_temp_address_for_he1b_private_key)) {
       alert("empty curr_htlc_temp_address_for_he1b_private_key");
       return;
     }
+
     let msg = new Message();
-    msg.type = this.messageType.MsgType_HTLC_SendR_N46;
+    msg.type = this.messageType.MsgType_HTLC_SendR_N45;
     msg.data = info;
+    msg.recipient_user_peer_id = recipient_user_peer_id;
+    msg.recipient_node_peer_id = recipient_node_peer_id;
     this.sendData(msg, callback);
   }
   public onHtlcSendR(jsonData: any) {}
 
   /**
-   * MsgType_HTLC_VerifyR_N47
+   * MsgType_HTLC_VerifyR_N46
+   * @param recipient_node_peer_id string 
+   * @param recipient_user_peer_id string
    * @param info HtlcVerifyRInfo
    * @param callback function
    */
-  public htlcVerifyR(info: HtlcVerifyRInfo, callback: Function) {
+  public htlcVerifyR(
+    recipient_node_peer_id: string,
+    recipient_user_peer_id: string,
+    info: HtlcVerifyRInfo, 
+    callback: Function) {
+
+    if (this.isNotString(recipient_node_peer_id)) {
+      alert("error recipient_node_peer_id");
+      return;
+    }
+    
+    if (this.isNotString(recipient_user_peer_id)) {
+      alert("error recipient_user_peer_id");
+      return;
+    }
+
+    if (this.isNotString(info.channel_id)) {
+      alert("empty channel_id");
+      return;
+    }
+
     if (this.isNotString(info.request_hash)) {
       alert("empty request_hash");
       return;
     }
+
     if (this.isNotString(info.r)) {
       alert("empty r");
       return;
     }
+
     if (this.isNotString(info.channel_address_private_key)) {
       alert("empty channel_address_private_key");
       return;
     }
 
     let msg = new Message();
-    msg.type = this.messageType.MsgType_HTLC_VerifyR_N47;
+    msg.type = this.messageType.MsgType_HTLC_VerifyR_N46;
     msg.data = info;
+    msg.recipient_user_peer_id = recipient_user_peer_id;
+    msg.recipient_node_peer_id = recipient_node_peer_id;
     this.sendData(msg, callback);
   }
   public onHtlcVerifyR(jsonData: any) {}
@@ -1158,24 +1206,47 @@ class ObdApi {
 
   /* ***************** close htlc tx begin*****************/
   /**
-   * MsgType_HTLC_RequestCloseCurrTx_N48
+   * MsgType_HTLC_RequestCloseCurrTx_N49
+   * @param recipient_node_peer_id string 
+   * @param recipient_user_peer_id string
    * @param info CloseHtlcTxInfo
    * @param callback function
    * */
-  public closeHtlcTx(info: CloseHtlcTxInfo, callback: Function) {
+  public closeHTLC(
+    recipient_node_peer_id: string,
+    recipient_user_peer_id: string,
+    info: CloseHtlcTxInfo, 
+    callback: Function) {
+
+    if (this.isNotString(recipient_node_peer_id)) {
+      alert("error recipient_node_peer_id");
+      return;
+    }
+    
+    if (this.isNotString(recipient_user_peer_id)) {
+      alert("error recipient_user_peer_id");
+      return;
+    }
+  
     if (this.isNotString(info.channel_id)) {
       alert("empty channel_id");
       return;
     }
+
     if (this.isNotString(info.channel_address_private_key)) {
       alert("empty channel_address_private_key");
       return;
     }
+
     if (this.isNotString(info.last_rsmc_temp_address_private_key)) {
       alert("empty last_rsmc_temp_address_private_key");
       return;
     }
     if (this.isNotString(info.last_htlc_temp_address_private_key)) {
+      alert("empty last_htlc_temp_address_private_key");
+      return;
+    }
+    if (this.isNotString(info.last_htlc_temp_address_for_htnx_private_key)) {
       alert("empty last_htlc_temp_address_private_key");
       return;
     }
@@ -1189,19 +1260,38 @@ class ObdApi {
     }
 
     let msg = new Message();
-    msg.type = this.messageType.MsgType_HTLC_RequestCloseCurrTx_N48;
+    msg.type = this.messageType.MsgType_HTLC_RequestCloseCurrTx_N49;
     msg.data = info;
+    msg.recipient_user_peer_id = recipient_user_peer_id;
+    msg.recipient_node_peer_id = recipient_node_peer_id;
     this.sendData(msg, callback);
   }
-  public onCloseHtlcTx(jsonData: any) {}
+  public onCloseHTLC(jsonData: any) {}
 
   /**
-   * MsgType_HTLC_CloseSigned_N49
+   * MsgType_HTLC_CloseSigned_N50
+   * @param recipient_node_peer_id string 
+   * @param recipient_user_peer_id string
    * @param info CloseHtlcTxInfoSigned
    * @param callback function
    */
-  public closeHtlcTxSigned(info: CloseHtlcTxInfoSigned, callback: Function) {
-    if (this.isNotString(info.request_close_htlc_hash)) {
+  public closeHTLCSigned(
+    recipient_node_peer_id: string,
+    recipient_user_peer_id: string,
+    info: CloseHtlcTxInfoSigned, 
+    callback: Function) {
+
+    if (this.isNotString(recipient_node_peer_id)) {
+      alert("error recipient_node_peer_id");
+      return;
+    }
+    
+    if (this.isNotString(recipient_user_peer_id)) {
+      alert("error recipient_user_peer_id");
+      return;
+    }
+
+    if (this.isNotString(info.request_hash)) {
       alert("empty request_close_htlc_hash");
       return;
     }
@@ -1230,11 +1320,13 @@ class ObdApi {
       return;
     }
     let msg = new Message();
-    msg.type = this.messageType.MsgType_HTLC_CloseSigned_N49;
+    msg.type = this.messageType.MsgType_HTLC_CloseSigned_N50;
+    msg.recipient_user_peer_id = recipient_user_peer_id;
+    msg.recipient_node_peer_id = recipient_node_peer_id;
     msg.data = info;
     this.sendData(msg, callback);
   }
-  public onCloseHtlcTxSigned(jsonData: any) {}
+  public onCloseHTLCSigned(jsonData: any) {}
 
   /* ***************** close htlc tx end*****************/
 
@@ -1456,7 +1548,7 @@ class ObdApi {
    */
   public getHtlcCreatedRandHInfoList(callback: Function) {
     let msg = new Message();
-    msg.type = this.messageType.MsgType_HTLC_CreatedRAndHInfoList_N4001;
+    // msg.type = this.messageType.MsgType_HTLC_CreatedRAndHInfoList_N4001;
     this.sendData(msg, callback);
   }
   public onGetHtlcCreatedRandHInfoList(jsonData: any) {}
@@ -1467,7 +1559,7 @@ class ObdApi {
    */
   public getHtlcSignedRandHInfoList(callback: Function) {
     let msg = new Message();
-    msg.type = this.messageType.MsgType_HTLC_SignedRAndHInfoList_N4101;
+    // msg.type = this.messageType.MsgType_HTLC_SignedRAndHInfoList_N4101;
     this.sendData(msg, callback);
   }
   public onGetHtlcSignedRandHInfoList(jsonData: any) {}
@@ -1483,7 +1575,7 @@ class ObdApi {
       return;
     }
     let msg = new Message();
-    msg.type = this.messageType.MsgType_HTLC_GetRFromLCommitTx_N4103;
+    // msg.type = this.messageType.MsgType_HTLC_GetRFromLCommitTx_N4103;
     msg.data["channel_id"] = channel_id;
     this.sendData(msg, callback);
   }
@@ -1500,7 +1592,7 @@ class ObdApi {
       return;
     }
     let msg = new Message();
-    msg.type = this.messageType.MsgType_HTLC_GetPathInfoByH_N4104;
+    // msg.type = this.messageType.MsgType_HTLC_GetPathInfoByH_N4104;
     msg.data = h;
     this.sendData(msg, callback);
   }
@@ -1516,7 +1608,7 @@ class ObdApi {
       return;
     }
     let msg = new Message();
-    msg.type = this.messageType.MsgType_HTLC_GetRInfoByHOfOwner_N4105;
+    // msg.type = this.messageType.MsgType_HTLC_GetRInfoByHOfOwner_N4105;
     msg.data = h;
     this.sendData(msg, callback);
   }

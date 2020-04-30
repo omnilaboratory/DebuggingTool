@@ -145,7 +145,7 @@
                 },
                 {
                     "name": "from_address_private_key",
-                    "help": "Why need private key?",
+                    "help": "Why need private key? OBD use private key to sign a raw transaction.",
                     "buttons": [
                         {
                             "innerText": "Select",
@@ -597,9 +597,27 @@
         },
         {
             "id": "HTLCFindPath",
-            "type_id": -40,
+            "type_id": -4001,
             "description": "HTLCFindPath is used to find a routing between A and B node for launch a HTLC transfer.",
             "parameters": [
+                {
+                    "name": "recipient_node_peer_id",
+                    "buttons": [
+                        {
+                            "innerText": "Counterparties",
+                            "onclick": "displayUserDataInNewHtml('Counterparties')"
+                        }
+                    ]
+                },
+                {
+                    "name": "recipient_user_peer_id",
+                    "buttons": [
+                        {
+                            "innerText": "Counterparties",
+                            "onclick": "displayUserDataInNewHtml('Counterparties')"
+                        }
+                    ]
+                },
                 {
                     "name": "property_id",
                     "buttons": [
@@ -612,6 +630,22 @@
                 {
                     "name": "amount",
                     "buttons": []
+                }
+            ]
+        },
+        {
+            "id": "HTLCCreated",
+            "type_id": -40,
+            "description": "HTLCCreated is used for looking for a path to transfer to target and Send H to middleman.",
+            "parameters": [
+                {
+                    "name": "recipient_node_peer_id",
+                    "buttons": [
+                        {
+                            "innerText": "Counterparties",
+                            "onclick": "displayUserDataInNewHtml('Counterparties')"
+                        }
+                    ]
                 },
                 {
                     "name": "recipient_user_peer_id",
@@ -621,153 +655,35 @@
                             "onclick": "displayUserDataInNewHtml('Counterparties')"
                         }
                     ]
-                }
-            ]
-        },
-        {
-            "id": "HTLCFindPathAndSendH",
-            "type_id": -42,
-            "description": "HTLCFindPathAndSendH is used for looking for a path to transfer to target and Send H to middleman.",
-            "parameters": [
+                },
                 {
-                    "name": "h",
+                    "name": "property_id",
                     "buttons": [
                         {
                             "innerText": "Display",
                             "onclick": "displayUserDataInNewHtml('MyAddresses')"
                         }
                     ]
+                },
+                {
+                    "name": "amount",
+                    "buttons": []
                 },
                 {
                     "name": "memo",
                     "buttons": []
                 },
                 {
-                    "name": "property_id",
-                    "buttons": [
-                        {
-                            "innerText": "Display",
-                            "onclick": "displayUserDataInNewHtml('MyAddresses')"
-                        }
-                    ]
-                },
-                {
-                    "name": "amount",
-                    "buttons": []
-                },
-                {
-                    "name": "recipient_user_peer_id",
-                    "buttons": [
-                        {
-                            "innerText": "Counterparties",
-                            "onclick": "displayUserDataInNewHtml('Counterparties')"
-                        }
-                    ]
-                }
-            ]
-        },
-        {
-            "id": "HTLCSendH",
-            "type_id": -43,
-            "description": "HTLCSendH is used to send the H to next node.",
-            "parameters": [
-                {
                     "name": "h",
                     "buttons": [
                         {
                             "innerText": "Display",
-                            "onclick": "displayUserDataInNewHtml('ChannelList')"
-                        }
-                    ]
-                },
-                {
-                    "name": "request_hash",
-                    "buttons": [
-                        {
-                            "innerText": "Display",
-                            "onclick": "displayUserDataInNewHtml('ChannelList')"
-                        }
-                    ]
-                }
-            ]
-        },
-        {
-            "id": "HTLCSignGetH",
-            "type_id": -44,
-            "description": "HTLCSignGetH is used to response a routing request by middleman..",
-            "parameters": [
-                {
-                    "name": "request_hash",
-                    "buttons": [
-                        {
-                            "innerText": "Display",
-                            "onclick": "displayUserDataInNewHtml('ChannelList')"
-                        }
-                    ]
-                },
-                {
-                    "name": "channel_address_private_key",
-                    "buttons": [
-                        {
-                            "innerText": "Display",
                             "onclick": "displayUserDataInNewHtml('MyAddresses')"
                         }
                     ]
                 },
                 {
-                    "name": "last_temp_address_private_key",
-                    "buttons": [
-                        {
-                            "innerText": "Display",
-                            "onclick": "displayUserDataInNewHtml('MyAddresses')"
-                        }
-                    ]
-                },
-                {
-                    "name": "curr_rsmc_temp_address_pub_key",
-                    "buttons": [
-                        {
-                            "innerText": "Select",
-                            "onclick": "displayUserDataInNewHtml('MyAddresses')"
-                        }
-                    ]
-                },
-                {
-                    "name": "curr_rsmc_temp_address_private_key",
-                    "buttons": [
-                        {
-                            "innerText": "Select",
-                            "onclick": "displayUserDataInNewHtml('MyAddresses')"
-                        }
-                    ]
-                },
-                {
-                    "name": "curr_htlc_temp_address_pub_key",
-                    "buttons": [
-                        {
-                            "innerText": "Select",
-                            "onclick": "displayUserDataInNewHtml('MyAddresses')"
-                        }
-                    ]
-                },
-                {
-                    "name": "curr_htlc_temp_address_private_key",
-                    "buttons": [
-                        {
-                            "innerText": "Select",
-                            "onclick": "displayUserDataInNewHtml('MyAddresses')"
-                        }
-                    ]
-                }
-            ]
-        },
-        {
-            "id": "CreateHtlcCTx",
-            "type_id": -45,
-            "description": "CreateHtlcCTx is used to create HTLC commitment transactions.",
-            "parameters": [
-                {
-                    "name": "request_hash",
+                    "name": "htlc_channel_path",
                     "buttons": [
                         {
                             "innerText": "Display",
@@ -850,12 +766,118 @@
             ]
         },
         {
+            "id": "HTLCSigned",
+            "type_id": -41,
+            "description": "HTLCSigned is used to response a routing request by middleman.",
+            "parameters": [
+                {
+                    "name": "recipient_node_peer_id",
+                    "buttons": [
+                        {
+                            "innerText": "Counterparties",
+                            "onclick": "displayUserDataInNewHtml('Counterparties')"
+                        }
+                    ]
+                },
+                {
+                    "name": "recipient_user_peer_id",
+                    "buttons": [
+                        {
+                            "innerText": "Counterparties",
+                            "onclick": "displayUserDataInNewHtml('Counterparties')"
+                        }
+                    ]
+                },
+                {
+                    "name": "request_hash",
+                    "buttons": [
+                        {
+                            "innerText": "Display",
+                            "onclick": "displayUserDataInNewHtml('ChannelList')"
+                        }
+                    ]
+                },
+                {
+                    "name": "channel_address_private_key",
+                    "buttons": [
+                        {
+                            "innerText": "Display",
+                            "onclick": "displayUserDataInNewHtml('MyAddresses')"
+                        }
+                    ]
+                },
+                {
+                    "name": "last_temp_address_private_key",
+                    "buttons": [
+                        {
+                            "innerText": "Display",
+                            "onclick": "displayUserDataInNewHtml('MyAddresses')"
+                        }
+                    ]
+                },
+                {
+                    "name": "curr_rsmc_temp_address_pub_key",
+                    "buttons": [
+                        {
+                            "innerText": "Select",
+                            "onclick": "displayUserDataInNewHtml('MyAddresses')"
+                        }
+                    ]
+                },
+                {
+                    "name": "curr_rsmc_temp_address_private_key",
+                    "buttons": [
+                        {
+                            "innerText": "Select",
+                            "onclick": "displayUserDataInNewHtml('MyAddresses')"
+                        }
+                    ]
+                },
+                {
+                    "name": "curr_htlc_temp_address_pub_key",
+                    "buttons": [
+                        {
+                            "innerText": "Select",
+                            "onclick": "displayUserDataInNewHtml('MyAddresses')"
+                        }
+                    ]
+                },
+                {
+                    "name": "curr_htlc_temp_address_private_key",
+                    "buttons": [
+                        {
+                            "innerText": "Select",
+                            "onclick": "displayUserDataInNewHtml('MyAddresses')"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
             "id": "HTLCSendR",
-            "type_id": -46,
+            "type_id": -45,
             "description": "HTLCSendR is used to forward R to a node.",
             "parameters": [
                 {
-                    "name": "request_hash",
+                    "name": "recipient_node_peer_id",
+                    "buttons": [
+                        {
+                            "innerText": "Counterparties",
+                            "onclick": "displayUserDataInNewHtml('Counterparties')"
+                        }
+                    ]
+                },
+                {
+                    "name": "recipient_user_peer_id",
+                    "buttons": [
+                        {
+                            "innerText": "Counterparties",
+                            "onclick": "displayUserDataInNewHtml('Counterparties')"
+                        }
+                    ]
+                },
+                {
+                    "name": "channel_id",
                     "buttons": [
                         {
                             "innerText": "Display",
@@ -903,9 +925,36 @@
         },
         {
             "id": "HTLCVerifyR",
-            "type_id": -47,
+            "type_id": -46,
             "description": "HTLCVerifyR: Reciever reverify R. If correct, then creates rest HTLC commitment transactions.",
             "parameters": [
+                {
+                    "name": "recipient_node_peer_id",
+                    "buttons": [
+                        {
+                            "innerText": "Counterparties",
+                            "onclick": "displayUserDataInNewHtml('Counterparties')"
+                        }
+                    ]
+                },
+                {
+                    "name": "recipient_user_peer_id",
+                    "buttons": [
+                        {
+                            "innerText": "Counterparties",
+                            "onclick": "displayUserDataInNewHtml('Counterparties')"
+                        }
+                    ]
+                },
+                {
+                    "name": "channel_id",
+                    "buttons": [
+                        {
+                            "innerText": "Display",
+                            "onclick": "displayUserDataInNewHtml('ChannelList')"
+                        }
+                    ]
+                },
                 {
                     "name": "request_hash",
                     "buttons": [
@@ -937,9 +986,27 @@
         },
         {
             "id": "CloseHTLC",
-            "type_id": -48,
+            "type_id": -49,
             "description": "CloseHTLC is used to close a HTLC channel. For continue using OBD to transfer assets OR some reasons Alice need to close this HTLC channel between she and Bob. Then Alice launch the closing request.",
             "parameters": [
+                {
+                    "name": "recipient_node_peer_id",
+                    "buttons": [
+                        {
+                            "innerText": "Counterparties",
+                            "onclick": "displayUserDataInNewHtml('Counterparties')"
+                        }
+                    ]
+                },
+                {
+                    "name": "recipient_user_peer_id",
+                    "buttons": [
+                        {
+                            "innerText": "Counterparties",
+                            "onclick": "displayUserDataInNewHtml('Counterparties')"
+                        }
+                    ]
+                },
                 {
                     "name": "channel_id",
                     "buttons": [
@@ -1007,11 +1074,29 @@
         },
         {
             "id": "CloseHTLCSigned",
-            "type_id": -49,
+            "type_id": -50,
             "description": "CloseHTLCSigned is used to response the request of close HTLC channel.",
             "parameters": [
                 {
-                    "name": "request_close_htlc_hash",
+                    "name": "recipient_node_peer_id",
+                    "buttons": [
+                        {
+                            "innerText": "Counterparties",
+                            "onclick": "displayUserDataInNewHtml('Counterparties')"
+                        }
+                    ]
+                },
+                {
+                    "name": "recipient_user_peer_id",
+                    "buttons": [
+                        {
+                            "innerText": "Counterparties",
+                            "onclick": "displayUserDataInNewHtml('Counterparties')"
+                        }
+                    ]
+                },
+                {
+                    "name": "request_hash",
                     "buttons": [
                         {
                             "innerText": "Display",

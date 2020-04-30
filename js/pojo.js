@@ -83,20 +83,42 @@ class CommitmentTxSigned {
         this.approval = false;
     }
 }
-class HtlcHInfo {
+class HtlcFindPathInfo {
     constructor() {
+        this.recipient_node_peer_id = "";
+        this.recipient_user_peer_id = "";
         this.property_id = 0;
         this.amount = 0;
-        this.recipient_user_peer_id = "";
     }
 }
-class HtlcRequestFindPathAndSendH {
+class HtlcCreatedInfo {
     constructor() {
-        this.h = "";
+        this.recipient_user_peer_id = "";
         this.property_id = 0;
         this.amount = 0;
-        this.recipient_user_peer_id = "";
         this.memo = "";
+        this.h = "";
+        this.htlc_channel_path = "";
+        this.channel_address_private_key = "";
+        this.last_temp_address_private_key = "";
+        this.curr_rsmc_temp_address_pub_key = "";
+        this.curr_rsmc_temp_address_private_key = "";
+        this.curr_htlc_temp_address_pub_key = "";
+        this.curr_htlc_temp_address_private_key = "";
+        this.curr_htlc_temp_address_for_ht1a_pub_key = "";
+        this.curr_htlc_temp_address_for_ht1a_private_key = "";
+    }
+}
+class HtlcSignedInfo {
+    constructor() {
+        this.request_hash = "";
+        this.approval = false;
+        this.channel_address_private_key = "";
+        this.last_temp_address_private_key = "";
+        this.curr_rsmc_temp_address_pub_key = "";
+        this.curr_rsmc_temp_address_private_key = "";
+        this.curr_htlc_temp_address_pub_key = "";
+        this.curr_htlc_temp_address_private_key = "";
     }
 }
 class HtlcHSignInfo {
@@ -135,7 +157,7 @@ class HtlcRequestOpen {
 }
 class HtlcSendRInfo {
     constructor() {
-        this.request_hash = "";
+        this.channel_id = "";
         this.r = "";
         this.channel_address_private_key = "";
         this.curr_htlc_temp_address_for_he1b_pub_key = "";
@@ -144,6 +166,7 @@ class HtlcSendRInfo {
 }
 class HtlcVerifyRInfo {
     constructor() {
+        this.channel_id = "";
         this.request_hash = "";
         this.r = "";
         this.channel_address_private_key = "";
@@ -162,7 +185,7 @@ class CloseHtlcTxInfo {
 }
 class CloseHtlcTxInfoSigned {
     constructor() {
-        this.request_close_htlc_hash = "";
+        this.request_hash = "";
         this.channel_address_private_key = "";
         this.last_rsmc_temp_address_private_key = "";
         this.last_htlc_temp_address_private_key = "";
@@ -296,23 +319,38 @@ class MessageType {
         this.MsgType_GetBalanceRespond_N354 = -354;
         this.MsgType_CloseChannelRequest_N38 = -38;
         this.MsgType_CloseChannelSign_N39 = -39;
+        // MsgType_HTLC_Invoice_N4003 = -4003;
+        // MsgType_HTLC_AddHTLC_N40 = -40;
+        // MsgType_HTLC_CreatedRAndHInfoList_N4001 = -4001;
+        // MsgType_HTLC_CreatedRAndHInfoItem_N4002 = -4002;
+        // MsgType_HTLC_SignedRAndHInfoList_N4101 = -4101;
+        // MsgType_HTLC_SignedRAndHInfoItem_N4102 = -4102;
+        // MsgType_HTLC_GetRFromLCommitTx_N4103 = -4103;
+        // MsgType_HTLC_GetPathInfoByH_N4104 = -4104;
+        // MsgType_HTLC_GetRInfoByHOfOwner_N4105 = -4105;
+        // MsgType_HTLC_FindPathAndSendH_N42 = -42;
+        // MsgType_HTLC_SendH_N43 = -43;
+        // MsgType_HTLC_SignGetH_N44 = -44;
+        // MsgType_HTLC_CreateCommitmentTx_N45 = -45;
+        // MsgType_HTLC_SendR_N46 = -46;
+        // MsgType_HTLC_VerifyR_N47 = -47;
+        // MsgType_HTLC_RequestCloseCurrTx_N48 = -48;
+        // MsgType_HTLC_CloseSigned_N49 = -49;
+        this.MsgType_HTLC_FindPath_N4001 = -4001;
         this.MsgType_HTLC_Invoice_N4003 = -4003;
         this.MsgType_HTLC_AddHTLC_N40 = -40;
-        this.MsgType_HTLC_CreatedRAndHInfoList_N4001 = -4001;
-        this.MsgType_HTLC_CreatedRAndHInfoItem_N4002 = -4002;
-        this.MsgType_HTLC_SignedRAndHInfoList_N4101 = -4101;
-        this.MsgType_HTLC_SignedRAndHInfoItem_N4102 = -4102;
-        this.MsgType_HTLC_GetRFromLCommitTx_N4103 = -4103;
-        this.MsgType_HTLC_GetPathInfoByH_N4104 = -4104;
-        this.MsgType_HTLC_GetRInfoByHOfOwner_N4105 = -4105;
-        this.MsgType_HTLC_FindPathAndSendH_N42 = -42;
-        this.MsgType_HTLC_SendH_N43 = -43;
-        this.MsgType_HTLC_SignGetH_N44 = -44;
-        this.MsgType_HTLC_CreateCommitmentTx_N45 = -45;
-        this.MsgType_HTLC_SendR_N46 = -46;
-        this.MsgType_HTLC_VerifyR_N47 = -47;
-        this.MsgType_HTLC_RequestCloseCurrTx_N48 = -48;
-        this.MsgType_HTLC_CloseSigned_N49 = -49;
+        this.MsgType_HTLC_AddHTLCSigned_N41 = -41;
+        this.MsgType_HTLC_PayerSignC3b_N42 = -42;
+        this.MsgType_HTLC_PayeeCreateHTRD1a_N43 = -43;
+        this.MsgType_HTLC_PayerSignHTRD1a_N44 = -44;
+        this.MsgType_HTLC_SendR_N45 = -45;
+        this.MsgType_HTLC_VerifyR_N46 = -46;
+        this.MsgType_HTLC_SendHerdHex_N47 = -47;
+        this.MsgType_HTLC_SignHedHex_N48 = -48;
+        this.MsgType_HTLC_RequestCloseCurrTx_N49 = -49;
+        this.MsgType_HTLC_CloseSigned_N50 = -50;
+        this.MsgType_HTLC_CloseHtlcRequestSignBR_N51 = -51;
+        this.MsgType_HTLC_CloseHtlcUpdateCnb_N52 = -52;
         this.MsgType_Atomic_Swap_N80 = -80;
         this.MsgType_Atomic_Swap_Accept_N81 = -81;
     }
