@@ -1797,7 +1797,7 @@ function createConnectNodeDiv(isCustom) {
     button.setAttribute('class', 'button button_small');
 
     if (isCustom === 'custom') {
-        button.setAttribute('onclick', 'connectOBDCustomMode()');
+        button.setAttribute('onclick', 'connectOBDInCustomMode()');
     } else {
         button.setAttribute('onclick', 'connectOBD()');
     }
