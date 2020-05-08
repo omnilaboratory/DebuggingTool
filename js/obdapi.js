@@ -504,29 +504,29 @@ class ObdApi {
     onGetAddressInfo(jsonData) { }
     /**
      * MsgType_ChannelOpen_N32
-     * @param funding_pubkey string
-     * @param recipient_user_peer_id string
      * @param recipient_node_peer_id string
+     * @param recipient_user_peer_id string
+     * @param funding_pubkey string
      * @param callback function
      */
-    openChannel(funding_pubkey, recipient_user_peer_id, recipient_node_peer_id, callback) {
-        if (this.isNotString(funding_pubkey)) {
-            alert("error funding_pubkey");
+    openChannel(recipient_node_peer_id, recipient_user_peer_id, funding_pubkey, callback) {
+        if (this.isNotString(recipient_node_peer_id)) {
+            alert("error recipient_node_peer_id");
             return;
         }
         if (this.isNotString(recipient_user_peer_id)) {
             alert("error recipient_user_peer_id");
             return;
         }
-        if (this.isNotString(recipient_node_peer_id)) {
-            alert("error recipient_node_peer_id");
+        if (this.isNotString(funding_pubkey)) {
+            alert("error funding_pubkey");
             return;
         }
         let msg = new Message();
         msg.type = this.messageType.MsgType_ChannelOpen_N32;
-        msg.data["funding_pubkey"] = funding_pubkey;
-        msg.recipient_user_peer_id = recipient_user_peer_id;
         msg.recipient_node_peer_id = recipient_node_peer_id;
+        msg.recipient_user_peer_id = recipient_user_peer_id;
+        msg.data["funding_pubkey"] = funding_pubkey;
         this.sendData(msg, callback);
     }
     onOpenChannel(jsonData) { }
@@ -561,8 +561,8 @@ class ObdApi {
         }
         let msg = new Message();
         msg.type = this.messageType.MsgType_ChannelAccept_N33;
-        msg.recipient_user_peer_id = recipient_user_peer_id;
         msg.recipient_node_peer_id = recipient_node_peer_id;
+        msg.recipient_user_peer_id = recipient_user_peer_id;
         msg.data = info;
         this.sendData(msg, callback);
     }

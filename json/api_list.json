@@ -165,6 +165,7 @@
                 },
                 {
                     "name": "amount",
+                    "help": "Minimum sending 0.00014184 BTC.",
                     "buttons": []
                 },
                 {

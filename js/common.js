@@ -111,9 +111,28 @@ function getAddressInfo() {
 // 
 function listeningN351(e, msgType) {
     console.info('listeningN351 = ' + JSON.stringify(e));
-
+    console.info('listeningN351 msgType = ' + msgType);
     saveChannelList(e, e.channelId, msgType);
-    // createOBDResponseDiv(e, msgType);
+}
+
+// 
+function listeningN40(e, msgType) {
+    console.info('listeningN40 = ' + JSON.stringify(e));
+    console.info('listeningN40 msgType = ' + msgType);
+    saveChannelList(e, e.channelId, msgType);
+}
+
+// 
+function registerEvent() {
+    var msg_type = enumMsgType.MsgType_CommitmentTx_CommitmentTransactionCreated_N351;
+    obdApi.registerEvent(msg_type, function(e) {
+        listeningN351(e, msg_type);
+
+        msg_type = enumMsgType.MsgType_HTLC_AddHTLC_N40;
+        obdApi.registerEvent(msg_type, function(e) {
+            listeningN40(e, msg_type);
+        });
+    });
 }
 
 // logIn API at local.
@@ -130,10 +149,7 @@ function logIn(msgType) {
     obdApi.logIn(mnemonic, function(e) {
 
         // Register event needed for listening.
-        var msg_type = enumMsgType.MsgType_CommitmentTx_CommitmentTransactionCreated_N351;
-        obdApi.registerEvent(msg_type, function(e) {
-            listeningN351(e, msg_type);
-        });
+        registerEvent();
 
         console.info('logIn - OBD Response = ' + JSON.stringify(e));
         // If already logined, then stop listening to OBD Response,
@@ -148,7 +164,7 @@ function logIn(msgType) {
         userID = e.userPeerId;
         $("#logined").text(userID);
         // $("#logined").text(userID.substring(0, 10) + '...');
-        createOBDResponseDiv(e, msgType);
+        // createOBDResponseDiv(e, msgType);
         isLogined = true;
     });
 }
@@ -173,11 +189,11 @@ function openChannel(msgType) {
     var pubkey = $("#funding_pubkey").val();
 
     // OBD API
-    obdApi.openChannel(pubkey, name, p2pID, function(e) {
+    obdApi.openChannel(p2pID, name, pubkey, function(e) {
         console.info('openChannel - OBD Response = ' + JSON.stringify(e));
         saveChannelList(e);
         saveCounterparties(name, p2pID);
-        createOBDResponseDiv(e, msgType);
+        // createOBDResponseDiv(e, msgType);
     });
 }
 
@@ -203,7 +219,7 @@ function acceptChannel(msgType) {
         console.info('-33 acceptChannel - OBD Response = ' + JSON.stringify(e));
         saveChannelList(e);
         saveCounterparties(name, p2pID);
-        createOBDResponseDiv(e, msgType);
+        // createOBDResponseDiv(e, msgType);
     });
 }
 
@@ -243,7 +259,7 @@ function htlcSendR(msgType) {
     obdApi.htlcSendR(recipient_node_peer_id, recipient_user_peer_id, info, function(e) {
         console.info('-45 htlcSendR - OBD Response = ' + JSON.stringify(e));
         saveChannelList(e, channel_id, msgType);
-        createOBDResponseDiv(e, msgType);
+        // createOBDResponseDiv(e, msgType);
     });
 }
 
@@ -281,7 +297,7 @@ function htlcVerifyR(msgType) {
     obdApi.htlcVerifyR(recipient_node_peer_id, recipient_user_peer_id, info, function(e) {
         console.info('-46 htlcVerifyR - OBD Response = ' + JSON.stringify(e));
         saveChannelList(e, channel_id, msgType);
-        createOBDResponseDiv(e, msgType);
+        // createOBDResponseDiv(e, msgType);
     });
 }
 
@@ -314,7 +330,7 @@ function closeHTLC(msgType) {
     obdApi.closeHTLC(recipient_node_peer_id, recipient_user_peer_id, info, function(e) {
         console.info('-49 closeHTLC - OBD Response = ' + JSON.stringify(e));
         saveChannelList(e, channel_id, msgType);
-        createOBDResponseDiv(e, msgType);
+        // createOBDResponseDiv(e, msgType);
     });
 }
 
@@ -358,7 +374,7 @@ function closeHTLCSigned(msgType) {
     obdApi.closeHTLCSigned(recipient_node_peer_id, recipient_user_peer_id, info, function(e) {
         console.info('-50 closeHTLCSigned - OBD Response = ' + JSON.stringify(e));
         saveChannelList(e, channel_id, msgType);
-        createOBDResponseDiv(e, msgType);
+        // createOBDResponseDiv(e, msgType);
     });
 }
 
@@ -393,8 +409,8 @@ function atomicSwap(msgType) {
     // OBD API
     obdApi.atomicSwap(info, function(e) {
         console.info('-80 atomicSwap - OBD Response = ' + JSON.stringify(e));
-        // saveChannelCreation(e, channel_id, msgType);
-        createOBDResponseDiv(e, msgType);
+        // saveChannelList(e, channel_id, msgType);
+        // createOBDResponseDiv(e, msgType);
     });
 }
 
@@ -430,8 +446,8 @@ function atomicSwapAccepted(msgType) {
     // OBD API
     obdApi.atomicSwapAccepted(info, function(e) {
         console.info('-81 atomicSwapAccepted - OBD Response = ' + JSON.stringify(e));
-        // saveChannelCreation(e, channel_id, msgType);
-        createOBDResponseDiv(e, msgType);
+        // saveChannelList(e, channel_id, msgType);
+        // createOBDResponseDiv(e, msgType);
     });
 }
 
@@ -447,7 +463,7 @@ function closeChannel(msgType) {
     obdApi.closeChannel(channel_id, function(e) {
         console.info('-38 closeChannel - OBD Response = ' + JSON.stringify(e));
         saveChannelList(e, channel_id, msgType);
-        createOBDResponseDiv(e, msgType);
+        // createOBDResponseDiv(e, msgType);
     });
 }
 
@@ -470,7 +486,7 @@ function closeChannelSigned(msgType) {
     obdApi.closeChannelSign(info, function(e) {
         console.info('-39 closeChannelSign - OBD Response = ' + JSON.stringify(e));
         saveChannelList(e, channel_id, msgType);
-        createOBDResponseDiv(e, msgType);
+        // createOBDResponseDiv(e, msgType);
     });
 }
 
@@ -597,7 +613,7 @@ function btcFundingCreated(msgType) {
     obdApi.btcFundingCreated(p2pID, name, info, function(e) {
         console.info('btcFundingCreated - OBD Response = ' + JSON.stringify(e));
         saveChannelList(e, temp_cid, msgType);
-        createOBDResponseDiv(e, msgType);
+        // createOBDResponseDiv(e, msgType);
     });
 }
 
@@ -624,7 +640,7 @@ function btcFundingSigned(msgType) {
     obdApi.btcFundingSigned(p2pID, name, info, function(e) {
         console.info('btcFundingSigned - OBD Response = ' + JSON.stringify(e));
         saveChannelList(e, temp_cid, msgType);
-        createOBDResponseDiv(e, msgType);
+        // createOBDResponseDiv(e, msgType);
     });
 }
 
@@ -653,7 +669,7 @@ function assetFundingCreated(msgType) {
     obdApi.channelFundingCreated(p2pID, name, info, function(e) {
         console.info('N34 - OBD Response = ' + JSON.stringify(e));
         saveChannelList(e, temp_cid, msgType);
-        createOBDResponseDiv(e, msgType);
+        // createOBDResponseDiv(e, msgType);
     });
 }
 
@@ -675,7 +691,7 @@ function assetFundingSigned(msgType) {
     obdApi.channelFundingSigned(p2pID, name, info, function(e) {
         console.info('N35 - OBD Response = ' + JSON.stringify(e));
         saveChannelList(e, channel_id, msgType);
-        createOBDResponseDiv(e, msgType);
+        // createOBDResponseDiv(e, msgType);
     });
 }
 
@@ -717,7 +733,7 @@ function fundingBTC(msgType) {
     obdApi.fundingBTC(info, function(e) {
         console.info('fundingBTC - OBD Response = ' + JSON.stringify(e));
         saveChannelList(e, tempChID, msgType);
-        createOBDResponseDiv(e, msgType);
+        // createOBDResponseDiv(e, msgType);
     });
 }
 
@@ -752,7 +768,7 @@ function fundingAsset(msgType) {
     obdApi.fundingAssetOfOmni(info, function(e) {
         console.info('fundingAssetOfOmni - OBD Response = ' + JSON.stringify(e));
         saveChannelList(e, tempChID, msgType);
-        createOBDResponseDiv(e, msgType);
+        // createOBDResponseDiv(e, msgType);
     });
 }
 
@@ -771,7 +787,7 @@ function createInvoice(msgType) {
     // OBD API
     obdApi.htlcInvoice(info, function(e) {
         console.info('createInvoice - OBD Response = ' + JSON.stringify(e));
-        // saveChannelCreation(e, tempChID, msgType);
+        // saveChannelList(e, tempChID, msgType);
         createOBDResponseDiv(e, msgType);
     });
 }
@@ -815,7 +831,7 @@ function htlcCreated(msgType) {
     obdApi.htlcCreated(recipient_node_peer_id, recipient_user_peer_id, info, function(e) {
         console.info('-40 htlcCreated - OBD Response = ' + JSON.stringify(e));
         saveChannelList(e, e.channelId, msgType, info);
-        createOBDResponseDiv(e, msgType);
+        // createOBDResponseDiv(e, msgType);
     });
 }
 
@@ -847,7 +863,7 @@ function htlcSigned(msgType) {
     obdApi.htlcSigned(recipient_node_peer_id, recipient_user_peer_id, info, function(e) {
         console.info('-41 htlcSigned - OBD Response = ' + JSON.stringify(e));
         saveChannelList(e, e.channelId, msgType, info);
-        createOBDResponseDiv(e, msgType);
+        // createOBDResponseDiv(e, msgType);
     });
 }
 
@@ -860,8 +876,8 @@ function htlcSendH(msgType) {
     // OBD API
     obdApi.htlcSendH(h, request_hash, function(e) {
         console.info('-43 htlcSendH - OBD Response = ' + JSON.stringify(e));
-        // saveChannelCreation(e);
-        createOBDResponseDiv(e, msgType);
+        // saveChannelList(e);
+        // createOBDResponseDiv(e, msgType);
     });
 }
 
@@ -882,8 +898,8 @@ function htlcFindPath(msgType) {
     // OBD API
     obdApi.htlcFindPath(info, function(e) {
         console.info('N4001 - htlcFindPath - OBD Response = ' + JSON.stringify(e));
-        // saveChannelCreation(e, tempChID, msgType);
-        createOBDResponseDiv(e, msgType);
+        // saveChannelList(e, tempChID, msgType);
+        // createOBDResponseDiv(e, msgType);
     });
 }
 
@@ -910,8 +926,8 @@ function RSMCCTxCreated(msgType) {
     // OBD API
     obdApi.commitmentTransactionCreated(p2pID, name, info, function(e) {
         console.info('RSMCCTxCreated - OBD Response = ' + JSON.stringify(e));
-        // saveChannelCreation(e, channel_id, msgType);
-        createOBDResponseDiv(e, msgType);
+        // saveChannelList in listening351 func.
+        // createOBDResponseDiv(e, msgType);
     });
 }
 
@@ -941,7 +957,7 @@ function RSMCCTxSigned(msgType) {
     obdApi.revokeAndAcknowledgeCommitmentTransaction(p2pID, name, info, function(e) {
         console.info('RSMCCTxSigned - OBD Response = ' + JSON.stringify(e));
         saveChannelList(e, channel_id, msgType);
-        createOBDResponseDiv(e, msgType);
+        // createOBDResponseDiv(e, msgType);
     });
 }
 
@@ -1244,7 +1260,9 @@ function displayOBDMessages(content) {
     // obdMessages += msgHead + fullMsg + '\n\n';
 
     arrObdMsg.push(fullMsg);
+    arrObdMsg.push('------------------------------------');
     arrObdMsg.push(msgHead);
+    arrObdMsg.push('------------------------------------');
     
     var showMsg = '';
     for (let i = arrObdMsg.length - 1; i >= 0; i--) {
@@ -1943,7 +1961,7 @@ function createOBDResponseDiv(response, msgType) {
     // create [title] element
     var title = document.createElement('div');
     title.setAttribute('class', 'panelTitle');
-    createElement(title, 'h2', 'OBD Response');
+    createElement(title, 'h2', 'Messages');
     newDiv.append(title);
 
     newDiv.append(obd_response_div);
@@ -2078,11 +2096,11 @@ function parseData1(response) {
             'Status : ' + response,
         ];
     } else {
-        var arrData = [
-            'NodeAddress : ' + response.nodeAddress,
-            'NodePeerID : '  + response.nodePeerId,
-            'UserPeerID : '     + response.userPeerId,
-        ];
+        // var arrData = [
+        //     'NodeAddress : ' + response.nodeAddress,
+        //     'NodePeerID : '  + response.nodePeerId,
+        //     'UserPeerID : '     + response.userPeerId,
+        // ];
     }
 
     for (let i = 0; i < arrData.length; i++) {
@@ -2539,9 +2557,15 @@ function parseDataN40(response) {
     var arrData = [
         'channelId : ' + response.channelId,
         'amount : ' + response.amount,
+        'commitmentTxHash : ' + response.commitmentTxHash,
+        'currHtlcTempAddressForHt1aPubKey : ' + response.currHtlcTempAddressForHt1aPubKey,
+        'currHtlcTempAddressPubKey : ' + response.currHtlcTempAddressPubKey,
+        'currRsmcTempAddressPubKey : ' + response.currRsmcTempAddressPubKey,
+        'h : ' + response.h,
         'htlcChannelPath : ' + response.htlcChannelPath,
         'htlcTxHex : ' + response.htlcTxHex,
-        'msgHash : ' + response.msgHash,
+        'lastTempAddressPrivateKey : ' + response.lastTempAddressPrivateKey,
+        'memo : ' + response.memo,
         'rsmcTxHex : ' + response.rsmcTxHex,
         'toOtherHex : ' + response.toOtherHex,
     ];
@@ -2576,13 +2600,9 @@ function parseDataN41(response) {
     }
 }
 
-// parseDataN4001    - 
+//
 function parseDataN4001(response) {
     var arrData = [
-        // 'recipient_user_peer_id : ' + response.recipient_user_peer_id,
-        // 'amount : ' + response.amount,
-        // 'property_id : ' + response.propertyId,
-        // 'msg : ' + response.msg,
         'channelPath : '    + response.channelPath,
         'nextNodePeerId : ' + response.nextNodePeerId,
     ];
@@ -3025,30 +3045,58 @@ function btcData(response, msgType) {
 function htlcData(response, msgType, info) {
     if (info) {
         var data = {
-            channelId: response.channelId,
-            h: response.h,
-            r: '',
-            request_hash: response.request_hash,
             date: new Date().toLocaleString(),
             msgType: msgType,
 
-            property_id: info.property_id,
-            amount: info.amount,
-            memo: info.memo,
+            channelId: response.channelId,
+            amount: response.amount,
+            htlcChannelPath: response.htlcChannelPath,
+            htlcTxHex: response.htlcTxHex,
+            msgHash: response.msgHash,
+            rsmcTxHex: response.rsmcTxHex,
+            toOtherHex: response.toOtherHex,
 
-            curr_state: '',
-            sender: '',
-            approval: '',
+
+            // h: response.h,
+            // r: '',
+            // request_hash: response.request_hash,
+            // property_id: info.property_id,
+            // memo: info.memo,
+            // curr_state: '',
+            // sender: '',
+            // approval: '',
         }
     } else {
+        // var data = {
+        //     channel_id: response.channel_id,
+        //     create_at: response.create_at,
+        //     create_by: response.create_by,
+        //     curr_state: response.curr_state,
+        //     request_hash: response.request_hash,
+        //     date: new Date().toLocaleString(),
+        //     msgType: msgType,
+        // }
+
         var data = {
-            channel_id: response.channel_id,
-            create_at: response.create_at,
-            create_by: response.create_by,
-            curr_state: response.curr_state,
-            request_hash: response.request_hash,
             date: new Date().toLocaleString(),
             msgType: msgType,
+
+            channelId: response.channelId,
+            amount: response.amount,
+            htlcChannelPath: response.htlcChannelPath,
+            htlcTxHex: response.htlcTxHex,
+            msgHash: response.msgHash,
+            rsmcTxHex: response.rsmcTxHex,
+            toOtherHex: response.toOtherHex,
+
+            // h: response.h,
+            // r: '',
+            // request_hash: response.request_hash,
+            // property_id: info.property_id,
+            // memo: info.memo,
+            // curr_state: '',
+            // sender: '',
+            // approval: '',
         }
     }
 
@@ -3945,7 +3993,6 @@ function sendCustomRequest() {
         console.info('sendCustomRequest - OBD Response = ' + JSON.stringify(e));
         saveInvokeHistory(saveVal, custom_request);
         historyInCustom();
-        // createOBDResponseDiv(e, msgType);
 
         // Display user id on screen top.
         if (Number(type) === 1) {  // Login func
@@ -4305,15 +4352,21 @@ function htlcRecord(parent, list, i) {
                 default:
                     arrData = [
                         'channelId : ' + list.result[i].htlc[i2].channelId,
-                        'h : ' + list.result[i].htlc[i2].h,
-                        'r : ' + list.result[i].htlc[i2].r,
-                        'request_hash : ' + list.result[i].htlc[i2].request_hash,
-                        'property_id : ' + list.result[i].htlc[i2].property_id,
                         'amount : ' + list.result[i].htlc[i2].amount,
-                        'memo : ' + list.result[i].htlc[i2].memo,
-                        'curr_state : ' + list.result[i].htlc[i2].curr_state,
-                        'sender : ' + list.result[i].htlc[i2].sender,
-                        'approval : ' + list.result[i].htlc[i2].approval,
+                        'htlcChannelPath : ' + list.result[i].htlc[i2].htlcChannelPath,
+                        'htlcTxHex : ' + list.result[i].htlc[i2].htlcTxHex,
+                        'msgHash : ' + list.result[i].htlc[i2].msgHash,
+                        'rsmcTxHex : ' + list.result[i].htlc[i2].rsmcTxHex,
+                        'toOtherHex : ' + list.result[i].htlc[i2].toOtherHex,
+
+                        // 'h : ' + list.result[i].htlc[i2].h,
+                        // 'r : ' + list.result[i].htlc[i2].r,
+                        // 'request_hash : ' + list.result[i].htlc[i2].request_hash,
+                        // 'property_id : ' + list.result[i].htlc[i2].property_id,
+                        // 'memo : ' + list.result[i].htlc[i2].memo,
+                        // 'curr_state : ' + list.result[i].htlc[i2].curr_state,
+                        // 'sender : ' + list.result[i].htlc[i2].sender,
+                        // 'approval : ' + list.result[i].htlc[i2].approval,
                     ];
                     break;
             }

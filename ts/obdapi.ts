@@ -585,19 +585,20 @@ class ObdApi {
 
   /**
    * MsgType_ChannelOpen_N32
-   * @param funding_pubkey string
-   * @param recipient_user_peer_id string
    * @param recipient_node_peer_id string
+   * @param recipient_user_peer_id string
+   * @param funding_pubkey string
    * @param callback function
    */
   public openChannel(
-    funding_pubkey: string,
-    recipient_user_peer_id: string,
     recipient_node_peer_id: string,
+    recipient_user_peer_id: string,
+    funding_pubkey: string,
     callback: Function
   ) {
-    if (this.isNotString(funding_pubkey)) {
-      alert("error funding_pubkey");
+    
+    if (this.isNotString(recipient_node_peer_id)) {
+      alert("error recipient_node_peer_id");
       return;
     }
 
@@ -606,16 +607,16 @@ class ObdApi {
       return;
     }
 
-    if (this.isNotString(recipient_node_peer_id)) {
-      alert("error recipient_node_peer_id");
+    if (this.isNotString(funding_pubkey)) {
+      alert("error funding_pubkey");
       return;
     }
 
     let msg = new Message();
     msg.type = this.messageType.MsgType_ChannelOpen_N32;
-    msg.data["funding_pubkey"] = funding_pubkey;
-    msg.recipient_user_peer_id = recipient_user_peer_id;
     msg.recipient_node_peer_id = recipient_node_peer_id;
+    msg.recipient_user_peer_id = recipient_user_peer_id;
+    msg.data["funding_pubkey"] = funding_pubkey;
     this.sendData(msg, callback);
   }
   public onOpenChannel(jsonData: any) {}
@@ -633,6 +634,7 @@ class ObdApi {
     info: AcceptChannelInfo,
     callback: Function
   ) {
+
     if (this.isNotString(recipient_node_peer_id)) {
       alert("error recipient_node_peer_id");
       return;
@@ -661,8 +663,8 @@ class ObdApi {
 
     let msg = new Message();
     msg.type = this.messageType.MsgType_ChannelAccept_N33;
-    msg.recipient_user_peer_id = recipient_user_peer_id;
     msg.recipient_node_peer_id = recipient_node_peer_id;
+    msg.recipient_user_peer_id = recipient_user_peer_id;
     msg.data = info;
     this.sendData(msg, callback);
   }
@@ -814,6 +816,7 @@ class ObdApi {
       alert("wrong amount");
       return;
     }
+
     let msg = new Message();
     msg.type = this.messageType.MsgType_CommitmentTx_CommitmentTransactionCreated_N351;
     msg.recipient_user_peer_id = recipient_user_peer_id;
