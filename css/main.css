@@ -109,6 +109,10 @@ pre {
     margin-left: 60px;
 }
 
+.button_log {
+    margin-left: 145px;
+}
+
 .button_clear_history {
     padding: 6px 25px;
     font-size: 15px;

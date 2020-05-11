@@ -1,0 +1,48 @@
+/* ----  FOR JSON FORMAT */
+pre {
+    background-color: #FFF;
+    outline: 1px solid #ccc; 
+    padding: 15px; 
+    margin-left: 60px;
+    margin-top: 50px;
+    margin-bottom: 50px;
+    width: 90%;
+    /* height: 560px; */
+    font-size: 15px;
+    overflow-y: auto;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+}
+
+.string { color: green; }
+.number {color: darkorange; }
+.boolean { color: blue; }
+.null { color: magenta; }
+.key { color: red; font-weight: bold; }
+/* -------------- */
+
+.top{
+    height: 60px;
+    background: #1E222A;
+    width: 89%;
+    color: #FFF;
+    line-height: 60px;
+    font-size: 22px;
+    font-weight: 600;
+    padding-left: 20px;
+    padding-right: 30px;
+    margin-left: 60px;
+    /* display: flex; */
+}
+
+.copyright {
+    background-color:#1E222A;
+    color: #eeeff5;
+    line-height: 50px;
+    font-size: 20px;
+    font-weight: 500;
+    text-align:center;
+    width: 92%;
+    margin-left: 60px;
+    /* height: 6%; */
+}
