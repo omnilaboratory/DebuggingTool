@@ -125,6 +125,9 @@ class ObdApi {
     }
     getDataFromServer(jsonData) {
         console.info(jsonData.data);
+        if (this.globalCallback) {
+            this.globalCallback(jsonData);
+        }
         if (jsonData.type == 0) {
             return;
         }
@@ -150,9 +153,6 @@ class ObdApi {
             tempData.sender_peer_id = jsonData.sender_peer_id;
             tempData.recipient_user_peer_id = jsonData.recipient_user_peer_id;
             jsonData = tempData;
-        }
-        if (this.globalCallback) {
-            this.globalCallback(jsonData);
         }
         console.info(new Date(), "----------------------------get msg from server--------------------");
         let fromId = jsonData.from;

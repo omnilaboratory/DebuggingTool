@@ -204,8 +204,8 @@ class OmniSendIssuanceManaged {
     }
 }
 class OmniSendIssuanceFixed extends OmniSendIssuanceManaged {
-    constructor() {
-        super(...arguments);
+    constructor(...args) {
+        super(...args);
         this.amount = 0;
     }
 }
@@ -246,8 +246,8 @@ class AtomicSwapRequest {
  * -81
  */
 class AtomicSwapAccepted extends AtomicSwapRequest {
-    constructor() {
-        super(...arguments);
+    constructor(...args) {
+        super(...args);
         this.target_transaction_id = "";
     }
 }
