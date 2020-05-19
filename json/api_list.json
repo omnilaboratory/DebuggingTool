@@ -63,6 +63,7 @@
                 {
                     "name": "funding_pubkey",
                     "help": "This Public Key of a wallet address will be used to generate a channel 2-2 multi-sig address.",
+                    "imgPath": "doc/tooltip/funding_pubkey.png",
                     "buttons": [
                         {
                             "innerText": "Select",
@@ -112,6 +113,7 @@
                 {
                     "name": "funding_pubkey",
                     "help": "This Public Key of a wallet address will be used to generate a channel 2-2 multi-sig address with another PubKey from counterparty.",
+                    "imgPath": "doc/tooltip/funding_pubkey.png",
                     "buttons": [
                         {
                             "innerText": "Select",
@@ -145,7 +147,7 @@
                 },
                 {
                     "name": "from_address_private_key",
-                    "help": "Why need private key? OBD use private key to sign a raw transaction.",
+                    "help": "OBD use this private key to create a commitment transaction that be signed but not broadcast.",
                     "buttons": [
                         {
                             "innerText": "Select",
@@ -213,6 +215,7 @@
                 },
                 {
                     "name": "channel_address_private_key",
+                    "help": "This key is the private key of the address used to create the Channel Address. OBD use the private key to create a revockable delivery transaction (RD Tx). This RD tx get bitcoin of deposit to channel (type 1009) back to sender if counterparty always does not response.",
                     "buttons": [
                         {
                             "innerText": "Display",
@@ -222,6 +225,8 @@
                 },
                 {
                     "name": "funding_tx_hex",
+                    "help": "The commitment transaction hex created in fundingBTC api (type 1009).",
+                    "imgPath": "doc/tooltip/3400-3500.png",
                     "buttons": [
                         {
                             "innerText": "Display",
@@ -265,6 +270,7 @@
                 },
                 {
                     "name": "channel_address_private_key",
+                    "help": "This key is the private key of the address used to create the Channel Address. OBD use the private key to sign the RD Tx created by BTCFundingCreated (type -3400). This RD tx get bitcoin of deposit to channel (type 1009) back to sender if counterparty always does not response.",
                     "buttons": [
                         {
                             "innerText": "Display",
@@ -274,6 +280,8 @@
                 },
                 {
                     "name": "funding_txid",
+                    "help": "? - need to ask Guojun. The commitment transaction txid created in fundingBTC api (type 1009).",
+                    "imgPath": "doc/tooltip/3400-3500.png",
                     "buttons": [
                         {
                             "innerText": "Display",
@@ -364,6 +372,8 @@
                 },
                 {
                     "name": "temp_address_pub_key",
+                    "help": "This key is the public key of the address will be used to create RD tx. This RD tx get omni asset in channel back to owner after a certain time (like seq = 1000 blocks) if forced to close channel (broadcast Cx transaction).",
+                    "imgPath": "doc/tooltip/Cx-RDx.png",
                     "buttons": [
                         {
                             "innerText": "Select",
@@ -373,6 +383,8 @@
                 },
                 {
                     "name": "temp_address_private_key",
+                    "help": "This key is the private key of the address will be used to create RD tx. This RD tx get omni asset in channel back to owner after a certain time (like seq = 1000 blocks) if forced to close channel (broadcast Cx transaction).",
+                    "imgPath": "doc/tooltip/Cx-RDx.png",
                     "buttons": [
                         {
                             "innerText": "Select",
@@ -382,6 +394,8 @@
                 },
                 {
                     "name": "channel_address_private_key",
+                    "help": "This key is the private key of the address used to create the Channel Address. OBD create Cxa transaction and use the private key to sign it. The Cxa represents the balance distribution in the channel.",
+                    "imgPath": "doc/tooltip/Cx-RDx.png",
                     "buttons": [
                         {
                             "innerText": "Display",
@@ -391,6 +405,8 @@
                 },
                 {
                     "name": "funding_tx_hex",
+                    "help": "The commitment transaction hex created in FundingAsset api (type 2001).",
+                    "imgPath": "doc/tooltip/FundingAsset.png",
                     "buttons": [
                         {
                             "innerText": "Display",
@@ -425,6 +441,7 @@
                 },
                 {
                     "name": "channel_id",
+                    "help": "The final channel id created in AssetFundingCreated api (type -34).",
                     "buttons": [
                         {
                             "innerText": "Display",
@@ -434,6 +451,8 @@
                 },
                 {
                     "name": "fundee_channel_address_private_key",
+                    "help": "This key is the private key of the address used to create the Channel Address. OBD use the private key to sign the Cx and RDx transactions created by AssetFundingCreated (type -34).",
+                    "imgPath": "doc/tooltip/34-35.png",
                     "buttons": [
                         {
                             "innerText": "Display",

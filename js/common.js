@@ -1164,8 +1164,14 @@ function saveMsg2Counterparty(e) {
     localStorage.setItem('broadcast_info', showMsg);
 }
 
+// get a copy of an object
+function getNewObjectOf(src) {
+    return Object.assign({}, src);
+}
+
 // 
-function displayOBDMessages(content) {
+function displayOBDMessages(msg) {
+    let content = getNewObjectOf(msg);
     console.info("broadcast info:", JSON.stringify(content));
 
     var msgHead;
@@ -1308,7 +1314,9 @@ function displayOBDMessages(content) {
     }
 
     content = JSON.stringify(content.result);
-    content = content.replace("\"", "").replace("\"", "");
+    if (Number(msg.type) != enumMsgType.MsgType_Error_0) {
+        content = content.replace("\"", "").replace("\"", "");
+    }
     console.info("OBD DIS - content = ", content);
 
     // the info save to local storage [ChannelList].
@@ -1724,13 +1732,13 @@ function clickApproval(obj) {
 }
 
 //
-function showTooltip(content, parent) {
+function showTooltip(content, parent, imgPath) {
     var div_help = document.createElement('div');
     div_help.setAttribute('class', 'wrapper');
 
     var help = document.createElement('img');
     help.setAttribute('class', 'btn_help');
-    help.setAttribute('src', 'doc/img/help.png');
+    help.setAttribute('src', 'doc/tooltip/help.png');
     help.setAttribute('alt', 'help');
     div_help.append(help);
 
@@ -1740,6 +1748,13 @@ function showTooltip(content, parent) {
     var tooltip = document.createElement('label');
     tooltip.innerText = content;
     div_tooltip.append(tooltip);
+
+    if (imgPath) {
+        createElement(div_tooltip, 'p');
+        let img = document.createElement('img');
+        img.setAttribute('src', imgPath);
+        div_tooltip.append(img);
+    }
     
     div_help.append(div_tooltip);
     parent.append(div_help);
@@ -1748,19 +1763,19 @@ function showTooltip(content, parent) {
 // create parameter of each API.
 function createParamOfAPI(arrParams, content_div) {
 
-    var input_box;
+    let input_box;
     
     for (let i = 0; i < arrParams.length; i++) {
         
-        var parent = document.createElement('div');
+        let parent = document.createElement('div');
         parent.setAttribute('class', 'parent_div');
 
         // Show tooltip.
         if (arrParams[i].help) {
-            showTooltip(arrParams[i].help, parent);
+            showTooltip(arrParams[i].help, parent, arrParams[i].imgPath);
         }
 
-        var div_other = document.createElement('div');
+        let div_other = document.createElement('div');
 
         // create [param_title] element
         createElement(div_other, 'text', arrParams[i].name + ' : ', 'param');
