@@ -394,7 +394,7 @@
                 },
                 {
                     "name": "channel_address_private_key",
-                    "help": "This key is the private key of the address used to create the Channel Address. OBD create Cxa transaction and use the private key to sign it. The Cxa represents the balance distribution in the channel.",
+                    "help": "This key is the private key of the address used to create the Channel Address. OBD create Cxa transaction and use the private key to sign it. The Cxa transaction represents the balance distribution in the channel.",
                     "imgPath": "doc/tooltip/Cx-RDx.png",
                     "buttons": [
                         {
@@ -495,7 +495,20 @@
                     ]
                 },
                 {
+                    "name": "channel_address_private_key",
+                    "help": "This is the private key used by Alice to create the channel. It will be used to sign C2a transaction in below picture as <Alice Sig>.",
+                    "imgPath": "doc/tooltip/C2a.png",
+                    "buttons": [
+                        {
+                            "innerText": "Display",
+                            "onclick": "displayUserDataInNewHtml('MyAddresses')"
+                        }
+                    ]
+                },
+                {
                     "name": "curr_temp_address_pub_key",
+                    "help": "This public key of an address (Alice3 in below picture) will be used to create a temp 2-2 multi-sig address as output 0 of newer Cx transaction like C2a in below picture.",
+                    "imgPath": "doc/tooltip/C2a.png",
                     "buttons": [
                         {
                             "innerText": "Select",
@@ -505,6 +518,8 @@
                 },
                 {
                     "name": "curr_temp_address_private_key",
+                    "help": "This private key of an address (Alice3's) will be used to sign RD2a transaction in below picture. The RD transaction get omni asset in channel back to Alice delay a lock time (like seq = 1000 blocks) if Alice forced to close channel (broadcast C2a transaction).",
+                    "imgPath": "doc/tooltip/C2a.png",
                     "buttons": [
                         {
                             "innerText": "Select",
@@ -513,16 +528,9 @@
                     ]
                 },
                 {
-                    "name": "channel_address_private_key",
-                    "buttons": [
-                        {
-                            "innerText": "Display",
-                            "onclick": "displayUserDataInNewHtml('MyAddresses')"
-                        }
-                    ]
-                },
-                {
                     "name": "last_temp_address_private_key",
+                    "help": "See below picture, this is the private key of Alice2 in the last RSMC transaction (C1a). It will be used to sign BR1a transaction. When Alice cheats, the BR transaction will punish Alice and transfer all assets belonging to Alice to Bob.",
+                    "imgPath": "doc/tooltip/BR1a.png",
                     "buttons": [
                         {
                             "innerText": "Display",
