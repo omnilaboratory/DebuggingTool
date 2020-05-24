@@ -578,6 +578,7 @@
                 },
                 {
                     "name": "request_commitment_hash",
+                    "help": "? need to confirm. - Txid of Cxa transaction created by Alice ?",
                     "buttons": [
                         {
                             "innerText": "Display",
@@ -586,7 +587,20 @@
                     ]
                 },
                 {
+                    "name": "channel_address_private_key",
+                    "help": "This is the private key used by Bob to create the channel. It will be used to sign C2a and BR1a transaction in below picture as Bob Sig. And used to create and sign C2b, RD2a transaction.",
+                    "imgPath": "doc/tooltip/BR1a.png",
+                    "buttons": [
+                        {
+                            "innerText": "Display",
+                            "onclick": "displayUserDataInNewHtml('MyAddresses')"
+                        }
+                    ]
+                },
+                {
                     "name": "curr_temp_address_pub_key",
+                    "help": "This public key of an address (Bob3 in below picture) will be used to create a temp 2-2 multi-sig address as output 0 of newer Cx transaction like C2b in below picture.",
+                    "imgPath": "doc/tooltip/C2b.png",
                     "buttons": [
                         {
                             "innerText": "Select",
@@ -596,6 +610,8 @@
                 },
                 {
                     "name": "curr_temp_address_private_key",
+                    "help": "This private key of an address (Bob3's) will be used to sign RD2b transaction in below picture. The RD transaction get omni asset in channel back to Bob delay a lock time (like seq = 1000 blocks) if Bob forced to close channel (broadcast C2b transaction).",
+                    "imgPath": "doc/tooltip/C2b.png",
                     "buttons": [
                         {
                             "innerText": "Select",
@@ -604,16 +620,9 @@
                     ]
                 },
                 {
-                    "name": "channel_address_private_key",
-                    "buttons": [
-                        {
-                            "innerText": "Display",
-                            "onclick": "displayUserDataInNewHtml('MyAddresses')"
-                        }
-                    ]
-                },
-                {
                     "name": "last_temp_address_private_key",
+                    "help": "See below picture, this is the private key of Alice2 in the last RSMC transaction (C1a). It will be used to sign BR1a transaction. When Alice cheats, the BR transaction will punish Alice and transfer all assets belonging to Alice to Bob.",
+                    "imgPath": "doc/tooltip/BR1a.png",
                     "buttons": [
                         {
                             "innerText": "Display",
