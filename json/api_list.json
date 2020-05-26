@@ -809,6 +809,8 @@
                 },
                 {
                     "name": "last_temp_address_private_key",
+                    "help": "This is the private key used in last transaction by Alice. It will be used to sign ?  transaction in below picture as Alice Sig.",
+                    "imgPath": "doc/tooltip/HTLC-2.png",
                     "buttons": [
                         {
                             "innerText": "Display",
@@ -852,15 +854,8 @@
                 },
                 {
                     "name": "channel_address_private_key",
-                    "buttons": [
-                        {
-                            "innerText": "Display",
-                            "onclick": "displayUserDataInNewHtml('MyAddresses')"
-                        }
-                    ]
-                },
-                {
-                    "name": "last_temp_address_private_key",
+                    "help": "This is the private key used by Bob to create the channel. It will be used to sign C2b and BR2b transaction in below picture as Bob Sig.",
+                    "imgPath": "doc/tooltip/HTLC-3.png",
                     "buttons": [
                         {
                             "innerText": "Display",
@@ -870,6 +865,8 @@
                 },
                 {
                     "name": "curr_rsmc_temp_address_pub_key",
+                    "help": "This public key of an address (Bob's address in output 1 of C2b in below picture) will be used to create a temp 2-2 multi-sig address as output 1 of newer Cx transaction like C2b in below picture.",
+                    "imgPath": "doc/tooltip/HTLC-3.png",
                     "buttons": [
                         {
                             "innerText": "Select",
@@ -879,6 +876,8 @@
                 },
                 {
                     "name": "curr_rsmc_temp_address_private_key",
+                    "help": "This private key of an address (Bob's) will be used to sign RD2b and BR2b transaction in below picture.",
+                    "imgPath": "doc/tooltip/HTLC-3.png",
                     "buttons": [
                         {
                             "innerText": "Select",
@@ -888,6 +887,8 @@
                 },
                 {
                     "name": "curr_htlc_temp_address_pub_key",
+                    "help": "This public key of an address (Bob's address in output 2 of C2b in below picture) will be used to create a temp 2-2 multi-sig address as output 2 of newer Cx transaction like C2b in below picture.",
+                    "imgPath": "doc/tooltip/HTLC-3.png",
                     "buttons": [
                         {
                             "innerText": "Select",
@@ -897,9 +898,22 @@
                 },
                 {
                     "name": "curr_htlc_temp_address_private_key",
+                    "help": "This private key of an address (Bob's) will be used to sign HE1b transaction in below picture.",
+                    "imgPath": "doc/tooltip/HTLC-4.png",
                     "buttons": [
                         {
                             "innerText": "Select",
+                            "onclick": "displayUserDataInNewHtml('MyAddresses')"
+                        }
+                    ]
+                },
+                {
+                    "name": "last_temp_address_private_key",
+                    "help": "This is the private key used in last transaction by Alice. It will be used to sign ?  transaction in below picture as Bob Sig.",
+                    "imgPath": "doc/tooltip/HTLC-4.png",
+                    "buttons": [
+                        {
+                            "innerText": "Display",
                             "onclick": "displayUserDataInNewHtml('MyAddresses')"
                         }
                     ]
@@ -940,6 +954,7 @@
                 },
                 {
                     "name": "r",
+                    "help": "The R (a Preimage R) currently is Private Key of a wallet address, and the H (Hash of a Preimage R) is Public Key of a wallet address. This is a temporary solution.",
                     "buttons": [
                         {
                             "innerText": "Display",
@@ -949,6 +964,8 @@
                 },
                 {
                     "name": "channel_address_private_key",
+                    "help": "This is the private key used by Bob to create the channel. It will be used to sign HTD1b transaction in below picture.",
+                    "imgPath": "doc/tooltip/HTLC-4.png",
                     "buttons": [
                         {
                             "innerText": "Display",
@@ -958,6 +975,8 @@
                 },
                 {
                     "name": "curr_htlc_temp_address_for_he1b_pub_key",
+                    "help": "This public key of an address will be used to create a temp 2-2 multi-sig address as HE1b in below picture.",
+                    "imgPath": "doc/tooltip/HTLC-4.png",
                     "buttons": [
                         {
                             "innerText": "Select",
@@ -967,6 +986,8 @@
                 },
                 {
                     "name": "curr_htlc_temp_address_for_he1b_private_key",
+                    "help": "This private key of an address will be used to sign HE1b transaction in below picture.",
+                    "imgPath": "doc/tooltip/HTLC-4.png",
                     "buttons": [
                         {
                             "innerText": "Select",
@@ -1019,6 +1040,7 @@
                 },
                 {
                     "name": "r",
+                    "help": "The R (a Preimage R) currently is Private Key of a wallet address, and the H (Hash of a Preimage R) is Public Key of a wallet address. This is a temporary solution.",
                     "buttons": [
                         {
                             "innerText": "Display",
@@ -1028,6 +1050,8 @@
                 },
                 {
                     "name": "channel_address_private_key",
+                    "help": "This is the private key used by Alice to create the channel. It will be used to sign HERD1b transaction in below picture.",
+                    "imgPath": "doc/tooltip/HTLC-4.png",
                     "buttons": [
                         {
                             "innerText": "Display",
@@ -1071,6 +1095,8 @@
                 },
                 {
                     "name": "channel_address_private_key",
+                    "help": "This is the private key used by Alice (launcher of the close request) to create the channel. It will be used to sign newer RSMC transaction like C3a.",
+                    "imgPath": "doc/tooltip/HTLC-1.png",
                     "buttons": [
                         {
                             "innerText": "Display",
@@ -1080,6 +1106,7 @@
                 },
                 {
                     "name": "last_rsmc_temp_address_private_key",
+                    "help": "Private Key of creating temporary 2-2 multi-sig address in previous RSMC transaction.",
                     "buttons": [
                         {
                             "innerText": "Display",
@@ -1089,6 +1116,7 @@
                 },
                 {
                     "name": "last_htlc_temp_address_private_key",
+                    "help": "Private Key of creating temporary 2-2 multi-sig address in previous HTLC transaction.",
                     "buttons": [
                         {
                             "innerText": "Display",
@@ -1098,6 +1126,7 @@
                 },
                 {
                     "name": "last_htlc_temp_address_for_htnx_private_key",
+                    "help": "Private Key of creating temporary 2-2 multi-sig address in previous HTLC htnx transaction.",
                     "buttons": [
                         {
                             "innerText": "Display",
@@ -1107,6 +1136,7 @@
                 },
                 {
                     "name": "curr_rsmc_temp_address_pub_key",
+                    "help": "This public key of an address will be used to create a temp 2-2 multi-sig address as output 0 of newer Cx transaction in RSMC.",
                     "buttons": [
                         {
                             "innerText": "Select",
@@ -1116,6 +1146,7 @@
                 },
                 {
                     "name": "curr_rsmc_temp_address_private_key",
+                    "help": "This private key of an address will be used to sign newer RDxa and BRxa transaction.",
                     "buttons": [
                         {
                             "innerText": "Select",
