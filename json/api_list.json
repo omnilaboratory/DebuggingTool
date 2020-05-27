@@ -134,6 +134,7 @@
             "parameters": [
                 {
                     "name": "from_address",
+                    "help": "Has some bitcoin in this address.",
                     "buttons": [
                         {
                             "innerText": "Select",
@@ -147,7 +148,7 @@
                 },
                 {
                     "name": "from_address_private_key",
-                    "help": "OBD use this private key to create a commitment transaction that be signed but not broadcast.",
+                    "help": "OBD create a transfer commitment transaction and use this private key to sign it but not broadcast.",
                     "buttons": [
                         {
                             "innerText": "Select",
@@ -157,7 +158,7 @@
                 },
                 {
                     "name": "to_address",
-                    "help": "Channel 2-2 multi-sig address generated after AcceptChannel API invoked with counterparty.",
+                    "help": "This is channel 2-2 multi-sig address generated after AcceptChannel API invoked with counterparty.",
                     "buttons": [
                         {
                             "innerText": "Display (Channel Address)",
@@ -215,7 +216,7 @@
                 },
                 {
                     "name": "channel_address_private_key",
-                    "help": "This key is the private key of the address used to create the Channel Address. OBD use the private key to create a revockable delivery transaction (RD Tx). This RD tx get bitcoin of deposit to channel (type 1009) back to sender if counterparty always does not response.",
+                    "help": "OBD create a revockable delivery transaction (RD Transaction). This private key used to sign the RD transaction. The RD transaction get bitcoin of deposit to channel (type 1009) back to sender if counterparty always does not response.",
                     "buttons": [
                         {
                             "innerText": "Display",
@@ -270,7 +271,7 @@
                 },
                 {
                     "name": "channel_address_private_key",
-                    "help": "This key is the private key of the address used to create the Channel Address. OBD use the private key to sign the RD Tx created by BTCFundingCreated (type -3400). This RD tx get bitcoin of deposit to channel (type 1009) back to sender if counterparty always does not response.",
+                    "help": "This key is the private key of the Bob's address used to create the Channel Address. OBD use the private key to sign the RD transaction created by BTCFundingCreated (Alice sent type -3400). This RD transaction get bitcoin of deposit to channel (type 1009) back to Alice if Bob always does not response.",
                     "buttons": [
                         {
                             "innerText": "Display",
@@ -298,6 +299,7 @@
             "parameters": [
                 {
                     "name": "from_address",
+                    "help": "Has some omni assets in this address.",
                     "buttons": [
                         {
                             "innerText": "Select",
@@ -307,6 +309,8 @@
                 },
                 {
                     "name": "from_address_private_key",
+                    "help": "OBD create a transfer commitment transaction and use this private key to sign it but not broadcast.",
+                    "imgPath": "doc/tooltip/FundingAsset.png",
                     "buttons": [
                         {
                             "innerText": "Select",
@@ -316,6 +320,7 @@
                 },
                 {
                     "name": "to_address",
+                    "help": "This is channel 2-2 multi-sig address generated after AcceptChannel API invoked with counterparty.",
                     "buttons": [
                         {
                             "innerText": "Display (Channel Addr)",
@@ -329,6 +334,7 @@
                 },
                 {
                     "name": "property_id",
+                    "help": "This is property id of a omni asset.",
                     "buttons": [
                         {
                             "innerText": "Display",
@@ -372,7 +378,7 @@
                 },
                 {
                     "name": "temp_address_pub_key",
-                    "help": "This key is the public key of the address will be used to create RD tx. This RD tx get omni asset in channel back to owner after a certain time (like seq = 1000 blocks) if forced to close channel (broadcast Cx transaction).",
+                    "help": "This public key of an address (Alice2 in picture below) will be used to create a temp 2-2 multi-sig address as output 0 of C1a transaction.",
                     "imgPath": "doc/tooltip/Cx-RDx.png",
                     "buttons": [
                         {
@@ -383,7 +389,7 @@
                 },
                 {
                     "name": "temp_address_private_key",
-                    "help": "This key is the private key of the address will be used to create RD tx. This RD tx get omni asset in channel back to owner after a certain time (like seq = 1000 blocks) if forced to close channel (broadcast Cx transaction).",
+                    "help": "This private key of an address (Alice2 in picture below) will be used to sign RD1a transaction. The RD1a transaction get omni asset in channel back to Alice after a certain time (like seq = 1000 blocks) if Alice forced to close channel (broadcast C1a transaction).",
                     "imgPath": "doc/tooltip/Cx-RDx.png",
                     "buttons": [
                         {
@@ -394,7 +400,7 @@
                 },
                 {
                     "name": "channel_address_private_key",
-                    "help": "This key is the private key of the address used to create the Channel Address. OBD create Cxa transaction and use the private key to sign it. The Cxa transaction represents the balance distribution in the channel.",
+                    "help": "This private key of the address used to create the Channel Address. OBD create C1a transaction and use the private key to sign it. The C1a transaction represents the balance distribution in the channel.",
                     "imgPath": "doc/tooltip/Cx-RDx.png",
                     "buttons": [
                         {
@@ -1190,6 +1196,8 @@
                 },
                 {
                     "name": "channel_address_private_key",
+                    "help": "This is the private key used by Bob (responser of the close request) to create the channel. It will be used to sign newer RSMC transaction like C3b.",
+                    "imgPath": "doc/tooltip/HTLC-5.png",
                     "buttons": [
                         {
                             "innerText": "Display",
@@ -1199,6 +1207,7 @@
                 },
                 {
                     "name": "last_rsmc_temp_address_private_key",
+                    "help": "Private Key of creating temporary 2-2 multi-sig address in previous RSMC transaction.",
                     "buttons": [
                         {
                             "innerText": "Display",
@@ -1208,6 +1217,7 @@
                 },
                 {
                     "name": "last_htlc_temp_address_private_key",
+                    "help": "Private Key of creating temporary 2-2 multi-sig address in previous HTLC transaction.",
                     "buttons": [
                         {
                             "innerText": "Display",
@@ -1217,6 +1227,7 @@
                 },
                 {
                     "name": "last_htlc_temp_address_for_htnx_private_key",
+                    "help": "Private Key of creating temporary 2-2 multi-sig address in previous HTLC htnx transaction.",
                     "buttons": [
                         {
                             "innerText": "Display",
@@ -1226,6 +1237,7 @@
                 },
                 {
                     "name": "curr_rsmc_temp_address_pub_key",
+                    "help": "This public key of an address will be used to create a temp 2-2 multi-sig address as output 0 of newer Cx transaction in RSMC.",
                     "buttons": [
                         {
                             "innerText": "Select",
@@ -1235,6 +1247,7 @@
                 },
                 {
                     "name": "curr_rsmc_temp_address_private_key",
+                    "help": "This private key of an address will be used to sign newer RDxa and BRxa transaction.",
                     "buttons": [
                         {
                             "innerText": "Select",
