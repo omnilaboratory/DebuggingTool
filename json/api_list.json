@@ -281,7 +281,7 @@
                 },
                 {
                     "name": "funding_txid",
-                    "help": "? - need to ask Guojun. The commitment transaction txid created in fundingBTC api (type 1009).",
+                    "help": "The commitment transaction txid created in fundingBTC api (type 1009).",
                     "imgPath": "doc/tooltip/3400-3500.png",
                     "buttons": [
                         {
@@ -457,7 +457,7 @@
                 },
                 {
                     "name": "fundee_channel_address_private_key",
-                    "help": "This key is the private key of the address used to create the Channel Address. OBD use the private key to sign the Cx and RDx transactions created by AssetFundingCreated (type -34).",
+                    "help": "This private key of the counterparty (Bob) address used to create the Channel Address. OBD use the private key to sign the C1a and RD1a transactions created by AssetFundingCreated (type -34).",
                     "imgPath": "doc/tooltip/34-35.png",
                     "buttons": [
                         {
@@ -502,7 +502,7 @@
                 },
                 {
                     "name": "channel_address_private_key",
-                    "help": "This is the private key used by Alice to create the channel. It will be used to sign C2a transaction in below picture as <Alice Sig>.",
+                    "help": "This private key used by Alice to create the channel. It will be used to sign C2a transaction in below picture as <Alice Sig>.",
                     "imgPath": "doc/tooltip/C2a.png",
                     "buttons": [
                         {
@@ -584,7 +584,8 @@
                 },
                 {
                     "name": "request_commitment_hash",
-                    "help": "? need to confirm. - Txid of Cxa transaction created by Alice ?",
+                    "help": "Commitment hash of C2a transaction created by Alice.",
+                    "imgPath": "doc/tooltip/C2a.png",
                     "buttons": [
                         {
                             "innerText": "Display",
@@ -627,7 +628,7 @@
                 },
                 {
                     "name": "last_temp_address_private_key",
-                    "help": "? - need confirm. See below picture, this is the private key of Alice2 in the last RSMC transaction (C1a). It will be used to sign BR1a transaction. When Alice cheats, the BR transaction will punish Alice and transfer all assets belonging to Alice to Bob.",
+                    "help": "See below picture, this is the private key of Alice2 in the last RSMC transaction (C1a). It will be used to sign BR1a transaction. When Alice cheats, the BR transaction will punish Alice and transfer all assets belonging to Alice to Bob.",
                     "imgPath": "doc/tooltip/BR1a.png",
                     "buttons": [
                         {
@@ -663,6 +664,7 @@
                 },
                 {
                     "name": "property_id",
+                    "help": "The property id of an omni asset.",
                     "buttons": [
                         {
                             "innerText": "Display",
@@ -701,6 +703,7 @@
                 },
                 {
                     "name": "property_id",
+                    "help": "The property id of an omni asset.",
                     "buttons": [
                         {
                             "innerText": "Display",
@@ -851,6 +854,7 @@
                 },
                 {
                     "name": "request_hash",
+                    "help": "The hash of commitment transaction created in HTLCCreated (type -40).",
                     "buttons": [
                         {
                             "innerText": "Display",
@@ -860,7 +864,7 @@
                 },
                 {
                     "name": "channel_address_private_key",
-                    "help": "This is the private key used by Bob to create the channel. It will be used to sign C2b and BR2b transaction in below picture as Bob Sig.",
+                    "help": "This private key used by Bob to create the channel. It will be used to sign C2b and BR2b transaction in below picture as Bob Sig.",
                     "imgPath": "doc/tooltip/HTLC-3.png",
                     "buttons": [
                         {
@@ -1037,6 +1041,7 @@
                 },
                 {
                     "name": "request_hash",
+                    "help": "The hash of commitment transaction created in HTLCSendR (type -45).",
                     "buttons": [
                         {
                             "innerText": "Display",
@@ -1187,6 +1192,7 @@
                 },
                 {
                     "name": "request_hash",
+                    "help": "The hash of commitment transaction created in CloseHTLC (type -49).",
                     "buttons": [
                         {
                             "innerText": "Display",
@@ -1289,6 +1295,7 @@
                 },
                 {
                     "name": "request_close_channel_hash",
+                    "help": "The hash of request created in CloseChannel (type -38).",
                     "buttons": [
                         {
                             "innerText": "Display",
