@@ -1,0 +1,28 @@
+#tracker
+{
+	font-family:"Trebuchet MS", Arial, Helvetica, sans-serif;
+	width:100%;
+	border-collapse:collapse;
+}
+#tracker td, #tracker th 
+{
+	font-size:13px;
+	border:1px solid #98bf21;
+    padding:3px 7px 2px 7px;
+    word-wrap:break-word; 
+    word-break:break-all;
+}
+#tracker th 
+{
+	font-size:13px;
+	text-align:left;
+	padding-top:5px;
+	padding-bottom:4px;
+	background-color:#A7C942;
+	color:#ffffff;
+}
+#tracker tr.alt td
+{
+	color:#000000;
+	background-color:#EAF2D3;
+}

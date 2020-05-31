@@ -1856,6 +1856,7 @@ function displayConnectOBD() {
 // remove name and request Div
 function removeNameReqDiv() {
     $("#name_req_div").remove();
+    $("#tracker_div").remove();
     var name_req_div = document.createElement('div');
     name_req_div.id = "name_req_div";
     $("#content").append(name_req_div);
@@ -1867,6 +1868,15 @@ function removeInvokeHistoryDiv() {
     var div = document.createElement('div');
     div.id = "invoke_history";
     $("#menu").append(div);
+}
+
+// 
+function removeTrackerDiv() {
+    $("#name_req_div").remove();
+    $("#tracker_div").remove();
+    var div = document.createElement('div');
+    div.id = "tracker_div";
+    $("#content").append(div);
 }
 
 // 
@@ -4489,4 +4499,60 @@ function jsonFormat(json) {
         }
         return '<span class="' + cls + '">' + match + '</span>';
     });
+}
+
+//
+function getObdNodes(pageNum, pageSize) {
+
+    let strURL = 'http://62.234.216.108:60060/api/common/getObdNodes?pageNum=' + 
+                pageNum + '&pageSize=' + pageSize;
+
+    $.ajax({
+        url: strURL,
+        type: "GET",
+        success: function(result) {
+            console.log(JSON.stringify(result));
+            tableNodes();
+        },
+        error: function(error) {
+            console.log('ERROR IS : ' + JSON.stringify(error));
+        }
+    })
+}
+
+//
+function tableNodes(pageNum, pageSize) {
+
+    removeTrackerDiv();
+
+    // table
+    let table = document.createElement('table');
+    table.id = 'tracker';
+    $("#tracker_div").append(table);
+
+    // head
+    createElement(table, 'tr');
+    createElement(table, 'th', 'id');
+    createElement(table, 'th', 'is_online');
+    createElement(table, 'th', 'latest_login_ip');
+    createElement(table, 'th', 'latest_login_at');
+    createElement(table, 'th', 'latest_offline_at');
+    createElement(table, 'th', 'node_id');
+    createElement(table, 'th', 'p2p_address');
+
+    // row
+    createElement(table, 'tr');
+    createElement(table, 'td', '1');
+    createElement(table, 'td', 'true');
+
+    // createElement(table, 'tr');
+    // createElement(table, 'td', '1');
+    // createElement(table, 'td', 'true');
+
+    let tr2 = document.createElement('tr');
+    tr2.setAttribute('class', 'alt');
+    table.append(tr2);
+    createElement(tr2, 'td', '2');
+    createElement(tr2, 'td', 'false');
+    
 }

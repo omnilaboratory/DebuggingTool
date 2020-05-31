@@ -7,6 +7,7 @@
     <title>OBD Debugging Tool</title>
     <link rel="stylesheet" href="css/main.css">
     <link rel="stylesheet" href="css/tooltip.css">
+    <link rel="stylesheet" href="css/table.css">
     <script src="https://lib.sinaapp.com/js/jquery/2.0.2/jquery-2.0.2.min.js"></script>
     <script src="js/btctool.js"></script>
     <script src="js/pojo.js"></script>
@@ -54,6 +55,15 @@
                 
                 <div class="menuTitle">Custom Mode</div>
                 <a href="#" class="url" onclick="displayCustomMode()">Debugging APIs</a>
+                
+                <div class="menuTitle">Tracker Data</div>
+                <div><a href="#" class="url" onclick="getObdNodes(1, 10)">Nodes</a></div>
+                <div><a href="#" class="url" onclick="getUsers()">Users</a></div>
+                <div><a href="#" class="url" onclick="getChannels()">Channels</a></div>
+                
+                <!-- Manage Assets - Dynamic create -->
+                <div class="menuTitle">Manage Assets</div>
+                <div id="manage_assets_list"></div>
                 
                 <!-- USER DATA LIST - Dynamic create -->
                 <div class="menuTitle">User Data</div>
