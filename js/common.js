@@ -4512,7 +4512,7 @@ function getObdNodes(pageNum, pageSize) {
         type: "GET",
         success: function(result) {
             console.log(JSON.stringify(result));
-            tableNodes();
+            tableNodes(result);
         },
         error: function(error) {
             console.log('ERROR IS : ' + JSON.stringify(error));
@@ -4521,38 +4521,123 @@ function getObdNodes(pageNum, pageSize) {
 }
 
 //
-function tableNodes(pageNum, pageSize) {
-
+function tableNodes(result) {
+    console.info('total count = ' + result.totalCount);
     removeTrackerDiv();
 
     // table
+    let tracker_div = $("#tracker_div");
     let table = document.createElement('table');
     table.id = 'tracker';
-    $("#tracker_div").append(table);
+    tracker_div.append(table);
 
     // head
     createElement(table, 'tr');
-    createElement(table, 'th', 'id');
-    createElement(table, 'th', 'is_online');
-    createElement(table, 'th', 'latest_login_ip');
-    createElement(table, 'th', 'latest_login_at');
-    createElement(table, 'th', 'latest_offline_at');
+    createElement(table, 'th', 'NO', 'col_1_width');
+    createElement(table, 'th', 'online', 'col_2_width');
     createElement(table, 'th', 'node_id');
     createElement(table, 'th', 'p2p_address');
+    createElement(table, 'th', 'login_ip', 'col_3_width');
+    createElement(table, 'th', 'login_time', 'col_4_width');
+    createElement(table, 'th', 'offline_time', 'col_4_width');
 
     // row
-    createElement(table, 'tr');
-    createElement(table, 'td', '1');
-    createElement(table, 'td', 'true');
+    let iNum = result.totalCount - result.data[0].id;
 
-    // createElement(table, 'tr');
-    // createElement(table, 'td', '1');
-    // createElement(table, 'td', 'true');
+    for (let i = 0; i < result.data.length; i++) {
+    // for (let i = result.data.length - 1; i >= 0; i--) {
+        if (i % 2 != 0) {
+            let tr2 = document.createElement('tr');
+            tr2.setAttribute('class', 'alt');
+            table.append(tr2);
+            // createElement(tr2, 'td', result.data[i].id);
+            createElement(tr2, 'td', i + 1 + iNum);
+            createElement(tr2, 'td', String(result.data[i].is_online));
+            createElement(tr2, 'td', result.data[i].node_id);
+            createElement(tr2, 'td', result.data[i].p2p_address);
+            createElement(tr2, 'td', result.data[i].latest_login_ip);
+            createElement(tr2, 'td', formatTime(result.data[i].latest_login_at));
+            createElement(tr2, 'td', formatTime(result.data[i].latest_offline_at));
+        } else {
+            createElement(table, 'tr');
+            // createElement(table, 'td', result.data[i].id);
+            createElement(table, 'td', i + 1 + iNum);
+            createElement(table, 'td', String(result.data[i].is_online));
+            createElement(table, 'td', result.data[i].node_id);
+            createElement(table, 'td', result.data[i].p2p_address);
+            createElement(table, 'td', result.data[i].latest_login_ip);
+            createElement(table, 'td', formatTime(result.data[i].latest_login_at));
+            createElement(table, 'td', formatTime(result.data[i].latest_offline_at));
+        }
+    }
 
-    let tr2 = document.createElement('tr');
-    tr2.setAttribute('class', 'alt');
-    table.append(tr2);
-    createElement(tr2, 'td', '2');
-    createElement(tr2, 'td', 'false');
-    
+    // total count
+    let bottom_div = document.createElement('div');
+    bottom_div.setAttribute('class', 'bottom_div');
+    tracker_div.append(bottom_div);
+
+    createElement(bottom_div, 'label', 'Total Count : ' + result.totalCount, 'left_margin');
+    createElement(bottom_div, 'label', 'Page ' + result.pageNum + ' / ' + result.totalPage, 'left_margin');
+
+    // previous page
+    let butPrevious = document.createElement('button');
+    butPrevious.id = 'butPrevious';
+    butPrevious.setAttribute('pageNum', result.pageNum);
+    butPrevious.setAttribute('totalPage', result.totalPage);
+    butPrevious.setAttribute('class', 'button button_small');
+    butPrevious.setAttribute('onclick', 'previousPage(this)');
+    butPrevious.innerText = 'Previous Page';
+    bottom_div.append(butPrevious);
+
+    if (result.pageNum === 1) {
+        butPrevious.setAttribute('class', 'button_small disabled');
+        butPrevious.setAttribute("disabled", "disabled");
+    }
+
+
+
+    // next page
+    let butNext = document.createElement('button');
+    butNext.setAttribute('pageNum', result.pageNum);
+    butNext.setAttribute('totalPage', result.totalPage);
+    butNext.setAttribute('class', 'button button_small');
+    butNext.setAttribute('onclick', 'nextPage(this)');
+    butNext.innerText = 'Next Page';
+    bottom_div.append(butNext);
+
+    if (result.pageNum === result.totalPage) {
+        butNext.setAttribute('class', 'button_small disabled');
+        butNext.setAttribute("disabled", "disabled");
+    }
+
+    // let apiItem = document.createElement('a');
+    // apiItem.href = '';
+    // // apiItem.setAttribute('class', 'url');
+    // apiItem.setAttribute('onclick', '');
+    // apiItem.innerText = 'Next Page';
+    // bottom_div.append(apiItem);
+}
+
+//
+function previousPage(obj) {
+    let previousPage = Number(obj.getAttribute("pageNum")) - 1;
+    console.info('previousPage = ' + previousPage);
+    getObdNodes(previousPage, 2);
+}
+
+//
+function nextPage(obj) {
+    let nextPage = Number(obj.getAttribute("pageNum")) + 1;
+    console.info('nextPage = ' + nextPage);
+    getObdNodes(nextPage, 2);
+}
+
+//
+function formatTime(time) {
+    // console.info(time);
+    if (time === '0001-01-01T00:00:00Z') {  // Null time
+        return '';
+    }
+
+    return time.substring(0, 19).replace('T', ' ');
 }

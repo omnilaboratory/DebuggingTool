@@ -1,14 +1,15 @@
 #tracker
 {
-	font-family:"Trebuchet MS", Arial, Helvetica, sans-serif;
+	/* font-family:"Trebuchet MS", Arial, Helvetica, sans-serif; */
 	width:100%;
 	border-collapse:collapse;
 }
 #tracker td, #tracker th 
 {
 	font-size:13px;
-	border:1px solid #98bf21;
-    padding:3px 7px 2px 7px;
+	border:1px solid #a9aaa7;
+    padding:10px 10px 10px 10px;
+    vertical-align: middle;
     word-wrap:break-word; 
     word-break:break-all;
 }
@@ -16,13 +17,38 @@
 {
 	font-size:13px;
 	text-align:left;
-	padding-top:5px;
-	padding-bottom:4px;
-	background-color:#A7C942;
+	padding-top:8px;
+	padding-bottom:8px;
+	background-color:rgb(78, 81, 87);
 	color:#ffffff;
 }
 #tracker tr.alt td
 {
 	color:#000000;
-	background-color:#EAF2D3;
+	background-color:rgb(214, 236, 223);
+}
+
+.col_1_width{
+    width: 20px;
+}
+
+.col_2_width{
+    width: 36px;
+}
+
+.col_3_width{
+    width: 50px;
+}
+
+.col_4_width{
+    width: 68px;
+}
+
+.bottom_div {
+    margin-top: 30px;
+    font-size: 18px;
+}
+
+.left_margin {
+    margin-right: 50px;
 }
