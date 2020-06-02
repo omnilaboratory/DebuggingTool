@@ -97,5 +97,5 @@ Switch back to Alice's window, we shall input Bob's `nodeAddress` and `userPeerI
 ## Step 5: open channel
 After successfully connecting Bob, Alice is able to open a channel with him.
 
-
+TO BE CONTINUE.....
 
