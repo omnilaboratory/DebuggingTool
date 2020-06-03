@@ -4502,9 +4502,9 @@ function jsonFormat(json) {
 }
 
 //
-function getObdNodes(pageNum, pageSize) {
+function getTrackerData(getWhat, pageNum, pageSize) {
 
-    let strURL = 'http://62.234.216.108:60060/api/common/getObdNodes?pageNum=' + 
+    let strURL = 'http://62.234.216.108:60060/api/common/' + getWhat + '?pageNum=' + 
                 pageNum + '&pageSize=' + pageSize;
 
     $.ajax({
@@ -4512,7 +4512,7 @@ function getObdNodes(pageNum, pageSize) {
         type: "GET",
         success: function(result) {
             console.log(JSON.stringify(result));
-            tableNodes(result);
+            tableData(getWhat, result);
         },
         error: function(error) {
             console.log('ERROR IS : ' + JSON.stringify(error));
@@ -4521,8 +4521,10 @@ function getObdNodes(pageNum, pageSize) {
 }
 
 //
-function tableNodes(result) {
+function tableData(getWhat, result) {
+    console.info('getWhat = ' + getWhat);
     console.info('total count = ' + result.totalCount);
+
     removeTrackerDiv();
 
     // table
@@ -4534,40 +4536,113 @@ function tableNodes(result) {
     // head
     createElement(table, 'tr');
     createElement(table, 'th', 'NO', 'col_1_width');
-    createElement(table, 'th', 'online', 'col_2_width');
-    createElement(table, 'th', 'node_id');
-    createElement(table, 'th', 'p2p_address');
-    createElement(table, 'th', 'login_ip', 'col_3_width');
-    createElement(table, 'th', 'login_time', 'col_4_width');
-    createElement(table, 'th', 'offline_time', 'col_4_width');
+    switch (getWhat) {
+        case 'getObdNodes':
+            createElement(table, 'th', 'online', 'col_2_width');
+            createElement(table, 'th', 'node_id');
+            createElement(table, 'th', 'p2p_address');
+            createElement(table, 'th', 'login_ip', 'col_3_width');
+            createElement(table, 'th', 'login_time', 'col_4_width');
+            createElement(table, 'th', 'offline_time', 'col_4_width');
+            break;
+
+        case 'getUsers':
+            createElement(table, 'th', 'online', 'col_2_width');
+            createElement(table, 'th', 'obd_node_id');
+            createElement(table, 'th', 'user_id');
+            createElement(table, 'th', 'offline_time', 'col_4_width');
+            break;
+            
+        case 'getChannels':
+            // createElement(table, 'th', 'obd_node_a');
+            // createElement(table, 'th', 'obd_node_b');
+            createElement(table, 'th', 'channel_id');
+            createElement(table, 'th', 'property_id', 'col_4_width');
+            // createElement(table, 'th', 'curr_state', 'col_2_width');
+            // createElement(table, 'th', 'user_a');
+            // createElement(table, 'th', 'user_b');
+            createElement(table, 'th', 'balance_a', 'col_4_width');
+            createElement(table, 'th', 'balance_b', 'col_4_width');
+            // createElement(table, 'th', 'create_time', 'col_4_width');
+            break;
+    }
+    
 
     // row
     let iNum = result.totalCount - result.data[0].id;
 
     for (let i = 0; i < result.data.length; i++) {
-    // for (let i = result.data.length - 1; i >= 0; i--) {
         if (i % 2 != 0) {
             let tr2 = document.createElement('tr');
             tr2.setAttribute('class', 'alt');
             table.append(tr2);
-            // createElement(tr2, 'td', result.data[i].id);
             createElement(tr2, 'td', i + 1 + iNum);
-            createElement(tr2, 'td', String(result.data[i].is_online));
-            createElement(tr2, 'td', result.data[i].node_id);
-            createElement(tr2, 'td', result.data[i].p2p_address);
-            createElement(tr2, 'td', result.data[i].latest_login_ip);
-            createElement(tr2, 'td', formatTime(result.data[i].latest_login_at));
-            createElement(tr2, 'td', formatTime(result.data[i].latest_offline_at));
+
+            switch (getWhat) {
+                case 'getObdNodes':
+                    createElement(tr2, 'td', String(result.data[i].is_online));
+                    createElement(tr2, 'td', result.data[i].node_id);
+                    createElement(tr2, 'td', result.data[i].p2p_address);
+                    createElement(tr2, 'td', result.data[i].latest_login_ip);
+                    createElement(tr2, 'td', formatTime(result.data[i].latest_login_at));
+                    createElement(tr2, 'td', formatTime(result.data[i].latest_offline_at));
+                    break;
+        
+                case 'getUsers':
+                    createElement(tr2, 'td', String(result.data[i].is_online));
+                    createElement(tr2, 'td', result.data[i].obd_node_id);
+                    createElement(tr2, 'td', result.data[i].user_id);
+                    createElement(tr2, 'td', formatTime(result.data[i].offline_at));
+                    break;
+        
+                case 'getChannels':
+                    // createElement(tr2, 'td', result.data[i].obd_node_ida);
+                    // createElement(tr2, 'td', result.data[i].obd_node_idb);
+                    createElement(tr2, 'td', result.data[i].channel_id);
+                    createElement(tr2, 'td', result.data[i].property_id);
+                    // createElement(tr2, 'td', result.data[i].curr_state);
+                    // createElement(tr2, 'td', result.data[i].peer_ida);
+                    // createElement(tr2, 'td', result.data[i].peer_idb);
+                    createElement(tr2, 'td', result.data[i].amount_a);
+                    createElement(tr2, 'td', result.data[i].amount_b);
+                    // createElement(tr2, 'td', result.data[i].create_at);
+                    break;
+            }
+
         } else {
             createElement(table, 'tr');
-            // createElement(table, 'td', result.data[i].id);
             createElement(table, 'td', i + 1 + iNum);
-            createElement(table, 'td', String(result.data[i].is_online));
-            createElement(table, 'td', result.data[i].node_id);
-            createElement(table, 'td', result.data[i].p2p_address);
-            createElement(table, 'td', result.data[i].latest_login_ip);
-            createElement(table, 'td', formatTime(result.data[i].latest_login_at));
-            createElement(table, 'td', formatTime(result.data[i].latest_offline_at));
+
+            switch (getWhat) {
+                case 'getObdNodes':
+                    createElement(table, 'td', String(result.data[i].is_online));
+                    createElement(table, 'td', result.data[i].node_id);
+                    createElement(table, 'td', result.data[i].p2p_address);
+                    createElement(table, 'td', result.data[i].latest_login_ip);
+                    createElement(table, 'td', formatTime(result.data[i].latest_login_at));
+                    createElement(table, 'td', formatTime(result.data[i].latest_offline_at));
+                    break;
+        
+                case 'getUsers':
+                    createElement(table, 'td', String(result.data[i].is_online));
+                    createElement(table, 'td', result.data[i].obd_node_id);
+                    createElement(table, 'td', result.data[i].user_id);
+                    createElement(table, 'td', formatTime(result.data[i].offline_at));
+                    break;
+        
+                case 'getChannels':
+                    // createElement(table, 'td', result.data[i].obd_node_ida);
+                    // createElement(table, 'td', result.data[i].obd_node_idb);
+                    createElement(table, 'td', result.data[i].channel_id);
+                    createElement(table, 'td', result.data[i].property_id);
+                    // createElement(table, 'td', result.data[i].curr_state);
+                    // createElement(table, 'td', result.data[i].peer_ida);
+                    // createElement(table, 'td', result.data[i].peer_idb);
+                    createElement(table, 'td', result.data[i].amount_a);
+                    createElement(table, 'td', result.data[i].amount_b);
+                    // createElement(table, 'td', result.data[i].create_at);
+                    break;
+            }
         }
     }
 
@@ -4581,12 +4656,12 @@ function tableNodes(result) {
 
     // previous page
     let butPrevious = document.createElement('button');
-    butPrevious.id = 'butPrevious';
+    butPrevious.setAttribute('getWhat', getWhat);
     butPrevious.setAttribute('pageNum', result.pageNum);
-    butPrevious.setAttribute('totalPage', result.totalPage);
+    // butPrevious.setAttribute('totalPage', result.totalPage);
     butPrevious.setAttribute('class', 'button button_small');
     butPrevious.setAttribute('onclick', 'previousPage(this)');
-    butPrevious.innerText = 'Previous Page';
+    butPrevious.innerText = 'Prev Page';
     bottom_div.append(butPrevious);
 
     if (result.pageNum === 1) {
@@ -4594,12 +4669,11 @@ function tableNodes(result) {
         butPrevious.setAttribute("disabled", "disabled");
     }
 
-
-
     // next page
     let butNext = document.createElement('button');
+    butNext.setAttribute('getWhat', getWhat);
     butNext.setAttribute('pageNum', result.pageNum);
-    butNext.setAttribute('totalPage', result.totalPage);
+    // butNext.setAttribute('totalPage', result.totalPage);
     butNext.setAttribute('class', 'button button_small');
     butNext.setAttribute('onclick', 'nextPage(this)');
     butNext.innerText = 'Next Page';
@@ -4609,27 +4683,22 @@ function tableNodes(result) {
         butNext.setAttribute('class', 'button_small disabled');
         butNext.setAttribute("disabled", "disabled");
     }
-
-    // let apiItem = document.createElement('a');
-    // apiItem.href = '';
-    // // apiItem.setAttribute('class', 'url');
-    // apiItem.setAttribute('onclick', '');
-    // apiItem.innerText = 'Next Page';
-    // bottom_div.append(apiItem);
 }
 
 //
 function previousPage(obj) {
+    let getWhat = obj.getAttribute("getWhat");
     let previousPage = Number(obj.getAttribute("pageNum")) - 1;
     console.info('previousPage = ' + previousPage);
-    getObdNodes(previousPage, 2);
+    getTrackerData(getWhat, previousPage, 10);
 }
 
 //
 function nextPage(obj) {
+    let getWhat = obj.getAttribute("getWhat");
     let nextPage = Number(obj.getAttribute("pageNum")) + 1;
     console.info('nextPage = ' + nextPage);
-    getObdNodes(nextPage, 2);
+    getTrackerData(getWhat, nextPage, 10);
 }
 
 //
