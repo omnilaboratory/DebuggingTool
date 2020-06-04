@@ -526,7 +526,136 @@ function getBalanceForOmni(msgType) {
     // OBD API
     obdApi.omniGetAllBalancesForAddress(address, function(e) {
         console.info('1200 getBalanceForOmni - OBD Response = ' + JSON.stringify(e));
-        createOBDResponseDiv(e, msgType);
+        // createOBDResponseDiv(e, msgType);
+    });
+}
+
+/** 
+ * 1201 issuanceFixed API at local.
+ * @param msgType
+ */
+function issuanceFixed(msgType) {
+
+    var from_address = $("#from_address").val();
+    var name = $("#name").val();
+    var ecosystem = $("#ecosystem").val();
+    var divisible_type = $("#divisible_type").val();
+    var data = $("#data").val();
+    var amount = $("#amount").val();
+
+    let info = new OmniSendIssuanceFixed();
+    info.from_address = from_address;
+    info.name = name;
+    info.ecosystem = Number(ecosystem);
+    info.divisible_type = Number(divisible_type);
+    info.data = data;
+    info.amount = Number(amount);
+
+    // OBD API
+    obdApi.createNewTokenFixed(info, function(e) {
+        console.info('1201 createNewTokenFixed - OBD Response = ' + JSON.stringify(e));
+        // createOBDResponseDiv(e, msgType);
+    });
+}
+
+/** 
+ * 1202 issuanceManaged API at local.
+ * @param msgType
+ */
+function issuanceManaged(msgType) {
+
+    var from_address = $("#from_address").val();
+    var name = $("#name").val();
+    var ecosystem = $("#ecosystem").val();
+    var divisible_type = $("#divisible_type").val();
+    var data = $("#data").val();
+
+    let info = new OmniSendIssuanceManaged();
+    info.from_address = from_address;
+    info.name = name;
+    info.ecosystem = Number(ecosystem);
+    info.divisible_type = Number(divisible_type);
+    info.data = data;
+
+    // OBD API
+    obdApi.createNewTokenManaged(info, function(e) {
+        console.info('1202 issuanceManaged - OBD Response = ' + JSON.stringify(e));
+        // createOBDResponseDiv(e, msgType);
+    });
+}
+
+/** 
+ * 1203 sendGrant API at local.
+ * @param msgType
+ */
+function sendGrant(msgType) {
+
+    var from_address = $("#from_address").val();
+    var property_id = $("#property_id").val();
+    var amount = $("#amount").val();
+    var memo = $("#memo").val();
+
+    let info = new OmniSendGrant();
+    info.from_address = from_address;
+    info.property_id = Number(property_id);
+    info.amount = Number(amount);
+    info.memo = memo;
+
+    // OBD API
+    obdApi.omniSendGrant(info, function(e) {
+        console.info('1203 sendGrant - OBD Response = ' + JSON.stringify(e));
+        // createOBDResponseDiv(e, msgType);
+    });
+}
+
+/** 
+ * 1204 sendRevoke API at local.
+ * @param msgType
+ */
+function sendRevoke(msgType) {
+
+    var from_address = $("#from_address").val();
+    var property_id = $("#property_id").val();
+    var amount = $("#amount").val();
+    var memo = $("#memo").val();
+
+    let info = new OmniSendRevoke();
+    info.from_address = from_address;
+    info.property_id = Number(property_id);
+    info.amount = Number(amount);
+    info.memo = memo;
+
+    // OBD API
+    obdApi.omniSendRevoke(info, function(e) {
+        console.info('1204 sendRevoke - OBD Response = ' + JSON.stringify(e));
+        // createOBDResponseDiv(e, msgType);
+    });
+}
+
+/** 
+ * 1205 listProperties API at local.
+ * @param msgType
+ */
+function listProperties(msgType) {
+    // OBD API
+    obdApi.listProperties(function(e) {
+        console.info('1205 listProperties - OBD Response = ' + JSON.stringify(e));
+        // createOBDResponseDiv(e, msgType);
+    });
+}
+
+/** 
+ * 1206 getTransaction API at local.
+ * @param msgType
+ */
+function getTransaction(msgType) {
+
+    var txid = $("#txid").val();
+
+    // OBD API
+    obdApi.getOmniTxByTxid(txid, function(e) {
+        console.info('1206 getTransaction - OBD Response = ' + JSON.stringify(e));
+        // createOBDResponseDiv(e, msgType);
     });
 }
 
@@ -541,7 +670,7 @@ function getAssetNameByID(msgType) {
     // OBD API
     obdApi.omniGetAssetNameByID(propertyId, function(e) {
         console.info('1207 getAssetNameByID - OBD Response = ' + JSON.stringify(e));
-        createOBDResponseDiv(e, msgType);
+        // createOBDResponseDiv(e, msgType);
     });
 }
 
@@ -1008,6 +1137,24 @@ function invokeAPIs(objSelf) {
         case enumMsgType.MsgType_Core_Omni_Getbalance_1200:
             getBalanceForOmni(msgType);
             break;
+        case enumMsgType.MsgType_Core_Omni_CreateNewTokenFixed_1201:
+            issuanceFixed(msgType);
+            break;
+        case enumMsgType.MsgType_Core_Omni_CreateNewTokenManaged_1202:
+            issuanceManaged(msgType);
+            break;
+        case enumMsgType.MsgType_Core_Omni_GrantNewUnitsOfManagedToken_1203:
+            sendGrant(msgType);
+            break;
+        case enumMsgType.MsgType_Core_Omni_RevokeUnitsOfManagedToken_1204:
+            sendRevoke(msgType);
+            break;
+        case enumMsgType.MsgType_Core_Omni_ListProperties_1205:
+            listProperties(msgType);
+            break;
+        case enumMsgType.MsgType_Core_Omni_GetTransaction_1206:
+            getTransaction(msgType);
+            break;
         case enumMsgType.MsgType_Core_Omni_GetAssetName_1207:
             getAssetNameByID(msgType);
             break;
@@ -1353,7 +1500,7 @@ function displayOBDMessages(msg) {
     localStorage.setItem('broadcast_info', showMsg);
 }
 
-// getUserDataList
+// 
 function getUserDataList(goWhere) {
 
     var api_id, description, apiItem, menuDiv;
@@ -1421,6 +1568,14 @@ function getAPIList() {
     createLeftSideMenu(jsonFile, divName);
 }
 
+// 
+function getManageAssetList() {
+    var jsonFile = "json/manage_asset.json";
+    var divName = "#manage_assets_list";
+
+    createLeftSideMenu(jsonFile, divName);
+}
+
 // createLeftSideMenu
 function createLeftSideMenu(jsonFile, divName) {
 
@@ -1464,7 +1619,7 @@ function displayAPIContent(obj) {
     createRequestDiv(obj);
     createInputParamDiv(obj, 'json/util_list.json');
     createInputParamDiv(obj, 'json/api_list.json');
-    // createInvokeAPIButton(obj);
+    createInputParamDiv(obj, 'json/manage_asset.json');
 }
 
 // create 

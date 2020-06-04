@@ -135,6 +135,23 @@
             ]
         },
         {
+            "id": "ListProperties",
+            "type_id": 1205,
+            "description": "ListProperties is used to list all tokens or smart properties. This call may take a long time, it may return a large amount of data, please use it with caution.",
+            "parameters": []
+        },
+        {
+            "id": "GetTransaction",
+            "type_id": 1206,
+            "description": "GetTransaction is used to get detailed information about an Omni transaction.",
+            "parameters": [
+                {
+                    "name": "txid",
+                    "buttons": []
+                }
+            ]
+        },
+        {
             "id": "GetAssetNameByID",
             "type_id": 1207,
             "description": "GetAssetNameByID is used to get omni asset name by asset id (Property Id) .",

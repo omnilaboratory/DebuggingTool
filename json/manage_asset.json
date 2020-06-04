@@ -1,0 +1,147 @@
+﻿{
+    "data": [
+        {
+            "id": "issuanceFixed",
+            "type_id": 1201,
+            "description": "issuanceFixed is used to create new tokens with fixed supply.",
+            "parameters": [
+                {
+                    "name": "from_address",
+                    "help": "The address to send from. This address must be belong to wallet (ismine = true) and has enough bitcoin to pay miner fee.",
+                    "buttons": [
+                        {
+                            "innerText": "Select",
+                            "onclick": "displayUserDataInNewHtml('MyAddresses')"
+                        }
+                    ]
+                },
+                {
+                    "name": "name",
+                    "help": "the name of the new tokens to create",
+                    "buttons": []
+                },
+                {
+                    "name": "ecosystem",
+                    "help": "the ecosystem to create the tokens in (1 for main ecosystem, 2 for test ecosystem)",
+                    "buttons": []
+                },
+                {
+                    "name": "divisible_type",
+                    "help": "the type of the tokens to create: (1 for indivisible tokens, 2 for divisible tokens)",
+                    "buttons": []
+                },
+                {
+                    "name": "data",
+                    "help": "a description for the new tokens (can be '')",
+                    "buttons": []
+                },
+                {
+                    "name": "amount",
+                    "help": "the number of tokens to create",
+                    "buttons": []
+                }
+            ]
+        },
+        {
+            "id": "issuanceManaged",
+            "type_id": 1202,
+            "description": "issuanceManaged is used to create new tokens with manageable supply. NOTE: Record the txid returned by OBD and get the property id you have issued manageable asset with GetTransaction (type 1206) API.",
+            "parameters": [
+                {
+                    "name": "from_address",
+                    "help": "the address to send from",
+                    "buttons": [
+                        {
+                            "innerText": "Select",
+                            "onclick": "displayUserDataInNewHtml('MyAddresses')"
+                        }
+                    ]
+                },
+                {
+                    "name": "name",
+                    "help": "the name of the new tokens to create",
+                    "buttons": []
+                },
+                {
+                    "name": "ecosystem",
+                    "help": "the ecosystem to create the tokens in (1 for main ecosystem, 2 for test ecosystem)",
+                    "buttons": []
+                },
+                {
+                    "name": "divisible_type",
+                    "help": "the type of the tokens to create: (1 for indivisible tokens, 2 for divisible tokens)",
+                    "buttons": []
+                },
+                {
+                    "name": "data",
+                    "help": "a description for the new tokens (can be '')",
+                    "buttons": []
+                }
+            ]
+        },
+        {
+            "id": "sendGrant",
+            "type_id": 1203,
+            "description": "sendGrant is used to issue or grant new units of managed tokens.",
+            "parameters": [
+                {
+                    "name": "from_address",
+                    "help": "the address to send from",
+                    "buttons": [
+                        {
+                            "innerText": "Select",
+                            "onclick": "displayUserDataInNewHtml('MyAddresses')"
+                        }
+                    ]
+                },
+                {
+                    "name": "property_id",
+                    "help": "The identifier of the tokens to grant. Get it by invoke GetTransaction (type 1206) API through input the txid returned by issuanceManaged (type 1202) API.",
+                    "buttons": []
+                },
+                {
+                    "name": "amount",
+                    "help": "the amount of tokens to create",
+                    "buttons": []
+                },
+                {
+                    "name": "memo",
+                    "help": "a text note attached to this transaction (none by default)",
+                    "buttons": []
+                }
+            ]
+        },
+        {
+            "id": "sendRevoke",
+            "type_id": 1204,
+            "description": "sendRevoke is used to revoke units of managed tokens.",
+            "parameters": [
+                {
+                    "name": "from_address",
+                    "help": "the address to send from",
+                    "buttons": [
+                        {
+                            "innerText": "Select",
+                            "onclick": "displayUserDataInNewHtml('MyAddresses')"
+                        }
+                    ]
+                },
+                {
+                    "name": "property_id",
+                    "help": "The identifier of the tokens to revoke. Get it by invoke GetTransaction (type 1206) API through input the txid returned by issuanceManaged (type 1202) API.",
+                    "buttons": []
+                },
+                {
+                    "name": "amount",
+                    "help": "the amount of tokens to revoke",
+                    "buttons": []
+                },
+                {
+                    "name": "memo",
+                    "help": "a text note attached to this transaction (none by default)",
+                    "buttons": []
+                }
+            ]
+        }
+    ]
+}
