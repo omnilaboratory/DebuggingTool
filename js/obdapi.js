@@ -1217,7 +1217,7 @@ class ObdApi {
             alert("empty property_id");
             return;
         }
-        if (info.amount == null || info.amount <= 1) {
+        if (info.amount == null || info.amount <= 0) {
             alert("wrong amount");
             return;
         }
@@ -1244,7 +1244,7 @@ class ObdApi {
             alert("empty property_id");
             return;
         }
-        if (info.amount == null || info.amount <= 1) {
+        if (info.amount == null || info.amount <= 0) {
             alert("wrong amount");
             return;
         }
