@@ -13,22 +13,14 @@ In this tutorial, you can connect either your own OBD node, or the node we confi
   <img width="500" alt="Debugging Tool Screenshot" src="https://github.com/omnilaboratory/DebuggingTool/blob/master/doc/img/image_screen.png">
 </p>
 
-* [Installation](https://github.com/omnilaboratory/DebuggingTool#Installation: clone this project and run it by Chrome)
-* [Operations](https://github.com/omnilaboratory/DebuggingTool#Operations) 
-	* [Step 1: connect to an OBD node](https://github.com/omnilaboratory/DebuggingTool#Step 1: connect to an OBD node)
-	* [Step 2: signup a new user](https://github.com/omnilaboratory/DebuggingTool#Step 2: signup a new user)
-	* [Step 3: Login using mnemonic words](https://github.com/omnilaboratory/DebuggingTool#Step 3: Login using mnemonic words)
-	* [Step 4: connect another user](https://github.com/omnilaboratory/DebuggingTool#Step 4: connect another user)
-	* [Step 5: channel operations](https://github.com/omnilaboratory/DebuggingTool#step-5-channel-operations-on-test-site)
-		* [create channel](https://github.com/omnilaboratory/obd#create-channel)
-		* [deposit](https://github.com/omnilaboratory/obd#deposit)
-		* [payments in channel](https://github.com/omnilaboratory/obd#payments-in-a-channel)
-			<!-- Added by Kevin Zhang 2019-11-19 -->		
-		* [transfer assets by HTLC](https://github.com/omnilaboratory/obd#step-6-transfer-assets-through-HTLC) 
-		* close channel (TBD)
-
-	
-	
+* [Installation](https://github.com/omnilaboratory/DebuggingTool#installation-clone-this-project-and-run-it-by-chrome)
+* [Operations](https://github.com/omnilaboratory/DebuggingTool#operations) 
+	* [Step 1: connect to an OBD node](https://github.com/omnilaboratory/DebuggingTool#step-1-connect-to-an-obd-node)
+	* [Step 2: signup a new user](https://github.com/omnilaboratory/DebuggingTool#step-2-signup-a-new-user)
+	* [Step 3: Login using mnemonic words](https://github.com/omnilaboratory/DebuggingTool#step-3-login-using-mnemonic-words)
+	* [Step 4: connect another user](https://github.com/omnilaboratory/DebuggingTool#step-4-connect-another-user)
+	* [Step 5: channel operations](https://github.com/omnilaboratory/DebuggingTool#step-5-channel-operations)
+ 	
 
 ## Installation: clone this project and run it by Chrome
 
