@@ -76,6 +76,13 @@ pre {
     margin-left: 10px;
 }
 
+.input_color {
+    color: rgb(126, 109, 109);
+    background: rgb(245, 239, 239);
+    border-radius: 3px;
+    border: 1px solid;
+}
+
 .disabled {
     cursor: not-allowed;
 }

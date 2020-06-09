@@ -141,6 +141,10 @@
                             "onclick": "displayUserDataInNewHtml('MyAddresses')"
                         },
                         {
+                            "innerText": "Create",
+                            "onclick": "autoCreateFundingPubkey(1009)"
+                        },
+                        {
                             "innerText": "Bitcoin Faucet",
                             "onclick": "openTestnetFaucet()"
                         }
@@ -304,6 +308,10 @@
                         {
                             "innerText": "Select",
                             "onclick": "displayUserDataInNewHtml('MyAddresses')"
+                        },
+                        {
+                            "innerText": "Create",
+                            "onclick": "autoCreateFundingPubkey(2001)"
                         }
                     ]
                 },
@@ -384,6 +392,10 @@
                         {
                             "innerText": "Select",
                             "onclick": "displayUserDataInNewHtml('MyAddresses')"
+                        },
+                        {
+                            "innerText": "Create",
+                            "onclick": "autoCreateFundingPubkey(-34)"
                         }
                     ]
                 },
@@ -519,6 +531,10 @@
                         {
                             "innerText": "Select",
                             "onclick": "displayUserDataInNewHtml('MyAddresses')"
+                        },
+                        {
+                            "innerText": "Create",
+                            "onclick": "autoCreateFundingPubkey(-351)"
                         }
                     ]
                 },
@@ -612,6 +628,10 @@
                         {
                             "innerText": "Select",
                             "onclick": "displayUserDataInNewHtml('MyAddresses')"
+                        },
+                        {
+                            "innerText": "Create",
+                            "onclick": "autoCreateFundingPubkey(-352)"
                         }
                     ]
                 },
@@ -758,6 +778,10 @@
                         {
                             "innerText": "Select",
                             "onclick": "displayUserDataInNewHtml('MyAddresses')"
+                        },
+                        {
+                            "innerText": "Create",
+                            "onclick": "autoCreateFundingPubkey(-401)"
                         }
                     ]
                 },
@@ -780,6 +804,10 @@
                         {
                             "innerText": "Select",
                             "onclick": "displayUserDataInNewHtml('MyAddresses')"
+                        },
+                        {
+                            "innerText": "Create",
+                            "onclick": "autoCreateFundingPubkey(-402)"
                         }
                     ]
                 },
@@ -802,6 +830,10 @@
                         {
                             "innerText": "Select",
                             "onclick": "displayUserDataInNewHtml('MyAddresses')"
+                        },
+                        {
+                            "innerText": "Create",
+                            "onclick": "autoCreateFundingPubkey(-403)"
                         }
                     ]
                 },
@@ -881,6 +913,10 @@
                         {
                             "innerText": "Select",
                             "onclick": "displayUserDataInNewHtml('MyAddresses')"
+                        },
+                        {
+                            "innerText": "Create",
+                            "onclick": "autoCreateFundingPubkey(-411)"
                         }
                     ]
                 },
@@ -903,6 +939,10 @@
                         {
                             "innerText": "Select",
                             "onclick": "displayUserDataInNewHtml('MyAddresses')"
+                        },
+                        {
+                            "innerText": "Create",
+                            "onclick": "autoCreateFundingPubkey(-412)"
                         }
                     ]
                 },
@@ -991,6 +1031,10 @@
                         {
                             "innerText": "Select",
                             "onclick": "displayUserDataInNewHtml('MyAddresses')"
+                        },
+                        {
+                            "innerText": "Create",
+                            "onclick": "autoCreateFundingPubkey(-45)"
                         }
                     ]
                 },
@@ -1152,6 +1196,10 @@
                         {
                             "innerText": "Select",
                             "onclick": "displayUserDataInNewHtml('MyAddresses')"
+                        },
+                        {
+                            "innerText": "Create",
+                            "onclick": "autoCreateFundingPubkey(-49)"
                         }
                     ]
                 },
@@ -1248,6 +1296,10 @@
                         {
                             "innerText": "Select",
                             "onclick": "displayUserDataInNewHtml('MyAddresses')"
+                        },
+                        {
+                            "innerText": "Create",
+                            "onclick": "autoCreateFundingPubkey(-50)"
                         }
                     ]
                 },

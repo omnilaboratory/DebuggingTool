@@ -1708,7 +1708,7 @@ function createInputParamDiv(obj, jsonFile) {
                 // Parameters
                 createParamOfAPI(arrParams, newDiv);
                 content_div.append(newDiv);
-                autoFillValue(arrParams);
+                autoFillValue(arrParams, obj);
             }
         }
 
@@ -1731,8 +1731,8 @@ function createInputParamDiv(obj, jsonFile) {
 }
 
 //
-function autoFillValue(arrParams) {
-    // auto fill
+function autoFillValue(arrParams, obj) {
+    // auto fill to temporary_channel_id
     if (arrParams[0].name === 'temporary_channel_id') {
         if (strTempChID) {
             $("#temporary_channel_id").val(strTempChID);
@@ -1748,6 +1748,106 @@ function autoFillValue(arrParams) {
             $("#amount").val(btcAmount);
             $("#miner_fee").val(btcMinerFee);
         }
+    }
+
+    // Auto generate addresses and fill pubkey and privkey to input box
+    let result;
+    let msgType = Number(obj.getAttribute("type_id"));
+    switch (msgType) {
+        case enumMsgType.MsgType_FundingCreate_AssetFundingCreated_N34:
+            result = getNewAddressWithMnemonic();
+            if (result === '') return;
+            $("#temp_address_pub_key").val(result.result.pubkey);
+            $("#temp_address_private_key").val(result.result.wif);
+            $("#temp_address_pub_key").attr("class", "input input_color");
+            $("#temp_address_private_key").attr("class", "input input_color");
+            saveAddresses(result);
+            break;
+
+        case enumMsgType.MsgType_CommitmentTx_CommitmentTransactionCreated_N351:
+        case enumMsgType.MsgType_CommitmentTxSigned_RevokeAndAcknowledgeCommitmentTransaction_N352:
+            result = getNewAddressWithMnemonic();
+            if (result === '') return;
+            $("#curr_temp_address_pub_key").val(result.result.pubkey);
+            $("#curr_temp_address_private_key").val(result.result.wif);
+            $("#curr_temp_address_pub_key").attr("class", "input input_color");
+            $("#curr_temp_address_private_key").attr("class", "input input_color");
+            saveAddresses(result);
+            break;
+
+        case enumMsgType.MsgType_HTLC_AddHTLC_N40:
+            result = getNewAddressWithMnemonic();
+            if (result === '') return;
+            $("#curr_rsmc_temp_address_pub_key").val(result.result.pubkey);
+            $("#curr_rsmc_temp_address_private_key").val(result.result.wif);
+            $("#curr_rsmc_temp_address_pub_key").attr("class", "input input_color");
+            $("#curr_rsmc_temp_address_private_key").attr("class", "input input_color");
+            saveAddresses(result);
+
+            result = getNewAddressWithMnemonic();
+            if (result === '') return;
+            $("#curr_htlc_temp_address_pub_key").val(result.result.pubkey);
+            $("#curr_htlc_temp_address_private_key").val(result.result.wif);
+            $("#curr_htlc_temp_address_pub_key").attr("class", "input input_color");
+            $("#curr_htlc_temp_address_private_key").attr("class", "input input_color");
+            saveAddresses(result);
+
+            result = getNewAddressWithMnemonic();
+            if (result === '') return;
+            $("#curr_htlc_temp_address_for_ht1a_pub_key").val(result.result.pubkey);
+            $("#curr_htlc_temp_address_for_ht1a_private_key").val(result.result.wif);
+            $("#curr_htlc_temp_address_for_ht1a_pub_key").attr("class", "input input_color");
+            $("#curr_htlc_temp_address_for_ht1a_private_key").attr("class", "input input_color");
+            saveAddresses(result);
+            break;
+
+        case enumMsgType.MsgType_HTLC_AddHTLCSigned_N41:
+            result = getNewAddressWithMnemonic();
+            if (result === '') return;
+            $("#curr_rsmc_temp_address_pub_key").val(result.result.pubkey);
+            $("#curr_rsmc_temp_address_private_key").val(result.result.wif);
+            $("#curr_rsmc_temp_address_pub_key").attr("class", "input input_color");
+            $("#curr_rsmc_temp_address_private_key").attr("class", "input input_color");
+            saveAddresses(result);
+
+            result = getNewAddressWithMnemonic();
+            if (result === '') return;
+            $("#curr_htlc_temp_address_pub_key").val(result.result.pubkey);
+            $("#curr_htlc_temp_address_private_key").val(result.result.wif);
+            $("#curr_htlc_temp_address_pub_key").attr("class", "input input_color");
+            $("#curr_htlc_temp_address_private_key").attr("class", "input input_color");
+            saveAddresses(result);
+            break;
+        
+        case enumMsgType.MsgType_HTLC_SendR_N45:
+            result = getNewAddressWithMnemonic();
+            if (result === '') return;
+            $("#curr_htlc_temp_address_for_he1b_pub_key").val(result.result.pubkey);
+            $("#curr_htlc_temp_address_for_he1b_private_key").val(result.result.wif);
+            $("#curr_htlc_temp_address_for_he1b_pub_key").attr("class", "input input_color");
+            $("#curr_htlc_temp_address_for_he1b_private_key").attr("class", "input input_color");
+            saveAddresses(result);
+            break;
+
+        case enumMsgType.MsgType_HTLC_RequestCloseCurrTx_N49:
+            result = getNewAddressWithMnemonic();
+            if (result === '') return;
+            $("#curr_rsmc_temp_address_pub_key").val(result.result.pubkey);
+            $("#curr_rsmc_temp_address_private_key").val(result.result.wif);
+            $("#curr_rsmc_temp_address_pub_key").attr("class", "input input_color");
+            $("#curr_rsmc_temp_address_private_key").attr("class", "input input_color");
+            saveAddresses(result);
+            break;
+
+        case enumMsgType.MsgType_HTLC_CloseSigned_N50:
+            result = getNewAddressWithMnemonic();
+            if (result === '') return;
+            $("#curr_rsmc_temp_address_pub_key").val(result.result.pubkey);
+            $("#curr_rsmc_temp_address_private_key").val(result.result.wif);
+            $("#curr_rsmc_temp_address_pub_key").attr("class", "input input_color");
+            $("#curr_rsmc_temp_address_private_key").attr("class", "input input_color");
+            saveAddresses(result);
+            break;
     }
 }
 
@@ -3779,9 +3879,39 @@ function autoCreateFundingPubkey(param) {
     if (result === '') return;
 
     switch (param) {
-        case 0:
+        case 1009:
+        case 2001:
             $("#from_address").val(result.result.address);
             $("#from_address_private_key").val(result.result.wif);
+            break;
+        case -34:
+            $("#temp_address_pub_key").val(result.result.pubkey);
+            $("#temp_address_private_key").val(result.result.wif);
+            break;
+        case -351:
+        case -352:
+            $("#curr_temp_address_pub_key").val(result.result.pubkey);
+            $("#curr_temp_address_private_key").val(result.result.wif);
+            break;
+        case -401: // first data for type -40
+        case -411: // first data for type -41
+        case -49:
+        case -50:
+            $("#curr_rsmc_temp_address_pub_key").val(result.result.pubkey);
+            $("#curr_rsmc_temp_address_private_key").val(result.result.wif);
+            break;
+        case -402: // second data for type -40
+        case -412: // second data for type -41
+            $("#curr_htlc_temp_address_pub_key").val(result.result.pubkey);
+            $("#curr_htlc_temp_address_private_key").val(result.result.wif);
+            break;
+        case -403: // third data for type -40
+            $("#curr_htlc_temp_address_for_ht1a_pub_key").val(result.result.pubkey);
+            $("#curr_htlc_temp_address_for_ht1a_private_key").val(result.result.wif);
+            break;
+        case -45:
+            $("#curr_htlc_temp_address_for_he1b_pub_key").val(result.result.pubkey);
+            $("#curr_htlc_temp_address_for_he1b_private_key").val(result.result.wif);
             break;
         default:
             $("#funding_pubkey").val(result.result.pubkey);
@@ -4599,7 +4729,7 @@ function createElement(parent, elementName, myInnerText, css) {
 function displayUserDataInNewHtml(goWhere) {
     saveGoWhere(goWhere);
     window.open('userData.html', 'data', 'height=600, width=800, top=150, ' +
-        'left=500, toolbar=no, menubar=no, scrollbars=no, resizable=no, ' +
+        'left=300, toolbar=no, menubar=no, scrollbars=no, resizable=no, ' +
         'location=no, status=no');
 }
 
