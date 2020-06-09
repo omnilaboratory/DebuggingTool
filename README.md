@@ -1,4 +1,4 @@
-# DebuggingTool
+# OBD GUI Tool
 [![](https://img.shields.io/badge/license-MIT-blue)](https://github.com/omnilaboratory/obd/blob/master/LICENSE) [![](https://img.shields.io/badge/standard%20readme-OK-brightgreen)](https://github.com/omnilaboratory/obd/blob/master/README.md) [![](https://img.shields.io/badge/golang-%3E%3D1.9.0-orange)](https://golang.org/dl/) [![](https://img.shields.io/badge/protocol-OmniBOLT-brightgreen)](https://github.com/omnilaboratory/OmniBOLT-spec) 
 [![](https://img.shields.io/badge/API%20V0.3-Document-blue)](https://api.omnilab.online) 
 
@@ -13,7 +13,16 @@ In this tutorial, you can connect either your own OBD node, or the node we confi
   <img width="500" alt="Debugging Tool Screenshot" src="https://github.com/omnilaboratory/DebuggingTool/blob/master/doc/img/image_screen.png">
 </p>
 
-## Step 0: clone this project and run it by Chrome
+* [Installation](https://github.com/omnilaboratory/DebuggingTool#installation-clone-this-project-and-run-it-by-chrome)
+* [Operations](https://github.com/omnilaboratory/DebuggingTool#operations) 
+	* [Step 1: connect to an OBD node](https://github.com/omnilaboratory/DebuggingTool#step-1-connect-to-an-obd-node)
+	* [Step 2: signup a new user](https://github.com/omnilaboratory/DebuggingTool#step-2-signup-a-new-user)
+	* [Step 3: Login using mnemonic words](https://github.com/omnilaboratory/DebuggingTool#step-3-login-using-mnemonic-words)
+	* [Step 4: connect another user](https://github.com/omnilaboratory/DebuggingTool#step-4-connect-another-user)
+	* [Step 5: channel operations](https://github.com/omnilaboratory/DebuggingTool#step-5-channel-operations)
+ 	
+
+## Installation: clone this project and run it by Chrome
 
 ```
 git clone https://github.com/omnilaboratory/DebuggingTool
@@ -27,7 +36,9 @@ chrome.exe --args --disable-web-security --user-data-dir=/any_temp_directory_for
 Then open index.html under the DebuggingTool directory.
 
 
-## Step 1: connect to an OBD node
+## Operations 
+
+### Step 1: connect to an OBD node
 
 <p align="center">
   <img width="750" alt="Connect Screenshot" src="https://github.com/omnilaboratory/DebuggingTool/blob/master/doc/img/connect.png">
@@ -39,7 +50,7 @@ Then open index.html under the DebuggingTool directory.
 
 If you want to build and deploy your own OBD, you shall go through the installation intruction at [obd repository](https://github.com/omnilaboratory/obd#installation).
 
-## Step 2: signup a new user
+### Step 2: signup a new user
 
 <p align="center">
   <img width="750" alt="SignUp" src="https://github.com/omnilaboratory/DebuggingTool/blob/master/doc/img/signup.png">
@@ -50,7 +61,7 @@ If you want to build and deploy your own OBD, you shall go through the installat
 3. OBD responses the new set of mnemonic words for the currently connected new user. The mnemonic words is the identity to carry out all the following operations in obd network; Record this mnemonic words in somewhere safe. For example, write it down on a paper.  
 
 
-## Step 3: Login using mnemonic words
+### Step 3: Login using mnemonic words
 
 <p align="center">
   <img width="750" alt="login" src="https://github.com/omnilaboratory/DebuggingTool/blob/master/doc/img/login.png">
@@ -78,7 +89,7 @@ This is the user id, which is used together with `nodeAddress` to tell someone e
 
 We assume this first window belongs to user Alice.
 
-## Step 4: connect another user
+### Step 4: connect another user
 
 Open another browser window, open index.html, and signup another user to get his `nodeAddress` and `userPeerId`. In this tutorial, this second window belongs to user Bob.
 
@@ -94,8 +105,6 @@ Switch back to Alice's window, we shall input Bob's `nodeAddress` and `userPeerI
 4. click "invoke API";  
 
 
-## Step 5: open channel
-After successfully connecting Bob, Alice is able to open a channel with him.
+### Step 5: Channel Operations
 
-TO BE CONTINUE.....
-
+Online API documents lists all the channel operations step by step, and testing demo data as well. Please visit OBD [online API documentation](https://api.omnilab.online) for the lastest update.  
