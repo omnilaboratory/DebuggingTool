@@ -225,190 +225,97 @@ class AtomicSwapAccepted extends AtomicSwapRequest {
 class MessageType {
   MsgType_Error_0 = 0;
 
-  MsgType_UserLogin_1 = -102001;
-  MsgType_UserLogout_2 = -102002;
-  MsgType_p2p_ConnectServer_3  = -102003;
-  MsgType_GetMnemonic_101 = -102004;
+  MsgType_UserLogin_2001          = -102001;
+  MsgType_UserLogout_2002         = -102002;
+  MsgType_p2p_ConnectServer_2003  = -102003;
+  MsgType_GetMnemonic_2004        = -102004;
 
-  MsgType_Core_GetNewAddress_1001 = -102101;
-  MsgType_Core_GetMiningInfo_1002 = -102102;
-  MsgType_Core_GetNetworkInfo_1003 = -102103;
-  MsgType_Core_SignMessageWithPrivKey_1004 = -102104;
-  MsgType_Core_VerifyMessage_1005 = -102105;
-  MsgType_Core_DumpPrivKey_1006 = -102106;
-  MsgType_Core_ListUnspent_1007 = -102107;
-  MsgType_Core_BalanceByAddress_1008 = -102108;
-  MsgType_Core_FundingBTC_1009 = -102109;
-  MsgType_Core_BtcCreateMultiSig_1010 = -102110;
-  MsgType_Core_Btc_ImportPrivKey_1011 = -102111;
-  MsgType_Core_Omni_Getbalance_1200 = -102112;
-  MsgType_Core_Omni_CreateNewTokenFixed_1201 = -102113;
-  MsgType_Core_Omni_CreateNewTokenManaged_1202 = -102114;
-  MsgType_Core_Omni_GrantNewUnitsOfManagedToken_1203 = -102115;
-  MsgType_Core_Omni_RevokeUnitsOfManagedToken_1204 = -102116;
-  MsgType_Core_Omni_ListProperties_1205 = -102117;
-  MsgType_Core_Omni_GetTransaction_1206 = -102118;
-  // MsgType_Core_Omni_GetAssetName_1207 = -102119;
-  MsgType_Core_Omni_GetProperty_2119  = -102119;
-  MsgType_Core_Omni_FundingAsset_2001 = -102120;
+  MsgType_Core_GetNewAddress_2101                    = -102101;
+  MsgType_Core_GetMiningInfo_2102                    = -102102;
+  MsgType_Core_GetNetworkInfo_2103                   = -102103;
+  MsgType_Core_SignMessageWithPrivKey_2104           = -102104;
+  MsgType_Core_VerifyMessage_2105                    = -102105;
+  MsgType_Core_DumpPrivKey_2106                      = -102106;
+  MsgType_Core_ListUnspent_2107                      = -102107;
+  MsgType_Core_BalanceByAddress_2108                 = -102108;
+  MsgType_Core_FundingBTC_2109                       = -102109;
+  MsgType_Core_BtcCreateMultiSig_2110                = -102110;
+  MsgType_Core_Btc_ImportPrivKey_2111                = -102111;
+  MsgType_Core_Omni_Getbalance_2112                  = -102112;
+  MsgType_Core_Omni_CreateNewTokenFixed_2113         = -102113;
+  MsgType_Core_Omni_CreateNewTokenManaged_2114       = -102114;
+  MsgType_Core_Omni_GrantNewUnitsOfManagedToken_2115 = -102115;
+  MsgType_Core_Omni_RevokeUnitsOfManagedToken_2116   = -102116;
+  MsgType_Core_Omni_ListProperties_2117              = -102117;
+  MsgType_Core_Omni_GetTransaction_2118              = -102118;
+  MsgType_Core_Omni_GetProperty_2119                 = -102119;
+  MsgType_Core_Omni_FundingAsset_2120                = -102120;
   
-  MsgType_Mnemonic_CreateAddress_N200 = -103000;
-  MsgType_Mnemonic_GetAddressByIndex_201 = -103001;
-
-  // 客户端调用的2位需要替换成4位
-  // MsgType_FundingCreate_AssetFundingCreated_N34 = -34;
-	MsgType_FundingCreate_SendAssetFundingCreated_34 = -100034;
-	// MsgType_FundingCreate_AssetFundingCreated_34     MsgType = -34
-	MsgType_FundingCreate_RecvAssetFundingCreated_34  = -110034;
-
-  // 客户端调用的4位需要替换成新的4位
-  // MsgType_FundingCreate_BtcCreate_N3400 = -103001;
-  MsgType_FundingCreate_SendBtcFundingCreated_340  = -100340;
-	// MsgType_FundingCreate_BtcFundingCreated_340     MsgType = -340
-	MsgType_FundingCreate_RecvBtcFundingCreated_340  = -110340;
-  
-  // MsgType_FundingCreate_ALlItem_N3403 = -103001;
-  //Omni充值列表
-  MsgType_FundingCreate_Asset_AllItem_3100 = -103100;
-
-  // MsgType_FundingCreate_ItemById_N3402 = -103001;
-	//Omni充值根据id获取充值详情
-	MsgType_FundingCreate_Asset_ItemById_3101 = -103101;
-
-  // MsgType_FundingCreate_ItemByTempId_N3401 = -103001;
-  //Omni充值根据通道id获取充值详情
+  MsgType_Mnemonic_CreateAddress_3000              = -103000;
+  MsgType_Mnemonic_GetAddressByIndex_3001          = -103001;
+  MsgType_FundingCreate_Asset_AllItem_3100         = -103100;
+	MsgType_FundingCreate_Asset_ItemById_3101        = -103101;
   MsgType_FundingCreate_Asset_ItemByChannelId_3102 = -103102;
-  
-  // MsgType_FundingCreate_Count_N3404 = -103001;
-	//Omni充值充值总次数
-  MsgType_FundingCreate_Asset_Count_3103 = -103103;
+  MsgType_FundingCreate_Asset_Count_3103           = -103103;
 
-  MsgType_FundingCreate_DelById_N3405 = -103001;
-
-  // MsgType_FundingSign_AssetFundingSigned_N35 = -35;
-	MsgType_FundingSign_SendAssetFundingSigned_35  = -100035;
-	// MsgType_FundingSign_AssetFundingSigned_35     MsgType = -35
-  MsgType_FundingSign_RecvAssetFundingSigned_35  = -110035;
-  
-  // MsgType_FundingSign_BtcSign_N3500 = -3500;
-  MsgType_FundingSign_SendBtcSign_350  = -100350;
-	// MsgType_FundingSign_BtcSign_350     MsgType = -350
-	MsgType_FundingSign_RecvBtcSign_350  = -110350;
-
-  // MsgType_ChannelOpen_N32 = -32;
-	MsgType_SendChannelOpen_32  = -100032;
-	// MsgType_ChannelOpen_32     MsgType = -32
-	MsgType_RecvChannelOpen_32  = -110032;
-  
-  // 放弃了？
-  // MsgType_ForceCloseChannel_N3205 = -3205;
-
-  // MsgType_ChannelOpen_AllItem_N3202 = -3202;
-  MsgType_ChannelOpen_AllItem_3150          = -103150;
-  
-  // MsgType_ChannelOpen_ItemByTempId_N3201 = -3201;
-  MsgType_ChannelOpen_ItemByTempId_3151     = -103151;
-  
-  // MsgType_ChannelOpen_Count_N3203 = -3203;
-  MsgType_ChannelOpen_Count_3152            = -103152;
-  
-  // MsgType_ChannelOpen_DelItemByTempId_N3204 = -3204;
-  MsgType_ChannelOpen_DelItemByTempId_3153  = -103153;
-  
-  // MsgType_GetChannelInfoByChanId_N3206 = -3206;
-  // MsgType_GetChannelInfoByChanId_N3207 = -3207;
-	MsgType_GetChannelInfoByChanId_3154       = -103154;
-  MsgType_GetChannelInfoByChanId_3155       = -103155;
-  
-  // MsgType_ChannelAccept_N33 = -33;
+	MsgType_SendChannelOpen_32    = -100032;
+  MsgType_RecvChannelOpen_32    = -110032;
 	MsgType_SendChannelAccept_33  = -100033;
-	// MsgType_ChannelAccept_33     MsgType = -33
-	MsgType_RecvChannelAccept_33  = -110033;
+  MsgType_RecvChannelAccept_33  = -110033;
   
-  // MsgType_CommitmentTx_CommitmentTransactionCreated_N351 = -351;
-  MsgType_CommitmentTx_SendCommitmentTransactionCreated_351           = -100351;
-	// MsgType_CommitmentTx_CommitmentTransactionCreated_351       MsgType = -351
-	MsgType_CommitmentTx_RecvCommitmentTransactionCreated_351          = -110351;
-  
-  // 已经放弃了？
-  // MsgType_CommitmentTx_GetBroadcastCommitmentTx_N35110 = -35110;
-  // MsgType_CommitmentTx_GetBroadcastRDTx_N35111 = -35111;
-  // MsgType_CommitmentTx_GetBroadcastBRTx_N35112 = -35112;
+	MsgType_FundingCreate_SendAssetFundingCreated_34  = -100034;
+	MsgType_FundingCreate_RecvAssetFundingCreated_34  = -110034;
+	MsgType_FundingSign_SendAssetFundingSigned_35     = -100035;
+  MsgType_FundingSign_RecvAssetFundingSigned_35     = -110035;
 
-  // MsgType_CommitmentTx_ItemsByChanId_N35101 = -35101;
+  MsgType_FundingCreate_SendBtcFundingCreated_340  = -100340;
+	MsgType_FundingCreate_RecvBtcFundingCreated_340  = -110340;
+  MsgType_FundingSign_SendBtcSign_350              = -100350;
+  MsgType_FundingSign_RecvBtcSign_350              = -110350;
+  MsgType_CommitmentTx_SendCommitmentTransactionCreated_351  = -100351;
+  MsgType_CommitmentTx_RecvCommitmentTransactionCreated_351  = -110351;
+  MsgType_CommitmentTxSigned_SendRevokeAndAcknowledgeCommitmentTransaction_352  = -100352;
+  MsgType_CommitmentTxSigned_RecvRevokeAndAcknowledgeCommitmentTransaction_352  = -110352;
+  
+  MsgType_ChannelOpen_AllItem_3150          = -103150;
+  MsgType_ChannelOpen_ItemByTempId_3151     = -103151;
+  MsgType_ChannelOpen_Count_3152            = -103152;
+  MsgType_ChannelOpen_DelItemByTempId_3153  = -103153;
+  MsgType_GetChannelInfoByChannelId_3154    = -103154;
+  MsgType_GetChannelInfoByDbId_3155         = -103155;
+
   MsgType_CommitmentTx_ItemsByChanId_3200               = -103200;
-  
-  // MsgType_CommitmentTx_ItemById_N35102 = -35102;
   MsgType_CommitmentTx_ItemById_3201                    = -103201;
-  
-  // MsgType_CommitmentTx_Count_N35103 = -35103;
   MsgType_CommitmentTx_Count_3202                       = -103202;
-  
-  // MsgType_CommitmentTx_LatestCommitmentTxByChanId_N35104 = -35104;
   MsgType_CommitmentTx_LatestCommitmentTxByChanId_3203  = -103203;
-  
-  // MsgType_CommitmentTx_LatestRDByChanId_N35105 = -35105;
   MsgType_CommitmentTx_LatestRDByChanId_3204            = -103204;
-  
-  // MsgType_CommitmentTx_LatestBRByChanId_N35106 = -35106;
   MsgType_CommitmentTx_LatestBRByChanId_3205            = -103205;
-  
-  // MsgType_SendBreachRemedyTransaction_N35107 = -35107;
   MsgType_SendBreachRemedyTransaction_3206              = -103206;
-  
-  // MsgType_CommitmentTx_AllRDByChanId_N35108 = -35108;
   MsgType_CommitmentTx_AllRDByChanId_3207               = -103207;
-  
-  // MsgType_CommitmentTx_AllBRByChanId_N35109 = -35109;
   MsgType_CommitmentTx_AllBRByChanId_3208               = -103208;
   
-
-
-  MsgType_CommitmentTxSigned_RevokeAndAcknowledgeCommitmentTransaction_N352 = -352;
-  MsgType_CommitmentTxSigned_ItemByChanId_N35201 = -35201;
-  MsgType_CommitmentTxSigned_ItemById_N35202 = -35202;
-  MsgType_CommitmentTxSigned_Count_N35203 = -35203;
-
-  MsgType_GetBalanceRequest_N353 = -353;
-  MsgType_GetBalanceRespond_N354 = -354;
-
-  MsgType_CloseChannelRequest_N38 = -38;
-  MsgType_CloseChannelSign_N39 = -39;
-
-  // MsgType_HTLC_Invoice_N4003 = -4003;
-  // MsgType_HTLC_AddHTLC_N40 = -40;
-  // MsgType_HTLC_CreatedRAndHInfoList_N4001 = -4001;
-  // MsgType_HTLC_CreatedRAndHInfoItem_N4002 = -4002;
-  // MsgType_HTLC_SignedRAndHInfoList_N4101 = -4101;
-  // MsgType_HTLC_SignedRAndHInfoItem_N4102 = -4102;
-  // MsgType_HTLC_GetRFromLCommitTx_N4103 = -4103;
-  // MsgType_HTLC_GetPathInfoByH_N4104 = -4104;
-  // MsgType_HTLC_GetRInfoByHOfOwner_N4105 = -4105;
-  // MsgType_HTLC_FindPathAndSendH_N42 = -42;
-  // MsgType_HTLC_SendH_N43 = -43;
-  // MsgType_HTLC_SignGetH_N44 = -44;
-  // MsgType_HTLC_CreateCommitmentTx_N45 = -45;
-  // MsgType_HTLC_SendR_N46 = -46;
-  // MsgType_HTLC_VerifyR_N47 = -47;
-  // MsgType_HTLC_RequestCloseCurrTx_N48 = -48;
-  // MsgType_HTLC_CloseSigned_N49 = -49;
-
-  MsgType_HTLC_FindPath_N4001              = -4001;
-  MsgType_HTLC_Invoice_N4003               = -4003;
-  MsgType_HTLC_AddHTLC_N40                 = -40;
-  MsgType_HTLC_AddHTLCSigned_N41           = -41;
-  MsgType_HTLC_PayerSignC3b_N42            = -42;
-  MsgType_HTLC_PayeeCreateHTRD1a_N43       = -43;
-  MsgType_HTLC_PayerSignHTRD1a_N44         = -44;
-  MsgType_HTLC_SendR_N45                   = -45;
-  MsgType_HTLC_VerifyR_N46                 = -46;
-  MsgType_HTLC_SendHerdHex_N47             = -47;
-  MsgType_HTLC_SignHedHex_N48              = -48;
-  MsgType_HTLC_RequestCloseCurrTx_N49      = -49;
-  MsgType_HTLC_CloseSigned_N50             = -50;
-  MsgType_HTLC_CloseHtlcRequestSignBR_N51  = -51;
-  MsgType_HTLC_CloseHtlcUpdateCnb_N52      = -52;
-
-  MsgType_Atomic_Swap_N80         = -80
-	MsgType_Atomic_Swap_Accept_N81  = -81
+	MsgType_SendCloseChannelRequest_38  = -100038;
+	MsgType_RecvCloseChannelRequest_38  = -110038;
+	MsgType_SendCloseChannelSign_39     = -100039;
+  MsgType_RecvCloseChannelSign_39     = -110039;
+  
+  MsgType_HTLC_FindPath_401          = -100401;
+  MsgType_HTLC_Invoice_402           = -100402;
+	MsgType_HTLC_SendAddHTLC_40        = -100040;
+  MsgType_HTLC_RecvAddHTLC_40        = -110040;
+  MsgType_HTLC_SendAddHTLCSigned_41  = -100041;
+  MsgType_HTLC_RecvAddHTLCSigned_41  = -110041;
+	MsgType_HTLC_SendVerifyR_45        = -100045;
+  MsgType_HTLC_RecvVerifyR_45        = -110045;
+  MsgType_HTLC_SendSignVerifyR_46    = -100046;
+  MsgType_HTLC_RecvSignVerifyR_46    = -110046;
+	MsgType_HTLC_SendRequestCloseCurrTx_49  = -100049;
+  MsgType_HTLC_RecvRequestCloseCurrTx_49  = -110049;
+	MsgType_HTLC_SendCloseSigned_50         = -100050;
+  MsgType_HTLC_RecvCloseSigned_50         = -110050;
+  
+  MsgType_Atomic_SendSwap_80         = -100080;
+  MsgType_Atomic_RecvSwap_80         = -110080;
+	MsgType_Atomic_SendSwapAccept_81   = -100081;
+	MsgType_Atomic_RecvSwapAccept_81   = -110081;
 }

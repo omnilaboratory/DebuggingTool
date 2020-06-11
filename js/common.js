@@ -139,22 +139,22 @@ function listeningN45(e, msgType) {
 
 // 
 function registerEvent() {
-    var msgTypeN351 = enumMsgType.MsgType_CommitmentTx_CommitmentTransactionCreated_N351;
+    var msgTypeN351 = enumMsgType.MsgType_CommitmentTx_SendCommitmentTransactionCreated_351;
     obdApi.registerEvent(msgTypeN351, function(e) {
         listeningN351(e, msgTypeN351);
     });
 
-    var msgTypeN40 = enumMsgType.MsgType_HTLC_AddHTLC_N40;
+    var msgTypeN40 = enumMsgType.MsgType_HTLC_SendAddHTLC_40;
     obdApi.registerEvent(msgTypeN40, function(e) {
         listeningN40(e, msgTypeN40);
     });
 
-    var msgTypeN41 = enumMsgType.MsgType_HTLC_AddHTLCSigned_N41;
+    var msgTypeN41 = enumMsgType.MsgType_HTLC_SendAddHTLCSigned_41;
     obdApi.registerEvent(msgTypeN41, function(e) {
         listeningN41(e, msgTypeN41);
     });
 
-    var msgTypeN45 = enumMsgType.MsgType_HTLC_SendR_N45;
+    var msgTypeN45 = enumMsgType.MsgType_HTLC_SendVerifyR_45;
     obdApi.registerEvent(msgTypeN45, function(e) {
         listeningN45(e, msgTypeN45);
     });
@@ -1134,150 +1134,150 @@ function invokeAPIs(objSelf) {
 
     switch (msgType) {
         // Util APIs.
-        case enumMsgType.MsgType_Core_Omni_Getbalance_1200:
+        case enumMsgType.MsgType_Core_Omni_Getbalance_2112:
             getBalanceForOmni(msgType);
             break;
-        case enumMsgType.MsgType_Core_Omni_CreateNewTokenFixed_1201:
+        case enumMsgType.MsgType_Core_Omni_CreateNewTokenFixed_2113:
             issuanceFixed(msgType);
             break;
-        case enumMsgType.MsgType_Core_Omni_CreateNewTokenManaged_1202:
+        case enumMsgType.MsgType_Core_Omni_CreateNewTokenManaged_2114:
             issuanceManaged(msgType);
             break;
-        case enumMsgType.MsgType_Core_Omni_GrantNewUnitsOfManagedToken_1203:
+        case enumMsgType.MsgType_Core_Omni_GrantNewUnitsOfManagedToken_2115:
             sendGrant(msgType);
             break;
-        case enumMsgType.MsgType_Core_Omni_RevokeUnitsOfManagedToken_1204:
+        case enumMsgType.MsgType_Core_Omni_RevokeUnitsOfManagedToken_2116:
             sendRevoke(msgType);
             break;
-        case enumMsgType.MsgType_Core_Omni_ListProperties_1205:
+        case enumMsgType.MsgType_Core_Omni_ListProperties_2117:
             listProperties(msgType);
             break;
-        case enumMsgType.MsgType_Core_Omni_GetTransaction_1206:
+        case enumMsgType.MsgType_Core_Omni_GetTransaction_2118:
             getTransaction(msgType);
             break;
-        case enumMsgType.MsgType_Core_Omni_GetAssetName_1207:
+        case enumMsgType.MsgType_Core_Omni_GetProperty_2119:
             getAssetNameByID(msgType);
             break;
-        case enumMsgType.MsgType_CommitmentTx_AllBRByChanId_N35109:
+        case enumMsgType.MsgType_CommitmentTx_AllBRByChanId_3208:
             getAllBRTx(msgType);
             break;
-        case enumMsgType.MsgType_GetChannelInfoByChanId_N3207:
+        case enumMsgType.MsgType_GetChannelInfoByChannelId_3154:
             getChannelDetail(msgType);
             break;
-        case enumMsgType.MsgType_ChannelOpen_AllItem_N3202:
+        case enumMsgType.MsgType_ChannelOpen_AllItem_3150:
             getAllChannels(msgType);
             break;
-        case enumMsgType.MsgType_CommitmentTx_ItemsByChanId_N35101:
+        case enumMsgType.MsgType_CommitmentTx_ItemsByChanId_3200:
             getAllCommitmentTransactions(msgType);
             break;
-        case enumMsgType.MsgType_CommitmentTx_LatestCommitmentTxByChanId_N35104:
+        case enumMsgType.MsgType_CommitmentTx_LatestCommitmentTxByChanId_3203:
             getLatestCommitmentTx(msgType);
             break;
-        case enumMsgType.MsgType_Core_GetNewAddress_1001:
+        case enumMsgType.MsgType_Core_GetNewAddress_2101:
             obdApi.getNewAddress(function(e) {
                 console.info('OBD Response = ' + e);
                 createOBDResponseDiv(e);
             });
             break;
-        case enumMsgType.MsgType_Mnemonic_CreateAddress_N200:
+        case enumMsgType.MsgType_Mnemonic_CreateAddress_3000:
             var result = getNewAddressWithMnemonic();
             if (result === '') return;
             saveAddresses(result);
             createOBDResponseDiv(result, msgType);
             break;
-        case enumMsgType.MsgType_Mnemonic_GetAddressByIndex_201:
+        case enumMsgType.MsgType_Mnemonic_GetAddressByIndex_3001:
             var result = getAddressInfo();
             if (result === '') return;
             createOBDResponseDiv(result, msgType);
             break;
 
             // APIs for debugging.
-        case enumMsgType.MsgType_UserLogin_1:
+        case enumMsgType.MsgType_UserLogin_2001:
             logIn(msgType);
             break;
-        case enumMsgType.MsgType_UserLogout_2:
+        case enumMsgType.MsgType_UserLogout_2002:
             obdApi.logout();
             break;
-        case enumMsgType.MsgType_GetMnemonic_101:
+        case enumMsgType.MsgType_GetMnemonic_2004:
             // Generate mnemonic by local js library.
             // This is equal OBD api signUp.
             var mnemonic = btctool.generateMnemonic(128);
             saveMnemonic(mnemonic);
             createOBDResponseDiv(mnemonic);
             break;
-        case enumMsgType.MsgType_Core_FundingBTC_1009:
+        case enumMsgType.MsgType_Core_FundingBTC_2109:
             fundingBTC(msgType);
             break;
-        case enumMsgType.MsgType_FundingCreate_BtcCreate_N3400:
+        case enumMsgType.MsgType_FundingCreate_SendBtcFundingCreated_340:
             btcFundingCreated(msgType);
             break;
-        case enumMsgType.MsgType_FundingSign_BtcSign_N3500:
+        case enumMsgType.MsgType_FundingSign_SendBtcSign_350:
             btcFundingSigned(msgType);
             break;
-        case enumMsgType.MsgType_Core_Omni_FundingAsset_2001:
+        case enumMsgType.MsgType_Core_Omni_FundingAsset_2120:
             fundingAsset(msgType);
             break;
-        case enumMsgType.MsgType_FundingCreate_AssetFundingCreated_N34:
+        case enumMsgType.MsgType_FundingCreate_SendAssetFundingCreated_34:
             assetFundingCreated(msgType);
             break;
-        case enumMsgType.MsgType_FundingSign_AssetFundingSigned_N35:
+        case enumMsgType.MsgType_FundingSign_SendAssetFundingSigned_35:
             assetFundingSigned(msgType);
             break;
-        case enumMsgType.MsgType_CommitmentTx_CommitmentTransactionCreated_N351:
+        case enumMsgType.MsgType_CommitmentTx_SendCommitmentTransactionCreated_351:
             RSMCCTxCreated(msgType);
             break;
-        case enumMsgType.MsgType_CommitmentTxSigned_RevokeAndAcknowledgeCommitmentTransaction_N352:
+        case enumMsgType.MsgType_CommitmentTxSigned_SendRevokeAndAcknowledgeCommitmentTransaction_352:
             RSMCCTxSigned(msgType);
             break;
-        case enumMsgType.MsgType_Core_Omni_GetTransaction_1206:
+        case enumMsgType.MsgType_Core_Omni_GetTransaction_2118:
             txid = "c76710920860456dff2433197db79dd030f9b527e83a2e253f5bc6ab7d197e73";
             obdApi.getOmniTxByTxid(txid);
             break;
             // Open Channel request.
-        case enumMsgType.MsgType_ChannelOpen_N32:
+        case enumMsgType.MsgType_SendChannelOpen_32:
             openChannel(msgType);
             break;
             // Accept Channel request.
-        case enumMsgType.MsgType_ChannelAccept_N33:
+        case enumMsgType.MsgType_SendChannelAccept_33:
             acceptChannel(msgType);
             break;
-        case enumMsgType.MsgType_HTLC_Invoice_N4003:
+        case enumMsgType.MsgType_HTLC_Invoice_402:
             createInvoice(msgType);
             break;
-        case enumMsgType.MsgType_HTLC_FindPath_N4001:
+        case enumMsgType.MsgType_HTLC_FindPath_401:
             htlcFindPath(msgType);
             break;
-        case enumMsgType.MsgType_HTLC_AddHTLC_N40:
+        case enumMsgType.MsgType_HTLC_SendAddHTLC_40:
             htlcCreated(msgType);
             break;
-        case enumMsgType.MsgType_HTLC_AddHTLCSigned_N41:
+        case enumMsgType.MsgType_HTLC_SendAddHTLCSigned_41:
             htlcSigned(msgType);
             break;
-        case enumMsgType.MsgType_HTLC_SendR_N45:
+        case enumMsgType.MsgType_HTLC_SendVerifyR_45:
             htlcSendR(msgType);
             break;
-        case enumMsgType.MsgType_HTLC_VerifyR_N46:
+        case enumMsgType.MsgType_HTLC_SendSignVerifyR_46:
             htlcVerifyR(msgType);
             break;
-        case enumMsgType.MsgType_HTLC_RequestCloseCurrTx_N49:
+        case enumMsgType.MsgType_HTLC_SendRequestCloseCurrTx_49:
             closeHTLC(msgType);
             break;
-        case enumMsgType.MsgType_HTLC_CloseSigned_N50:
+        case enumMsgType.MsgType_HTLC_SendCloseSigned_50:
             closeHTLCSigned(msgType);
             break;
-        case enumMsgType.MsgType_CloseChannelRequest_N38:
+        case enumMsgType.MsgType_SendCloseChannelRequest_38:
             closeChannel(msgType);
             break;
-        case enumMsgType.MsgType_CloseChannelSign_N39:
+        case enumMsgType.MsgType_SendCloseChannelSign_39:
             closeChannelSigned(msgType);
             break;
-        case enumMsgType.MsgType_Atomic_Swap_N80:
+        case enumMsgType.MsgType_Atomic_SendSwap_80:
             atomicSwap(msgType);
             break;
-        case enumMsgType.MsgType_Atomic_Swap_Accept_N81:
+        case enumMsgType.MsgType_Atomic_SendSwapAccept_81:
             atomicSwapAccepted(msgType);
             break;
-        case enumMsgType.MsgType_p2p_ConnectServer_3:
+        case enumMsgType.MsgType_p2p_ConnectServer_2003:
             connectP2PNode(msgType);
             break;
         default:
@@ -1328,31 +1328,31 @@ function displayOBDMessages(msg) {
 
     switch (Number(content.type)) {
         // case enumMsgType.MsgType_Error_0:
-        // case enumMsgType.MsgType_Core_GetNewAddress_1001:
-        // case enumMsgType.MsgType_Mnemonic_CreateAddress_N200:
-        // case enumMsgType.MsgType_Mnemonic_GetAddressByIndex_201:
-        // case enumMsgType.MsgType_GetMnemonic_101:
-        // case enumMsgType.MsgType_Core_BalanceByAddress_1008:
-        // case enumMsgType.MsgType_Core_FundingBTC_1009:
-        // case enumMsgType.MsgType_Core_Omni_Getbalance_1200:
-        // case enumMsgType.MsgType_Core_Omni_GetAssetName_1207:
-        // case enumMsgType.MsgType_Core_Omni_FundingAsset_2001:
-        // case enumMsgType.MsgType_HTLC_Invoice_N4003:
-        // case enumMsgType.MsgType_CommitmentTx_LatestCommitmentTxByChanId_N35104:
-        // case enumMsgType.MsgType_CommitmentTx_ItemsByChanId_N35101:
-        // case enumMsgType.MsgType_ChannelOpen_AllItem_N3202:
-        // case enumMsgType.MsgType_GetChannelInfoByChanId_N3207:
-        // case enumMsgType.MsgType_CommitmentTx_AllBRByChanId_N35109:
+        // case enumMsgType.MsgType_Core_GetNewAddress_2101:
+        // case enumMsgType.MsgType_Mnemonic_CreateAddress_3000:
+        // case enumMsgType.MsgType_Mnemonic_GetAddressByIndex_3001:
+        // case enumMsgType.MsgType_GetMnemonic_2004:
+        // case enumMsgType.MsgType_Core_BalanceByAddress_2108:
+        // case enumMsgType.MsgType_Core_FundingBTC_2109:
+        // case enumMsgType.MsgType_Core_Omni_Getbalance_2112:
+        // case enumMsgType.MsgType_Core_Omni_GetProperty_2119:
+        // case enumMsgType.MsgType_Core_Omni_FundingAsset_2120:
+        // case enumMsgType.MsgType_HTLC_Invoice_402:
+        // case enumMsgType.MsgType_CommitmentTx_LatestCommitmentTxByChanId_3203:
+        // case enumMsgType.MsgType_CommitmentTx_ItemsByChanId_3200:
+        // case enumMsgType.MsgType_ChannelOpen_AllItem_3150:
+        // case enumMsgType.MsgType_GetChannelInfoByChannelId_3154:
+        // case enumMsgType.MsgType_CommitmentTx_AllBRByChanId_3208:
         //     return;
-        case enumMsgType.MsgType_UserLogin_1:
+        case enumMsgType.MsgType_UserLogin_2001:
             content.result = 'Logged In - ' + content.from;
             msgHead = msgTime +  '  - Logged In.';
             break;
-        case enumMsgType.MsgType_p2p_ConnectServer_3:
+        case enumMsgType.MsgType_p2p_ConnectServer_2003:
             content.result = 'Connect to P2P Node success.';
             msgHead = msgTime+  '  - Connect to P2P Node success.';
             break;
-        case enumMsgType.MsgType_ChannelOpen_N32:
+        case enumMsgType.MsgType_SendChannelOpen_32:
             content.result = 'LAUNCH - ' + content.from +
                 ' - launch an Open Channel request. ';
 
@@ -1361,7 +1361,7 @@ function displayOBDMessages(msg) {
             // 'The [temporary_channel_id] is : ' + 
             // content.result.temporary_channel_id;
             break;
-        case enumMsgType.MsgType_ChannelAccept_N33:
+        case enumMsgType.MsgType_SendChannelAccept_33:
             if (content.result.curr_state === 11) { // Accept
                 content.result = 'ACCEPT - ' + content.from +
                     ' - accept Open Channel request. ';
@@ -1380,78 +1380,78 @@ function displayOBDMessages(msg) {
                 // content.result.temporary_channel_id;
             }
             break;
-        case enumMsgType.MsgType_FundingCreate_BtcCreate_N3400:
+        case enumMsgType.MsgType_FundingCreate_SendBtcFundingCreated_340:
             content.result = 'Notification - ' + content.from +
                 ' - depositing BTC in Channel.';
             msgHead = msgTime +  '  - Notification: depositing BTC in Channel.';
             break;
-        case enumMsgType.MsgType_FundingSign_BtcSign_N3500:
+        case enumMsgType.MsgType_FundingSign_SendBtcSign_350:
             content.result = 'Reply - ' + content.from +
                 ' - depositing BTC message.';
             msgHead = msgTime +  '  - Reply: depositing BTC message.';
             break;
-        case enumMsgType.MsgType_FundingCreate_AssetFundingCreated_N34:
+        case enumMsgType.MsgType_FundingCreate_SendAssetFundingCreated_34:
             content.result = 'Notification - ' + content.from +
                 ' - depositing Omni Asset in Channel.';
             msgHead = msgTime +  '  - Notification: depositing Omni Asset in Channel.';
             break;
-        case enumMsgType.MsgType_FundingSign_AssetFundingSigned_N35:
+        case enumMsgType.MsgType_FundingSign_SendAssetFundingSigned_35:
             content.result = 'Reply - ' + content.from +
                 ' - depositing Omni Asset message.';
             msgHead = msgTime +  '  - Reply: depositing Omni Asset message.';
             break;
-        case enumMsgType.MsgType_CommitmentTx_CommitmentTransactionCreated_N351:
+        case enumMsgType.MsgType_CommitmentTx_SendCommitmentTransactionCreated_351:
             content.result = 'RSMC transfer - ' + content.from +
                 ' - launch a transfer.';
             msgHead = msgTime +  '  - RSMC: launch a transfer.';
             break;
-        case enumMsgType.MsgType_CommitmentTxSigned_RevokeAndAcknowledgeCommitmentTransaction_N352:
+        case enumMsgType.MsgType_CommitmentTxSigned_SendRevokeAndAcknowledgeCommitmentTransaction_352:
             content.result = 'RSMC transfer - ' + content.from +
                 ' - accept a transfer.';
             msgHead = msgTime +  '  - RSMC: accept a transfer.';
             break;
-        case enumMsgType.MsgType_HTLC_AddHTLC_N40:
+        case enumMsgType.MsgType_HTLC_SendAddHTLC_40:
             content.result = 'HTLC - ' + content.from +
                 ' - launch a HTLC transfer.';
             msgHead = msgTime +  '  - HTLC: launch a HTLC transfer.';
             break;
-        case enumMsgType.MsgType_HTLC_AddHTLCSigned_N41:
+        case enumMsgType.MsgType_HTLC_SendAddHTLCSigned_41:
             content.result = 'HTLC - ' + content.from +
                 ' - accept a HTLC transfer.';
             msgHead = msgTime +  '  - HTLC: accept a HTLC transfer.';
             break;
-        case enumMsgType.MsgType_HTLC_SendR_N45:
+        case enumMsgType.MsgType_HTLC_SendVerifyR_45:
             content.result = 'HTLC - ' + content.from +
                 ' - Sent R.';
             msgHead = msgTime +  '  - HTLC: Sent R.';
             break;
-        case enumMsgType.MsgType_HTLC_VerifyR_N46:
+        case enumMsgType.MsgType_HTLC_SendSignVerifyR_46:
             content.result = 'HTLC - ' + content.from +
                 ' - Verify R.';
             msgHead = msgTime +  '  - HTLC: Verify R.';
             break;
-        case enumMsgType.MsgType_HTLC_RequestCloseCurrTx_N49:
+        case enumMsgType.MsgType_HTLC_SendRequestCloseCurrTx_49:
             content.result = 'HTLC - ' + content.from +
                 ' - Request Close.';
             msgHead = msgTime +  '  - HTLC: Request Close.';
             break;
-        case enumMsgType.MsgType_HTLC_CloseSigned_N50:
+        case enumMsgType.MsgType_HTLC_SendCloseSigned_50:
             content.result = 'HTLC - ' + content.result.msg;
             msgHead = msgTime +  '  - HTLC: Closed.';
             break;
-        case enumMsgType.MsgType_CloseChannelRequest_N38:
+        case enumMsgType.MsgType_SendCloseChannelRequest_38:
             content.result = 'N38 Request Close Channel from - ' + content.from;
             msgHead = msgTime +  '  - Request Close Channel.';
             break;
-        case enumMsgType.MsgType_CloseChannelSign_N39:
+        case enumMsgType.MsgType_SendCloseChannelSign_39:
             content.result = 'N39 Response Close Channel from - ' + content.from;
             msgHead = msgTime +  '  - Response Close Channel.';
             break;
-        case enumMsgType.MsgType_Atomic_Swap_N80:
+        case enumMsgType.MsgType_Atomic_SendSwap_80:
             content.result = 'N80 Request Atomic Swap from - ' + content.from;
             msgHead = msgTime +  '  - Request Atomic Swap.';
             break;
-        case enumMsgType.MsgType_Atomic_Swap_Accept_N81:
+        case enumMsgType.MsgType_Atomic_SendSwapAccept_81:
             content.result = 'N81 Response Atomic Swap from - ' + content.from;
             msgHead = msgTime +  '  - Response Atomic Swap.';
             break;
@@ -1716,12 +1716,12 @@ function createInputParamDiv(obj, jsonFile) {
         if (jsonFile === 'json/api_list.json') {
             var msgType = Number(obj.getAttribute("type_id"));
             switch (msgType) {
-                case enumMsgType.MsgType_ChannelAccept_N33:
-                case enumMsgType.MsgType_FundingSign_BtcSign_N3500:
-                case enumMsgType.MsgType_FundingSign_AssetFundingSigned_N35:
-                case enumMsgType.MsgType_CommitmentTxSigned_RevokeAndAcknowledgeCommitmentTransaction_N352:
-                case enumMsgType.MsgType_CloseChannelSign_N39:
-                case enumMsgType.MsgType_HTLC_AddHTLCSigned_N41:
+                case enumMsgType.MsgType_SendChannelAccept_33:
+                case enumMsgType.MsgType_FundingSign_SendBtcSign_350:
+                case enumMsgType.MsgType_FundingSign_SendAssetFundingSigned_35:
+                case enumMsgType.MsgType_CommitmentTxSigned_SendRevokeAndAcknowledgeCommitmentTransaction_352:
+                case enumMsgType.MsgType_SendCloseChannelSign_39:
+                case enumMsgType.MsgType_HTLC_SendAddHTLCSigned_41:
                     displayApprovalCheckbox(newDiv, obj, msgType);
                     content_div.append(newDiv);
                     break;
@@ -1754,7 +1754,7 @@ function autoFillValue(arrParams, obj) {
     let result;
     let msgType = Number(obj.getAttribute("type_id"));
     switch (msgType) {
-        case enumMsgType.MsgType_FundingCreate_AssetFundingCreated_N34:
+        case enumMsgType.MsgType_FundingCreate_SendAssetFundingCreated_34:
             result = getNewAddressWithMnemonic();
             if (result === '') return;
             $("#temp_address_pub_key").val(result.result.pubkey);
@@ -1764,8 +1764,8 @@ function autoFillValue(arrParams, obj) {
             saveAddresses(result);
             break;
 
-        case enumMsgType.MsgType_CommitmentTx_CommitmentTransactionCreated_N351:
-        case enumMsgType.MsgType_CommitmentTxSigned_RevokeAndAcknowledgeCommitmentTransaction_N352:
+        case enumMsgType.MsgType_CommitmentTx_SendCommitmentTransactionCreated_351:
+        case enumMsgType.MsgType_CommitmentTxSigned_SendRevokeAndAcknowledgeCommitmentTransaction_352:
             result = getNewAddressWithMnemonic();
             if (result === '') return;
             $("#curr_temp_address_pub_key").val(result.result.pubkey);
@@ -1775,7 +1775,7 @@ function autoFillValue(arrParams, obj) {
             saveAddresses(result);
             break;
 
-        case enumMsgType.MsgType_HTLC_AddHTLC_N40:
+        case enumMsgType.MsgType_HTLC_SendAddHTLC_40:
             result = getNewAddressWithMnemonic();
             if (result === '') return;
             $("#curr_rsmc_temp_address_pub_key").val(result.result.pubkey);
@@ -1801,7 +1801,7 @@ function autoFillValue(arrParams, obj) {
             saveAddresses(result);
             break;
 
-        case enumMsgType.MsgType_HTLC_AddHTLCSigned_N41:
+        case enumMsgType.MsgType_HTLC_SendAddHTLCSigned_41:
             result = getNewAddressWithMnemonic();
             if (result === '') return;
             $("#curr_rsmc_temp_address_pub_key").val(result.result.pubkey);
@@ -1819,7 +1819,7 @@ function autoFillValue(arrParams, obj) {
             saveAddresses(result);
             break;
         
-        case enumMsgType.MsgType_HTLC_SendR_N45:
+        case enumMsgType.MsgType_HTLC_SendVerifyR_45:
             result = getNewAddressWithMnemonic();
             if (result === '') return;
             $("#curr_htlc_temp_address_for_he1b_pub_key").val(result.result.pubkey);
@@ -1829,7 +1829,7 @@ function autoFillValue(arrParams, obj) {
             saveAddresses(result);
             break;
 
-        case enumMsgType.MsgType_HTLC_RequestCloseCurrTx_N49:
+        case enumMsgType.MsgType_HTLC_SendRequestCloseCurrTx_49:
             result = getNewAddressWithMnemonic();
             if (result === '') return;
             $("#curr_rsmc_temp_address_pub_key").val(result.result.pubkey);
@@ -1839,7 +1839,7 @@ function autoFillValue(arrParams, obj) {
             saveAddresses(result);
             break;
 
-        case enumMsgType.MsgType_HTLC_CloseSigned_N50:
+        case enumMsgType.MsgType_HTLC_SendCloseSigned_50:
             result = getNewAddressWithMnemonic();
             if (result === '') return;
             $("#curr_rsmc_temp_address_pub_key").val(result.result.pubkey);
@@ -1857,22 +1857,22 @@ function displayApprovalCheckbox(content_div, obj, msgType) {
     createElement(content_div, 'text', 'Approval ');
     var element = document.createElement('input');
     switch (msgType) {
-        case enumMsgType.MsgType_ChannelAccept_N33:
+        case enumMsgType.MsgType_SendChannelAccept_33:
             element.id = 'checkbox_n33';
             break;
-        case enumMsgType.MsgType_FundingSign_BtcSign_N3500:
+        case enumMsgType.MsgType_FundingSign_SendBtcSign_350:
             element.id = 'checkbox_n3500';
             break;
-        case enumMsgType.MsgType_FundingSign_AssetFundingSigned_N35:
+        case enumMsgType.MsgType_FundingSign_SendAssetFundingSigned_35:
             element.id = 'checkbox_n35';
             break;
-        case enumMsgType.MsgType_CommitmentTxSigned_RevokeAndAcknowledgeCommitmentTransaction_N352:
+        case enumMsgType.MsgType_CommitmentTxSigned_SendRevokeAndAcknowledgeCommitmentTransaction_352:
             element.id = 'checkbox_n352';
             break;
-        case enumMsgType.MsgType_HTLC_AddHTLCSigned_N41:
+        case enumMsgType.MsgType_HTLC_SendAddHTLCSigned_41:
             element.id = 'checkbox_n41';
             break;
-        case enumMsgType.MsgType_CloseChannelSign_N39:
+        case enumMsgType.MsgType_SendCloseChannelSign_39:
             element.id = 'checkbox_n39';
             break;
     }
@@ -2321,101 +2321,101 @@ function createOBDResponseDiv(response, msgType) {
             var msg = response + '. Please refresh the page if you want to connect again.';
             createElement(obd_response_div, 'p', msg);
             break;
-        case enumMsgType.MsgType_Core_Omni_Getbalance_1200:
+        case enumMsgType.MsgType_Core_Omni_Getbalance_2112:
             parseData1200(response);
             break;
-        case enumMsgType.MsgType_Core_Omni_GetAssetName_1207:
+        case enumMsgType.MsgType_Core_Omni_GetProperty_2119:
             parseData1207(response);
             break;
-        case enumMsgType.MsgType_CommitmentTx_AllBRByChanId_N35109:
+        case enumMsgType.MsgType_CommitmentTx_AllBRByChanId_3208:
             parseDataN35109(response);
             break;
-        case enumMsgType.MsgType_GetChannelInfoByChanId_N3207:
+        case enumMsgType.MsgType_GetChannelInfoByChannelId_3154:
             parseDataN3207(response);
             break;
-        case enumMsgType.MsgType_ChannelOpen_AllItem_N3202:
+        case enumMsgType.MsgType_ChannelOpen_AllItem_3150:
             parseDataN3202(response);
             break;
-        case enumMsgType.MsgType_CommitmentTx_ItemsByChanId_N35101:
+        case enumMsgType.MsgType_CommitmentTx_ItemsByChanId_3200:
             parseDataN35101(response);
             break;
-        case enumMsgType.MsgType_CommitmentTx_LatestCommitmentTxByChanId_N35104:
+        case enumMsgType.MsgType_CommitmentTx_LatestCommitmentTxByChanId_3203:
             parseDataN35104(response);
             break;
-        case enumMsgType.MsgType_Mnemonic_CreateAddress_N200:
-        case enumMsgType.MsgType_Mnemonic_GetAddressByIndex_201:
+        case enumMsgType.MsgType_Mnemonic_CreateAddress_3000:
+        case enumMsgType.MsgType_Mnemonic_GetAddressByIndex_3001:
             parseDataN200(response);
             break;
-        case enumMsgType.MsgType_ChannelOpen_N32:
+        case enumMsgType.MsgType_SendChannelOpen_32:
             parseDataN32(response);
             break;
-        case enumMsgType.MsgType_ChannelAccept_N33:
+        case enumMsgType.MsgType_SendChannelAccept_33:
             parseDataN33(response);
             break;
-        case enumMsgType.MsgType_Core_FundingBTC_1009:
+        case enumMsgType.MsgType_Core_FundingBTC_2109:
             parseData1009(response);
             break;
-        case enumMsgType.MsgType_FundingCreate_BtcCreate_N3400:
+        case enumMsgType.MsgType_FundingCreate_SendBtcFundingCreated_340:
             parseDataN3400(response);
             break;
-        case enumMsgType.MsgType_FundingSign_BtcSign_N3500:
+        case enumMsgType.MsgType_FundingSign_SendBtcSign_350:
             parseDataN3500(response);
             break;
-        case enumMsgType.MsgType_Core_Omni_FundingAsset_2001:
+        case enumMsgType.MsgType_Core_Omni_FundingAsset_2120:
             parseData2001(response);
             break;
-        case enumMsgType.MsgType_FundingCreate_AssetFundingCreated_N34:
+        case enumMsgType.MsgType_FundingCreate_SendAssetFundingCreated_34:
             parseDataN34(response);
             break;
-        case enumMsgType.MsgType_FundingSign_AssetFundingSigned_N35:
+        case enumMsgType.MsgType_FundingSign_SendAssetFundingSigned_35:
             parseDataN35(response);
             break;
-        case enumMsgType.MsgType_CommitmentTx_CommitmentTransactionCreated_N351:
+        case enumMsgType.MsgType_CommitmentTx_SendCommitmentTransactionCreated_351:
             parseDataN351(response);
             break;
-        case enumMsgType.MsgType_CommitmentTxSigned_RevokeAndAcknowledgeCommitmentTransaction_N352:
+        case enumMsgType.MsgType_CommitmentTxSigned_SendRevokeAndAcknowledgeCommitmentTransaction_352:
             parseDataN352(response);
             break;
-        case enumMsgType.MsgType_HTLC_Invoice_N4003:
+        case enumMsgType.MsgType_HTLC_Invoice_402:
             parseDataN4003(response);
             break;
-        case enumMsgType.MsgType_HTLC_FindPath_N4001:
+        case enumMsgType.MsgType_HTLC_FindPath_401:
             parseDataN4001(response);
             break;
-        case enumMsgType.MsgType_HTLC_AddHTLC_N40:
+        case enumMsgType.MsgType_HTLC_SendAddHTLC_40:
             parseDataN40(response);
             break;
-        case enumMsgType.MsgType_HTLC_AddHTLCSigned_N41:
+        case enumMsgType.MsgType_HTLC_SendAddHTLCSigned_41:
             parseDataN41(response);
             break;
-        case enumMsgType.MsgType_HTLC_SendR_N45:
+        case enumMsgType.MsgType_HTLC_SendVerifyR_45:
             parseDataN45(response);
             break;
-        case enumMsgType.MsgType_HTLC_VerifyR_N46:
+        case enumMsgType.MsgType_HTLC_SendSignVerifyR_46:
             parseDataN46(response);
             break;
-        case enumMsgType.MsgType_HTLC_RequestCloseCurrTx_N49:
+        case enumMsgType.MsgType_HTLC_SendRequestCloseCurrTx_49:
             parseDataN49(response);
             break;
-        case enumMsgType.MsgType_HTLC_CloseSigned_N50:
+        case enumMsgType.MsgType_HTLC_SendCloseSigned_50:
             parseDataN50(response);
             break;
-        case enumMsgType.MsgType_CloseChannelRequest_N38:
+        case enumMsgType.MsgType_SendCloseChannelRequest_38:
             parseDataN38(response);
             break;
-        case enumMsgType.MsgType_CloseChannelSign_N39:
+        case enumMsgType.MsgType_SendCloseChannelSign_39:
             parseDataN39(response);
             break;
-        case enumMsgType.MsgType_Atomic_Swap_N80:
+        case enumMsgType.MsgType_Atomic_SendSwap_80:
             parseDataN80(response);
             break;
-        case enumMsgType.MsgType_Atomic_Swap_Accept_N81:
+        case enumMsgType.MsgType_Atomic_SendSwapAccept_81:
             parseDataN81(response);
             break;
-        case enumMsgType.MsgType_UserLogin_1:
+        case enumMsgType.MsgType_UserLogin_2001:
             parseData1(response);
             break;
-        case enumMsgType.MsgType_p2p_ConnectServer_3:
+        case enumMsgType.MsgType_p2p_ConnectServer_2003:
             parseData3(response);
             break;
         default:
@@ -3515,17 +3515,17 @@ function saveChannelList(response, channelID, msgType) {
         for (let i = 0; i < list.result.length; i++) {
             if (chID === list.result[i].temporary_channel_id) {
                 switch (msgType) {
-                    case enumMsgType.MsgType_HTLC_AddHTLC_N40:
+                    case enumMsgType.MsgType_HTLC_SendAddHTLC_40:
                         list.result[i].htlc.push(htlcData(response, msgType));
                         break;
-                    case enumMsgType.MsgType_HTLC_AddHTLCSigned_N41:
+                    case enumMsgType.MsgType_HTLC_SendAddHTLCSigned_41:
                         for (let i2 = 0; i2 < list.result[i].htlc.length; i2++) {
                             if ($("#request_hash").val() === list.result[i].htlc[i2].msgHash) {
                                 updateHtlcData(response, list.result[i].htlc[i2], msgType);
                             }
                         }
                         break;
-                    case enumMsgType.MsgType_HTLC_SendR_N45:
+                    case enumMsgType.MsgType_HTLC_SendVerifyR_45:
                         for (let i2 = 0; i2 < list.result[i].htlc.length; i2++) {
                             if ($("#request_hash").val() === list.result[i].htlc[i2].msgHash) {
                                 list.result[i].htlc[i2].r = response.r;
@@ -3535,7 +3535,7 @@ function saveChannelList(response, channelID, msgType) {
                             }
                         }
                         break;
-                    case enumMsgType.MsgType_HTLC_VerifyR_N46:
+                    case enumMsgType.MsgType_HTLC_SendSignVerifyR_46:
                         for (let i2 = 0; i2 < list.result[i].htlc.length; i2++) {
                             if ($("#request_hash").val() === list.result[i].htlc[i2].msgHash) {
                                 list.result[i].htlc[i2].msgHash = response.msgHash;
@@ -3544,10 +3544,10 @@ function saveChannelList(response, channelID, msgType) {
                             }
                         }
                         break;
-                    case enumMsgType.MsgType_HTLC_RequestCloseCurrTx_N49:
+                    case enumMsgType.MsgType_HTLC_SendRequestCloseCurrTx_49:
                         list.result[i].htlc.push(htlcData(response, msgType));
                         break;
-                    case enumMsgType.MsgType_HTLC_CloseSigned_N50:
+                    case enumMsgType.MsgType_HTLC_SendCloseSigned_50:
                         for (let i2 = 0; i2 < list.result[i].htlc.length; i2++) {
                             if ($("#request_hash").val() === list.result[i].htlc[i2].msgHash) {
                                 list.result[i].htlc[i2].msgType = msgType;
@@ -3555,20 +3555,20 @@ function saveChannelList(response, channelID, msgType) {
                             }
                         }
                         break;
-                    case enumMsgType.MsgType_CommitmentTx_CommitmentTransactionCreated_N351:
+                    case enumMsgType.MsgType_CommitmentTx_SendCommitmentTransactionCreated_351:
                         list.result[i].transfer.push(rsmcData(response, msgType));
                         break;
-                    case enumMsgType.MsgType_CommitmentTxSigned_RevokeAndAcknowledgeCommitmentTransaction_N352:
+                    case enumMsgType.MsgType_CommitmentTxSigned_SendRevokeAndAcknowledgeCommitmentTransaction_352:
                         for (let i2 = 0; i2 < list.result[i].transfer.length; i2++) {
                             if ($("#request_commitment_hash").val() === list.result[i].transfer[i2].msgHash) {
                                 updateRsmcData(response, list.result[i].transfer[i2], msgType);
                             }
                         }
                         break;
-                    case enumMsgType.MsgType_Core_FundingBTC_1009:
+                    case enumMsgType.MsgType_Core_FundingBTC_2109:
                         list.result[i].btc.push(btcData(response, msgType));
                         break;
-                    case enumMsgType.MsgType_FundingCreate_BtcCreate_N3400:
+                    case enumMsgType.MsgType_FundingCreate_SendBtcFundingCreated_340:
                         for (let i2 = 0; i2 < list.result[i].btc.length; i2++) {
                             if (response.funding_txid === list.result[i].btc[i2].txid) {
                                 list.result[i].btc[i2].msgType = msgType;
@@ -3576,7 +3576,7 @@ function saveChannelList(response, channelID, msgType) {
                             }
                         }
                         break;
-                    case enumMsgType.MsgType_FundingSign_BtcSign_N3500:
+                    case enumMsgType.MsgType_FundingSign_SendBtcSign_350:
                         for (let i2 = 0; i2 < list.result[i].btc.length; i2++) {
                             if ($("#funding_txid").val() === list.result[i].btc[i2].txid) {
                                 // list.result[i].btc[i2].txid = response.txid;
@@ -3586,10 +3586,10 @@ function saveChannelList(response, channelID, msgType) {
                             }
                         }
                         break;
-                    case enumMsgType.MsgType_Core_Omni_FundingAsset_2001:
+                    case enumMsgType.MsgType_Core_Omni_FundingAsset_2120:
                         list.result[i].omniAsset.push(omniAssetData(response, msgType));
                         break;
-                    case enumMsgType.MsgType_FundingCreate_AssetFundingCreated_N34:
+                    case enumMsgType.MsgType_FundingCreate_SendAssetFundingCreated_34:
                         for (let i2 = 0; i2 < list.result[i].omniAsset.length; i2++) {
                             if ($("#funding_tx_hex").val() === list.result[i].omniAsset[i2].hex) {
                                 list.result[i].temporary_channel_id = response.channel_id;
@@ -3597,14 +3597,14 @@ function saveChannelList(response, channelID, msgType) {
                             }
                         }
                         break;
-                    case enumMsgType.MsgType_FundingSign_AssetFundingSigned_N35:
+                    case enumMsgType.MsgType_FundingSign_SendAssetFundingSigned_35:
                         for (let i2 = 0; i2 < list.result[i].omniAsset.length; i2++) {
                             if ($("#channel_id").val() === list.result[i].omniAsset[i2].channel_id) {
                                 updateOmniAssetData(response, list.result[i].omniAsset[i2], msgType);
                             }
                         }
                         break;
-                    case enumMsgType.MsgType_CloseChannelRequest_N38:
+                    case enumMsgType.MsgType_SendCloseChannelRequest_38:
                         if (list.result[i].data.length > 2) {
                             list.result[i].data[2].request_close_channel_hash = response.request_close_channel_hash;
                             list.result[i].data[2].date = new Date().toLocaleString();
@@ -3612,7 +3612,7 @@ function saveChannelList(response, channelID, msgType) {
                             list.result[i].data.push(channelData(response));
                         }
                         break;
-                    case enumMsgType.MsgType_CloseChannelSign_N39:
+                    case enumMsgType.MsgType_SendCloseChannelSign_39:
                         list.result[i].data.push(channelData(response));
                         break;
                     default:
@@ -3644,11 +3644,11 @@ function updateOmniAssetData(response, data, msgType) {
     data.date = new Date().toLocaleString();
     data.channel_id = response.channel_id;
 
-    if (msgType === enumMsgType.MsgType_FundingCreate_AssetFundingCreated_N34) {
+    if (msgType === enumMsgType.MsgType_FundingCreate_SendAssetFundingCreated_34) {
         data.funding_omni_hex = response.funding_omni_hex;
         data.c1a_rsmc_hex = response.c1a_rsmc_hex;
         data.rsmc_temp_address_pub_key = response.rsmc_temp_address_pub_key;
-    } else if (msgType === enumMsgType.MsgType_FundingSign_AssetFundingSigned_N35) {
+    } else if (msgType === enumMsgType.MsgType_FundingSign_SendAssetFundingSigned_35) {
         data.approval = response.approval;
         data.rd_hex = response.rd_hex;
         data.rsmc_signed_hex = response.rsmc_signed_hex;
@@ -4403,7 +4403,7 @@ function channelID(parent, list, i) {
         var msgType = list.result[i].omniAsset[0].msgType;
     } catch (error) {}
 
-    if (msgType === enumMsgType.MsgType_FundingSign_AssetFundingSigned_N35) {
+    if (msgType === enumMsgType.MsgType_FundingSign_SendAssetFundingSigned_35) {
         createElement(parent, 'text', 'DONE - Channel ID : ');
     } else {
         createElement(parent, 'text', 'TEMP - Channel ID : ');
@@ -4478,13 +4478,13 @@ function btcRecord(parent, list, i) {
 
             var status;
             switch (list.result[i].btc[i2].msgType) {
-                case enumMsgType.MsgType_Core_FundingBTC_1009:
+                case enumMsgType.MsgType_Core_FundingBTC_2109:
                     status = 'Precharge (1009)';
                     break;
-                case enumMsgType.MsgType_FundingCreate_BtcCreate_N3400:
+                case enumMsgType.MsgType_FundingCreate_SendBtcFundingCreated_340:
                     status = 'Noticed (-3400)';
                     break;
-                case enumMsgType.MsgType_FundingSign_BtcSign_N3500:
+                case enumMsgType.MsgType_FundingSign_SendBtcSign_350:
                     status = 'Confirmed (-3500)';
                     break;
                 default:
@@ -4526,13 +4526,13 @@ function omniAssetRecord(parent, list, i) {
         for (let i2 = 0; i2 < list.result[i].omniAsset.length; i2++) {
             var status;
             switch (list.result[i].omniAsset[i2].msgType) {
-                case enumMsgType.MsgType_Core_Omni_FundingAsset_2001:
+                case enumMsgType.MsgType_Core_Omni_FundingAsset_2120:
                     status = 'Precharge (2001)';
                     break;
-                case enumMsgType.MsgType_FundingCreate_AssetFundingCreated_N34:
+                case enumMsgType.MsgType_FundingCreate_SendAssetFundingCreated_34:
                     status = 'Noticed (-34)';
                     break;
-                case enumMsgType.MsgType_FundingSign_AssetFundingSigned_N35:
+                case enumMsgType.MsgType_FundingSign_SendAssetFundingSigned_35:
                     status = 'Confirmed (-35)';
                     break;
             }
@@ -4586,10 +4586,10 @@ function rsmcRecord(parent, list, i) {
 
             var status;
             switch (list.result[i].transfer[i2].msgType) {
-                case enumMsgType.MsgType_CommitmentTx_CommitmentTransactionCreated_N351:
+                case enumMsgType.MsgType_CommitmentTx_SendCommitmentTransactionCreated_351:
                     status = 'Pre-transfer (-351)';
                     break;
-                case enumMsgType.MsgType_CommitmentTxSigned_RevokeAndAcknowledgeCommitmentTransaction_N352:
+                case enumMsgType.MsgType_CommitmentTxSigned_SendRevokeAndAcknowledgeCommitmentTransaction_352:
                     status = 'Done transfer (-352)';
                     break;
             }
@@ -4635,22 +4635,22 @@ function htlcRecord(parent, list, i) {
 
             var status;
             switch (list.result[i].htlc[i2].msgType) {
-                case enumMsgType.MsgType_HTLC_AddHTLC_N40:
+                case enumMsgType.MsgType_HTLC_SendAddHTLC_40:
                     status = 'HTLC-Created (-40)';
                     break;
-                case enumMsgType.MsgType_HTLC_AddHTLCSigned_N41:
+                case enumMsgType.MsgType_HTLC_SendAddHTLCSigned_41:
                     status = 'HTLC-Signed (-41)';
                     break;
-                case enumMsgType.MsgType_HTLC_SendR_N45:
+                case enumMsgType.MsgType_HTLC_SendVerifyR_45:
                     status = 'Send R (-45)';
                     break;
-                case enumMsgType.MsgType_HTLC_VerifyR_N46:
+                case enumMsgType.MsgType_HTLC_SendSignVerifyR_46:
                     status = 'Verify R (-46)';
                     break;
-                case enumMsgType.MsgType_HTLC_RequestCloseCurrTx_N49:
+                case enumMsgType.MsgType_HTLC_SendRequestCloseCurrTx_49:
                     status = 'Request Close (-49)';
                     break;
-                case enumMsgType.MsgType_HTLC_CloseSigned_N50:
+                case enumMsgType.MsgType_HTLC_SendCloseSigned_50:
                     status = 'Closed (-50)';
                     break;
             }
@@ -4661,8 +4661,8 @@ function htlcRecord(parent, list, i) {
             createElement(parent, 'p', '---------------------------------------------');
 
             switch (list.result[i].htlc[i2].msgType) {
-                case enumMsgType.MsgType_HTLC_RequestCloseCurrTx_N49:
-                case enumMsgType.MsgType_HTLC_CloseSigned_N50:
+                case enumMsgType.MsgType_HTLC_SendRequestCloseCurrTx_49:
+                case enumMsgType.MsgType_HTLC_SendCloseSigned_50:
                     arrData = [
                         'channel_id : ' + list.result[i].htlc[i2].channel_id,
                         'create_at : ' + list.result[i].htlc[i2].create_at,
