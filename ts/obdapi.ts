@@ -138,7 +138,8 @@ class ObdApi {
       return;
     }
 
-    if (msg.type < 0 && this.isLogin == false) {
+    if (((msg.type <= -100000 && msg.type >= -102000) ||
+         (msg.type <= -103000 && msg.type >= -104000)) && this.isLogin == false) {
       alert("please login");
       return;
     }
@@ -749,19 +750,19 @@ class ObdApi {
       return;
     }
 
-    if (this.isNotString(info.channel_id)) {
-      alert("empty channel_id");
+    if (this.isNotString(info.temporary_channel_id)) {
+      alert("empty temporary_channel_id");
       return;
     }
-    if (info.approval == null) {
-      info.approval = false;
-    }
-    if (info.approval == true) {
-      if (this.isNotString(info.fundee_channel_address_private_key)) {
-        alert("empty fundee_channel_address_private_key");
-        return;
-      }
-    }
+    // if (info.approval == null) {
+    //   info.approval = false;
+    // }
+    // if (info.approval == true) {
+    //   if (this.isNotString(info.fundee_channel_address_private_key)) {
+    //     alert("empty fundee_channel_address_private_key");
+    //     return;
+    //   }
+    // }
 
     let msg = new Message();
     msg.type = this.messageType.MsgType_FundingSign_SendAssetFundingSigned_35;
@@ -1059,36 +1060,36 @@ class ObdApi {
       return;
     }
 
-    if (info.approval == null) {
-      info.approval = false;
-    }
+    // if (info.approval == null) {
+    //   info.approval = false;
+    // }
 
-    if (info.approval == true) {
-      if (this.isNotString(info.channel_address_private_key)) {
-        alert("empty channel_address_private_key");
-        return;
-      }
-      if (this.isNotString(info.last_temp_address_private_key)) {
-        alert("empty last_temp_address_private_key");
-        return;
-      }
-      if (this.isNotString(info.curr_rsmc_temp_address_pub_key)) {
-        alert("empty curr_rsmc_temp_address_pub_key");
-        return;
-      }
-      if (this.isNotString(info.curr_rsmc_temp_address_private_key)) {
-        alert("empty curr_rsmc_temp_address_private_key");
-        return;
-      }
-      if (this.isNotString(info.curr_htlc_temp_address_pub_key)) {
-        alert("empty curr_htlc_temp_address_pub_key");
-        return;
-      }
-      if (this.isNotString(info.curr_htlc_temp_address_private_key)) {
-        alert("empty curr_htlc_temp_address_private_key");
-        return;
-      }
-    }
+    // if (info.approval == true) {
+    //   if (this.isNotString(info.channel_address_private_key)) {
+    //     alert("empty channel_address_private_key");
+    //     return;
+    //   }
+    //   if (this.isNotString(info.last_temp_address_private_key)) {
+    //     alert("empty last_temp_address_private_key");
+    //     return;
+    //   }
+    //   if (this.isNotString(info.curr_rsmc_temp_address_pub_key)) {
+    //     alert("empty curr_rsmc_temp_address_pub_key");
+    //     return;
+    //   }
+    //   if (this.isNotString(info.curr_rsmc_temp_address_private_key)) {
+    //     alert("empty curr_rsmc_temp_address_private_key");
+    //     return;
+    //   }
+    //   if (this.isNotString(info.curr_htlc_temp_address_pub_key)) {
+    //     alert("empty curr_htlc_temp_address_pub_key");
+    //     return;
+    //   }
+    //   if (this.isNotString(info.curr_htlc_temp_address_private_key)) {
+    //     alert("empty curr_htlc_temp_address_private_key");
+    //     return;
+    //   }
+    // }
 
     let msg = new Message();
     msg.type = this.messageType.MsgType_HTLC_SendAddHTLCSigned_41;

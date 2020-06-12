@@ -57,9 +57,9 @@ class ChannelFundingCreatedInfo {
 }
 class ChannelFundingSignedInfo {
     constructor() {
-        this.channel_id = "";
+        this.temporary_channel_id = "";
         this.fundee_channel_address_private_key = "";
-        this.approval = false;
+        // approval: boolean = false;
     }
 }
 class CommitmentTx {
@@ -112,7 +112,7 @@ class HtlcCreatedInfo {
 class HtlcSignedInfo {
     constructor() {
         this.request_hash = "";
-        this.approval = false;
+        // approval: boolean = false;
         this.channel_address_private_key = "";
         this.last_temp_address_private_key = "";
         this.curr_rsmc_temp_address_pub_key = "";

@@ -458,8 +458,8 @@
                     ]
                 },
                 {
-                    "name": "channel_id",
-                    "help": "The final channel id created in AssetFundingCreated api (type -34).",
+                    "name": "temporary_channel_id",
+                    "help": "The temporary channel id created in AssetFundingCreated api (type -100034).",
                     "buttons": [
                         {
                             "innerText": "Display",

@@ -49,9 +49,9 @@ class ChannelFundingCreatedInfo {
 }
 
 class ChannelFundingSignedInfo {
-  channel_id: string = "";
+  temporary_channel_id: string = "";
   fundee_channel_address_private_key: string = "";
-  approval: boolean = false;
+  // approval: boolean = false;
 }
 
 class CommitmentTx {
@@ -99,7 +99,7 @@ class HtlcCreatedInfo {
 
 class HtlcSignedInfo {
   request_hash: string = "";
-  approval: boolean = false;
+  // approval: boolean = false;
   channel_address_private_key: string = "";
   last_temp_address_private_key: string = "";
   curr_rsmc_temp_address_pub_key: string = "";
