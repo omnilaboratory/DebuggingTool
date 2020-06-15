@@ -91,6 +91,15 @@ class HtlcFindPathInfo {
         this.amount = 0;
     }
 }
+class InvoiceInfo {
+    constructor() {
+        this.property_id = 0;
+        this.amount = 0;
+        this.h = "";
+        this.expiry_time = "";
+        this.description = "";
+    }
+}
 class HtlcCreatedInfo {
     constructor() {
         this.recipient_user_peer_id = "";

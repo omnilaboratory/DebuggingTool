@@ -24,35 +24,6 @@
             ]
         },
         {
-            "id": "createInvoice",
-            "type_id": -100402,
-            "description": "createInvoice is used to generate an invoice for receiver.",
-            "parameters": [
-                {
-                    "name": "property_id",
-                    "buttons": [
-                        {
-                            "innerText": "Display",
-                            "onclick": "displayUserDataInNewHtml('MyAddresses')"
-                        }
-                    ]
-                },
-                {
-                    "name": "amount",
-                    "buttons": []
-                },
-                {
-                    "name": "recipient_user_peer_id",
-                    "buttons": [
-                        {
-                            "innerText": "Counterparties",
-                            "onclick": "displayUserDataInNewHtml('Counterparties')"
-                        }
-                    ]
-                }
-            ]
-        },
-        {
             "id": "GetAllChannels",
             "type_id": -103150,
             "description": "GetAllChannels is used to get all of channels.",

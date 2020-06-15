@@ -7,6 +7,9 @@ var isConnectToOBD = false;
 // Save login status.
 var isLogined = false;
 
+// Save obd node id.
+var nodeID;
+
 // Save userID of a user already logined.
 var userID;
 
@@ -70,12 +73,12 @@ function getNewAddressWithMnemonic() {
         return '';
     }
 
-    var newIndex = getNewAddrIndex();
+    let newIndex = getNewAddrIndex();
     // console.info('mnemonicWithLogined = ' + mnemonicWithLogined);
     // console.info('addr index = ' + newIndex);
 
     // True: testnet  False: mainnet
-    var result = btctool.generateWalletInfo(mnemonicWithLogined, newIndex, true);
+    let result = btctool.generateWalletInfo(mnemonicWithLogined, newIndex, true);
     console.info('local addr data = ' + JSON.stringify(result));
 
     return result;
@@ -138,7 +141,52 @@ function listeningN45(e, msgType) {
 }
 
 // 
+function listening110032(e, msgType) {
+    console.info('listening110032 = ' + JSON.stringify(e));
+    // saveChannelList(e, e.channel_id, msgType);
+    // saveMsg2Counterparty(e);
+
+    let p2pID    = e.funder_node_address;
+    let name     = e.funder_peer_id;
+    let temp_cid = e.temporary_channel_id;
+
+    console.info('p2pID = ' + p2pID);
+    console.info('name = ' + name);
+    console.info('temp_cid = ' + temp_cid);
+
+    let info = new AcceptChannelInfo();
+    info.temporary_channel_id = temp_cid;
+
+    // Generate an address by local js library.
+    let result = getNewAddressWithMnemonic();
+    info.funding_pubkey = result.result.pubkey;
+    console.info('funding_pubkey = ' + result.result.pubkey);
+    saveAddresses(result);
+
+    info.approval = true;
+
+    // Save value to variable
+    strTempChID = temp_cid;
+
+    // OBD API
+    obdApi.acceptChannel(p2pID, name, info, function(e) {
+        console.info('-100033 acceptChannel - OBD Response = ' + JSON.stringify(e));
+        saveChannelList(e);
+        saveCounterparties(name, p2pID);
+        // createOBDResponseDiv(e, msgType);
+    });
+}
+
+// 
 function registerEvent() {
+    // for testing to auto response mode
+    var msg_110032 = enumMsgType.MsgType_RecvChannelOpen_32;
+    // console.info('msg_110032 = ' + msg_110032);
+    obdApi.registerEvent(msg_110032, function(e) {
+        listening110032(e, msg_110032);
+    });
+
+
     var msgTypeN351 = enumMsgType.MsgType_CommitmentTx_SendCommitmentTransactionCreated_351;
     obdApi.registerEvent(msgTypeN351, function(e) {
         listeningN351(e, msgTypeN351);
@@ -186,6 +234,7 @@ function logIn(msgType) {
 
         // Otherwise, a new loginning, update the userID.
         mnemonicWithLogined = mnemonic;
+        nodeID = e.nodePeerId;
         userID = e.userPeerId;
         $("#logined").text(userID);
         // $("#logined").text(userID.substring(0, 10) + '...');
@@ -222,7 +271,7 @@ function openChannel(msgType) {
     });
 }
 
-// -33 accept Channel API at local.
+// -100033 accept Channel API at local.
 function acceptChannel(msgType) {
 
     var p2pID    = $("#recipient_node_peer_id").val();
@@ -241,7 +290,7 @@ function acceptChannel(msgType) {
 
     // OBD API
     obdApi.acceptChannel(p2pID, name, info, function(e) {
-        console.info('-33 acceptChannel - OBD Response = ' + JSON.stringify(e));
+        console.info('-100033 acceptChannel - OBD Response = ' + JSON.stringify(e));
         saveChannelList(e);
         saveCounterparties(name, p2pID);
         // createOBDResponseDiv(e, msgType);
@@ -929,20 +978,41 @@ function fundingAsset(msgType) {
 // createInvoice API at local.
 function createInvoice(msgType) {
 
-    var property_id = $("#property_id").val();
-    var amount = $("#amount").val();
-    var recipient_user_peer_id = $("#recipient_user_peer_id").val();
+    let property_id = $("#property_id").val();
+    let amount      = $("#amount").val();
+    let h           = $("#h").val();
+    let expiry_time = $("#expiry_time").val();
+    let description = $("#description").val();
 
-    let info = new HtlcHInfo();
+    let info         = new InvoiceInfo();
     info.property_id = Number(property_id);
-    info.amount = Number(amount);
-    info.recipient_user_peer_id = recipient_user_peer_id;
+    info.amount      = Number(amount);
+    info.h           = h;
+    info.expiry_time = expiry_time;
+    info.description = description;
 
     // OBD API
     obdApi.htlcInvoice(info, function(e) {
         console.info('createInvoice - OBD Response = ' + JSON.stringify(e));
         // saveChannelList(e, tempChID, msgType);
-        createOBDResponseDiv(e, msgType);
+        // createOBDResponseDiv(e, msgType);
+
+        $("#newDiv").remove();
+        createElement($("#name_req_div"), 'div', '', 'panelItem', 'newDiv');
+        
+        let newDiv     = $("#newDiv");
+        let strInvoice = JSON.stringify(e);
+
+        // Basecode string of invoice
+        strInvoice = strInvoice.replace("\"", "").replace("\"", "");
+        createElement(newDiv, 'div', strInvoice, 'str_invoice');
+
+        // QRCode of invoice
+        createElement(newDiv, 'div', '', 'qrcode', 'qrcode');
+        let qrcode = new QRCode("qrcode", {
+            width : 160, height : 160
+        });
+        qrcode.makeCode(strInvoice);
     });
 }
 
@@ -1464,7 +1534,7 @@ function displayOBDMessages(msg) {
     if (Number(msg.type) != enumMsgType.MsgType_Error_0) {
         content = content.replace("\"", "").replace("\"", "");
     }
-    console.info("OBD DIS - content = ", content);
+    // console.info("OBD DIS - content = ", content);
 
     // the info save to local storage [ChannelList].
     channelInfo = content;
@@ -1754,6 +1824,15 @@ function autoFillValue(arrParams, obj) {
     let result;
     let msgType = Number(obj.getAttribute("type_id"));
     switch (msgType) {
+        // case enumMsgType.MsgType_HTLC_Invoice_402:
+        //     if (isLogined) {
+        //         $("#recipient_node_peer_id").val(nodeID);
+        //         $("#recipient_user_peer_id").val(userID);
+        //         $("#recipient_node_peer_id").attr("class", "input input_color");
+        //         $("#recipient_user_peer_id").attr("class", "input input_color");
+        //     }
+            // break;
+
         case enumMsgType.MsgType_FundingCreate_SendAssetFundingCreated_34:
             result = getNewAddressWithMnemonic();
             if (result === '') return;
@@ -3880,17 +3959,17 @@ function autoCreateFundingPubkey(param) {
     if (result === '') return;
 
     switch (param) {
-        case 1009:
-        case 2001:
+        case -102109:
+        case -102120:
             $("#from_address").val(result.result.address);
             $("#from_address_private_key").val(result.result.wif);
             break;
-        case -34:
+        case -100034:
             $("#temp_address_pub_key").val(result.result.pubkey);
             $("#temp_address_private_key").val(result.result.wif);
             break;
-        case -351:
-        case -352:
+        case -100351:
+        case -100352:
             $("#curr_temp_address_pub_key").val(result.result.pubkey);
             $("#curr_temp_address_private_key").val(result.result.wif);
             break;
@@ -4711,9 +4790,9 @@ function htlcRecord(parent, list, i) {
 // Functions of Common Util.
 
 // create html elements
-function createElement(parent, elementName, myInnerText, css) {
+function createElement(parent, elementName, myInnerText, css, elementID) {
 
-    var element = document.createElement(elementName);
+    let element = document.createElement(elementName);
 
     if (myInnerText) {
         element.innerText = myInnerText;
@@ -4721,6 +4800,10 @@ function createElement(parent, elementName, myInnerText, css) {
 
     if (css) {
         element.setAttribute('class', css);
+    }
+
+    if (elementID) {
+        element.id = elementID;
     }
 
     parent.append(element);

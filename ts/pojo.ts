@@ -80,6 +80,14 @@ class HtlcFindPathInfo {
   amount: number = 0;
 }
 
+class InvoiceInfo {
+  property_id: number = 0;
+  amount: number = 0;
+  h: string = "";
+  expiry_time: string = "";
+  description: string = "";
+}
+
 class HtlcCreatedInfo {
   recipient_user_peer_id: string = "";
   property_id: number = 0;

@@ -27,6 +27,44 @@
             ]
         },
         {
+            "id": "createInvoice",
+            "type_id": -100402,
+            "description": "createInvoice is used to generate an invoice for receiver.",
+            "parameters": [
+                {
+                    "name": "property_id",
+                    "buttons": [
+                        {
+                            "innerText": "Display",
+                            "onclick": "displayUserDataInNewHtml('MyAddresses')"
+                        }
+                    ]
+                },
+                {
+                    "name": "amount",
+                    "buttons": []
+                },
+                {
+                    "name": "h",
+                    "help": "The H (Hash of a Preimage R) currently is Public Key of a wallet address, and the R (Preimage R) is Private Key of a wallet address. This is a temporary solution.",
+                    "buttons": [
+                        {
+                            "innerText": "Display",
+                            "onclick": "displayUserDataInNewHtml('MyAddresses')"
+                        }
+                    ]
+                },
+                {
+                    "name": "expiry_time",
+                    "buttons": []
+                },
+                {
+                    "name": "description",
+                    "buttons": []
+                }
+            ]
+        },
+        {
             "id": "connectP2PNode",
             "type_id": -102003,
             "description": "connectP2PNode is a temp func in debugging mode. It connects to a p2p node.",
@@ -142,7 +180,7 @@
                         },
                         {
                             "innerText": "Create",
-                            "onclick": "autoCreateFundingPubkey(1009)"
+                            "onclick": "autoCreateFundingPubkey(-102109)"
                         },
                         {
                             "innerText": "Bitcoin Faucet",
@@ -311,7 +349,7 @@
                         },
                         {
                             "innerText": "Create",
-                            "onclick": "autoCreateFundingPubkey(2001)"
+                            "onclick": "autoCreateFundingPubkey(-102120)"
                         }
                     ]
                 },
@@ -395,7 +433,7 @@
                         },
                         {
                             "innerText": "Create",
-                            "onclick": "autoCreateFundingPubkey(-34)"
+                            "onclick": "autoCreateFundingPubkey(-100034)"
                         }
                     ]
                 },
@@ -534,7 +572,7 @@
                         },
                         {
                             "innerText": "Create",
-                            "onclick": "autoCreateFundingPubkey(-351)"
+                            "onclick": "autoCreateFundingPubkey(-100351)"
                         }
                     ]
                 },
@@ -631,7 +669,7 @@
                         },
                         {
                             "innerText": "Create",
-                            "onclick": "autoCreateFundingPubkey(-352)"
+                            "onclick": "autoCreateFundingPubkey(-100352)"
                         }
                     ]
                 },
