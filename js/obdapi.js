@@ -296,24 +296,24 @@ class ObdApi {
         this.isLogin = false;
     }
     /**
-     * MsgType_p2p_ConnectServer_2003
+     * MsgType_p2p_ConnectPeer_2003
+     * @param info P2PPeer
      * @param callback function
      */
-    connectP2PNode(p2pAddress, callback) {
-        if (this.isNotString(p2pAddress)) {
-            alert("empty p2pAddress");
+    connectP2PPeer(info, callback) {
+        if (this.isNotString(info.remote_node_address)) {
+            alert("empty remote_node_address");
             return;
         }
         let msg = new Message();
-        msg.data = p2pAddress;
-        msg.type = this.messageType.MsgType_p2p_ConnectServer_2003;
+        msg.data = info;
+        msg.type = this.messageType.MsgType_p2p_ConnectPeer_2003;
         this.sendData(msg, callback);
     }
     /**
      * MsgType_GetMnemonic_2004
      */
     genMnemonic() {
-        return btctool.generateMnemonic(128);
     }
     // /**
     //  * MsgType_GetMnemonic_2004

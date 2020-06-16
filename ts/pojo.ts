@@ -230,12 +230,19 @@ class AtomicSwapAccepted extends AtomicSwapRequest {
   target_transaction_id: string = "";
 }
 
+/**
+ * MsgType_p2p_ConnectPeer_2003
+ */
+class P2PPeer {
+  remote_node_address: string = "";
+}
+
 class MessageType {
   MsgType_Error_0 = 0;
 
   MsgType_UserLogin_2001          = -102001;
   MsgType_UserLogout_2002         = -102002;
-  MsgType_p2p_ConnectServer_2003  = -102003;
+  MsgType_p2p_ConnectPeer_2003    = -102003;
   MsgType_GetMnemonic_2004        = -102004;
 
   MsgType_Core_GetNewAddress_2101                    = -102101;

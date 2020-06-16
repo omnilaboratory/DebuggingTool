@@ -60,6 +60,11 @@ var btcFromAddr, btcFromAddrPrivKey, btcToAddr, btcAmount, btcMinerFee;
  */
 var strTempChID;
 
+/**
+ * open / close auto mode.
+ */
+var isAutoMode = false;
+
 
 // Get name of saveGoWhere variable.
 function getSaveName() {
@@ -140,37 +145,32 @@ function listeningN45(e, msgType) {
     // saveMsg2Counterparty(e);
 }
 
-// 
+// auto response to -100032 (openChannel) and send -100033 acceptChannel
 function listening110032(e, msgType) {
+    console.info('NOW isAutoMode = ' + isAutoMode);
+    if (!isAutoMode) return;
+    
     console.info('listening110032 = ' + JSON.stringify(e));
-    // saveChannelList(e, e.channel_id, msgType);
-    // saveMsg2Counterparty(e);
 
     let p2pID    = e.funder_node_address;
     let name     = e.funder_peer_id;
     let temp_cid = e.temporary_channel_id;
 
-    console.info('p2pID = ' + p2pID);
-    console.info('name = ' + name);
-    console.info('temp_cid = ' + temp_cid);
-
     let info = new AcceptChannelInfo();
     info.temporary_channel_id = temp_cid;
+    info.approval = true;
 
     // Generate an address by local js library.
     let result = getNewAddressWithMnemonic();
     info.funding_pubkey = result.result.pubkey;
-    console.info('funding_pubkey = ' + result.result.pubkey);
     saveAddresses(result);
-
-    info.approval = true;
 
     // Save value to variable
     strTempChID = temp_cid;
 
     // OBD API
     obdApi.acceptChannel(p2pID, name, info, function(e) {
-        console.info('-100033 acceptChannel - OBD Response = ' + JSON.stringify(e));
+        console.info('-100033 acceptChannel = ' + JSON.stringify(e));
         saveChannelList(e);
         saveCounterparties(name, p2pID);
         // createOBDResponseDiv(e, msgType);
@@ -179,9 +179,8 @@ function listening110032(e, msgType) {
 
 // 
 function registerEvent() {
-    // for testing to auto response mode
-    var msg_110032 = enumMsgType.MsgType_RecvChannelOpen_32;
-    // console.info('msg_110032 = ' + msg_110032);
+    // auto response mode
+    let msg_110032 = enumMsgType.MsgType_RecvChannelOpen_32;
     obdApi.registerEvent(msg_110032, function(e) {
         listening110032(e, msg_110032);
     });
@@ -243,14 +242,15 @@ function logIn(msgType) {
     });
 }
 
-// 3 connectP2PNode API at local.
-function connectP2PNode(msgType) {
-
-    var nodeAddress  = $("#NodeAddress").val();
+// connectP2PPeer API at local.
+function connectP2PPeer(msgType) {
+    let remote_node_address = $("#remote_node_address").val();
+    let info = new P2PPeer();
+    info.remote_node_address = remote_node_address;
 
     // OBD API
-    obdApi.connectP2PNode(nodeAddress, function(e) {
-        console.info('connectP2PNode - OBD Response = ' + JSON.stringify(e));
+    obdApi.connectP2PPeer(info, function(e) {
+        console.info('connectP2PPeer - OBD Response = ' + JSON.stringify(e));
         createOBDResponseDiv(e, msgType);
     });
 }
@@ -989,6 +989,7 @@ function createInvoice(msgType) {
     info.amount      = Number(amount);
     info.h           = h;
     info.expiry_time = expiry_time;
+    console.info('info.expiry_time = ' + info.expiry_time);
     info.description = description;
 
     // OBD API
@@ -1347,8 +1348,8 @@ function invokeAPIs(objSelf) {
         case enumMsgType.MsgType_Atomic_SendSwapAccept_81:
             atomicSwapAccepted(msgType);
             break;
-        case enumMsgType.MsgType_p2p_ConnectServer_2003:
-            connectP2PNode(msgType);
+        case enumMsgType.MsgType_p2p_ConnectPeer_2003:
+            connectP2PPeer(msgType);
             break;
         default:
             console.info(msgType + " do not exist");
@@ -1418,9 +1419,9 @@ function displayOBDMessages(msg) {
             content.result = 'Logged In - ' + content.from;
             msgHead = msgTime +  '  - Logged In.';
             break;
-        case enumMsgType.MsgType_p2p_ConnectServer_2003:
-            content.result = 'Connect to P2P Node success.';
-            msgHead = msgTime+  '  - Connect to P2P Node success.';
+        case enumMsgType.MsgType_p2p_ConnectPeer_2003:
+            content.result = 'Connect to P2P Peer.';
+            msgHead = msgTime+  '  - Connect to P2P Peer.';
             break;
         case enumMsgType.MsgType_SendChannelOpen_32:
             content.result = 'LAUNCH - ' + content.from +
@@ -1824,14 +1825,17 @@ function autoFillValue(arrParams, obj) {
     let result;
     let msgType = Number(obj.getAttribute("type_id"));
     switch (msgType) {
-        // case enumMsgType.MsgType_HTLC_Invoice_402:
+        case enumMsgType.MsgType_HTLC_Invoice_402:
+            let date = new Date().toJSON().substr(0, 10).replace('T', ' ');
+            $("#expiry_time").val(date);
+            $("#expiry_time").attr("type", "date");
         //     if (isLogined) {
         //         $("#recipient_node_peer_id").val(nodeID);
         //         $("#recipient_user_peer_id").val(userID);
         //         $("#recipient_node_peer_id").attr("class", "input input_color");
         //         $("#recipient_user_peer_id").attr("class", "input input_color");
         //     }
-            // break;
+            break;
 
         case enumMsgType.MsgType_FundingCreate_SendAssetFundingCreated_34:
             result = getNewAddressWithMnemonic();
@@ -2495,7 +2499,7 @@ function createOBDResponseDiv(response, msgType) {
         case enumMsgType.MsgType_UserLogin_2001:
             parseData1(response);
             break;
-        case enumMsgType.MsgType_p2p_ConnectServer_2003:
+        case enumMsgType.MsgType_p2p_ConnectPeer_2003:
             parseData3(response);
             break;
         default:
@@ -5078,4 +5082,14 @@ function formatTime(time) {
     }
 
     return time.substring(0, 19).replace('T', ' ');
+}
+
+//
+function autoMode(obj) {
+    if (obj.checked) {
+        isAutoMode = true;
+    } else {
+        isAutoMode = false;
+    }
+    console.info('CLICK - isAutoMode = ' + isAutoMode);
 }

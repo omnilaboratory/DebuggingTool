@@ -56,21 +56,23 @@
                 },
                 {
                     "name": "expiry_time",
+                    "help": "Example: 2020-7-16",
                     "buttons": []
                 },
                 {
                     "name": "description",
+                    "help": "A memo",
                     "buttons": []
                 }
             ]
         },
         {
-            "id": "connectP2PNode",
+            "id": "connectP2PPeer",
             "type_id": -102003,
-            "description": "connectP2PNode is a temp func in debugging mode. It connects to a p2p node.",
+            "description": "connectP2PPeer is a temp func in debugging mode. It connects to a p2p node.",
             "parameters": [
                 {
-                    "name": "NodeAddress",
+                    "name": "remote_node_address",
                     "buttons": []
                 }
             ]

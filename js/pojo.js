@@ -260,12 +260,20 @@ class AtomicSwapAccepted extends AtomicSwapRequest {
         this.target_transaction_id = "";
     }
 }
+/**
+ * MsgType_p2p_ConnectPeer_2003
+ */
+class P2PPeer {
+    constructor() {
+        this.remote_node_address = "";
+    }
+}
 class MessageType {
     constructor() {
         this.MsgType_Error_0 = 0;
         this.MsgType_UserLogin_2001 = -102001;
         this.MsgType_UserLogout_2002 = -102002;
-        this.MsgType_p2p_ConnectServer_2003 = -102003;
+        this.MsgType_p2p_ConnectPeer_2003 = -102003;
         this.MsgType_GetMnemonic_2004 = -102004;
         this.MsgType_Core_GetNewAddress_2101 = -102101;
         this.MsgType_Core_GetMiningInfo_2102 = -102102;

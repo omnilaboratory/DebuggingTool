@@ -330,8 +330,7 @@ pre {
 } 
 
 .qrcode {
-    /* width:60px; */
     height:200px;
     margin-left:200px;
     margin-top:50px;
-} 
+}

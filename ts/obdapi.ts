@@ -349,17 +349,20 @@ class ObdApi {
   }
 
   /**
-   * MsgType_p2p_ConnectServer_2003
+   * MsgType_p2p_ConnectPeer_2003
+   * @param info P2PPeer
    * @param callback function
    */
-  public connectP2PNode(p2pAddress: string, callback: Function) {
-    if (this.isNotString(p2pAddress)) {
-      alert("empty p2pAddress");
+  public connectP2PPeer(info: P2PPeer, callback: Function) {
+
+    if (this.isNotString(info.remote_node_address)) {
+      alert("empty remote_node_address");
       return;
     }
-    let msg = new Message();
-    msg.data = p2pAddress;
-    msg.type = this.messageType.MsgType_p2p_ConnectServer_2003;
+
+    let msg  = new Message();
+    msg.data = info;
+    msg.type = this.messageType.MsgType_p2p_ConnectPeer_2003;
     this.sendData(msg, callback);
   }
 

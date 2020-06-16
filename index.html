@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="css/main.css">
     <link rel="stylesheet" href="css/tooltip.css">
     <link rel="stylesheet" href="css/table.css">
+    <link rel="stylesheet" href="css/input_style.css">
     <script src="https://lib.sinaapp.com/js/jquery/2.0.2/jquery-2.0.2.min.js"></script>
     <script src="js/btctool.js"></script>
     <script src="js/pojo.js"></script>
@@ -52,6 +53,13 @@
         <div class="main">
             <!-- Left Side Menu -->
             <div id="menu" class="leftSide">
+
+                <!-- Auto Mode -->
+                <div class="auto_mode">
+                    <label for="auto_mode">Auto Mode</label>
+                    <input id="auto_mode" type="checkbox" class="switch" onclick="autoMode(this)">
+                </div>
+
                 <div class="menuTitle">Start</div>
                 <a href="#" class="url" onclick="displayConnectOBD()">Connect to OBD node</a>
                 
