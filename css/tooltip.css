@@ -127,6 +127,60 @@
     transform: translateY(0px);
 }
 
+/* ==================== */
+/* for .fa.fa-info-circle */
+.wrapper .info_icon {
+    background: #093c49;
+    top: 100%;
+    color: rgb(102, 221, 55);
+    display: block;
+    left: -30px;
+    margin-top: 15px;
+    opacity: 0;
+    padding: 20px;
+    pointer-events: none;
+    position: absolute;
+    z-index: 1;
+    width: 180px;
+    word-break: normal;
+    transform: translateY(10px);
+    transition: all .25s ease-out;
+    box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.28);
+}
+
+/* This bridges the gap so you can mouse into the tooltip without it disappearing */
+.wrapper .info_icon:before {
+    top: -20px;
+    content: " ";
+    display: block;
+    height: 20px;
+    left: 0;
+    position: absolute;
+    width: 100%;
+}  
+
+/* CSS Triangles - see Trevor's post */
+.wrapper .info_icon:after {
+    border-left: solid transparent 10px;
+    border-right: solid transparent 10px;
+    border-bottom: solid #093c49 10px;
+    top: -10px;
+    content: " ";
+    height: 0;
+    left: 25px;
+    /* left: 20%; */
+    margin-left: -13px;
+    position: absolute;
+    width: 0;
+}
+
+.wrapper:hover .info_icon {
+    opacity: 1;
+    pointer-events: auto;
+    transform: translateY(0px);
+}
+/* ======================= */
+
 .parent_div {
     display: flex;
 }
@@ -136,4 +190,18 @@
     height: 30px;
     vertical-align: bottom;
     padding-right: 10px;
+}
+
+.auto_mode {
+    font-size: 17px;
+    font-weight: 600;
+    margin-top: 20px;
+}
+
+.fa.fa-info-circle {
+    font-size: 21px;
+    color: rgb(92, 92, 202);
+    margin-top: 20px;
+    margin-right: 10px;
+    margin-left: -25px;
 }

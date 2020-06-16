@@ -179,9 +179,6 @@ class ObdApi {
             case this.messageType.MsgType_UserLogout_2002:
                 this.onLogout(resultData);
                 break;
-            // case this.messageType.MsgType_GetMnemonic_2004:
-            //   this.onSignUp(resultData);
-            //   break;
             case this.messageType.MsgType_Core_GetNewAddress_2101:
                 this.onGetNewAddressFromOmniCore(resultData);
                 break;
@@ -310,21 +307,14 @@ class ObdApi {
         msg.type = this.messageType.MsgType_p2p_ConnectPeer_2003;
         this.sendData(msg, callback);
     }
+
     /**
      * MsgType_GetMnemonic_2004
      */
     genMnemonic() {
+        return btctool.generateMnemonic(128);
     }
-    // /**
-    //  * MsgType_GetMnemonic_2004
-    //  * @param callback function
-    //  */
-    // public signUp(callback: Function) {
-    //   let msg = new Message();
-    //   msg.type = this.messageType.MsgType_GetMnemonic_2004;
-    //   this.sendData(msg, callback);
-    // }
-    // public onSignUp(jsonData: any) {}
+
     /**
      * MsgType_Core_GetNewAddress_2101
      * @param callback function

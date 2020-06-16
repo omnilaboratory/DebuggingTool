@@ -148,10 +148,4 @@
 	input[type='radio']:checked {
 	  --s: .5;
 	}
-
-	.auto_mode {
-		font-size: 17px;
-		font-weight: 600;
-		margin-top: 20px;
-	}
 }

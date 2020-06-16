@@ -9,6 +9,7 @@
     <link rel="stylesheet" href="css/tooltip.css">
     <link rel="stylesheet" href="css/table.css">
     <link rel="stylesheet" href="css/input_style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <script src="https://lib.sinaapp.com/js/jquery/2.0.2/jquery-2.0.2.min.js"></script>
     <script src="js/btctool.js"></script>
     <script src="js/pojo.js"></script>
@@ -55,9 +56,17 @@
             <div id="menu" class="leftSide">
 
                 <!-- Auto Mode -->
-                <div class="auto_mode">
-                    <label for="auto_mode">Auto Mode</label>
-                    <input id="auto_mode" type="checkbox" class="switch" onclick="autoMode(this)">
+                <div class="parent_div">
+                    <div class="wrapper">
+                        <i class="fa fa-info-circle"></i>
+                        <div class="info_icon"><label>Auto response to some request like 
+                            OpenChannel, BTCFundingCreated, AssetFundingCreated, 
+                            RSMCCTxCreated, HTLCCreated.</label></div>
+                    </div>
+                    <div class="auto_mode">
+                        <label for="auto_mode">Auto Mode</label>
+                        <input id="auto_mode" type="checkbox" class="switch" onclick="autoMode(this)">
+                    </div>
                 </div>
 
                 <div class="menuTitle">Start</div>
