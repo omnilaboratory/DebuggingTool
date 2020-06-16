@@ -1270,8 +1270,8 @@ function invokeAPIs(objSelf) {
             break;
         case enumMsgType.MsgType_GetMnemonic_2004:
             // Generate mnemonic by local js library.
-            // This is equal OBD api signUp.
-            var mnemonic = btctool.generateMnemonic(128);
+            // var mnemonic = btctool.generateMnemonic(128);
+            let mnemonic = obdApi.genMnemonic();
             saveMnemonic(mnemonic);
             createOBDResponseDiv(mnemonic);
             break;

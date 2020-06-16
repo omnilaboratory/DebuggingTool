@@ -1,9 +1,9 @@
 ﻿{
     "data": [
         {
-            "id": "signUp",
+            "id": "genMnemonic",
             "type_id": -102004,
-            "description": "SignUp is used to sign up a new user by hirarchecal deterministic wallet system integrated in OBD. OBD returns mnemonic words to the client who signs up, and create a new user by the hash of the mnemonic words as the UserID.",
+            "description": "genMnemonic is used to sign up a new user by hirarchecal deterministic wallet system integrated in OBD. OBD returns mnemonic words to the client who signs up, and create a new user by the hash of the mnemonic words as the UserID.",
             "parameters": []
         },
         {
