@@ -71,8 +71,8 @@ function getSaveName() {
     return itemGoWhere;
 }
 
-// getNewAddressWithMnemonic by local js library
-function getNewAddressWithMnemonic() {
+// genAddressFromMnemonic by local js library
+function genAddressFromMnemonic() {
     if (!isLogined) { // Not logined
         alert('Please login first.');
         return '';
@@ -121,31 +121,32 @@ function listeningN351(e, msgType) {
     console.info('listeningN351 = ' + JSON.stringify(e));
     console.info('listeningN351 msgType = ' + msgType);
     saveChannelList(e, e.channelId, msgType);
-    // saveMsg2Counterparty(e);
+    // saveMsgFromCounterparty(e);
 }
 
 // 
 function listeningN40(e, msgType) {
     console.info('listeningN40 = ' + JSON.stringify(e));
     saveChannelList(e, e.channelId, msgType);
-    // saveMsg2Counterparty(e);
+    // saveMsgFromCounterparty(e);
 }
 
 // 
 function listeningN41(e, msgType) {
     console.info('listeningN41 = ' + JSON.stringify(e));
     saveChannelList(e, e.channel_id, msgType);
-    // saveMsg2Counterparty(e);
+    // saveMsgFromCounterparty(e);
 }
 
 // 
 function listeningN45(e, msgType) {
     console.info('listeningN45 = ' + JSON.stringify(e));
     saveChannelList(e, e.channel_id, msgType);
-    // saveMsg2Counterparty(e);
+    // saveMsgFromCounterparty(e);
 }
 
-// auto response to -100032 (openChannel) and send -100033 acceptChannel
+// auto response to -100032 (openChannel) 
+// listening to -110032 and send -100033 acceptChannel
 function listening110032(e, msgType) {
     console.info('NOW isAutoMode = ' + isAutoMode);
     if (!isAutoMode) return;
@@ -161,8 +162,9 @@ function listening110032(e, msgType) {
     info.approval = true;
 
     // Generate an address by local js library.
-    let result = getNewAddressWithMnemonic();
+    let result = genAddressFromMnemonic();
     info.funding_pubkey = result.result.pubkey;
+    saveFundingAddrData(result);
     saveAddresses(result);
 
     // Save value to variable
@@ -177,6 +179,95 @@ function listening110032(e, msgType) {
     });
 }
 
+// auto response to -100340 (BTCFundingCreated)
+// listening to -110340 and send -100350 BTCFundingSigned
+function listening110340(e, msgType) {
+    console.info('NOW isAutoMode = ' + isAutoMode);
+    if (!isAutoMode) return;
+    
+    console.info('listening110340 = ' + JSON.stringify(e));
+
+    let p2pID    = e.funder_node_address;
+    let name     = e.funder_peer_id;
+    let temp_cid = e.temporary_channel_id;
+    let privkey  = getFundingAddrPrivKey();
+    let tx_id    = e.funding_txid;
+
+    let info = new FundingBtcSigned();
+    info.temporary_channel_id         = temp_cid;
+    info.channel_address_private_key  = privkey;
+    info.funding_txid                 = tx_id;
+    info.approval                     = true;
+
+    // Save value to variable
+    strTempChID = temp_cid;
+
+    // OBD API
+    obdApi.btcFundingSigned(p2pID, name, info, function(e) {
+        console.info('-100350 btcFundingSigned = ' + JSON.stringify(e));
+        saveChannelList(e, temp_cid, msgType);
+    });
+}
+
+// auto response to -100034 (AssetFundingCreated)
+// listening to -110034 and send -100035 AssetFundingSigned
+function listening110034(e, msgType) {
+    console.info('NOW isAutoMode = ' + isAutoMode);
+    if (!isAutoMode) return;
+    
+    console.info('listening110034 = ' + JSON.stringify(e));
+
+    let p2pID    = e.funder_node_address;
+    let name     = e.funder_peer_id;
+    let temp_cid = e.temporary_channel_id;
+    let privkey  = getFundingAddrPrivKey();
+
+    let info = new ChannelFundingSignedInfo();
+    info.temporary_channel_id = temp_cid;
+    info.fundee_channel_address_private_key = privkey;
+
+    // OBD API
+    obdApi.channelFundingSigned(p2pID, name, info, function(e) {
+        console.info('-100035 AssetFundingSigned = ' + JSON.stringify(e));
+        saveChannelList(e, e.channel_id, msgType);
+    });
+}
+
+// auto response to -100351 (RSMCCTxCreated)
+// listening to -110351 and send -100352 RSMCCTxSigned
+function listening110351(e, msgType) {
+    console.info('NOW isAutoMode = ' + isAutoMode);
+    if (!isAutoMode) return;
+    
+    console.info('listening110351 = ' + JSON.stringify(e));
+
+    let p2pID    = e.funder_node_address;
+    let name     = e.funder_peer_id;
+
+    // Generate an address by local js library.
+    let result = genAddressFromMnemonic();
+    // saveFundingAddrData(result);
+    saveAddresses(result);
+
+    var last_temp_address_private_key = $("#last_temp_address_private_key").val();
+    var request_commitment_hash = $("#request_commitment_hash").val();
+
+    let info                           = new CommitmentTxSigned();
+    info.channel_id                    = e.channel_id;
+    info.curr_temp_address_pub_key     = result.result.pubkey;
+    info.curr_temp_address_private_key = result.result.wif;
+    info.channel_address_private_key   = getFundingAddrPrivKey();
+    info.last_temp_address_private_key = last_temp_address_private_key;
+    info.request_commitment_hash       = request_commitment_hash;
+    info.approval                      = true;
+
+    // OBD API
+    obdApi.revokeAndAcknowledgeCommitmentTransaction(p2pID, name, info, function(e) {
+        console.info('-100352 RSMCCTxSigned = ' + JSON.stringify(e));
+        saveChannelList(e, e.channel_id, msgType);
+    });
+}
+
 // 
 function registerEvent() {
     // auto response mode
@@ -184,6 +275,25 @@ function registerEvent() {
     obdApi.registerEvent(msg_110032, function(e) {
         listening110032(e, msg_110032);
     });
+
+    // auto response mode
+    let msg_110340 = enumMsgType.MsgType_FundingCreate_RecvBtcFundingCreated_340;
+    obdApi.registerEvent(msg_110340, function(e) {
+        listening110340(e, msg_110340);
+    });
+
+    // auto response mode
+    let msg_110034 = enumMsgType.MsgType_FundingCreate_RecvAssetFundingCreated_34;
+    obdApi.registerEvent(msg_110034, function(e) {
+        listening110034(e, msg_110034);
+    });
+
+    // auto response mode
+    let msg_110351 = enumMsgType.MsgType_CommitmentTx_RecvCommitmentTransactionCreated_351;
+    obdApi.registerEvent(msg_110351, function(e) {
+        listening110351(e, msg_110351);
+    });
+
 
 
     var msgTypeN351 = enumMsgType.MsgType_CommitmentTx_SendCommitmentTransactionCreated_351;
@@ -820,7 +930,7 @@ function btcFundingCreated(msgType) {
     });
 }
 
-// BTC Funding Signed -3500 API at local.
+// BTC Funding Signed -100350 API at local.
 function btcFundingSigned(msgType) {
 
     var p2pID    = $("#recipient_node_peer_id").val();
@@ -1167,7 +1277,7 @@ function RSMCCTxCreated(msgType) {
     });
 }
 
-// Revoke and Acknowledge Commitment Transaction -352 API at local.
+// Revoke and Acknowledge Commitment Transaction -100352 API at local.
 function RSMCCTxSigned(msgType) {
 
     var p2pID    = $("#recipient_node_peer_id").val();
@@ -1191,7 +1301,7 @@ function RSMCCTxSigned(msgType) {
 
     // OBD API
     obdApi.revokeAndAcknowledgeCommitmentTransaction(p2pID, name, info, function(e) {
-        console.info('RSMCCTxSigned - OBD Response = ' + JSON.stringify(e));
+        console.info('-100352 RSMCCTxSigned = ' + JSON.stringify(e));
         saveChannelList(e, channel_id, msgType);
         // createOBDResponseDiv(e, msgType);
     });
@@ -1244,14 +1354,14 @@ function invokeAPIs(objSelf) {
         case enumMsgType.MsgType_CommitmentTx_LatestCommitmentTxByChanId_3203:
             getLatestCommitmentTx(msgType);
             break;
-        case enumMsgType.MsgType_Core_GetNewAddress_2101:
-            obdApi.getNewAddress(function(e) {
-                console.info('OBD Response = ' + e);
-                createOBDResponseDiv(e);
-            });
-            break;
+        // case enumMsgType.MsgType_Core_GetNewAddress_2101:
+        //     obdApi.getNewAddress(function(e) {
+        //         console.info('OBD Response = ' + e);
+        //         createOBDResponseDiv(e);
+        //     });
+        //     break;
         case enumMsgType.MsgType_Mnemonic_CreateAddress_3000:
-            var result = getNewAddressWithMnemonic();
+            var result = genAddressFromMnemonic();
             if (result === '') return;
             saveAddresses(result);
             createOBDResponseDiv(result, msgType);
@@ -1272,7 +1382,8 @@ function invokeAPIs(objSelf) {
         case enumMsgType.MsgType_GetMnemonic_2004:
             // Generate mnemonic by local js library.
             // var mnemonic = btctool.generateMnemonic(128);
-            let mnemonic = obdApi.genMnemonic();
+            // let mnemonic = obdApi.genMnemonic();
+            let mnemonic = genMnemonic();
             saveMnemonic(mnemonic);
             createOBDResponseDiv(mnemonic);
             break;
@@ -1358,8 +1469,8 @@ function invokeAPIs(objSelf) {
 }
 
 // 
-function saveMsg2Counterparty(e) {
-    console.info("saveMsg2Counterparty:", JSON.stringify(e));
+function saveMsgFromCounterparty(e) {
+    console.info("saveMsgFromCounterparty:", JSON.stringify(e));
 
     var data = localStorage.getItem('broadcast_info');
 
@@ -1399,7 +1510,6 @@ function displayOBDMessages(msg) {
 
     switch (Number(content.type)) {
         // case enumMsgType.MsgType_Error_0:
-        // case enumMsgType.MsgType_Core_GetNewAddress_2101:
         // case enumMsgType.MsgType_Mnemonic_CreateAddress_3000:
         // case enumMsgType.MsgType_Mnemonic_GetAddressByIndex_3001:
         // case enumMsgType.MsgType_GetMnemonic_2004:
@@ -1568,8 +1678,12 @@ function displayOBDMessages(msg) {
         newMsg += '\n\n\n\n' + data;
         showMsg = newMsg;
     }
+    // testNum++;
+    // console.info('INFO --> testNum = ' + testNum);
+    // console.info('INFO --> showMsg = ' + showMsg);
     localStorage.setItem('broadcast_info', showMsg);
 }
+// var testNum = 0;
 
 // 
 function getUserDataList(goWhere) {
@@ -1838,7 +1952,7 @@ function autoFillValue(arrParams, obj) {
             break;
 
         case enumMsgType.MsgType_FundingCreate_SendAssetFundingCreated_34:
-            result = getNewAddressWithMnemonic();
+            result = genAddressFromMnemonic();
             if (result === '') return;
             $("#temp_address_pub_key").val(result.result.pubkey);
             $("#temp_address_private_key").val(result.result.wif);
@@ -1849,7 +1963,7 @@ function autoFillValue(arrParams, obj) {
 
         case enumMsgType.MsgType_CommitmentTx_SendCommitmentTransactionCreated_351:
         case enumMsgType.MsgType_CommitmentTxSigned_SendRevokeAndAcknowledgeCommitmentTransaction_352:
-            result = getNewAddressWithMnemonic();
+            result = genAddressFromMnemonic();
             if (result === '') return;
             $("#curr_temp_address_pub_key").val(result.result.pubkey);
             $("#curr_temp_address_private_key").val(result.result.wif);
@@ -1859,7 +1973,7 @@ function autoFillValue(arrParams, obj) {
             break;
 
         case enumMsgType.MsgType_HTLC_SendAddHTLC_40:
-            result = getNewAddressWithMnemonic();
+            result = genAddressFromMnemonic();
             if (result === '') return;
             $("#curr_rsmc_temp_address_pub_key").val(result.result.pubkey);
             $("#curr_rsmc_temp_address_private_key").val(result.result.wif);
@@ -1867,7 +1981,7 @@ function autoFillValue(arrParams, obj) {
             $("#curr_rsmc_temp_address_private_key").attr("class", "input input_color");
             saveAddresses(result);
 
-            result = getNewAddressWithMnemonic();
+            result = genAddressFromMnemonic();
             if (result === '') return;
             $("#curr_htlc_temp_address_pub_key").val(result.result.pubkey);
             $("#curr_htlc_temp_address_private_key").val(result.result.wif);
@@ -1875,7 +1989,7 @@ function autoFillValue(arrParams, obj) {
             $("#curr_htlc_temp_address_private_key").attr("class", "input input_color");
             saveAddresses(result);
 
-            result = getNewAddressWithMnemonic();
+            result = genAddressFromMnemonic();
             if (result === '') return;
             $("#curr_htlc_temp_address_for_ht1a_pub_key").val(result.result.pubkey);
             $("#curr_htlc_temp_address_for_ht1a_private_key").val(result.result.wif);
@@ -1885,7 +1999,7 @@ function autoFillValue(arrParams, obj) {
             break;
 
         case enumMsgType.MsgType_HTLC_SendAddHTLCSigned_41:
-            result = getNewAddressWithMnemonic();
+            result = genAddressFromMnemonic();
             if (result === '') return;
             $("#curr_rsmc_temp_address_pub_key").val(result.result.pubkey);
             $("#curr_rsmc_temp_address_private_key").val(result.result.wif);
@@ -1893,7 +2007,7 @@ function autoFillValue(arrParams, obj) {
             $("#curr_rsmc_temp_address_private_key").attr("class", "input input_color");
             saveAddresses(result);
 
-            result = getNewAddressWithMnemonic();
+            result = genAddressFromMnemonic();
             if (result === '') return;
             $("#curr_htlc_temp_address_pub_key").val(result.result.pubkey);
             $("#curr_htlc_temp_address_private_key").val(result.result.wif);
@@ -1903,7 +2017,7 @@ function autoFillValue(arrParams, obj) {
             break;
         
         case enumMsgType.MsgType_HTLC_SendVerifyR_45:
-            result = getNewAddressWithMnemonic();
+            result = genAddressFromMnemonic();
             if (result === '') return;
             $("#curr_htlc_temp_address_for_he1b_pub_key").val(result.result.pubkey);
             $("#curr_htlc_temp_address_for_he1b_private_key").val(result.result.wif);
@@ -1913,7 +2027,7 @@ function autoFillValue(arrParams, obj) {
             break;
 
         case enumMsgType.MsgType_HTLC_SendRequestCloseCurrTx_49:
-            result = getNewAddressWithMnemonic();
+            result = genAddressFromMnemonic();
             if (result === '') return;
             $("#curr_rsmc_temp_address_pub_key").val(result.result.pubkey);
             $("#curr_rsmc_temp_address_private_key").val(result.result.wif);
@@ -1923,7 +2037,7 @@ function autoFillValue(arrParams, obj) {
             break;
 
         case enumMsgType.MsgType_HTLC_SendCloseSigned_50:
-            result = getNewAddressWithMnemonic();
+            result = genAddressFromMnemonic();
             if (result === '') return;
             $("#curr_rsmc_temp_address_pub_key").val(result.result.pubkey);
             $("#curr_rsmc_temp_address_private_key").val(result.result.wif);
@@ -3264,7 +3378,7 @@ function parseData1009(response) {
     }
 }
 
-// parseDataN200 - getNewAddressWithMnemonic
+// parseDataN200 - genAddressFromMnemonic
 function parseDataN200(response) {
     var arrData = [
         'ADDRESS : ' + response.result.address,
@@ -3388,10 +3502,28 @@ function getNewAddrIndex() {
     }
 }
 
+//
+function getFundingAddrPrivKey() {
+    let addr = JSON.parse(localStorage.getItem("FundingAddrData"));
+    console.info('getFundingAddrPrivKey() = ' + addr.wif);
+    return addr.wif;
+}
+
+//
+function saveFundingAddrData(response) {
+    let data = {
+        address: response.result.address,
+        index: response.result.index,
+        pubkey: response.result.pubkey,
+        wif: response.result.wif
+    }
+    localStorage.setItem("FundingAddrData", JSON.stringify(data));
+}
+
 // Address data generated with mnemonic save to local storage.
 function saveAddresses(response) {
 
-    var addr = JSON.parse(localStorage.getItem(itemAddr));
+    let addr = JSON.parse(localStorage.getItem(itemAddr));
 
     // If has data.
     if (addr) {
@@ -3959,7 +4091,7 @@ function autoCreateMnemonic() {
 // Generate a new pub key of an address.
 function autoCreateFundingPubkey(param) {
     // Generate address by local js library.
-    var result = getNewAddressWithMnemonic();
+    var result = genAddressFromMnemonic();
     if (result === '') return;
 
     switch (param) {
@@ -5092,4 +5224,12 @@ function autoMode(obj) {
         isAutoMode = false;
     }
     console.info('CLICK - isAutoMode = ' + isAutoMode);
+}
+
+/**
+ * MsgType_GetMnemonic_2004
+ * This is a OBD JS API. Will be moved to obdapi.js file.
+ */
+function genMnemonic() {
+    return btctool.generateMnemonic(128);
 }

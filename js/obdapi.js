@@ -179,9 +179,9 @@ class ObdApi {
             case this.messageType.MsgType_UserLogout_2002:
                 this.onLogout(resultData);
                 break;
-            case this.messageType.MsgType_Core_GetNewAddress_2101:
-                this.onGetNewAddressFromOmniCore(resultData);
-                break;
+            // case this.messageType.MsgType_Core_GetNewAddress_2101:
+            //   this.onGetNewAddressFromOmniCore(resultData);
+            //   break;
             case this.messageType.MsgType_Core_FundingBTC_2109:
                 this.onFundingBTC(resultData);
                 break;
@@ -192,7 +192,7 @@ class ObdApi {
                 this.onFundingAssetOfOmni(resultData);
                 break;
             case this.messageType.MsgType_Mnemonic_CreateAddress_3000:
-                this.onCreateAddressByMnemonic(resultData);
+                this.onGenAddressFromMnemonic(resultData);
                 break;
             case this.messageType.MsgType_Mnemonic_GetAddressByIndex_3001:
                 this.onGetAddressInfo(resultData);
@@ -307,24 +307,16 @@ class ObdApi {
         msg.type = this.messageType.MsgType_p2p_ConnectPeer_2003;
         this.sendData(msg, callback);
     }
-
-    /**
-     * MsgType_GetMnemonic_2004
-     */
-    genMnemonic() {
-        return btctool.generateMnemonic(128);
-    }
-
     /**
      * MsgType_Core_GetNewAddress_2101
      * @param callback function
      */
-    getNewAddress(callback) {
-        let msg = new Message();
-        msg.type = this.messageType.MsgType_Core_GetNewAddress_2101;
-        this.sendData(msg, callback);
-    }
-    onGetNewAddressFromOmniCore(jsonData) { }
+    // public getNewAddress(callback: Function) {
+    //   let msg = new Message();
+    //   msg.type = this.messageType.MsgType_Core_GetNewAddress_2101;
+    //   this.sendData(msg, callback);
+    // }
+    // public onGetNewAddressFromOmniCore(jsonData: any) {}
     /**
      * MsgType_Core_FundingBTC_2109
      * @param info BtcFundingInfo
@@ -477,12 +469,12 @@ class ObdApi {
      * MsgType_Mnemonic_CreateAddress_3000
      * @param callback function
      */
-    getNewAddressWithMnemonic(callback) {
+    genAddressFromMnemonic(callback) {
         let msg = new Message();
         msg.type = this.messageType.MsgType_Mnemonic_CreateAddress_3000;
         this.sendData(msg, callback);
     }
-    onCreateAddressByMnemonic(jsonData) { }
+    onGenAddressFromMnemonic(jsonData) { }
     /**
      * MsgType_Mnemonic_GetAddressByIndex_3001
      * @param index:number

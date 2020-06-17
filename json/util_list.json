@@ -1,13 +1,7 @@
 ﻿{
     "data": [
         {
-            "id": "getNewAddress",
-            "type_id": -102101,
-            "description": "NewAddress is used to create a new address by omni core rpc command.",
-            "parameters": []
-        },
-        {
-            "id": "getNewAddressWithMnemonic",
+            "id": "genAddressFromMnemonic",
             "type_id": -103000,
             "description": "NewAddressWithMnemonic is used to create a new address with mnemonic words.",
             "parameters": []

@@ -224,9 +224,9 @@ class ObdApi {
       case this.messageType.MsgType_UserLogout_2002:
         this.onLogout(resultData);
         break;
-      case this.messageType.MsgType_Core_GetNewAddress_2101:
-        this.onGetNewAddressFromOmniCore(resultData);
-        break;
+      // case this.messageType.MsgType_Core_GetNewAddress_2101:
+      //   this.onGetNewAddressFromOmniCore(resultData);
+      //   break;
       case this.messageType.MsgType_Core_FundingBTC_2109:
         this.onFundingBTC(resultData);
         break;
@@ -238,7 +238,7 @@ class ObdApi {
         break;
 
       case this.messageType.MsgType_Mnemonic_CreateAddress_3000:
-        this.onCreateAddressByMnemonic(resultData);
+        this.onGenAddressFromMnemonic(resultData);
         break;
       case this.messageType.MsgType_Mnemonic_GetAddressByIndex_3001:
         this.onGetAddressInfo(resultData);
@@ -367,12 +367,12 @@ class ObdApi {
    * MsgType_Core_GetNewAddress_2101
    * @param callback function
    */
-  public getNewAddress(callback: Function) {
-    let msg = new Message();
-    msg.type = this.messageType.MsgType_Core_GetNewAddress_2101;
-    this.sendData(msg, callback);
-  }
-  public onGetNewAddressFromOmniCore(jsonData: any) {}
+  // public getNewAddress(callback: Function) {
+  //   let msg = new Message();
+  //   msg.type = this.messageType.MsgType_Core_GetNewAddress_2101;
+  //   this.sendData(msg, callback);
+  // }
+  // public onGetNewAddressFromOmniCore(jsonData: any) {}
 
   /**
    * MsgType_Core_FundingBTC_2109
@@ -551,12 +551,12 @@ class ObdApi {
    * MsgType_Mnemonic_CreateAddress_3000
    * @param callback function
    */
-  public getNewAddressWithMnemonic(callback: Function) {
+  public genAddressFromMnemonic(callback: Function) {
     let msg = new Message();
     msg.type = this.messageType.MsgType_Mnemonic_CreateAddress_3000;
     this.sendData(msg, callback);
   }
-  public onCreateAddressByMnemonic(jsonData: any) {}
+  public onGenAddressFromMnemonic(jsonData: any) {}
 
   /**
    * MsgType_Mnemonic_GetAddressByIndex_3001
