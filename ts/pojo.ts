@@ -68,7 +68,7 @@ class CommitmentTxSigned {
   curr_temp_address_pub_key: string = "";
   curr_temp_address_private_key: string = "";
   last_temp_address_private_key: string = "";
-  request_commitment_hash: string = "";
+  msg_hash: string = "";
   channel_address_private_key: string = "";
   approval: boolean = false;
 }

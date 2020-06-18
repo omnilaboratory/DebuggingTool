@@ -71,51 +71,6 @@ function getSaveName() {
     return itemGoWhere;
 }
 
-// genAddressFromMnemonic by local js library
-function genAddressFromMnemonic() {
-    if (!isLogined) { // Not logined
-        alert('Please login first.');
-        return '';
-    }
-
-    let newIndex = getNewAddrIndex();
-    // console.info('mnemonicWithLogined = ' + mnemonicWithLogined);
-    // console.info('addr index = ' + newIndex);
-
-    // True: testnet  False: mainnet
-    let result = btctool.generateWalletInfo(mnemonicWithLogined, newIndex, true);
-    console.info('local addr data = ' + JSON.stringify(result));
-
-    return result;
-}
-
-// get Address Info by local js library
-function getAddressInfo() {
-    if (!isLogined) { // Not logined
-        alert('Please login first.');
-        return '';
-    }
-
-    var index = $("#index").val();
-    console.info('index = ' + index);
-
-    try {
-        // True: testnet  False: mainnet
-        var result = btctool.generateWalletInfo(mnemonicWithLogined, index, true);
-        console.info('local addr data = ' + JSON.stringify(result));
-    } catch (error) {
-        alert('Please input a valid index of address.');
-        return '';
-    }
-
-    if (!result.status) { // status = false
-        alert('Please input a valid index of address.');
-        return '';
-    }
-
-    return result;
-}
-
 // 
 function listeningN351(e, msgType) {
     console.info('listeningN351 = ' + JSON.stringify(e));
@@ -157,15 +112,16 @@ function listening110032(e, msgType) {
     let name     = e.funder_peer_id;
     let temp_cid = e.temporary_channel_id;
 
-    let info = new AcceptChannelInfo();
-    info.temporary_channel_id = temp_cid;
-    info.approval = true;
-
     // Generate an address by local js library.
     let result = genAddressFromMnemonic();
-    info.funding_pubkey = result.result.pubkey;
     saveFundingAddrData(result);
     saveAddresses(result);
+
+    // will send -100033 acceptChannel
+    let info                  = new AcceptChannelInfo();
+    info.temporary_channel_id = temp_cid;
+    info.funding_pubkey       = result.result.pubkey;
+    info.approval             = true;
 
     // Save value to variable
     strTempChID = temp_cid;
@@ -175,7 +131,6 @@ function listening110032(e, msgType) {
         console.info('-100033 acceptChannel = ' + JSON.stringify(e));
         saveChannelList(e);
         saveCounterparties(name, p2pID);
-        // createOBDResponseDiv(e, msgType);
     });
 }
 
@@ -184,26 +139,21 @@ function listening110032(e, msgType) {
 function listening110340(e, msgType) {
     console.info('NOW isAutoMode = ' + isAutoMode);
     if (!isAutoMode) return;
-    
     console.info('listening110340 = ' + JSON.stringify(e));
 
-    let p2pID    = e.funder_node_address;
-    let name     = e.funder_peer_id;
-    let temp_cid = e.temporary_channel_id;
-    let privkey  = getFundingAddrPrivKey();
-    let tx_id    = e.funding_txid;
-
-    let info = new FundingBtcSigned();
+    // will send -100350 BTCFundingSigned
+    let temp_cid                      = e.temporary_channel_id;
+    let info                          = new FundingBtcSigned();
     info.temporary_channel_id         = temp_cid;
-    info.channel_address_private_key  = privkey;
-    info.funding_txid                 = tx_id;
+    info.channel_address_private_key  = getFundingAddrPrivKey();
+    info.funding_txid                 = e.funding_txid;
     info.approval                     = true;
 
     // Save value to variable
     strTempChID = temp_cid;
 
     // OBD API
-    obdApi.btcFundingSigned(p2pID, name, info, function(e) {
+    obdApi.btcFundingSigned(e.funder_node_address, e.funder_peer_id, info, function(e) {
         console.info('-100350 btcFundingSigned = ' + JSON.stringify(e));
         saveChannelList(e, temp_cid, msgType);
     });
@@ -214,20 +164,15 @@ function listening110340(e, msgType) {
 function listening110034(e, msgType) {
     console.info('NOW isAutoMode = ' + isAutoMode);
     if (!isAutoMode) return;
-    
     console.info('listening110034 = ' + JSON.stringify(e));
 
-    let p2pID    = e.funder_node_address;
-    let name     = e.funder_peer_id;
-    let temp_cid = e.temporary_channel_id;
-    let privkey  = getFundingAddrPrivKey();
-
-    let info = new ChannelFundingSignedInfo();
-    info.temporary_channel_id = temp_cid;
-    info.fundee_channel_address_private_key = privkey;
+    // will send -100035 AssetFundingSigned
+    let info                                = new ChannelFundingSignedInfo();
+    info.temporary_channel_id               = e.temporary_channel_id;
+    info.fundee_channel_address_private_key = getFundingAddrPrivKey();
 
     // OBD API
-    obdApi.channelFundingSigned(p2pID, name, info, function(e) {
+    obdApi.channelFundingSigned(e.funder_node_address, e.funder_peer_id, info, function(e) {
         console.info('-100035 AssetFundingSigned = ' + JSON.stringify(e));
         saveChannelList(e, e.channel_id, msgType);
     });
@@ -238,31 +183,28 @@ function listening110034(e, msgType) {
 function listening110351(e, msgType) {
     console.info('NOW isAutoMode = ' + isAutoMode);
     if (!isAutoMode) return;
-    
     console.info('listening110351 = ' + JSON.stringify(e));
-
-    let p2pID    = e.funder_node_address;
-    let name     = e.funder_peer_id;
 
     // Generate an address by local js library.
     let result = genAddressFromMnemonic();
     // saveFundingAddrData(result);
     saveAddresses(result);
 
+    // will send -100352 RSMCCTxSigned
     var last_temp_address_private_key = $("#last_temp_address_private_key").val();
-    var request_commitment_hash = $("#request_commitment_hash").val();
 
     let info                           = new CommitmentTxSigned();
     info.channel_id                    = e.channel_id;
+    info.msg_hash                      = e.msg_hash;
     info.curr_temp_address_pub_key     = result.result.pubkey;
     info.curr_temp_address_private_key = result.result.wif;
     info.channel_address_private_key   = getFundingAddrPrivKey();
     info.last_temp_address_private_key = last_temp_address_private_key;
-    info.request_commitment_hash       = request_commitment_hash;
     info.approval                      = true;
 
     // OBD API
-    obdApi.revokeAndAcknowledgeCommitmentTransaction(p2pID, name, info, function(e) {
+    obdApi.revokeAndAcknowledgeCommitmentTransaction(
+        e.funder_node_address, e.funder_peer_id, info, function(e) {
         console.info('-100352 RSMCCTxSigned = ' + JSON.stringify(e));
         saveChannelList(e, e.channel_id, msgType);
     });
@@ -1287,7 +1229,7 @@ function RSMCCTxSigned(msgType) {
     var curr_temp_address_private_key = $("#curr_temp_address_private_key").val();
     var channel_address_private_key = $("#channel_address_private_key").val();
     var last_temp_address_private_key = $("#last_temp_address_private_key").val();
-    var request_commitment_hash = $("#request_commitment_hash").val();
+    var msg_hash = $("#msg_hash").val();
     var approval = $("#checkbox_n352").prop("checked");
 
     let info = new CommitmentTxSigned();
@@ -1296,7 +1238,7 @@ function RSMCCTxSigned(msgType) {
     info.curr_temp_address_private_key = curr_temp_address_private_key;
     info.channel_address_private_key = channel_address_private_key;
     info.last_temp_address_private_key = last_temp_address_private_key;
-    info.request_commitment_hash = request_commitment_hash;
+    info.msg_hash = msg_hash;
     info.approval = approval;
 
     // OBD API
@@ -1952,6 +1894,7 @@ function autoFillValue(arrParams, obj) {
             break;
 
         case enumMsgType.MsgType_FundingCreate_SendAssetFundingCreated_34:
+            if (!isLogined) return;  // Not logined
             result = genAddressFromMnemonic();
             if (result === '') return;
             $("#temp_address_pub_key").val(result.result.pubkey);
@@ -1963,6 +1906,7 @@ function autoFillValue(arrParams, obj) {
 
         case enumMsgType.MsgType_CommitmentTx_SendCommitmentTransactionCreated_351:
         case enumMsgType.MsgType_CommitmentTxSigned_SendRevokeAndAcknowledgeCommitmentTransaction_352:
+            if (!isLogined) return;  // Not logined
             result = genAddressFromMnemonic();
             if (result === '') return;
             $("#curr_temp_address_pub_key").val(result.result.pubkey);
@@ -1973,6 +1917,7 @@ function autoFillValue(arrParams, obj) {
             break;
 
         case enumMsgType.MsgType_HTLC_SendAddHTLC_40:
+            if (!isLogined) return;  // Not logined
             result = genAddressFromMnemonic();
             if (result === '') return;
             $("#curr_rsmc_temp_address_pub_key").val(result.result.pubkey);
@@ -1999,6 +1944,7 @@ function autoFillValue(arrParams, obj) {
             break;
 
         case enumMsgType.MsgType_HTLC_SendAddHTLCSigned_41:
+            if (!isLogined) return;  // Not logined
             result = genAddressFromMnemonic();
             if (result === '') return;
             $("#curr_rsmc_temp_address_pub_key").val(result.result.pubkey);
@@ -2017,6 +1963,7 @@ function autoFillValue(arrParams, obj) {
             break;
         
         case enumMsgType.MsgType_HTLC_SendVerifyR_45:
+            if (!isLogined) return;  // Not logined
             result = genAddressFromMnemonic();
             if (result === '') return;
             $("#curr_htlc_temp_address_for_he1b_pub_key").val(result.result.pubkey);
@@ -2027,6 +1974,7 @@ function autoFillValue(arrParams, obj) {
             break;
 
         case enumMsgType.MsgType_HTLC_SendRequestCloseCurrTx_49:
+            if (!isLogined) return;  // Not logined
             result = genAddressFromMnemonic();
             if (result === '') return;
             $("#curr_rsmc_temp_address_pub_key").val(result.result.pubkey);
@@ -2037,6 +1985,7 @@ function autoFillValue(arrParams, obj) {
             break;
 
         case enumMsgType.MsgType_HTLC_SendCloseSigned_50:
+            if (!isLogined) return;  // Not logined
             result = genAddressFromMnemonic();
             if (result === '') return;
             $("#curr_rsmc_temp_address_pub_key").val(result.result.pubkey);
@@ -3776,7 +3725,7 @@ function saveChannelList(response, channelID, msgType) {
                         break;
                     case enumMsgType.MsgType_CommitmentTxSigned_SendRevokeAndAcknowledgeCommitmentTransaction_352:
                         for (let i2 = 0; i2 < list.result[i].transfer.length; i2++) {
-                            if ($("#request_commitment_hash").val() === list.result[i].transfer[i2].msgHash) {
+                            if ($("#msg_hash").val() === list.result[i].transfer[i2].msgHash) {
                                 updateRsmcData(response, list.result[i].transfer[i2], msgType);
                             }
                         }
@@ -4196,7 +4145,7 @@ function displayAddresses(param) {
     if (param === inNewHtml) { // New page
         var status = JSON.parse(localStorage.getItem(itemGoWhere));
         if (!status.isLogined) { // Not login.
-            createElement(newDiv, 'h3', 'NO USER LOGINED.');
+            createElement(newDiv, 'h3', 'NOT LOGINED.');
             parent.append(newDiv);
             return;
         } else {
@@ -4205,7 +4154,7 @@ function displayAddresses(param) {
 
     } else {
         if (!isLogined) { // Not login.
-            createElement(newDiv, 'h3', 'NO USER LOGINED.');
+            createElement(newDiv, 'h3', 'NOT LOGINED.');
             parent.append(newDiv);
             return;
         }
@@ -4291,7 +4240,7 @@ function displayCounterparties(param) {
     if (param === inNewHtml) { // New page
         var status = JSON.parse(localStorage.getItem(itemGoWhere));
         if (!status.isLogined) { // Not login.
-            createElement(newDiv, 'h3', 'NO USER LOGINED.');
+            createElement(newDiv, 'h3', 'NOT LOGINED.');
             parent.append(newDiv);
             return;
         } else {
@@ -4300,7 +4249,7 @@ function displayCounterparties(param) {
 
     } else {
         if (!isLogined) { // Not login.
-            createElement(newDiv, 'h3', 'NO USER LOGINED.');
+            createElement(newDiv, 'h3', 'NOT LOGINED.');
             parent.append(newDiv);
             return;
         }
@@ -4565,7 +4514,7 @@ function displayChannelCreation(param) {
     if (param === inNewHtml) {
         var status = JSON.parse(localStorage.getItem(saveGoWhere));
         if (!status.isLogined) { // Not login.
-            createElement(parent, 'text', 'NO USER LOGINED.');
+            createElement(parent, 'text', 'NOT LOGINED.');
             return;
         } else {
             userID = status.userID;
@@ -4573,7 +4522,7 @@ function displayChannelCreation(param) {
         
     } else {
         if (!isLogined) { // Not login.
-            createElement(parent, 'text', 'NO USER LOGINED.');
+            createElement(parent, 'text', 'NOT LOGINED.');
             return;
         }
     }
@@ -5232,4 +5181,57 @@ function autoMode(obj) {
  */
 function genMnemonic() {
     return btctool.generateMnemonic(128);
+}
+
+/**
+ * MsgType_Mnemonic_CreateAddress_3000
+ * genAddressFromMnemonic by local js library
+ * This is a OBD JS API. Will be moved to obdapi.js file.
+ */
+function genAddressFromMnemonic() {
+    if (!isLogined) { // Not logined
+        alert('Please login first.');
+        return '';
+    }
+
+    let newIndex = getNewAddrIndex();
+    // console.info('mnemonicWithLogined = ' + mnemonicWithLogined);
+    // console.info('addr index = ' + newIndex);
+
+    // True: testnet  False: mainnet
+    let result = btctool.generateWalletInfo(mnemonicWithLogined, newIndex, true);
+    console.info('local addr data = ' + JSON.stringify(result));
+
+    return result;
+}
+
+/**
+ * MsgType_Mnemonic_GetAddressByIndex_3001
+ * get Address Info by local js library
+ * This is a OBD JS API. Will be moved to obdapi.js file.
+ */
+function getAddressInfo() {
+    if (!isLogined) { // Not logined
+        alert('Please login first.');
+        return '';
+    }
+
+    var index = $("#index").val();
+    console.info('index = ' + index);
+
+    try {
+        // True: testnet  False: mainnet
+        var result = btctool.generateWalletInfo(mnemonicWithLogined, index, true);
+        console.info('local addr data = ' + JSON.stringify(result));
+    } catch (error) {
+        alert('Please input a valid index of address.');
+        return '';
+    }
+
+    if (!result.status) { // status = false
+        alert('Please input a valid index of address.');
+        return '';
+    }
+
+    return result;
 }

@@ -847,8 +847,8 @@ class ObdApi {
       return;
     }
 
-    if (this.isNotString(info.request_commitment_hash)) {
-      alert("empty request_commitment_hash");
+    if (this.isNotString(info.msg_hash)) {
+      alert("empty msg_hash");
       return;
     }
 

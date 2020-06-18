@@ -639,7 +639,7 @@
                     ]
                 },
                 {
-                    "name": "request_commitment_hash",
+                    "name": "msg_hash",
                     "help": "Commitment hash of C2a transaction created by Alice.",
                     "imgPath": "doc/tooltip/C2a.png",
                     "buttons": [
