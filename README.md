@@ -115,13 +115,13 @@ In the other window you just opened in step 4 for Bob, you will see an incoming 
 ### Step 6: create an invoice
 
 <p align="center">
-  <img width="750" alt="connectNode" src="https://github.com/omnilaboratory/DebuggingTool/blob/master/doc/img/createInvoice.png">
+  <img width="500" alt="connectNode" src="https://github.com/omnilaboratory/DebuggingTool/blob/master/doc/img/createInvoice.png">
 </p>
 
 
 1. switch back to Alice's window;  
 2. click "createInvoice";  
-3. input the `property_id`, `amount`, `h` `expiry_time` and short memo; into the "NodeAddress" input box;  
+3. input the `property_id`, `amount`, `h` `expiry_time` and short memo, where `h` is the locker (`hash(r)`) that payer uses it to lock a payment, only you can unlock it by your secrete `r`;  
 4. click "invoke API", you will see the beth32 encoded invoice string and QR code are created;  
 
 Share ths invoice string or QR code to anyone (not only Bob) who is going to pay you. 
