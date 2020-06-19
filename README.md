@@ -7,7 +7,7 @@ OmniBOLT Daemon Debugging Tool. This is a graphic user interface for developers.
 
 If you come to this tool in developing modules for OmniBOLT, you must have successfully installed and ran OBD on your local or remote machine. If you do not familiar with the whole process yet, we suggest you [install](https://github.com/omnilaboratory/obd#table-of-contents) OBD first and try to run it for a quick experience.  
 
-In this tutorial, you can connect either your own OBD node, or the node we configured for our community: ws://62.234.216.108:60030/ws, or both.  
+In this tutorial, you can connect either your own OBD node, or the node we configured for our community: `ws://62.234.216.108:60030/ws`, or both.  
 
 <p align="center">
   <img width="500" alt="Debugging Tool Screenshot" src="https://github.com/omnilaboratory/DebuggingTool/blob/master/doc/img/image_screen.png">
