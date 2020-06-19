@@ -22,6 +22,8 @@ In this tutorial, you can connect either your own OBD node, or the node we confi
 	* [Step 5: open channel](https://github.com/omnilaboratory/DebuggingTool#step-5-open-channel)
 	* [Step 6: create an invoice](https://github.com/omnilaboratory/DebuggingTool#step-6-create-an-invoice)
 	* [Step 7: channel operations](https://github.com/omnilaboratory/DebuggingTool#step-7-channel-operations)
+* [JS-SDK](https://github.com/omnilaboratory/DebuggingTool#js-sdk)
+* [how to use APIs](https://github.com/omnilaboratory/DebuggingTool#how-to-use-apis)
  	
 
 ## Installation: clone this project and run it by Chrome
@@ -132,3 +134,17 @@ Share ths invoice string or QR code to anyone (not only Bob) who is going to pay
 Then you are able to keep going with other operations to dive deeper into OmniBOLT.  
 
 Online API documents lists all the channel operations step by step, and testing demo data as well. Please visit OBD [online API documentation](https://api.omnilab.online) to learn how to fill in arguments to work with OBD.  
+
+
+## JS SDK
+
+The js sdk is located under [js/obdapi.js](https://github.com/omnilaboratory/DebuggingTool/blob/master/js/obdapi.js).
+
+## How to use APIs
+
+JS/TypeScript examples can be found under [js/common.js](https://github.com/omnilaboratory/DebuggingTool/blob/master/js/common.js).
+
+Or you will seek help via [online API documentation](https://api.omnilab.online). 
+
+
+
