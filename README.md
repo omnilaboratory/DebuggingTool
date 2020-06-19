@@ -85,7 +85,7 @@ nodePeerId : QmP1mQMzDRV2bKWdhwvPWFubSAz1gqJY44RjdYm3G5DFeF
 ```
 userPeerId : 30dfbc0e1b42c4cb50410b7a08186ce405a92fff235480608425bf4b0207e5ad
 ```
-This is the user id, which is used together with `nodeAddress` to tell someone else that "i'm here, please connect me by connectP2PNode".  
+This is the user id, which is used together with `nodeAddress` to tell someone else that "i'm here, please connect me by connectP2PPeer".  
 
 We assume this first window belongs to user Alice.
 
@@ -100,7 +100,7 @@ Switch back to Alice's window, we shall input Bob's `nodeAddress` and `userPeerI
 </p>
 
 1. switch back to Alice's window;  
-2. click "connectP2PNode";  
+2. click "connectP2PPeer";  
 3. input the `nodeAddress` into the "NodeAddress" input box;  
 4. click "invoke API";  
 

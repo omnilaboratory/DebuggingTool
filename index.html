@@ -8,11 +8,14 @@
     <link rel="stylesheet" href="css/main.css">
     <link rel="stylesheet" href="css/tooltip.css">
     <link rel="stylesheet" href="css/table.css">
+    <link rel="stylesheet" href="css/input_style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <script src="https://lib.sinaapp.com/js/jquery/2.0.2/jquery-2.0.2.min.js"></script>
     <script src="js/btctool.js"></script>
     <script src="js/pojo.js"></script>
     <script src="js/obdapi.js"></script>
     <script src="js/common.js"></script>
+    <script src="js/qrcode.min.js"></script>
 </head>
 
 <script>
@@ -51,24 +54,26 @@
         <div class="main">
             <!-- Left Side Menu -->
             <div id="menu" class="leftSide">
+
+                <!-- Auto Mode -->
+                <div class="parent_div">
+                    <div class="wrapper">
+                        <i class="fa fa-info-circle"></i>
+                        <div class="info_icon"><label>Auto response to some request like 
+                            OpenChannel, BTCFundingCreated, AssetFundingCreated, 
+                            RSMCCTxCreated, HTLCCreated.</label></div>
+                    </div>
+                    <div class="auto_mode">
+                        <label for="auto_mode">Auto Mode</label>
+                        <input id="auto_mode" type="checkbox" class="switch" onclick="autoMode(this)">
+                    </div>
+                </div>
+
                 <div class="menuTitle">Start</div>
                 <a href="#" class="url" onclick="displayConnectOBD()">Connect to OBD node</a>
                 
                 <div class="menuTitle">Custom Mode</div>
                 <a href="#" class="url" onclick="displayCustomMode()">Debugging APIs</a>
-                
-                <div class="menuTitle">Tracker Data</div>
-                <div class="bottom_margin"><a href="#" class="url" onclick="getTrackerData('getObdNodes', 1, 10)">Nodes</a></div>
-                <div class="bottom_margin"><a href="#" class="url" onclick="getTrackerData('getUsers', 1, 10)">Users</a></div>
-                <div class="bottom_margin"><a href="#" class="url" onclick="getTrackerData('getChannels', 1, 10)">Channels</a></div>
-                
-                <!-- Manage Assets - Dynamic create -->
-                <div class="menuTitle">Manage Assets</div>
-                <div id="manage_assets_list"></div>
-                
-                <!-- USER DATA LIST - Dynamic create -->
-                <div class="menuTitle">User Data</div>
-                <div id="user_data_list"></div>
 
                 <!-- APIs for Debugging - Dynamic create -->
                 <div class="menuTitle">APIs for Debugging</div>
@@ -77,6 +82,19 @@
                 <!-- APIs for Util - Dynamic create -->
                 <div class="menuTitle">Util</div>
                 <div id="util_list"></div>
+
+                <!-- USER DATA LIST - Dynamic create -->
+                <div class="menuTitle">User Data</div>
+                <div id="user_data_list"></div>
+
+                <!-- Manage Assets - Dynamic create -->
+                <div class="menuTitle">Manage Assets</div>
+                <div id="manage_assets_list"></div>
+
+                <div class="menuTitle">Tracker Data</div>
+                <div class="bottom_margin"><a href="#" class="url" onclick="getTrackerData('getObdNodes', 1, 10)">Nodes</a></div>
+                <div class="bottom_margin"><a href="#" class="url" onclick="getTrackerData('getUsers', 1, 10)">Users</a></div>
+                <div class="bottom_margin"><a href="#" class="url" onclick="getTrackerData('getChannels', 1, 10)">Channels</a></div>
             </div>
 
             <!-- API invoked area, click left side menu to display. -->

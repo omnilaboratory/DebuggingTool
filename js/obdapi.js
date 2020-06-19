@@ -112,7 +112,8 @@ class ObdApi {
             alert("please try to connect obd again");
             return;
         }
-        if (msg.type < 0 && this.isLogin == false) {
+        if (((msg.type <= -100000 && msg.type >= -102000) ||
+            (msg.type <= -103000 && msg.type >= -104000)) && this.isLogin == false) {
             alert("please login");
             return;
         }
@@ -134,7 +135,7 @@ class ObdApi {
         let callback = this.callbackMap[jsonData.type];
         if (jsonData.status == false) {
             //omni error ,do not alert
-            if (jsonData.type == this.messageType.MsgType_Core_Omni_Getbalance_1200) {
+            if (jsonData.type == this.messageType.MsgType_Core_Omni_Getbalance_2112) {
                 if (callback != null) {
                     callback("");
                 }
@@ -171,88 +172,85 @@ class ObdApi {
             callback(resultData);
         }
         switch (jsonData.type) {
-            case this.messageType.MsgType_UserLogin_1:
+            case this.messageType.MsgType_UserLogin_2001:
                 this.userPeerId = toId;
                 this.onLogIn(resultData);
                 break;
-            case this.messageType.MsgType_UserLogout_2:
+            case this.messageType.MsgType_UserLogout_2002:
                 this.onLogout(resultData);
                 break;
-            case this.messageType.MsgType_GetMnemonic_101:
-                this.onSignUp(resultData);
-                break;
-            case this.messageType.MsgType_Core_GetNewAddress_1001:
-                this.onGetNewAddressFromOmniCore(resultData);
-                break;
-            case this.messageType.MsgType_Core_FundingBTC_1009:
+            // case this.messageType.MsgType_Core_GetNewAddress_2101:
+            //   this.onGetNewAddressFromOmniCore(resultData);
+            //   break;
+            case this.messageType.MsgType_Core_FundingBTC_2109:
                 this.onFundingBTC(resultData);
                 break;
-            case this.messageType.MsgType_Core_Omni_ListProperties_1205:
+            case this.messageType.MsgType_Core_Omni_ListProperties_2117:
                 this.onListProperties(resultData);
                 break;
-            case this.messageType.MsgType_Core_Omni_FundingAsset_2001:
+            case this.messageType.MsgType_Core_Omni_FundingAsset_2120:
                 this.onFundingAssetOfOmni(resultData);
                 break;
-            case this.messageType.MsgType_Mnemonic_CreateAddress_N200:
-                this.onCreateAddressByMnemonic(resultData);
+            case this.messageType.MsgType_Mnemonic_CreateAddress_3000:
+                this.onGenAddressFromMnemonic(resultData);
                 break;
-            case this.messageType.MsgType_Mnemonic_GetAddressByIndex_201:
+            case this.messageType.MsgType_Mnemonic_GetAddressByIndex_3001:
                 this.onGetAddressInfo(resultData);
                 break;
-            case this.messageType.MsgType_ChannelOpen_N32:
+            case this.messageType.MsgType_SendChannelOpen_32:
                 this.onOpenChannel(resultData);
                 break;
-            case this.messageType.MsgType_ChannelAccept_N33:
+            case this.messageType.MsgType_SendChannelAccept_33:
                 this.onAcceptChannel(resultData);
                 break;
-            case this.messageType.MsgType_FundingCreate_AssetFundingCreated_N34:
+            case this.messageType.MsgType_FundingCreate_SendAssetFundingCreated_34:
                 this.onChannelFundingCreated(resultData);
                 break;
-            case this.messageType.MsgType_FundingSign_AssetFundingSigned_N35:
+            case this.messageType.MsgType_FundingSign_SendAssetFundingSigned_35:
                 this.onChannelFundingSigned(resultData);
                 break;
             case this.messageType
-                .MsgType_CommitmentTx_CommitmentTransactionCreated_N351:
+                .MsgType_CommitmentTx_SendCommitmentTransactionCreated_351:
                 this.onCommitmentTransactionCreated(resultData);
                 break;
             case this.messageType
-                .MsgType_CommitmentTxSigned_RevokeAndAcknowledgeCommitmentTransaction_N352:
+                .MsgType_CommitmentTxSigned_SendRevokeAndAcknowledgeCommitmentTransaction_352:
                 this.onRevokeAndAcknowledgeCommitmentTransaction(resultData);
                 break;
-            case this.messageType.MsgType_HTLC_Invoice_N4003:
+            case this.messageType.MsgType_HTLC_Invoice_402:
                 this.onHtlcInvoice(resultData);
                 break;
-            case this.messageType.MsgType_HTLC_FindPath_N4001:
+            case this.messageType.MsgType_HTLC_FindPath_401:
                 this.onHtlcFindPath(resultData);
                 break;
-            case this.messageType.MsgType_HTLC_AddHTLC_N40:
+            case this.messageType.MsgType_HTLC_SendAddHTLC_40:
                 this.onHtlcCreated(resultData);
                 break;
-            case this.messageType.MsgType_HTLC_AddHTLCSigned_N41:
+            case this.messageType.MsgType_HTLC_SendAddHTLCSigned_41:
                 this.onHtlcSigned(resultData);
                 break;
-            case this.messageType.MsgType_HTLC_SendR_N45:
+            case this.messageType.MsgType_HTLC_SendVerifyR_45:
                 this.onHtlcSendR(resultData);
                 break;
-            case this.messageType.MsgType_HTLC_VerifyR_N46:
+            case this.messageType.MsgType_HTLC_SendSignVerifyR_46:
                 this.onHtlcVerifyR(resultData);
                 break;
-            case this.messageType.MsgType_HTLC_RequestCloseCurrTx_N49:
+            case this.messageType.MsgType_HTLC_SendRequestCloseCurrTx_49:
                 this.onCloseHTLC(resultData);
                 break;
-            case this.messageType.MsgType_HTLC_CloseSigned_N50:
+            case this.messageType.MsgType_HTLC_SendCloseSigned_50:
                 this.onCloseHTLCSigned(resultData);
                 break;
-            case this.messageType.MsgType_Core_Omni_GetTransaction_1206:
+            case this.messageType.MsgType_Core_Omni_GetTransaction_2118:
                 this.onGetOmniTxByTxid(resultData);
                 break;
-            case this.messageType.MsgType_Core_Omni_CreateNewTokenFixed_1201:
+            case this.messageType.MsgType_Core_Omni_CreateNewTokenFixed_2113:
                 this.onCreateNewTokenFixed(resultData);
                 break;
         }
     }
     /**
-     * MsgType_UserLogin_1
+     * MsgType_UserLogin_2001
      * @param mnemonic:string
      * @param callback function
      */
@@ -268,7 +266,7 @@ class ObdApi {
             return;
         }
         let msg = new Message();
-        msg.type = this.messageType.MsgType_UserLogin_1;
+        msg.type = this.messageType.MsgType_UserLogin_2001;
         msg.data["mnemonic"] = mnemonic;
         this.sendData(msg, callback);
     }
@@ -278,13 +276,13 @@ class ObdApi {
         }
     }
     /**
-     * MsgType_UserLogout_2
+     * MsgType_UserLogout_2002
      * @param callback function
      */
     logout(callback) {
         if (this.isLogin) {
             let msg = new Message();
-            msg.type = this.messageType.MsgType_UserLogout_2;
+            msg.type = this.messageType.MsgType_UserLogout_2002;
             this.sendData(msg, callback);
         }
         else {
@@ -295,41 +293,32 @@ class ObdApi {
         this.isLogin = false;
     }
     /**
-     * MsgType_p2p_ConnectServer_3
+     * MsgType_p2p_ConnectPeer_2003
+     * @param info P2PPeer
      * @param callback function
      */
-    connectP2PNode(p2pAddress, callback) {
-        if (this.isNotString(p2pAddress)) {
-            alert("empty p2pAddress");
+    connectP2PPeer(info, callback) {
+        if (this.isNotString(info.remote_node_address)) {
+            alert("empty remote_node_address");
             return;
         }
         let msg = new Message();
-        msg.data = p2pAddress;
-        msg.type = this.messageType.MsgType_p2p_ConnectServer_3;
+        msg.data = info;
+        msg.type = this.messageType.MsgType_p2p_ConnectPeer_2003;
         this.sendData(msg, callback);
     }
     /**
-     * MsgType_GetMnemonic_101
+     * MsgType_Core_GetNewAddress_2101
      * @param callback function
      */
-    signUp(callback) {
-        let msg = new Message();
-        msg.type = this.messageType.MsgType_GetMnemonic_101;
-        this.sendData(msg, callback);
-    }
-    onSignUp(jsonData) { }
+    // public getNewAddress(callback: Function) {
+    //   let msg = new Message();
+    //   msg.type = this.messageType.MsgType_Core_GetNewAddress_2101;
+    //   this.sendData(msg, callback);
+    // }
+    // public onGetNewAddressFromOmniCore(jsonData: any) {}
     /**
-     * MsgType_Core_GetNewAddress_1001
-     * @param callback function
-     */
-    getNewAddress(callback) {
-        let msg = new Message();
-        msg.type = this.messageType.MsgType_Core_GetNewAddress_1001;
-        this.sendData(msg, callback);
-    }
-    onGetNewAddressFromOmniCore(jsonData) { }
-    /**
-     * MsgType_Core_FundingBTC_1009
+     * MsgType_Core_FundingBTC_2109
      * @param info BtcFundingInfo
      * @param callback function
      */
@@ -354,13 +343,13 @@ class ObdApi {
             info.miner_fee = 0;
         }
         let msg = new Message();
-        msg.type = this.messageType.MsgType_Core_FundingBTC_1009;
+        msg.type = this.messageType.MsgType_Core_FundingBTC_2109;
         msg.data = info;
         this.sendData(msg, callback);
     }
     onFundingBTC(jsonData) { }
     /**
-     * MsgType_FundingCreate_BtcCreate_N3400
+     * MsgType_FundingCreate_SendBtcFundingCreated_340
      * @param recipient_node_peer_id string
      * @param recipient_user_peer_id string
      * @param info  FundingBtcCreated
@@ -388,14 +377,14 @@ class ObdApi {
             return;
         }
         let msg = new Message();
-        msg.type = this.messageType.MsgType_FundingCreate_BtcCreate_N3400;
+        msg.type = this.messageType.MsgType_FundingCreate_SendBtcFundingCreated_340;
         msg.recipient_user_peer_id = recipient_user_peer_id;
         msg.recipient_node_peer_id = recipient_node_peer_id;
         msg.data = info;
         this.sendData(msg, callback);
     }
     /**
-     * MsgType_FundingSign_BtcSign_N3500
+     * MsgType_FundingSign_SendBtcSign_350
      * @param recipient_node_peer_id string
      * @param recipient_user_peer_id string
      * @param info FundingBtcSigned
@@ -425,24 +414,24 @@ class ObdApi {
             }
         }
         let msg = new Message();
-        msg.type = this.messageType.MsgType_FundingSign_BtcSign_N3500;
+        msg.type = this.messageType.MsgType_FundingSign_SendBtcSign_350;
         msg.recipient_user_peer_id = recipient_user_peer_id;
         msg.recipient_node_peer_id = recipient_node_peer_id;
         msg.data = info;
         this.sendData(msg, callback);
     }
     /**
-     * MsgType_Core_Omni_ListProperties_1205
+     * MsgType_Core_Omni_ListProperties_2117
      * @param callback function
      */
     listProperties(callback) {
         let msg = new Message();
-        msg.type = this.messageType.MsgType_Core_Omni_ListProperties_1205;
+        msg.type = this.messageType.MsgType_Core_Omni_ListProperties_2117;
         this.sendData(msg, callback);
     }
     onListProperties(jsonData) { }
     /**
-     * MsgType_Core_Omni_FundingAsset_2001
+     * MsgType_Core_Omni_FundingAsset_2120
      * @param info OmniFundingAssetInfo
      * @param callback function
      */
@@ -471,23 +460,23 @@ class ObdApi {
             info.miner_fee = 0;
         }
         let msg = new Message();
-        msg.type = this.messageType.MsgType_Core_Omni_FundingAsset_2001;
+        msg.type = this.messageType.MsgType_Core_Omni_FundingAsset_2120;
         msg.data = info;
         this.sendData(msg, callback);
     }
     onFundingAssetOfOmni(jsonData) { }
     /**
-     * MsgType_Mnemonic_CreateAddress_N200
+     * MsgType_Mnemonic_CreateAddress_3000
      * @param callback function
      */
-    getNewAddressWithMnemonic(callback) {
+    genAddressFromMnemonic(callback) {
         let msg = new Message();
-        msg.type = this.messageType.MsgType_Mnemonic_CreateAddress_N200;
+        msg.type = this.messageType.MsgType_Mnemonic_CreateAddress_3000;
         this.sendData(msg, callback);
     }
-    onCreateAddressByMnemonic(jsonData) { }
+    onGenAddressFromMnemonic(jsonData) { }
     /**
-     * MsgType_Mnemonic_GetAddressByIndex_201
+     * MsgType_Mnemonic_GetAddressByIndex_3001
      * @param index:number
      * @param callback function
      */
@@ -497,13 +486,13 @@ class ObdApi {
             return;
         }
         let msg = new Message();
-        msg.type = this.messageType.MsgType_Mnemonic_GetAddressByIndex_201;
+        msg.type = this.messageType.MsgType_Mnemonic_GetAddressByIndex_3001;
         msg.data = index;
         this.sendData(msg, callback);
     }
     onGetAddressInfo(jsonData) { }
     /**
-     * MsgType_ChannelOpen_N32
+     * MsgType_SendChannelOpen_32
      * @param recipient_node_peer_id string
      * @param recipient_user_peer_id string
      * @param funding_pubkey string
@@ -523,7 +512,7 @@ class ObdApi {
             return;
         }
         let msg = new Message();
-        msg.type = this.messageType.MsgType_ChannelOpen_N32;
+        msg.type = this.messageType.MsgType_SendChannelOpen_32;
         msg.recipient_node_peer_id = recipient_node_peer_id;
         msg.recipient_user_peer_id = recipient_user_peer_id;
         msg.data["funding_pubkey"] = funding_pubkey;
@@ -531,7 +520,7 @@ class ObdApi {
     }
     onOpenChannel(jsonData) { }
     /**
-     * MsgType_ChannelAccept_N33
+     * MsgType_SendChannelAccept_33
      * @param recipient_node_peer_id string
      * @param recipient_user_peer_id string
      * @param info AcceptChannelInfo
@@ -560,7 +549,7 @@ class ObdApi {
             }
         }
         let msg = new Message();
-        msg.type = this.messageType.MsgType_ChannelAccept_N33;
+        msg.type = this.messageType.MsgType_SendChannelAccept_33;
         msg.recipient_node_peer_id = recipient_node_peer_id;
         msg.recipient_user_peer_id = recipient_user_peer_id;
         msg.data = info;
@@ -568,7 +557,7 @@ class ObdApi {
     }
     onAcceptChannel(jsonData) { }
     /**
-     * MsgType_FundingCreate_AssetFundingCreated_N34
+     * MsgType_FundingCreate_SendAssetFundingCreated_34
      * @param recipient_node_peer_id string
      * @param recipient_user_peer_id string
      * @param info ChannelFundingCreatedInfo
@@ -604,7 +593,7 @@ class ObdApi {
             return;
         }
         let msg = new Message();
-        msg.type = this.messageType.MsgType_FundingCreate_AssetFundingCreated_N34;
+        msg.type = this.messageType.MsgType_FundingCreate_SendAssetFundingCreated_34;
         msg.recipient_user_peer_id = recipient_user_peer_id;
         msg.recipient_node_peer_id = recipient_node_peer_id;
         msg.data = info;
@@ -612,7 +601,7 @@ class ObdApi {
     }
     onChannelFundingCreated(jsonData) { }
     /**
-     * MsgType_FundingSign_AssetFundingSigned_N35
+     * MsgType_FundingSign_SendAssetFundingSigned_35
      * @param recipient_node_peer_id string
      * @param recipient_user_peer_id string
      * @param info ChannelFundingSignedInfo
@@ -627,21 +616,21 @@ class ObdApi {
             alert("error recipient_user_peer_id");
             return;
         }
-        if (this.isNotString(info.channel_id)) {
-            alert("empty channel_id");
+        if (this.isNotString(info.temporary_channel_id)) {
+            alert("empty temporary_channel_id");
             return;
         }
-        if (info.approval == null) {
-            info.approval = false;
-        }
-        if (info.approval == true) {
-            if (this.isNotString(info.fundee_channel_address_private_key)) {
-                alert("empty fundee_channel_address_private_key");
-                return;
-            }
-        }
+        // if (info.approval == null) {
+        //   info.approval = false;
+        // }
+        // if (info.approval == true) {
+        //   if (this.isNotString(info.fundee_channel_address_private_key)) {
+        //     alert("empty fundee_channel_address_private_key");
+        //     return;
+        //   }
+        // }
         let msg = new Message();
-        msg.type = this.messageType.MsgType_FundingSign_AssetFundingSigned_N35;
+        msg.type = this.messageType.MsgType_FundingSign_SendAssetFundingSigned_35;
         msg.recipient_user_peer_id = recipient_user_peer_id;
         msg.recipient_node_peer_id = recipient_node_peer_id;
         msg.data = info;
@@ -649,7 +638,7 @@ class ObdApi {
     }
     onChannelFundingSigned(jsonData) { }
     /**
-     * MsgType_CommitmentTx_CommitmentTransactionCreated_N351
+     * MsgType_CommitmentTx_SendCommitmentTransactionCreated_351
      * @param recipient_node_peer_id string
      * @param recipient_user_peer_id string
      * @param info CommitmentTx
@@ -689,7 +678,7 @@ class ObdApi {
             return;
         }
         let msg = new Message();
-        msg.type = this.messageType.MsgType_CommitmentTx_CommitmentTransactionCreated_N351;
+        msg.type = this.messageType.MsgType_CommitmentTx_SendCommitmentTransactionCreated_351;
         msg.recipient_user_peer_id = recipient_user_peer_id;
         msg.recipient_node_peer_id = recipient_node_peer_id;
         msg.data = info;
@@ -697,7 +686,7 @@ class ObdApi {
     }
     onCommitmentTransactionCreated(jsonData) { }
     /**
-     * MsgType_CommitmentTxSigned_RevokeAndAcknowledgeCommitmentTransaction_N352
+     * MsgType_CommitmentTxSigned_SendRevokeAndAcknowledgeCommitmentTransaction_352
      * @param recipient_node_peer_id string
      * @param recipient_user_peer_id string
      * @param info CommitmentTxSigned
@@ -716,8 +705,8 @@ class ObdApi {
             alert("empty channel_id");
             return;
         }
-        if (this.isNotString(info.request_commitment_hash)) {
-            alert("empty request_commitment_hash");
+        if (this.isNotString(info.msg_hash)) {
+            alert("empty msg_hash");
             return;
         }
         if (info.approval == null) {
@@ -738,7 +727,7 @@ class ObdApi {
             }
         }
         let msg = new Message();
-        msg.type = this.messageType.MsgType_CommitmentTxSigned_RevokeAndAcknowledgeCommitmentTransaction_N352;
+        msg.type = this.messageType.MsgType_CommitmentTxSigned_SendRevokeAndAcknowledgeCommitmentTransaction_352;
         msg.recipient_user_peer_id = recipient_user_peer_id;
         msg.recipient_node_peer_id = recipient_node_peer_id;
         msg.data = info;
@@ -746,15 +735,15 @@ class ObdApi {
     }
     onRevokeAndAcknowledgeCommitmentTransaction(jsonData) { }
     /**
-     * MsgType_HTLC_Invoice_N4003
-     * @param info HtlcFindPathInfo
+     * MsgType_HTLC_Invoice_402
+     * @param info InvoiceInfo
      * @param callback function
      */
     htlcInvoice(info, callback) {
-        if (this.isNotString(info.recipient_user_peer_id)) {
-            alert("empty recipient_user_peer_id");
-            return;
-        }
+        // if (this.isNotString(info.recipient_user_peer_id)) {
+        //   alert("empty recipient_user_peer_id");
+        //   return;
+        // }
         if (info.property_id == null || info.property_id <= 0) {
             alert("empty property_id");
             return;
@@ -763,15 +752,23 @@ class ObdApi {
             alert("wrong amount");
             return;
         }
+        if (this.isNotString(info.h)) {
+            alert("empty h");
+            return;
+        }
+        if (this.isNotString(info.expiry_time)) {
+            alert("empty expiry_time");
+            return;
+        }
         let msg = new Message();
-        msg.type = this.messageType.MsgType_HTLC_Invoice_N4003;
+        msg.type = this.messageType.MsgType_HTLC_Invoice_402;
         msg.data = info;
         this.sendData(msg, callback);
     }
     onHtlcInvoice(jsonData) { }
     /**
-     * MsgType_HTLC_FindPath_N4001
-     * @param info HtlcHInfo
+     * MsgType_HTLC_FindPath_401
+     * @param info HtlcFindPathInfo
      * @param callback function
      */
     htlcFindPath(info, callback) {
@@ -792,13 +789,13 @@ class ObdApi {
             return;
         }
         let msg = new Message();
-        msg.type = this.messageType.MsgType_HTLC_FindPath_N4001;
+        msg.type = this.messageType.MsgType_HTLC_FindPath_401;
         msg.data = info;
         this.sendData(msg, callback);
     }
     onHtlcFindPath(jsonData) { }
     /**
-     * MsgType_HTLC_AddHTLC_N40
+     * MsgType_HTLC_SendAddHTLC_40
      * @param recipient_node_peer_id string
      * @param recipient_user_peer_id string
      * @param info HtlcCreatedInfo
@@ -865,7 +862,7 @@ class ObdApi {
             return;
         }
         let msg = new Message();
-        msg.type = this.messageType.MsgType_HTLC_AddHTLC_N40;
+        msg.type = this.messageType.MsgType_HTLC_SendAddHTLC_40;
         msg.data = info;
         msg.recipient_user_peer_id = recipient_user_peer_id;
         msg.recipient_node_peer_id = recipient_node_peer_id;
@@ -873,7 +870,7 @@ class ObdApi {
     }
     onHtlcCreated(jsonData) { }
     /**
-     * MsgType_HTLC_AddHTLCSigned_N41
+     * MsgType_HTLC_SendAddHTLCSigned_41
      * @param recipient_node_peer_id string
      * @param recipient_user_peer_id string
      * @param info HtlcSignedInfo
@@ -892,37 +889,37 @@ class ObdApi {
             alert("empty request_hash");
             return;
         }
-        if (info.approval == null) {
-            info.approval = false;
-        }
-        if (info.approval == true) {
-            if (this.isNotString(info.channel_address_private_key)) {
-                alert("empty channel_address_private_key");
-                return;
-            }
-            if (this.isNotString(info.last_temp_address_private_key)) {
-                alert("empty last_temp_address_private_key");
-                return;
-            }
-            if (this.isNotString(info.curr_rsmc_temp_address_pub_key)) {
-                alert("empty curr_rsmc_temp_address_pub_key");
-                return;
-            }
-            if (this.isNotString(info.curr_rsmc_temp_address_private_key)) {
-                alert("empty curr_rsmc_temp_address_private_key");
-                return;
-            }
-            if (this.isNotString(info.curr_htlc_temp_address_pub_key)) {
-                alert("empty curr_htlc_temp_address_pub_key");
-                return;
-            }
-            if (this.isNotString(info.curr_htlc_temp_address_private_key)) {
-                alert("empty curr_htlc_temp_address_private_key");
-                return;
-            }
-        }
+        // if (info.approval == null) {
+        //   info.approval = false;
+        // }
+        // if (info.approval == true) {
+        //   if (this.isNotString(info.channel_address_private_key)) {
+        //     alert("empty channel_address_private_key");
+        //     return;
+        //   }
+        //   if (this.isNotString(info.last_temp_address_private_key)) {
+        //     alert("empty last_temp_address_private_key");
+        //     return;
+        //   }
+        //   if (this.isNotString(info.curr_rsmc_temp_address_pub_key)) {
+        //     alert("empty curr_rsmc_temp_address_pub_key");
+        //     return;
+        //   }
+        //   if (this.isNotString(info.curr_rsmc_temp_address_private_key)) {
+        //     alert("empty curr_rsmc_temp_address_private_key");
+        //     return;
+        //   }
+        //   if (this.isNotString(info.curr_htlc_temp_address_pub_key)) {
+        //     alert("empty curr_htlc_temp_address_pub_key");
+        //     return;
+        //   }
+        //   if (this.isNotString(info.curr_htlc_temp_address_private_key)) {
+        //     alert("empty curr_htlc_temp_address_private_key");
+        //     return;
+        //   }
+        // }
         let msg = new Message();
-        msg.type = this.messageType.MsgType_HTLC_AddHTLCSigned_N41;
+        msg.type = this.messageType.MsgType_HTLC_SendAddHTLCSigned_41;
         msg.data = info;
         msg.recipient_user_peer_id = recipient_user_peer_id;
         msg.recipient_node_peer_id = recipient_node_peer_id;
@@ -931,7 +928,7 @@ class ObdApi {
     onHtlcSigned(jsonData) { }
     /* ***************** backward R begin*****************/
     /**
-     * MsgType_HTLC_SendR_N45
+     * MsgType_HTLC_SendVerifyR_45
      * @param recipient_node_peer_id string
      * @param recipient_user_peer_id string
      * @param info HtlcSendRInfo
@@ -967,7 +964,7 @@ class ObdApi {
             return;
         }
         let msg = new Message();
-        msg.type = this.messageType.MsgType_HTLC_SendR_N45;
+        msg.type = this.messageType.MsgType_HTLC_SendVerifyR_45;
         msg.data = info;
         msg.recipient_user_peer_id = recipient_user_peer_id;
         msg.recipient_node_peer_id = recipient_node_peer_id;
@@ -975,7 +972,7 @@ class ObdApi {
     }
     onHtlcSendR(jsonData) { }
     /**
-     * MsgType_HTLC_VerifyR_N46
+     * MsgType_HTLC_SendSignVerifyR_46
      * @param recipient_node_peer_id string
      * @param recipient_user_peer_id string
      * @param info HtlcVerifyRInfo
@@ -1007,7 +1004,7 @@ class ObdApi {
             return;
         }
         let msg = new Message();
-        msg.type = this.messageType.MsgType_HTLC_VerifyR_N46;
+        msg.type = this.messageType.MsgType_HTLC_SendSignVerifyR_46;
         msg.data = info;
         msg.recipient_user_peer_id = recipient_user_peer_id;
         msg.recipient_node_peer_id = recipient_node_peer_id;
@@ -1017,7 +1014,7 @@ class ObdApi {
     /* ***************** backward R end*****************/
     /* ***************** close htlc tx begin*****************/
     /**
-     * MsgType_HTLC_RequestCloseCurrTx_N49
+     * MsgType_HTLC_SendRequestCloseCurrTx_49
      * @param recipient_node_peer_id string
      * @param recipient_user_peer_id string
      * @param info CloseHtlcTxInfo
@@ -1061,7 +1058,7 @@ class ObdApi {
             return;
         }
         let msg = new Message();
-        msg.type = this.messageType.MsgType_HTLC_RequestCloseCurrTx_N49;
+        msg.type = this.messageType.MsgType_HTLC_SendRequestCloseCurrTx_49;
         msg.data = info;
         msg.recipient_user_peer_id = recipient_user_peer_id;
         msg.recipient_node_peer_id = recipient_node_peer_id;
@@ -1069,7 +1066,7 @@ class ObdApi {
     }
     onCloseHTLC(jsonData) { }
     /**
-     * MsgType_HTLC_CloseSigned_N50
+     * MsgType_HTLC_SendCloseSigned_50
      * @param recipient_node_peer_id string
      * @param recipient_user_peer_id string
      * @param info CloseHtlcTxInfoSigned
@@ -1113,7 +1110,7 @@ class ObdApi {
             return;
         }
         let msg = new Message();
-        msg.type = this.messageType.MsgType_HTLC_CloseSigned_N50;
+        msg.type = this.messageType.MsgType_HTLC_SendCloseSigned_50;
         msg.recipient_user_peer_id = recipient_user_peer_id;
         msg.recipient_node_peer_id = recipient_node_peer_id;
         msg.data = info;
@@ -1123,7 +1120,7 @@ class ObdApi {
     /* ***************** close htlc tx end*****************/
     /* ********************* query data *************************** */
     /**
-     * MsgType_Core_Omni_GetTransaction_1206
+     * MsgType_Core_Omni_GetTransaction_2118
      * @param txid string
      * @param callback function
      */
@@ -1132,13 +1129,13 @@ class ObdApi {
             alert("empty txid");
         }
         let msg = new Message();
-        msg.type = this.messageType.MsgType_Core_Omni_GetTransaction_1206;
+        msg.type = this.messageType.MsgType_Core_Omni_GetTransaction_2118;
         msg.data["txid"] = txid;
         this.sendData(msg, callback);
     }
     onGetOmniTxByTxid(jsonData) { }
     /**
-     * MsgType_Core_Omni_CreateNewTokenFixed_1201
+     * MsgType_Core_Omni_CreateNewTokenFixed_2113
      * @param info OmniSendIssuanceFixed
      * @param callback function
      */
@@ -1167,13 +1164,13 @@ class ObdApi {
             info.data = "";
         }
         let msg = new Message();
-        msg.type = this.messageType.MsgType_Core_Omni_CreateNewTokenFixed_1201;
+        msg.type = this.messageType.MsgType_Core_Omni_CreateNewTokenFixed_2113;
         msg.data = info;
         this.sendData(msg, callback);
     }
     onCreateNewTokenFixed(jsonData) { }
     /**
-     * MsgType_Core_Omni_CreateNewTokenManaged_1202
+     * MsgType_Core_Omni_CreateNewTokenManaged_2114
      * @param info OmniSendIssuanceManaged
      * @param callback function
      */
@@ -1198,13 +1195,13 @@ class ObdApi {
             info.data = "";
         }
         let msg = new Message();
-        msg.type = this.messageType.MsgType_Core_Omni_CreateNewTokenManaged_1202;
+        msg.type = this.messageType.MsgType_Core_Omni_CreateNewTokenManaged_2114;
         msg.data = info;
         this.sendData(msg, callback);
     }
     onCreateNewTokenManaged(jsonData) { }
     /**
-     * MsgType_Core_Omni_GrantNewUnitsOfManagedToken_1203
+     * MsgType_Core_Omni_GrantNewUnitsOfManagedToken_2115
      * @param info OmniSendGrant
      * @param callback function
      */
@@ -1225,13 +1222,13 @@ class ObdApi {
             info.memo = "";
         }
         let msg = new Message();
-        msg.type = this.messageType.MsgType_Core_Omni_GrantNewUnitsOfManagedToken_1203;
+        msg.type = this.messageType.MsgType_Core_Omni_GrantNewUnitsOfManagedToken_2115;
         msg.data = info;
         this.sendData(msg, callback);
     }
     onOmniSendGrant(jsonData) { }
     /**
-     * MsgType_Core_Omni_RevokeUnitsOfManagedToken_1204
+     * MsgType_Core_Omni_RevokeUnitsOfManagedToken_2116
      * @param info OmniSendRevoke
      * @param callback function
      */
@@ -1252,13 +1249,13 @@ class ObdApi {
             info.memo = "";
         }
         let msg = new Message();
-        msg.type = this.messageType.MsgType_Core_Omni_RevokeUnitsOfManagedToken_1204;
+        msg.type = this.messageType.MsgType_Core_Omni_RevokeUnitsOfManagedToken_2116;
         msg.data = info;
         this.sendData(msg, callback);
     }
     onOmniSendRevoke(jsonData) { }
     /**
-     * MsgType_Core_Omni_Getbalance_1200
+     * MsgType_Core_Omni_Getbalance_2112
      * @param address string
      * @param callback function
      */
@@ -1268,13 +1265,13 @@ class ObdApi {
             return;
         }
         let msg = new Message();
-        msg.type = this.messageType.MsgType_Core_Omni_Getbalance_1200;
+        msg.type = this.messageType.MsgType_Core_Omni_Getbalance_2112;
         msg.data["address"] = address;
         this.sendData(msg, callback);
     }
     onOmniGetAllBalancesForAddress(jsonData) { }
     /**
-     * MsgType_Core_Omni_GetAssetName_1207
+     * MsgType_Core_Omni_GetProperty_2119
      * @param propertyId string
      * @param callback function
      */
@@ -1284,13 +1281,13 @@ class ObdApi {
             return;
         }
         let msg = new Message();
-        msg.type = this.messageType.MsgType_Core_Omni_GetAssetName_1207;
+        msg.type = this.messageType.MsgType_Core_Omni_GetProperty_2119;
         msg.data["propertyId"] = propertyId;
         this.sendData(msg, callback);
     }
     onOmniGetAssetNameByID(jsonData) { }
     /**
-     * MsgType_Core_BalanceByAddress_1008
+     * MsgType_Core_BalanceByAddress_2108
      * @param address string
      * @param callback function
      */
@@ -1300,13 +1297,13 @@ class ObdApi {
             return;
         }
         let msg = new Message();
-        msg.type = this.messageType.MsgType_Core_BalanceByAddress_1008;
+        msg.type = this.messageType.MsgType_Core_BalanceByAddress_2108;
         msg.data["address"] = address;
         this.sendData(msg, callback);
     }
     onGetBtcBalanceByAddress(jsonData) { }
     /**
-     * MsgType_Core_Btc_ImportPrivKey_1011
+     * MsgType_Core_Btc_ImportPrivKey_2111
      * @param privkey string
      * @param callback function
      */
@@ -1316,7 +1313,7 @@ class ObdApi {
             return;
         }
         let msg = new Message();
-        msg.type = this.messageType.MsgType_Core_Btc_ImportPrivKey_1011;
+        msg.type = this.messageType.MsgType_Core_Btc_ImportPrivKey_2111;
         msg.data["privkey"] = privkey;
         this.sendData(msg, callback);
     }
@@ -1390,7 +1387,7 @@ class ObdApi {
     }
     onGetRByHOfReceiver(jsonData) { }
     /**
-     * MsgType_CommitmentTx_LatestCommitmentTxByChanId_N35104
+     * MsgType_CommitmentTx_LatestCommitmentTxByChanId_3203
      * @param channel_id string
      * @param callback function
      */
@@ -1400,13 +1397,13 @@ class ObdApi {
             return;
         }
         let msg = new Message();
-        msg.type = this.messageType.MsgType_CommitmentTx_LatestCommitmentTxByChanId_N35104;
+        msg.type = this.messageType.MsgType_CommitmentTx_LatestCommitmentTxByChanId_3203;
         msg.data["channel_id"] = channel_id;
         this.sendData(msg, callback);
     }
     onGetLatestCommitmentTxByChannelId(jsonData) { }
     /**
-     * MsgType_CommitmentTx_ItemsByChanId_N35101
+     * MsgType_CommitmentTx_ItemsByChanId_3200
      * @param channel_id string
      * @param callback function
      */
@@ -1416,23 +1413,23 @@ class ObdApi {
             return;
         }
         let msg = new Message();
-        msg.type = this.messageType.MsgType_CommitmentTx_ItemsByChanId_N35101;
+        msg.type = this.messageType.MsgType_CommitmentTx_ItemsByChanId_3200;
         msg.data["channel_id"] = channel_id;
         this.sendData(msg, callback);
     }
     onGetItemsByChannelId(jsonData) { }
     /**
-     * MsgType_ChannelOpen_AllItem_N3202
+     * MsgType_ChannelOpen_AllItem_3150
      * @param callback function
      */
     getAllChannels(callback) {
         let msg = new Message();
-        msg.type = this.messageType.MsgType_ChannelOpen_AllItem_N3202;
+        msg.type = this.messageType.MsgType_ChannelOpen_AllItem_3150;
         this.sendData(msg, callback);
     }
     onGetAllChannels(jsonData) { }
     /**
-     * MsgType_GetChannelInfoByChanId_N3207
+     * MsgType_GetChannelInfoByChannelId_3154
      * @param id number
      * @param callback function
      */
@@ -1442,13 +1439,13 @@ class ObdApi {
             return;
         }
         let msg = new Message();
-        msg.type = this.messageType.MsgType_GetChannelInfoByChanId_N3207;
+        msg.type = this.messageType.MsgType_GetChannelInfoByChannelId_3154;
         msg.data = id;
         this.sendData(msg, callback);
     }
     onGetChannelById(jsonData) { }
     /**
-     * MsgType_CommitmentTx_AllBRByChanId_N35109
+     * MsgType_CommitmentTx_AllBRByChanId_3208
      * @param channel_id string
      * @param callback function
      */
@@ -1458,13 +1455,13 @@ class ObdApi {
             return;
         }
         let msg = new Message();
-        msg.type = this.messageType.MsgType_CommitmentTx_AllBRByChanId_N35109;
+        msg.type = this.messageType.MsgType_CommitmentTx_AllBRByChanId_3208;
         msg.data["channel_id"] = channel_id;
         this.sendData(msg, callback);
     }
     onGetAllBrTx(jsonData) { }
     /**
-     * MsgType_CommitmentTx_ItemsByChanId_N35101
+     * MsgType_CommitmentTx_ItemsByChanId_3200
      * @param channel_id string
      * @param callback function
      */
@@ -1474,13 +1471,13 @@ class ObdApi {
             return;
         }
         let msg = new Message();
-        msg.type = this.messageType.MsgType_CommitmentTx_ItemsByChanId_N35101;
+        msg.type = this.messageType.MsgType_CommitmentTx_ItemsByChanId_3200;
         msg.data["channel_id"] = channel_id;
         this.sendData(msg, callback);
     }
     onGetAllCommitmentTx(jsonData) { }
     /**
-     * MsgType_CommitmentTx_LatestRDByChanId_N35105
+     * MsgType_CommitmentTx_LatestRDByChanId_3204
      * @param channel_id string
      * @param callback function
      */
@@ -1490,13 +1487,13 @@ class ObdApi {
             return;
         }
         let msg = new Message();
-        msg.type = this.messageType.MsgType_CommitmentTx_LatestRDByChanId_N35105;
+        msg.type = this.messageType.MsgType_CommitmentTx_LatestRDByChanId_3204;
         msg.data["channel_id"] = channel_id;
         this.sendData(msg, callback);
     }
     onGetLatestCommitmentTx(jsonData) { }
     /**
-     * MsgType_CommitmentTx_LatestBRByChanId_N35106
+     * MsgType_CommitmentTx_LatestBRByChanId_3205
      * @param channel_id string
      * @param callback function
      */
@@ -1506,13 +1503,13 @@ class ObdApi {
             return;
         }
         let msg = new Message();
-        msg.type = this.messageType.MsgType_CommitmentTx_LatestBRByChanId_N35106;
+        msg.type = this.messageType.MsgType_CommitmentTx_LatestBRByChanId_3205;
         msg.data["channel_id"] = channel_id;
         this.sendData(msg, callback);
     }
     onGetLatestBRTx(jsonData) { }
     /**
-     * MsgType_CommitmentTx_AllRDByChanId_N35108
+     * MsgType_CommitmentTx_AllRDByChanId_3207
      * @param channel_id string
      * @param callback function
      */
@@ -1522,13 +1519,13 @@ class ObdApi {
             return;
         }
         let msg = new Message();
-        msg.type = this.messageType.MsgType_CommitmentTx_AllRDByChanId_N35108;
+        msg.type = this.messageType.MsgType_CommitmentTx_AllRDByChanId_3207;
         msg.data["channel_id"] = channel_id;
         this.sendData(msg, callback);
     }
     onGetAllRDTx(jsonData) { }
     /**
-     * MsgType_SendBreachRemedyTransaction_N35107
+     * MsgType_SendBreachRemedyTransaction_3206
      * @param channel_id string
      * @param callback function
      */
@@ -1538,13 +1535,13 @@ class ObdApi {
             return;
         }
         let msg = new Message();
-        msg.type = this.messageType.MsgType_SendBreachRemedyTransaction_N35107;
+        msg.type = this.messageType.MsgType_SendBreachRemedyTransaction_3206;
         msg.data["channel_id"] = channel_id;
         this.sendData(msg, callback);
     }
     onSendBreachRemedyTransaction(jsonData) { }
     /**
-     * MsgType_CloseChannelRequest_N38
+     * MsgType_SendCloseChannelRequest_38
      * @param channel_id string
      * @param callback function
      */
@@ -1554,13 +1551,13 @@ class ObdApi {
             return;
         }
         let msg = new Message();
-        msg.type = this.messageType.MsgType_CloseChannelRequest_N38;
+        msg.type = this.messageType.MsgType_SendCloseChannelRequest_38;
         msg.data["channel_id"] = channel_id;
         this.sendData(msg, callback);
     }
     onCloseChannel(jsonData) { }
     /**
-     * MsgType_CloseChannelSign_N39
+     * MsgType_SendCloseChannelSign_39
      * @param info CloseChannelSign
      * @param callback function
      */
@@ -1577,13 +1574,13 @@ class ObdApi {
             info.approval = false;
         }
         let msg = new Message();
-        msg.type = this.messageType.MsgType_CloseChannelSign_N39;
+        msg.type = this.messageType.MsgType_SendCloseChannelSign_39;
         msg.data = info;
         this.sendData(msg, callback);
     }
     onCloseChannelSign(jsonData) { }
     /**
-     * MsgType_Atomic_Swap_N80
+     * MsgType_Atomic_SendSwap_80
      * @param info AtomicSwapRequest
      * @param callback function
      */
@@ -1621,12 +1618,12 @@ class ObdApi {
             return;
         }
         let msg = new Message();
-        msg.type = this.messageType.MsgType_Atomic_Swap_N80;
+        msg.type = this.messageType.MsgType_Atomic_SendSwap_80;
         msg.data = info;
         this.sendData(msg, callback);
     }
     /**
-     * MsgType_Atomic_Swap_Accept_N81
+     * MsgType_Atomic_SendSwapAccept_81
      * @param info AtomicSwapAccepted
      * @param callback function
      */
@@ -1668,7 +1665,7 @@ class ObdApi {
             return;
         }
         let msg = new Message();
-        msg.type = this.messageType.MsgType_Atomic_Swap_Accept_N81;
+        msg.type = this.messageType.MsgType_Atomic_SendSwapAccept_81;
         msg.data = info;
         this.sendData(msg, callback);
     }

@@ -26,11 +26,11 @@ function generateWalletInfo(mnemonic, index, isTestNet = false) {
     }
     let seedHex = bip39.mnemonicToSeedSync(mnemonic, "");
     let root = bip32.fromSeed(seedHex);
-    let child0 = root.derivePath("m/44'/0'/0'/0/" + index);
+    let child0 = root.derivePath("m/44'/0'/" + index);
     let network = bitcoin.networks.bitcoin;
     networkName = "bitcoin"
     if (isTestNet) {
-        child0 = root.derivePath("m/44'/1'/0'/0/" + index);
+        child0 = root.derivePath("m/44'/1'/" + index);
         network = bitcoin.networks.testnet;
         networkName = "testnet"
     }

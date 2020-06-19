@@ -2,7 +2,7 @@
     "data": [
         {
             "id": "issuanceFixed",
-            "type_id": 1201,
+            "type_id": -102113,
             "description": "issuanceFixed is used to create new tokens with fixed supply.",
             "parameters": [
                 {
@@ -44,7 +44,7 @@
         },
         {
             "id": "issuanceManaged",
-            "type_id": 1202,
+            "type_id": -102114,
             "description": "issuanceManaged is used to create new tokens with manageable supply. NOTE: Record the txid returned by OBD and get the property id you have issued manageable asset with GetTransaction (type 1206) API.",
             "parameters": [
                 {
@@ -81,7 +81,7 @@
         },
         {
             "id": "sendGrant",
-            "type_id": 1203,
+            "type_id": -102115,
             "description": "sendGrant is used to issue or grant new units of managed tokens.",
             "parameters": [
                 {
@@ -113,7 +113,7 @@
         },
         {
             "id": "sendRevoke",
-            "type_id": 1204,
+            "type_id": -102116,
             "description": "sendRevoke is used to revoke units of managed tokens.",
             "parameters": [
                 {

@@ -7,6 +7,9 @@ var isConnectToOBD = false;
 // Save login status.
 var isLogined = false;
 
+// Save obd node id.
+var nodeID;
+
 // Save userID of a user already logined.
 var userID;
 
@@ -57,55 +60,15 @@ var btcFromAddr, btcFromAddrPrivKey, btcToAddr, btcAmount, btcMinerFee;
  */
 var strTempChID;
 
+/**
+ * open / close auto mode.
+ */
+var isAutoMode = false;
+
 
 // Get name of saveGoWhere variable.
 function getSaveName() {
     return itemGoWhere;
-}
-
-// getNewAddressWithMnemonic by local js library
-function getNewAddressWithMnemonic() {
-    if (!isLogined) { // Not logined
-        alert('Please login first.');
-        return '';
-    }
-
-    var newIndex = getNewAddrIndex();
-    // console.info('mnemonicWithLogined = ' + mnemonicWithLogined);
-    // console.info('addr index = ' + newIndex);
-
-    // True: testnet  False: mainnet
-    var result = btctool.generateWalletInfo(mnemonicWithLogined, newIndex, true);
-    console.info('local addr data = ' + JSON.stringify(result));
-
-    return result;
-}
-
-// get Address Info by local js library
-function getAddressInfo() {
-    if (!isLogined) { // Not logined
-        alert('Please login first.');
-        return '';
-    }
-
-    var index = $("#index").val();
-    console.info('index = ' + index);
-
-    try {
-        // True: testnet  False: mainnet
-        var result = btctool.generateWalletInfo(mnemonicWithLogined, index, true);
-        console.info('local addr data = ' + JSON.stringify(result));
-    } catch (error) {
-        alert('Please input a valid index of address.');
-        return '';
-    }
-
-    if (!result.status) { // status = false
-        alert('Please input a valid index of address.');
-        return '';
-    }
-
-    return result;
 }
 
 // 
@@ -113,48 +76,184 @@ function listeningN351(e, msgType) {
     console.info('listeningN351 = ' + JSON.stringify(e));
     console.info('listeningN351 msgType = ' + msgType);
     saveChannelList(e, e.channelId, msgType);
-    // saveMsg2Counterparty(e);
+    // saveMsgFromCounterparty(e);
 }
 
 // 
 function listeningN40(e, msgType) {
     console.info('listeningN40 = ' + JSON.stringify(e));
     saveChannelList(e, e.channelId, msgType);
-    // saveMsg2Counterparty(e);
+    // saveMsgFromCounterparty(e);
 }
 
 // 
 function listeningN41(e, msgType) {
     console.info('listeningN41 = ' + JSON.stringify(e));
     saveChannelList(e, e.channel_id, msgType);
-    // saveMsg2Counterparty(e);
+    // saveMsgFromCounterparty(e);
 }
 
 // 
 function listeningN45(e, msgType) {
     console.info('listeningN45 = ' + JSON.stringify(e));
     saveChannelList(e, e.channel_id, msgType);
-    // saveMsg2Counterparty(e);
+    // saveMsgFromCounterparty(e);
+}
+
+// auto response to -100032 (openChannel) 
+// listening to -110032 and send -100033 acceptChannel
+function listening110032(e, msgType) {
+    console.info('NOW isAutoMode = ' + isAutoMode);
+    if (!isAutoMode) return;
+    
+    console.info('listening110032 = ' + JSON.stringify(e));
+
+    let p2pID    = e.funder_node_address;
+    let name     = e.funder_peer_id;
+    let temp_cid = e.temporary_channel_id;
+
+    // Generate an address by local js library.
+    let result = genAddressFromMnemonic();
+    saveFundingAddrData(result);
+    saveAddresses(result);
+
+    // will send -100033 acceptChannel
+    let info                  = new AcceptChannelInfo();
+    info.temporary_channel_id = temp_cid;
+    info.funding_pubkey       = result.result.pubkey;
+    info.approval             = true;
+
+    // Save value to variable
+    strTempChID = temp_cid;
+
+    // OBD API
+    obdApi.acceptChannel(p2pID, name, info, function(e) {
+        console.info('-100033 acceptChannel = ' + JSON.stringify(e));
+        saveChannelList(e);
+        saveCounterparties(name, p2pID);
+    });
+}
+
+// auto response to -100340 (BTCFundingCreated)
+// listening to -110340 and send -100350 BTCFundingSigned
+function listening110340(e, msgType) {
+    console.info('NOW isAutoMode = ' + isAutoMode);
+    if (!isAutoMode) return;
+    console.info('listening110340 = ' + JSON.stringify(e));
+
+    // will send -100350 BTCFundingSigned
+    let temp_cid                      = e.temporary_channel_id;
+    let info                          = new FundingBtcSigned();
+    info.temporary_channel_id         = temp_cid;
+    info.channel_address_private_key  = getFundingAddrPrivKey();
+    info.funding_txid                 = e.funding_txid;
+    info.approval                     = true;
+
+    // Save value to variable
+    strTempChID = temp_cid;
+
+    // OBD API
+    obdApi.btcFundingSigned(e.funder_node_address, e.funder_peer_id, info, function(e) {
+        console.info('-100350 btcFundingSigned = ' + JSON.stringify(e));
+        saveChannelList(e, temp_cid, msgType);
+    });
+}
+
+// auto response to -100034 (AssetFundingCreated)
+// listening to -110034 and send -100035 AssetFundingSigned
+function listening110034(e, msgType) {
+    console.info('NOW isAutoMode = ' + isAutoMode);
+    if (!isAutoMode) return;
+    console.info('listening110034 = ' + JSON.stringify(e));
+
+    // will send -100035 AssetFundingSigned
+    let info                                = new ChannelFundingSignedInfo();
+    info.temporary_channel_id               = e.temporary_channel_id;
+    info.fundee_channel_address_private_key = getFundingAddrPrivKey();
+
+    // OBD API
+    obdApi.channelFundingSigned(e.funder_node_address, e.funder_peer_id, info, function(e) {
+        console.info('-100035 AssetFundingSigned = ' + JSON.stringify(e));
+        saveChannelList(e, e.channel_id, msgType);
+    });
+}
+
+// auto response to -100351 (RSMCCTxCreated)
+// listening to -110351 and send -100352 RSMCCTxSigned
+function listening110351(e, msgType) {
+    console.info('NOW isAutoMode = ' + isAutoMode);
+    if (!isAutoMode) return;
+    console.info('listening110351 = ' + JSON.stringify(e));
+
+    // Generate an address by local js library.
+    let result = genAddressFromMnemonic();
+    // saveFundingAddrData(result);
+    saveAddresses(result);
+
+    // will send -100352 RSMCCTxSigned
+    var last_temp_address_private_key = $("#last_temp_address_private_key").val();
+
+    let info                           = new CommitmentTxSigned();
+    info.channel_id                    = e.channel_id;
+    info.msg_hash                      = e.msg_hash;
+    info.curr_temp_address_pub_key     = result.result.pubkey;
+    info.curr_temp_address_private_key = result.result.wif;
+    info.channel_address_private_key   = getFundingAddrPrivKey();
+    info.last_temp_address_private_key = last_temp_address_private_key;
+    info.approval                      = true;
+
+    // OBD API
+    obdApi.revokeAndAcknowledgeCommitmentTransaction(
+        e.funder_node_address, e.funder_peer_id, info, function(e) {
+        console.info('-100352 RSMCCTxSigned = ' + JSON.stringify(e));
+        saveChannelList(e, e.channel_id, msgType);
+    });
 }
 
 // 
 function registerEvent() {
-    var msgTypeN351 = enumMsgType.MsgType_CommitmentTx_CommitmentTransactionCreated_N351;
+    // auto response mode
+    let msg_110032 = enumMsgType.MsgType_RecvChannelOpen_32;
+    obdApi.registerEvent(msg_110032, function(e) {
+        listening110032(e, msg_110032);
+    });
+
+    // auto response mode
+    let msg_110340 = enumMsgType.MsgType_FundingCreate_RecvBtcFundingCreated_340;
+    obdApi.registerEvent(msg_110340, function(e) {
+        listening110340(e, msg_110340);
+    });
+
+    // auto response mode
+    let msg_110034 = enumMsgType.MsgType_FundingCreate_RecvAssetFundingCreated_34;
+    obdApi.registerEvent(msg_110034, function(e) {
+        listening110034(e, msg_110034);
+    });
+
+    // auto response mode
+    let msg_110351 = enumMsgType.MsgType_CommitmentTx_RecvCommitmentTransactionCreated_351;
+    obdApi.registerEvent(msg_110351, function(e) {
+        listening110351(e, msg_110351);
+    });
+
+
+
+    var msgTypeN351 = enumMsgType.MsgType_CommitmentTx_SendCommitmentTransactionCreated_351;
     obdApi.registerEvent(msgTypeN351, function(e) {
         listeningN351(e, msgTypeN351);
     });
 
-    var msgTypeN40 = enumMsgType.MsgType_HTLC_AddHTLC_N40;
+    var msgTypeN40 = enumMsgType.MsgType_HTLC_SendAddHTLC_40;
     obdApi.registerEvent(msgTypeN40, function(e) {
         listeningN40(e, msgTypeN40);
     });
 
-    var msgTypeN41 = enumMsgType.MsgType_HTLC_AddHTLCSigned_N41;
+    var msgTypeN41 = enumMsgType.MsgType_HTLC_SendAddHTLCSigned_41;
     obdApi.registerEvent(msgTypeN41, function(e) {
         listeningN41(e, msgTypeN41);
     });
 
-    var msgTypeN45 = enumMsgType.MsgType_HTLC_SendR_N45;
+    var msgTypeN45 = enumMsgType.MsgType_HTLC_SendVerifyR_45;
     obdApi.registerEvent(msgTypeN45, function(e) {
         listeningN45(e, msgTypeN45);
     });
@@ -186,6 +285,7 @@ function logIn(msgType) {
 
         // Otherwise, a new loginning, update the userID.
         mnemonicWithLogined = mnemonic;
+        nodeID = e.nodePeerId;
         userID = e.userPeerId;
         $("#logined").text(userID);
         // $("#logined").text(userID.substring(0, 10) + '...');
@@ -194,14 +294,15 @@ function logIn(msgType) {
     });
 }
 
-// 3 connectP2PNode API at local.
-function connectP2PNode(msgType) {
-
-    var nodeAddress  = $("#NodeAddress").val();
+// connectP2PPeer API at local.
+function connectP2PPeer(msgType) {
+    let remote_node_address = $("#remote_node_address").val();
+    let info = new P2PPeer();
+    info.remote_node_address = remote_node_address;
 
     // OBD API
-    obdApi.connectP2PNode(nodeAddress, function(e) {
-        console.info('connectP2PNode - OBD Response = ' + JSON.stringify(e));
+    obdApi.connectP2PPeer(info, function(e) {
+        console.info('connectP2PPeer - OBD Response = ' + JSON.stringify(e));
         createOBDResponseDiv(e, msgType);
     });
 }
@@ -222,7 +323,7 @@ function openChannel(msgType) {
     });
 }
 
-// -33 accept Channel API at local.
+// -100033 accept Channel API at local.
 function acceptChannel(msgType) {
 
     var p2pID    = $("#recipient_node_peer_id").val();
@@ -241,7 +342,7 @@ function acceptChannel(msgType) {
 
     // OBD API
     obdApi.acceptChannel(p2pID, name, info, function(e) {
-        console.info('-33 acceptChannel - OBD Response = ' + JSON.stringify(e));
+        console.info('-100033 acceptChannel - OBD Response = ' + JSON.stringify(e));
         saveChannelList(e);
         saveCounterparties(name, p2pID);
         // createOBDResponseDiv(e, msgType);
@@ -771,7 +872,7 @@ function btcFundingCreated(msgType) {
     });
 }
 
-// BTC Funding Signed -3500 API at local.
+// BTC Funding Signed -100350 API at local.
 function btcFundingSigned(msgType) {
 
     var p2pID    = $("#recipient_node_peer_id").val();
@@ -798,7 +899,7 @@ function btcFundingSigned(msgType) {
     });
 }
 
-// Omni Asset Funding Created -34 API at local.
+// Omni Asset Funding Created -100034 API at local.
 function assetFundingCreated(msgType) {
 
     var p2pID    = $("#recipient_node_peer_id").val();
@@ -821,29 +922,29 @@ function assetFundingCreated(msgType) {
 
     // OBD API
     obdApi.channelFundingCreated(p2pID, name, info, function(e) {
-        console.info('N34 - OBD Response = ' + JSON.stringify(e));
+        console.info('-100034 - OBD Response = ' + JSON.stringify(e));
         saveChannelList(e, temp_cid, msgType);
         // createOBDResponseDiv(e, msgType);
     });
 }
 
-// Omni Asset Funding Signed -35 API at local.
+// Omni Asset Funding Signed -100035 API at local.
 function assetFundingSigned(msgType) {
 
     var p2pID      = $("#recipient_node_peer_id").val();
     var name       = $("#recipient_user_peer_id").val();
-    var channel_id = $("#channel_id").val();
+    var temporary_channel_id = $("#temporary_channel_id").val();
     var privkey    = $("#fundee_channel_address_private_key").val();
-    var approval   = $("#checkbox_n35").prop("checked");
+    // var approval   = $("#checkbox_n35").prop("checked");
 
     let info = new ChannelFundingSignedInfo();
-    info.channel_id = channel_id;
+    info.temporary_channel_id = temporary_channel_id;
     info.fundee_channel_address_private_key = privkey;
-    info.approval = approval;
+    // info.approval = approval;
 
     // OBD API
     obdApi.channelFundingSigned(p2pID, name, info, function(e) {
-        console.info('N35 - OBD Response = ' + JSON.stringify(e));
+        console.info('-100035 - OBD Response = ' + JSON.stringify(e));
         saveChannelList(e, channel_id, msgType);
         // createOBDResponseDiv(e, msgType);
     });
@@ -929,20 +1030,42 @@ function fundingAsset(msgType) {
 // createInvoice API at local.
 function createInvoice(msgType) {
 
-    var property_id = $("#property_id").val();
-    var amount = $("#amount").val();
-    var recipient_user_peer_id = $("#recipient_user_peer_id").val();
+    let property_id = $("#property_id").val();
+    let amount      = $("#amount").val();
+    let h           = $("#h").val();
+    let expiry_time = $("#expiry_time").val();
+    let description = $("#description").val();
 
-    let info = new HtlcHInfo();
+    let info         = new InvoiceInfo();
     info.property_id = Number(property_id);
-    info.amount = Number(amount);
-    info.recipient_user_peer_id = recipient_user_peer_id;
+    info.amount      = Number(amount);
+    info.h           = h;
+    info.expiry_time = expiry_time;
+    console.info('info.expiry_time = ' + info.expiry_time);
+    info.description = description;
 
     // OBD API
     obdApi.htlcInvoice(info, function(e) {
         console.info('createInvoice - OBD Response = ' + JSON.stringify(e));
         // saveChannelList(e, tempChID, msgType);
-        createOBDResponseDiv(e, msgType);
+        // createOBDResponseDiv(e, msgType);
+
+        $("#newDiv").remove();
+        createElement($("#name_req_div"), 'div', '', 'panelItem', 'newDiv');
+        
+        let newDiv     = $("#newDiv");
+        let strInvoice = JSON.stringify(e);
+
+        // Basecode string of invoice
+        strInvoice = strInvoice.replace("\"", "").replace("\"", "");
+        createElement(newDiv, 'div', strInvoice, 'str_invoice');
+
+        // QRCode of invoice
+        createElement(newDiv, 'div', '', 'qrcode', 'qrcode');
+        let qrcode = new QRCode("qrcode", {
+            width : 160, height : 160
+        });
+        qrcode.makeCode(strInvoice);
     });
 }
 
@@ -989,7 +1112,7 @@ function htlcCreated(msgType) {
     });
 }
 
-// -41 htlcSigned API at local.
+// -100041 htlcSigned API at local.
 function htlcSigned(msgType) {
 
     var recipient_node_peer_id  = $("#recipient_node_peer_id").val();
@@ -1001,7 +1124,7 @@ function htlcSigned(msgType) {
     var curr_rsmc_temp_address_private_key = $("#curr_rsmc_temp_address_private_key").val();
     var curr_htlc_temp_address_pub_key = $("#curr_htlc_temp_address_pub_key").val();
     var curr_htlc_temp_address_private_key = $("#curr_htlc_temp_address_private_key").val();
-    var approval = $("#checkbox_n41").prop("checked");
+    // var approval = $("#checkbox_n41").prop("checked");
 
     let info = new HtlcSignedInfo();
     info.request_hash = request_hash;
@@ -1011,7 +1134,7 @@ function htlcSigned(msgType) {
     info.curr_rsmc_temp_address_private_key = curr_rsmc_temp_address_private_key;
     info.curr_htlc_temp_address_pub_key = curr_htlc_temp_address_pub_key;
     info.curr_htlc_temp_address_private_key = curr_htlc_temp_address_private_key;
-    info.approval = approval;
+    // info.approval = approval;
 
     // Get channel_id by request_hash.
     // var channelId;
@@ -1026,7 +1149,7 @@ function htlcSigned(msgType) {
 
     // OBD API
     obdApi.htlcSigned(recipient_node_peer_id, recipient_user_peer_id, info, function(e) {
-        console.info('-41 htlcSigned - OBD Response = ' + JSON.stringify(e));
+        console.info('-100041 htlcSigned - OBD Response = ' + JSON.stringify(e));
         saveChannelList(e, e.channel_id, msgType);
         // createOBDResponseDiv(e, msgType);
     });
@@ -1096,7 +1219,7 @@ function RSMCCTxCreated(msgType) {
     });
 }
 
-// Revoke and Acknowledge Commitment Transaction -352 API at local.
+// Revoke and Acknowledge Commitment Transaction -100352 API at local.
 function RSMCCTxSigned(msgType) {
 
     var p2pID    = $("#recipient_node_peer_id").val();
@@ -1106,7 +1229,7 @@ function RSMCCTxSigned(msgType) {
     var curr_temp_address_private_key = $("#curr_temp_address_private_key").val();
     var channel_address_private_key = $("#channel_address_private_key").val();
     var last_temp_address_private_key = $("#last_temp_address_private_key").val();
-    var request_commitment_hash = $("#request_commitment_hash").val();
+    var msg_hash = $("#msg_hash").val();
     var approval = $("#checkbox_n352").prop("checked");
 
     let info = new CommitmentTxSigned();
@@ -1115,12 +1238,12 @@ function RSMCCTxSigned(msgType) {
     info.curr_temp_address_private_key = curr_temp_address_private_key;
     info.channel_address_private_key = channel_address_private_key;
     info.last_temp_address_private_key = last_temp_address_private_key;
-    info.request_commitment_hash = request_commitment_hash;
+    info.msg_hash = msg_hash;
     info.approval = approval;
 
     // OBD API
     obdApi.revokeAndAcknowledgeCommitmentTransaction(p2pID, name, info, function(e) {
-        console.info('RSMCCTxSigned - OBD Response = ' + JSON.stringify(e));
+        console.info('-100352 RSMCCTxSigned = ' + JSON.stringify(e));
         saveChannelList(e, channel_id, msgType);
         // createOBDResponseDiv(e, msgType);
     });
@@ -1134,151 +1257,152 @@ function invokeAPIs(objSelf) {
 
     switch (msgType) {
         // Util APIs.
-        case enumMsgType.MsgType_Core_Omni_Getbalance_1200:
+        case enumMsgType.MsgType_Core_Omni_Getbalance_2112:
             getBalanceForOmni(msgType);
             break;
-        case enumMsgType.MsgType_Core_Omni_CreateNewTokenFixed_1201:
+        case enumMsgType.MsgType_Core_Omni_CreateNewTokenFixed_2113:
             issuanceFixed(msgType);
             break;
-        case enumMsgType.MsgType_Core_Omni_CreateNewTokenManaged_1202:
+        case enumMsgType.MsgType_Core_Omni_CreateNewTokenManaged_2114:
             issuanceManaged(msgType);
             break;
-        case enumMsgType.MsgType_Core_Omni_GrantNewUnitsOfManagedToken_1203:
+        case enumMsgType.MsgType_Core_Omni_GrantNewUnitsOfManagedToken_2115:
             sendGrant(msgType);
             break;
-        case enumMsgType.MsgType_Core_Omni_RevokeUnitsOfManagedToken_1204:
+        case enumMsgType.MsgType_Core_Omni_RevokeUnitsOfManagedToken_2116:
             sendRevoke(msgType);
             break;
-        case enumMsgType.MsgType_Core_Omni_ListProperties_1205:
+        case enumMsgType.MsgType_Core_Omni_ListProperties_2117:
             listProperties(msgType);
             break;
-        case enumMsgType.MsgType_Core_Omni_GetTransaction_1206:
+        case enumMsgType.MsgType_Core_Omni_GetTransaction_2118:
             getTransaction(msgType);
             break;
-        case enumMsgType.MsgType_Core_Omni_GetAssetName_1207:
+        case enumMsgType.MsgType_Core_Omni_GetProperty_2119:
             getAssetNameByID(msgType);
             break;
-        case enumMsgType.MsgType_CommitmentTx_AllBRByChanId_N35109:
+        case enumMsgType.MsgType_CommitmentTx_AllBRByChanId_3208:
             getAllBRTx(msgType);
             break;
-        case enumMsgType.MsgType_GetChannelInfoByChanId_N3207:
+        case enumMsgType.MsgType_GetChannelInfoByChannelId_3154:
             getChannelDetail(msgType);
             break;
-        case enumMsgType.MsgType_ChannelOpen_AllItem_N3202:
+        case enumMsgType.MsgType_ChannelOpen_AllItem_3150:
             getAllChannels(msgType);
             break;
-        case enumMsgType.MsgType_CommitmentTx_ItemsByChanId_N35101:
+        case enumMsgType.MsgType_CommitmentTx_ItemsByChanId_3200:
             getAllCommitmentTransactions(msgType);
             break;
-        case enumMsgType.MsgType_CommitmentTx_LatestCommitmentTxByChanId_N35104:
+        case enumMsgType.MsgType_CommitmentTx_LatestCommitmentTxByChanId_3203:
             getLatestCommitmentTx(msgType);
             break;
-        case enumMsgType.MsgType_Core_GetNewAddress_1001:
-            obdApi.getNewAddress(function(e) {
-                console.info('OBD Response = ' + e);
-                createOBDResponseDiv(e);
-            });
-            break;
-        case enumMsgType.MsgType_Mnemonic_CreateAddress_N200:
-            var result = getNewAddressWithMnemonic();
+        // case enumMsgType.MsgType_Core_GetNewAddress_2101:
+        //     obdApi.getNewAddress(function(e) {
+        //         console.info('OBD Response = ' + e);
+        //         createOBDResponseDiv(e);
+        //     });
+        //     break;
+        case enumMsgType.MsgType_Mnemonic_CreateAddress_3000:
+            var result = genAddressFromMnemonic();
             if (result === '') return;
             saveAddresses(result);
             createOBDResponseDiv(result, msgType);
             break;
-        case enumMsgType.MsgType_Mnemonic_GetAddressByIndex_201:
+        case enumMsgType.MsgType_Mnemonic_GetAddressByIndex_3001:
             var result = getAddressInfo();
             if (result === '') return;
             createOBDResponseDiv(result, msgType);
             break;
 
             // APIs for debugging.
-        case enumMsgType.MsgType_UserLogin_1:
+        case enumMsgType.MsgType_UserLogin_2001:
             logIn(msgType);
             break;
-        case enumMsgType.MsgType_UserLogout_2:
+        case enumMsgType.MsgType_UserLogout_2002:
             obdApi.logout();
             break;
-        case enumMsgType.MsgType_GetMnemonic_101:
+        case enumMsgType.MsgType_GetMnemonic_2004:
             // Generate mnemonic by local js library.
-            // This is equal OBD api signUp.
-            var mnemonic = btctool.generateMnemonic(128);
+            // var mnemonic = btctool.generateMnemonic(128);
+            // let mnemonic = obdApi.genMnemonic();
+            let mnemonic = genMnemonic();
             saveMnemonic(mnemonic);
             createOBDResponseDiv(mnemonic);
             break;
-        case enumMsgType.MsgType_Core_FundingBTC_1009:
+        case enumMsgType.MsgType_Core_FundingBTC_2109:
             fundingBTC(msgType);
             break;
-        case enumMsgType.MsgType_FundingCreate_BtcCreate_N3400:
+        case enumMsgType.MsgType_FundingCreate_SendBtcFundingCreated_340:
             btcFundingCreated(msgType);
             break;
-        case enumMsgType.MsgType_FundingSign_BtcSign_N3500:
+        case enumMsgType.MsgType_FundingSign_SendBtcSign_350:
             btcFundingSigned(msgType);
             break;
-        case enumMsgType.MsgType_Core_Omni_FundingAsset_2001:
+        case enumMsgType.MsgType_Core_Omni_FundingAsset_2120:
             fundingAsset(msgType);
             break;
-        case enumMsgType.MsgType_FundingCreate_AssetFundingCreated_N34:
+        case enumMsgType.MsgType_FundingCreate_SendAssetFundingCreated_34:
             assetFundingCreated(msgType);
             break;
-        case enumMsgType.MsgType_FundingSign_AssetFundingSigned_N35:
+        case enumMsgType.MsgType_FundingSign_SendAssetFundingSigned_35:
             assetFundingSigned(msgType);
             break;
-        case enumMsgType.MsgType_CommitmentTx_CommitmentTransactionCreated_N351:
+        case enumMsgType.MsgType_CommitmentTx_SendCommitmentTransactionCreated_351:
             RSMCCTxCreated(msgType);
             break;
-        case enumMsgType.MsgType_CommitmentTxSigned_RevokeAndAcknowledgeCommitmentTransaction_N352:
+        case enumMsgType.MsgType_CommitmentTxSigned_SendRevokeAndAcknowledgeCommitmentTransaction_352:
             RSMCCTxSigned(msgType);
             break;
-        case enumMsgType.MsgType_Core_Omni_GetTransaction_1206:
+        case enumMsgType.MsgType_Core_Omni_GetTransaction_2118:
             txid = "c76710920860456dff2433197db79dd030f9b527e83a2e253f5bc6ab7d197e73";
             obdApi.getOmniTxByTxid(txid);
             break;
             // Open Channel request.
-        case enumMsgType.MsgType_ChannelOpen_N32:
+        case enumMsgType.MsgType_SendChannelOpen_32:
             openChannel(msgType);
             break;
             // Accept Channel request.
-        case enumMsgType.MsgType_ChannelAccept_N33:
+        case enumMsgType.MsgType_SendChannelAccept_33:
             acceptChannel(msgType);
             break;
-        case enumMsgType.MsgType_HTLC_Invoice_N4003:
+        case enumMsgType.MsgType_HTLC_Invoice_402:
             createInvoice(msgType);
             break;
-        case enumMsgType.MsgType_HTLC_FindPath_N4001:
+        case enumMsgType.MsgType_HTLC_FindPath_401:
             htlcFindPath(msgType);
             break;
-        case enumMsgType.MsgType_HTLC_AddHTLC_N40:
+        case enumMsgType.MsgType_HTLC_SendAddHTLC_40:
             htlcCreated(msgType);
             break;
-        case enumMsgType.MsgType_HTLC_AddHTLCSigned_N41:
+        case enumMsgType.MsgType_HTLC_SendAddHTLCSigned_41:
             htlcSigned(msgType);
             break;
-        case enumMsgType.MsgType_HTLC_SendR_N45:
+        case enumMsgType.MsgType_HTLC_SendVerifyR_45:
             htlcSendR(msgType);
             break;
-        case enumMsgType.MsgType_HTLC_VerifyR_N46:
+        case enumMsgType.MsgType_HTLC_SendSignVerifyR_46:
             htlcVerifyR(msgType);
             break;
-        case enumMsgType.MsgType_HTLC_RequestCloseCurrTx_N49:
+        case enumMsgType.MsgType_HTLC_SendRequestCloseCurrTx_49:
             closeHTLC(msgType);
             break;
-        case enumMsgType.MsgType_HTLC_CloseSigned_N50:
+        case enumMsgType.MsgType_HTLC_SendCloseSigned_50:
             closeHTLCSigned(msgType);
             break;
-        case enumMsgType.MsgType_CloseChannelRequest_N38:
+        case enumMsgType.MsgType_SendCloseChannelRequest_38:
             closeChannel(msgType);
             break;
-        case enumMsgType.MsgType_CloseChannelSign_N39:
+        case enumMsgType.MsgType_SendCloseChannelSign_39:
             closeChannelSigned(msgType);
             break;
-        case enumMsgType.MsgType_Atomic_Swap_N80:
+        case enumMsgType.MsgType_Atomic_SendSwap_80:
             atomicSwap(msgType);
             break;
-        case enumMsgType.MsgType_Atomic_Swap_Accept_N81:
+        case enumMsgType.MsgType_Atomic_SendSwapAccept_81:
             atomicSwapAccepted(msgType);
             break;
-        case enumMsgType.MsgType_p2p_ConnectServer_3:
-            connectP2PNode(msgType);
+        case enumMsgType.MsgType_p2p_ConnectPeer_2003:
+            connectP2PPeer(msgType);
             break;
         default:
             console.info(msgType + " do not exist");
@@ -1287,8 +1411,8 @@ function invokeAPIs(objSelf) {
 }
 
 // 
-function saveMsg2Counterparty(e) {
-    console.info("saveMsg2Counterparty:", JSON.stringify(e));
+function saveMsgFromCounterparty(e) {
+    console.info("saveMsgFromCounterparty:", JSON.stringify(e));
 
     var data = localStorage.getItem('broadcast_info');
 
@@ -1328,31 +1452,30 @@ function displayOBDMessages(msg) {
 
     switch (Number(content.type)) {
         // case enumMsgType.MsgType_Error_0:
-        // case enumMsgType.MsgType_Core_GetNewAddress_1001:
-        // case enumMsgType.MsgType_Mnemonic_CreateAddress_N200:
-        // case enumMsgType.MsgType_Mnemonic_GetAddressByIndex_201:
-        // case enumMsgType.MsgType_GetMnemonic_101:
-        // case enumMsgType.MsgType_Core_BalanceByAddress_1008:
-        // case enumMsgType.MsgType_Core_FundingBTC_1009:
-        // case enumMsgType.MsgType_Core_Omni_Getbalance_1200:
-        // case enumMsgType.MsgType_Core_Omni_GetAssetName_1207:
-        // case enumMsgType.MsgType_Core_Omni_FundingAsset_2001:
-        // case enumMsgType.MsgType_HTLC_Invoice_N4003:
-        // case enumMsgType.MsgType_CommitmentTx_LatestCommitmentTxByChanId_N35104:
-        // case enumMsgType.MsgType_CommitmentTx_ItemsByChanId_N35101:
-        // case enumMsgType.MsgType_ChannelOpen_AllItem_N3202:
-        // case enumMsgType.MsgType_GetChannelInfoByChanId_N3207:
-        // case enumMsgType.MsgType_CommitmentTx_AllBRByChanId_N35109:
+        // case enumMsgType.MsgType_Mnemonic_CreateAddress_3000:
+        // case enumMsgType.MsgType_Mnemonic_GetAddressByIndex_3001:
+        // case enumMsgType.MsgType_GetMnemonic_2004:
+        // case enumMsgType.MsgType_Core_BalanceByAddress_2108:
+        // case enumMsgType.MsgType_Core_FundingBTC_2109:
+        // case enumMsgType.MsgType_Core_Omni_Getbalance_2112:
+        // case enumMsgType.MsgType_Core_Omni_GetProperty_2119:
+        // case enumMsgType.MsgType_Core_Omni_FundingAsset_2120:
+        // case enumMsgType.MsgType_HTLC_Invoice_402:
+        // case enumMsgType.MsgType_CommitmentTx_LatestCommitmentTxByChanId_3203:
+        // case enumMsgType.MsgType_CommitmentTx_ItemsByChanId_3200:
+        // case enumMsgType.MsgType_ChannelOpen_AllItem_3150:
+        // case enumMsgType.MsgType_GetChannelInfoByChannelId_3154:
+        // case enumMsgType.MsgType_CommitmentTx_AllBRByChanId_3208:
         //     return;
-        case enumMsgType.MsgType_UserLogin_1:
+        case enumMsgType.MsgType_UserLogin_2001:
             content.result = 'Logged In - ' + content.from;
             msgHead = msgTime +  '  - Logged In.';
             break;
-        case enumMsgType.MsgType_p2p_ConnectServer_3:
-            content.result = 'Connect to P2P Node success.';
-            msgHead = msgTime+  '  - Connect to P2P Node success.';
+        case enumMsgType.MsgType_p2p_ConnectPeer_2003:
+            content.result = 'Connect to P2P Peer.';
+            msgHead = msgTime+  '  - Connect to P2P Peer.';
             break;
-        case enumMsgType.MsgType_ChannelOpen_N32:
+        case enumMsgType.MsgType_SendChannelOpen_32:
             content.result = 'LAUNCH - ' + content.from +
                 ' - launch an Open Channel request. ';
 
@@ -1361,7 +1484,7 @@ function displayOBDMessages(msg) {
             // 'The [temporary_channel_id] is : ' + 
             // content.result.temporary_channel_id;
             break;
-        case enumMsgType.MsgType_ChannelAccept_N33:
+        case enumMsgType.MsgType_SendChannelAccept_33:
             if (content.result.curr_state === 11) { // Accept
                 content.result = 'ACCEPT - ' + content.from +
                     ' - accept Open Channel request. ';
@@ -1380,78 +1503,78 @@ function displayOBDMessages(msg) {
                 // content.result.temporary_channel_id;
             }
             break;
-        case enumMsgType.MsgType_FundingCreate_BtcCreate_N3400:
+        case enumMsgType.MsgType_FundingCreate_SendBtcFundingCreated_340:
             content.result = 'Notification - ' + content.from +
                 ' - depositing BTC in Channel.';
             msgHead = msgTime +  '  - Notification: depositing BTC in Channel.';
             break;
-        case enumMsgType.MsgType_FundingSign_BtcSign_N3500:
+        case enumMsgType.MsgType_FundingSign_SendBtcSign_350:
             content.result = 'Reply - ' + content.from +
                 ' - depositing BTC message.';
             msgHead = msgTime +  '  - Reply: depositing BTC message.';
             break;
-        case enumMsgType.MsgType_FundingCreate_AssetFundingCreated_N34:
+        case enumMsgType.MsgType_FundingCreate_SendAssetFundingCreated_34:
             content.result = 'Notification - ' + content.from +
                 ' - depositing Omni Asset in Channel.';
             msgHead = msgTime +  '  - Notification: depositing Omni Asset in Channel.';
             break;
-        case enumMsgType.MsgType_FundingSign_AssetFundingSigned_N35:
+        case enumMsgType.MsgType_FundingSign_SendAssetFundingSigned_35:
             content.result = 'Reply - ' + content.from +
                 ' - depositing Omni Asset message.';
             msgHead = msgTime +  '  - Reply: depositing Omni Asset message.';
             break;
-        case enumMsgType.MsgType_CommitmentTx_CommitmentTransactionCreated_N351:
+        case enumMsgType.MsgType_CommitmentTx_SendCommitmentTransactionCreated_351:
             content.result = 'RSMC transfer - ' + content.from +
                 ' - launch a transfer.';
             msgHead = msgTime +  '  - RSMC: launch a transfer.';
             break;
-        case enumMsgType.MsgType_CommitmentTxSigned_RevokeAndAcknowledgeCommitmentTransaction_N352:
+        case enumMsgType.MsgType_CommitmentTxSigned_SendRevokeAndAcknowledgeCommitmentTransaction_352:
             content.result = 'RSMC transfer - ' + content.from +
                 ' - accept a transfer.';
             msgHead = msgTime +  '  - RSMC: accept a transfer.';
             break;
-        case enumMsgType.MsgType_HTLC_AddHTLC_N40:
+        case enumMsgType.MsgType_HTLC_SendAddHTLC_40:
             content.result = 'HTLC - ' + content.from +
                 ' - launch a HTLC transfer.';
             msgHead = msgTime +  '  - HTLC: launch a HTLC transfer.';
             break;
-        case enumMsgType.MsgType_HTLC_AddHTLCSigned_N41:
+        case enumMsgType.MsgType_HTLC_SendAddHTLCSigned_41:
             content.result = 'HTLC - ' + content.from +
                 ' - accept a HTLC transfer.';
             msgHead = msgTime +  '  - HTLC: accept a HTLC transfer.';
             break;
-        case enumMsgType.MsgType_HTLC_SendR_N45:
+        case enumMsgType.MsgType_HTLC_SendVerifyR_45:
             content.result = 'HTLC - ' + content.from +
                 ' - Sent R.';
             msgHead = msgTime +  '  - HTLC: Sent R.';
             break;
-        case enumMsgType.MsgType_HTLC_VerifyR_N46:
+        case enumMsgType.MsgType_HTLC_SendSignVerifyR_46:
             content.result = 'HTLC - ' + content.from +
                 ' - Verify R.';
             msgHead = msgTime +  '  - HTLC: Verify R.';
             break;
-        case enumMsgType.MsgType_HTLC_RequestCloseCurrTx_N49:
+        case enumMsgType.MsgType_HTLC_SendRequestCloseCurrTx_49:
             content.result = 'HTLC - ' + content.from +
                 ' - Request Close.';
             msgHead = msgTime +  '  - HTLC: Request Close.';
             break;
-        case enumMsgType.MsgType_HTLC_CloseSigned_N50:
+        case enumMsgType.MsgType_HTLC_SendCloseSigned_50:
             content.result = 'HTLC - ' + content.result.msg;
             msgHead = msgTime +  '  - HTLC: Closed.';
             break;
-        case enumMsgType.MsgType_CloseChannelRequest_N38:
+        case enumMsgType.MsgType_SendCloseChannelRequest_38:
             content.result = 'N38 Request Close Channel from - ' + content.from;
             msgHead = msgTime +  '  - Request Close Channel.';
             break;
-        case enumMsgType.MsgType_CloseChannelSign_N39:
+        case enumMsgType.MsgType_SendCloseChannelSign_39:
             content.result = 'N39 Response Close Channel from - ' + content.from;
             msgHead = msgTime +  '  - Response Close Channel.';
             break;
-        case enumMsgType.MsgType_Atomic_Swap_N80:
+        case enumMsgType.MsgType_Atomic_SendSwap_80:
             content.result = 'N80 Request Atomic Swap from - ' + content.from;
             msgHead = msgTime +  '  - Request Atomic Swap.';
             break;
-        case enumMsgType.MsgType_Atomic_Swap_Accept_N81:
+        case enumMsgType.MsgType_Atomic_SendSwapAccept_81:
             content.result = 'N81 Response Atomic Swap from - ' + content.from;
             msgHead = msgTime +  '  - Response Atomic Swap.';
             break;
@@ -1464,7 +1587,7 @@ function displayOBDMessages(msg) {
     if (Number(msg.type) != enumMsgType.MsgType_Error_0) {
         content = content.replace("\"", "").replace("\"", "");
     }
-    console.info("OBD DIS - content = ", content);
+    // console.info("OBD DIS - content = ", content);
 
     // the info save to local storage [ChannelList].
     channelInfo = content;
@@ -1497,8 +1620,12 @@ function displayOBDMessages(msg) {
         newMsg += '\n\n\n\n' + data;
         showMsg = newMsg;
     }
+    // testNum++;
+    // console.info('INFO --> testNum = ' + testNum);
+    // console.info('INFO --> showMsg = ' + showMsg);
     localStorage.setItem('broadcast_info', showMsg);
 }
+// var testNum = 0;
 
 // 
 function getUserDataList(goWhere) {
@@ -1708,7 +1835,7 @@ function createInputParamDiv(obj, jsonFile) {
                 // Parameters
                 createParamOfAPI(arrParams, newDiv);
                 content_div.append(newDiv);
-                autoFillValue(arrParams);
+                autoFillValue(arrParams, obj);
             }
         }
 
@@ -1716,12 +1843,12 @@ function createInputParamDiv(obj, jsonFile) {
         if (jsonFile === 'json/api_list.json') {
             var msgType = Number(obj.getAttribute("type_id"));
             switch (msgType) {
-                case enumMsgType.MsgType_ChannelAccept_N33:
-                case enumMsgType.MsgType_FundingSign_BtcSign_N3500:
-                case enumMsgType.MsgType_FundingSign_AssetFundingSigned_N35:
-                case enumMsgType.MsgType_CommitmentTxSigned_RevokeAndAcknowledgeCommitmentTransaction_N352:
-                case enumMsgType.MsgType_CloseChannelSign_N39:
-                case enumMsgType.MsgType_HTLC_AddHTLCSigned_N41:
+                case enumMsgType.MsgType_SendChannelAccept_33:
+                case enumMsgType.MsgType_FundingSign_SendBtcSign_350:
+                // case enumMsgType.MsgType_FundingSign_SendAssetFundingSigned_35:
+                case enumMsgType.MsgType_CommitmentTxSigned_SendRevokeAndAcknowledgeCommitmentTransaction_352:
+                case enumMsgType.MsgType_SendCloseChannelSign_39:
+                // case enumMsgType.MsgType_HTLC_SendAddHTLCSigned_41:
                     displayApprovalCheckbox(newDiv, obj, msgType);
                     content_div.append(newDiv);
                     break;
@@ -1731,8 +1858,8 @@ function createInputParamDiv(obj, jsonFile) {
 }
 
 //
-function autoFillValue(arrParams) {
-    // auto fill
+function autoFillValue(arrParams, obj) {
+    // auto fill to temporary_channel_id
     if (arrParams[0].name === 'temporary_channel_id') {
         if (strTempChID) {
             $("#temporary_channel_id").val(strTempChID);
@@ -1749,6 +1876,125 @@ function autoFillValue(arrParams) {
             $("#miner_fee").val(btcMinerFee);
         }
     }
+
+    // Auto generate addresses and fill pubkey and privkey to input box
+    let result;
+    let msgType = Number(obj.getAttribute("type_id"));
+    switch (msgType) {
+        case enumMsgType.MsgType_HTLC_Invoice_402:
+            let date = new Date().toJSON().substr(0, 10).replace('T', ' ');
+            $("#expiry_time").val(date);
+            $("#expiry_time").attr("type", "date");
+        //     if (isLogined) {
+        //         $("#recipient_node_peer_id").val(nodeID);
+        //         $("#recipient_user_peer_id").val(userID);
+        //         $("#recipient_node_peer_id").attr("class", "input input_color");
+        //         $("#recipient_user_peer_id").attr("class", "input input_color");
+        //     }
+            break;
+
+        case enumMsgType.MsgType_FundingCreate_SendAssetFundingCreated_34:
+            if (!isLogined) return;  // Not logined
+            result = genAddressFromMnemonic();
+            if (result === '') return;
+            $("#temp_address_pub_key").val(result.result.pubkey);
+            $("#temp_address_private_key").val(result.result.wif);
+            $("#temp_address_pub_key").attr("class", "input input_color");
+            $("#temp_address_private_key").attr("class", "input input_color");
+            saveAddresses(result);
+            break;
+
+        case enumMsgType.MsgType_CommitmentTx_SendCommitmentTransactionCreated_351:
+        case enumMsgType.MsgType_CommitmentTxSigned_SendRevokeAndAcknowledgeCommitmentTransaction_352:
+            if (!isLogined) return;  // Not logined
+            result = genAddressFromMnemonic();
+            if (result === '') return;
+            $("#curr_temp_address_pub_key").val(result.result.pubkey);
+            $("#curr_temp_address_private_key").val(result.result.wif);
+            $("#curr_temp_address_pub_key").attr("class", "input input_color");
+            $("#curr_temp_address_private_key").attr("class", "input input_color");
+            saveAddresses(result);
+            break;
+
+        case enumMsgType.MsgType_HTLC_SendAddHTLC_40:
+            if (!isLogined) return;  // Not logined
+            result = genAddressFromMnemonic();
+            if (result === '') return;
+            $("#curr_rsmc_temp_address_pub_key").val(result.result.pubkey);
+            $("#curr_rsmc_temp_address_private_key").val(result.result.wif);
+            $("#curr_rsmc_temp_address_pub_key").attr("class", "input input_color");
+            $("#curr_rsmc_temp_address_private_key").attr("class", "input input_color");
+            saveAddresses(result);
+
+            result = genAddressFromMnemonic();
+            if (result === '') return;
+            $("#curr_htlc_temp_address_pub_key").val(result.result.pubkey);
+            $("#curr_htlc_temp_address_private_key").val(result.result.wif);
+            $("#curr_htlc_temp_address_pub_key").attr("class", "input input_color");
+            $("#curr_htlc_temp_address_private_key").attr("class", "input input_color");
+            saveAddresses(result);
+
+            result = genAddressFromMnemonic();
+            if (result === '') return;
+            $("#curr_htlc_temp_address_for_ht1a_pub_key").val(result.result.pubkey);
+            $("#curr_htlc_temp_address_for_ht1a_private_key").val(result.result.wif);
+            $("#curr_htlc_temp_address_for_ht1a_pub_key").attr("class", "input input_color");
+            $("#curr_htlc_temp_address_for_ht1a_private_key").attr("class", "input input_color");
+            saveAddresses(result);
+            break;
+
+        case enumMsgType.MsgType_HTLC_SendAddHTLCSigned_41:
+            if (!isLogined) return;  // Not logined
+            result = genAddressFromMnemonic();
+            if (result === '') return;
+            $("#curr_rsmc_temp_address_pub_key").val(result.result.pubkey);
+            $("#curr_rsmc_temp_address_private_key").val(result.result.wif);
+            $("#curr_rsmc_temp_address_pub_key").attr("class", "input input_color");
+            $("#curr_rsmc_temp_address_private_key").attr("class", "input input_color");
+            saveAddresses(result);
+
+            result = genAddressFromMnemonic();
+            if (result === '') return;
+            $("#curr_htlc_temp_address_pub_key").val(result.result.pubkey);
+            $("#curr_htlc_temp_address_private_key").val(result.result.wif);
+            $("#curr_htlc_temp_address_pub_key").attr("class", "input input_color");
+            $("#curr_htlc_temp_address_private_key").attr("class", "input input_color");
+            saveAddresses(result);
+            break;
+        
+        case enumMsgType.MsgType_HTLC_SendVerifyR_45:
+            if (!isLogined) return;  // Not logined
+            result = genAddressFromMnemonic();
+            if (result === '') return;
+            $("#curr_htlc_temp_address_for_he1b_pub_key").val(result.result.pubkey);
+            $("#curr_htlc_temp_address_for_he1b_private_key").val(result.result.wif);
+            $("#curr_htlc_temp_address_for_he1b_pub_key").attr("class", "input input_color");
+            $("#curr_htlc_temp_address_for_he1b_private_key").attr("class", "input input_color");
+            saveAddresses(result);
+            break;
+
+        case enumMsgType.MsgType_HTLC_SendRequestCloseCurrTx_49:
+            if (!isLogined) return;  // Not logined
+            result = genAddressFromMnemonic();
+            if (result === '') return;
+            $("#curr_rsmc_temp_address_pub_key").val(result.result.pubkey);
+            $("#curr_rsmc_temp_address_private_key").val(result.result.wif);
+            $("#curr_rsmc_temp_address_pub_key").attr("class", "input input_color");
+            $("#curr_rsmc_temp_address_private_key").attr("class", "input input_color");
+            saveAddresses(result);
+            break;
+
+        case enumMsgType.MsgType_HTLC_SendCloseSigned_50:
+            if (!isLogined) return;  // Not logined
+            result = genAddressFromMnemonic();
+            if (result === '') return;
+            $("#curr_rsmc_temp_address_pub_key").val(result.result.pubkey);
+            $("#curr_rsmc_temp_address_private_key").val(result.result.wif);
+            $("#curr_rsmc_temp_address_pub_key").attr("class", "input input_color");
+            $("#curr_rsmc_temp_address_private_key").attr("class", "input input_color");
+            saveAddresses(result);
+            break;
+    }
 }
 
 // display Approval Checkbox
@@ -1757,22 +2003,22 @@ function displayApprovalCheckbox(content_div, obj, msgType) {
     createElement(content_div, 'text', 'Approval ');
     var element = document.createElement('input');
     switch (msgType) {
-        case enumMsgType.MsgType_ChannelAccept_N33:
+        case enumMsgType.MsgType_SendChannelAccept_33:
             element.id = 'checkbox_n33';
             break;
-        case enumMsgType.MsgType_FundingSign_BtcSign_N3500:
+        case enumMsgType.MsgType_FundingSign_SendBtcSign_350:
             element.id = 'checkbox_n3500';
             break;
-        case enumMsgType.MsgType_FundingSign_AssetFundingSigned_N35:
-            element.id = 'checkbox_n35';
-            break;
-        case enumMsgType.MsgType_CommitmentTxSigned_RevokeAndAcknowledgeCommitmentTransaction_N352:
+        // case enumMsgType.MsgType_FundingSign_SendAssetFundingSigned_35:
+        //     element.id = 'checkbox_n35';
+        //     break;
+        case enumMsgType.MsgType_CommitmentTxSigned_SendRevokeAndAcknowledgeCommitmentTransaction_352:
             element.id = 'checkbox_n352';
             break;
-        case enumMsgType.MsgType_HTLC_AddHTLCSigned_N41:
-            element.id = 'checkbox_n41';
-            break;
-        case enumMsgType.MsgType_CloseChannelSign_N39:
+        // case enumMsgType.MsgType_HTLC_SendAddHTLCSigned_41:
+        //     element.id = 'checkbox_n41';
+        //     break;
+        case enumMsgType.MsgType_SendCloseChannelSign_39:
             element.id = 'checkbox_n39';
             break;
     }
@@ -1813,15 +2059,15 @@ function clickApproval(obj) {
             }
             break;
 
-        case 'checkbox_n35':
-            if (obj.checked) {
-                $("#fundee_channel_address_private_key").show();
-                $("#fundee_channel_address_private_keyDis").show();
-            } else {
-                $("#fundee_channel_address_private_key").hide();
-                $("#fundee_channel_address_private_keyDis").hide();
-            }
-            break;
+        // case 'checkbox_n35':
+        //     if (obj.checked) {
+        //         $("#fundee_channel_address_private_key").show();
+        //         $("#fundee_channel_address_private_keyDis").show();
+        //     } else {
+        //         $("#fundee_channel_address_private_key").hide();
+        //         $("#fundee_channel_address_private_keyDis").hide();
+        //     }
+        //     break;
 
         case 'checkbox_n352':
             if (obj.checked) {
@@ -1844,35 +2090,36 @@ function clickApproval(obj) {
                 $("#channel_address_private_keyDis").hide();
             }
             break;
-        case 'checkbox_n41':
-            if (obj.checked) {
-                $("#curr_rsmc_temp_address_pub_key").show();
-                $("#curr_rsmc_temp_address_pub_keySel").show();
-                $("#curr_rsmc_temp_address_private_key").show();
-                $("#curr_rsmc_temp_address_private_keySel").show();
-                $("#curr_htlc_temp_address_pub_key").show();
-                $("#curr_htlc_temp_address_pub_keySel").show();
-                $("#curr_htlc_temp_address_private_key").show();
-                $("#curr_htlc_temp_address_private_keySel").show();
-                $("#last_temp_address_private_key").show();
-                $("#last_temp_address_private_keyDis").show();
-                $("#channel_address_private_key").show();
-                $("#channel_address_private_keyDis").show();
-            } else {
-                $("#curr_rsmc_temp_address_pub_key").hide();
-                $("#curr_rsmc_temp_address_pub_keySel").hide();
-                $("#curr_rsmc_temp_address_private_key").hide();
-                $("#curr_rsmc_temp_address_private_keySel").hide();
-                $("#curr_htlc_temp_address_pub_key").hide();
-                $("#curr_htlc_temp_address_pub_keySel").hide();
-                $("#curr_htlc_temp_address_private_key").hide();
-                $("#curr_htlc_temp_address_private_keySel").hide();
-                $("#last_temp_address_private_key").hide();
-                $("#last_temp_address_private_keyDis").hide();
-                $("#channel_address_private_key").hide();
-                $("#channel_address_private_keyDis").hide();
-            }
-            break;
+
+        // case 'checkbox_n41':
+        //     if (obj.checked) {
+        //         $("#curr_rsmc_temp_address_pub_key").show();
+        //         $("#curr_rsmc_temp_address_pub_keySel").show();
+        //         $("#curr_rsmc_temp_address_private_key").show();
+        //         $("#curr_rsmc_temp_address_private_keySel").show();
+        //         $("#curr_htlc_temp_address_pub_key").show();
+        //         $("#curr_htlc_temp_address_pub_keySel").show();
+        //         $("#curr_htlc_temp_address_private_key").show();
+        //         $("#curr_htlc_temp_address_private_keySel").show();
+        //         $("#last_temp_address_private_key").show();
+        //         $("#last_temp_address_private_keyDis").show();
+        //         $("#channel_address_private_key").show();
+        //         $("#channel_address_private_keyDis").show();
+        //     } else {
+        //         $("#curr_rsmc_temp_address_pub_key").hide();
+        //         $("#curr_rsmc_temp_address_pub_keySel").hide();
+        //         $("#curr_rsmc_temp_address_private_key").hide();
+        //         $("#curr_rsmc_temp_address_private_keySel").hide();
+        //         $("#curr_htlc_temp_address_pub_key").hide();
+        //         $("#curr_htlc_temp_address_pub_keySel").hide();
+        //         $("#curr_htlc_temp_address_private_key").hide();
+        //         $("#curr_htlc_temp_address_private_keySel").hide();
+        //         $("#last_temp_address_private_key").hide();
+        //         $("#last_temp_address_private_keyDis").hide();
+        //         $("#channel_address_private_key").hide();
+        //         $("#channel_address_private_keyDis").hide();
+        //     }
+        //     break;
 
         case 'checkbox_n39':
             if (obj.checked) {
@@ -2221,101 +2468,101 @@ function createOBDResponseDiv(response, msgType) {
             var msg = response + '. Please refresh the page if you want to connect again.';
             createElement(obd_response_div, 'p', msg);
             break;
-        case enumMsgType.MsgType_Core_Omni_Getbalance_1200:
+        case enumMsgType.MsgType_Core_Omni_Getbalance_2112:
             parseData1200(response);
             break;
-        case enumMsgType.MsgType_Core_Omni_GetAssetName_1207:
+        case enumMsgType.MsgType_Core_Omni_GetProperty_2119:
             parseData1207(response);
             break;
-        case enumMsgType.MsgType_CommitmentTx_AllBRByChanId_N35109:
+        case enumMsgType.MsgType_CommitmentTx_AllBRByChanId_3208:
             parseDataN35109(response);
             break;
-        case enumMsgType.MsgType_GetChannelInfoByChanId_N3207:
+        case enumMsgType.MsgType_GetChannelInfoByChannelId_3154:
             parseDataN3207(response);
             break;
-        case enumMsgType.MsgType_ChannelOpen_AllItem_N3202:
+        case enumMsgType.MsgType_ChannelOpen_AllItem_3150:
             parseDataN3202(response);
             break;
-        case enumMsgType.MsgType_CommitmentTx_ItemsByChanId_N35101:
+        case enumMsgType.MsgType_CommitmentTx_ItemsByChanId_3200:
             parseDataN35101(response);
             break;
-        case enumMsgType.MsgType_CommitmentTx_LatestCommitmentTxByChanId_N35104:
+        case enumMsgType.MsgType_CommitmentTx_LatestCommitmentTxByChanId_3203:
             parseDataN35104(response);
             break;
-        case enumMsgType.MsgType_Mnemonic_CreateAddress_N200:
-        case enumMsgType.MsgType_Mnemonic_GetAddressByIndex_201:
+        case enumMsgType.MsgType_Mnemonic_CreateAddress_3000:
+        case enumMsgType.MsgType_Mnemonic_GetAddressByIndex_3001:
             parseDataN200(response);
             break;
-        case enumMsgType.MsgType_ChannelOpen_N32:
+        case enumMsgType.MsgType_SendChannelOpen_32:
             parseDataN32(response);
             break;
-        case enumMsgType.MsgType_ChannelAccept_N33:
+        case enumMsgType.MsgType_SendChannelAccept_33:
             parseDataN33(response);
             break;
-        case enumMsgType.MsgType_Core_FundingBTC_1009:
+        case enumMsgType.MsgType_Core_FundingBTC_2109:
             parseData1009(response);
             break;
-        case enumMsgType.MsgType_FundingCreate_BtcCreate_N3400:
+        case enumMsgType.MsgType_FundingCreate_SendBtcFundingCreated_340:
             parseDataN3400(response);
             break;
-        case enumMsgType.MsgType_FundingSign_BtcSign_N3500:
+        case enumMsgType.MsgType_FundingSign_SendBtcSign_350:
             parseDataN3500(response);
             break;
-        case enumMsgType.MsgType_Core_Omni_FundingAsset_2001:
+        case enumMsgType.MsgType_Core_Omni_FundingAsset_2120:
             parseData2001(response);
             break;
-        case enumMsgType.MsgType_FundingCreate_AssetFundingCreated_N34:
+        case enumMsgType.MsgType_FundingCreate_SendAssetFundingCreated_34:
             parseDataN34(response);
             break;
-        case enumMsgType.MsgType_FundingSign_AssetFundingSigned_N35:
+        case enumMsgType.MsgType_FundingSign_SendAssetFundingSigned_35:
             parseDataN35(response);
             break;
-        case enumMsgType.MsgType_CommitmentTx_CommitmentTransactionCreated_N351:
+        case enumMsgType.MsgType_CommitmentTx_SendCommitmentTransactionCreated_351:
             parseDataN351(response);
             break;
-        case enumMsgType.MsgType_CommitmentTxSigned_RevokeAndAcknowledgeCommitmentTransaction_N352:
+        case enumMsgType.MsgType_CommitmentTxSigned_SendRevokeAndAcknowledgeCommitmentTransaction_352:
             parseDataN352(response);
             break;
-        case enumMsgType.MsgType_HTLC_Invoice_N4003:
+        case enumMsgType.MsgType_HTLC_Invoice_402:
             parseDataN4003(response);
             break;
-        case enumMsgType.MsgType_HTLC_FindPath_N4001:
+        case enumMsgType.MsgType_HTLC_FindPath_401:
             parseDataN4001(response);
             break;
-        case enumMsgType.MsgType_HTLC_AddHTLC_N40:
+        case enumMsgType.MsgType_HTLC_SendAddHTLC_40:
             parseDataN40(response);
             break;
-        case enumMsgType.MsgType_HTLC_AddHTLCSigned_N41:
+        case enumMsgType.MsgType_HTLC_SendAddHTLCSigned_41:
             parseDataN41(response);
             break;
-        case enumMsgType.MsgType_HTLC_SendR_N45:
+        case enumMsgType.MsgType_HTLC_SendVerifyR_45:
             parseDataN45(response);
             break;
-        case enumMsgType.MsgType_HTLC_VerifyR_N46:
+        case enumMsgType.MsgType_HTLC_SendSignVerifyR_46:
             parseDataN46(response);
             break;
-        case enumMsgType.MsgType_HTLC_RequestCloseCurrTx_N49:
+        case enumMsgType.MsgType_HTLC_SendRequestCloseCurrTx_49:
             parseDataN49(response);
             break;
-        case enumMsgType.MsgType_HTLC_CloseSigned_N50:
+        case enumMsgType.MsgType_HTLC_SendCloseSigned_50:
             parseDataN50(response);
             break;
-        case enumMsgType.MsgType_CloseChannelRequest_N38:
+        case enumMsgType.MsgType_SendCloseChannelRequest_38:
             parseDataN38(response);
             break;
-        case enumMsgType.MsgType_CloseChannelSign_N39:
+        case enumMsgType.MsgType_SendCloseChannelSign_39:
             parseDataN39(response);
             break;
-        case enumMsgType.MsgType_Atomic_Swap_N80:
+        case enumMsgType.MsgType_Atomic_SendSwap_80:
             parseDataN80(response);
             break;
-        case enumMsgType.MsgType_Atomic_Swap_Accept_N81:
+        case enumMsgType.MsgType_Atomic_SendSwapAccept_81:
             parseDataN81(response);
             break;
-        case enumMsgType.MsgType_UserLogin_1:
+        case enumMsgType.MsgType_UserLogin_2001:
             parseData1(response);
             break;
-        case enumMsgType.MsgType_p2p_ConnectServer_3:
+        case enumMsgType.MsgType_p2p_ConnectPeer_2003:
             parseData3(response);
             break;
         default:
@@ -3080,7 +3327,7 @@ function parseData1009(response) {
     }
 }
 
-// parseDataN200 - getNewAddressWithMnemonic
+// parseDataN200 - genAddressFromMnemonic
 function parseDataN200(response) {
     var arrData = [
         'ADDRESS : ' + response.result.address,
@@ -3204,10 +3451,28 @@ function getNewAddrIndex() {
     }
 }
 
+//
+function getFundingAddrPrivKey() {
+    let addr = JSON.parse(localStorage.getItem("FundingAddrData"));
+    console.info('getFundingAddrPrivKey() = ' + addr.wif);
+    return addr.wif;
+}
+
+//
+function saveFundingAddrData(response) {
+    let data = {
+        address: response.result.address,
+        index: response.result.index,
+        pubkey: response.result.pubkey,
+        wif: response.result.wif
+    }
+    localStorage.setItem("FundingAddrData", JSON.stringify(data));
+}
+
 // Address data generated with mnemonic save to local storage.
 function saveAddresses(response) {
 
-    var addr = JSON.parse(localStorage.getItem(itemAddr));
+    let addr = JSON.parse(localStorage.getItem(itemAddr));
 
     // If has data.
     if (addr) {
@@ -3415,17 +3680,17 @@ function saveChannelList(response, channelID, msgType) {
         for (let i = 0; i < list.result.length; i++) {
             if (chID === list.result[i].temporary_channel_id) {
                 switch (msgType) {
-                    case enumMsgType.MsgType_HTLC_AddHTLC_N40:
+                    case enumMsgType.MsgType_HTLC_SendAddHTLC_40:
                         list.result[i].htlc.push(htlcData(response, msgType));
                         break;
-                    case enumMsgType.MsgType_HTLC_AddHTLCSigned_N41:
+                    case enumMsgType.MsgType_HTLC_SendAddHTLCSigned_41:
                         for (let i2 = 0; i2 < list.result[i].htlc.length; i2++) {
                             if ($("#request_hash").val() === list.result[i].htlc[i2].msgHash) {
                                 updateHtlcData(response, list.result[i].htlc[i2], msgType);
                             }
                         }
                         break;
-                    case enumMsgType.MsgType_HTLC_SendR_N45:
+                    case enumMsgType.MsgType_HTLC_SendVerifyR_45:
                         for (let i2 = 0; i2 < list.result[i].htlc.length; i2++) {
                             if ($("#request_hash").val() === list.result[i].htlc[i2].msgHash) {
                                 list.result[i].htlc[i2].r = response.r;
@@ -3435,7 +3700,7 @@ function saveChannelList(response, channelID, msgType) {
                             }
                         }
                         break;
-                    case enumMsgType.MsgType_HTLC_VerifyR_N46:
+                    case enumMsgType.MsgType_HTLC_SendSignVerifyR_46:
                         for (let i2 = 0; i2 < list.result[i].htlc.length; i2++) {
                             if ($("#request_hash").val() === list.result[i].htlc[i2].msgHash) {
                                 list.result[i].htlc[i2].msgHash = response.msgHash;
@@ -3444,10 +3709,10 @@ function saveChannelList(response, channelID, msgType) {
                             }
                         }
                         break;
-                    case enumMsgType.MsgType_HTLC_RequestCloseCurrTx_N49:
+                    case enumMsgType.MsgType_HTLC_SendRequestCloseCurrTx_49:
                         list.result[i].htlc.push(htlcData(response, msgType));
                         break;
-                    case enumMsgType.MsgType_HTLC_CloseSigned_N50:
+                    case enumMsgType.MsgType_HTLC_SendCloseSigned_50:
                         for (let i2 = 0; i2 < list.result[i].htlc.length; i2++) {
                             if ($("#request_hash").val() === list.result[i].htlc[i2].msgHash) {
                                 list.result[i].htlc[i2].msgType = msgType;
@@ -3455,20 +3720,20 @@ function saveChannelList(response, channelID, msgType) {
                             }
                         }
                         break;
-                    case enumMsgType.MsgType_CommitmentTx_CommitmentTransactionCreated_N351:
+                    case enumMsgType.MsgType_CommitmentTx_SendCommitmentTransactionCreated_351:
                         list.result[i].transfer.push(rsmcData(response, msgType));
                         break;
-                    case enumMsgType.MsgType_CommitmentTxSigned_RevokeAndAcknowledgeCommitmentTransaction_N352:
+                    case enumMsgType.MsgType_CommitmentTxSigned_SendRevokeAndAcknowledgeCommitmentTransaction_352:
                         for (let i2 = 0; i2 < list.result[i].transfer.length; i2++) {
-                            if ($("#request_commitment_hash").val() === list.result[i].transfer[i2].msgHash) {
+                            if ($("#msg_hash").val() === list.result[i].transfer[i2].msgHash) {
                                 updateRsmcData(response, list.result[i].transfer[i2], msgType);
                             }
                         }
                         break;
-                    case enumMsgType.MsgType_Core_FundingBTC_1009:
+                    case enumMsgType.MsgType_Core_FundingBTC_2109:
                         list.result[i].btc.push(btcData(response, msgType));
                         break;
-                    case enumMsgType.MsgType_FundingCreate_BtcCreate_N3400:
+                    case enumMsgType.MsgType_FundingCreate_SendBtcFundingCreated_340:
                         for (let i2 = 0; i2 < list.result[i].btc.length; i2++) {
                             if (response.funding_txid === list.result[i].btc[i2].txid) {
                                 list.result[i].btc[i2].msgType = msgType;
@@ -3476,7 +3741,7 @@ function saveChannelList(response, channelID, msgType) {
                             }
                         }
                         break;
-                    case enumMsgType.MsgType_FundingSign_BtcSign_N3500:
+                    case enumMsgType.MsgType_FundingSign_SendBtcSign_350:
                         for (let i2 = 0; i2 < list.result[i].btc.length; i2++) {
                             if ($("#funding_txid").val() === list.result[i].btc[i2].txid) {
                                 // list.result[i].btc[i2].txid = response.txid;
@@ -3486,10 +3751,10 @@ function saveChannelList(response, channelID, msgType) {
                             }
                         }
                         break;
-                    case enumMsgType.MsgType_Core_Omni_FundingAsset_2001:
+                    case enumMsgType.MsgType_Core_Omni_FundingAsset_2120:
                         list.result[i].omniAsset.push(omniAssetData(response, msgType));
                         break;
-                    case enumMsgType.MsgType_FundingCreate_AssetFundingCreated_N34:
+                    case enumMsgType.MsgType_FundingCreate_SendAssetFundingCreated_34:
                         for (let i2 = 0; i2 < list.result[i].omniAsset.length; i2++) {
                             if ($("#funding_tx_hex").val() === list.result[i].omniAsset[i2].hex) {
                                 list.result[i].temporary_channel_id = response.channel_id;
@@ -3497,14 +3762,14 @@ function saveChannelList(response, channelID, msgType) {
                             }
                         }
                         break;
-                    case enumMsgType.MsgType_FundingSign_AssetFundingSigned_N35:
+                    case enumMsgType.MsgType_FundingSign_SendAssetFundingSigned_35:
                         for (let i2 = 0; i2 < list.result[i].omniAsset.length; i2++) {
                             if ($("#channel_id").val() === list.result[i].omniAsset[i2].channel_id) {
                                 updateOmniAssetData(response, list.result[i].omniAsset[i2], msgType);
                             }
                         }
                         break;
-                    case enumMsgType.MsgType_CloseChannelRequest_N38:
+                    case enumMsgType.MsgType_SendCloseChannelRequest_38:
                         if (list.result[i].data.length > 2) {
                             list.result[i].data[2].request_close_channel_hash = response.request_close_channel_hash;
                             list.result[i].data[2].date = new Date().toLocaleString();
@@ -3512,7 +3777,7 @@ function saveChannelList(response, channelID, msgType) {
                             list.result[i].data.push(channelData(response));
                         }
                         break;
-                    case enumMsgType.MsgType_CloseChannelSign_N39:
+                    case enumMsgType.MsgType_SendCloseChannelSign_39:
                         list.result[i].data.push(channelData(response));
                         break;
                     default:
@@ -3544,11 +3809,11 @@ function updateOmniAssetData(response, data, msgType) {
     data.date = new Date().toLocaleString();
     data.channel_id = response.channel_id;
 
-    if (msgType === enumMsgType.MsgType_FundingCreate_AssetFundingCreated_N34) {
+    if (msgType === enumMsgType.MsgType_FundingCreate_SendAssetFundingCreated_34) {
         data.funding_omni_hex = response.funding_omni_hex;
         data.c1a_rsmc_hex = response.c1a_rsmc_hex;
         data.rsmc_temp_address_pub_key = response.rsmc_temp_address_pub_key;
-    } else if (msgType === enumMsgType.MsgType_FundingSign_AssetFundingSigned_N35) {
+    } else if (msgType === enumMsgType.MsgType_FundingSign_SendAssetFundingSigned_35) {
         data.approval = response.approval;
         data.rd_hex = response.rd_hex;
         data.rsmc_signed_hex = response.rsmc_signed_hex;
@@ -3775,13 +4040,43 @@ function autoCreateMnemonic() {
 // Generate a new pub key of an address.
 function autoCreateFundingPubkey(param) {
     // Generate address by local js library.
-    var result = getNewAddressWithMnemonic();
+    var result = genAddressFromMnemonic();
     if (result === '') return;
 
     switch (param) {
-        case 0:
+        case -102109:
+        case -102120:
             $("#from_address").val(result.result.address);
             $("#from_address_private_key").val(result.result.wif);
+            break;
+        case -100034:
+            $("#temp_address_pub_key").val(result.result.pubkey);
+            $("#temp_address_private_key").val(result.result.wif);
+            break;
+        case -100351:
+        case -100352:
+            $("#curr_temp_address_pub_key").val(result.result.pubkey);
+            $("#curr_temp_address_private_key").val(result.result.wif);
+            break;
+        case -401: // first data for type -40
+        case -411: // first data for type -41
+        case -49:
+        case -50:
+            $("#curr_rsmc_temp_address_pub_key").val(result.result.pubkey);
+            $("#curr_rsmc_temp_address_private_key").val(result.result.wif);
+            break;
+        case -402: // second data for type -40
+        case -412: // second data for type -41
+            $("#curr_htlc_temp_address_pub_key").val(result.result.pubkey);
+            $("#curr_htlc_temp_address_private_key").val(result.result.wif);
+            break;
+        case -403: // third data for type -40
+            $("#curr_htlc_temp_address_for_ht1a_pub_key").val(result.result.pubkey);
+            $("#curr_htlc_temp_address_for_ht1a_private_key").val(result.result.wif);
+            break;
+        case -45:
+            $("#curr_htlc_temp_address_for_he1b_pub_key").val(result.result.pubkey);
+            $("#curr_htlc_temp_address_for_he1b_private_key").val(result.result.wif);
             break;
         default:
             $("#funding_pubkey").val(result.result.pubkey);
@@ -3850,7 +4145,7 @@ function displayAddresses(param) {
     if (param === inNewHtml) { // New page
         var status = JSON.parse(localStorage.getItem(itemGoWhere));
         if (!status.isLogined) { // Not login.
-            createElement(newDiv, 'h3', 'NO USER LOGINED.');
+            createElement(newDiv, 'h3', 'NOT LOGINED.');
             parent.append(newDiv);
             return;
         } else {
@@ -3859,7 +4154,7 @@ function displayAddresses(param) {
 
     } else {
         if (!isLogined) { // Not login.
-            createElement(newDiv, 'h3', 'NO USER LOGINED.');
+            createElement(newDiv, 'h3', 'NOT LOGINED.');
             parent.append(newDiv);
             return;
         }
@@ -3945,7 +4240,7 @@ function displayCounterparties(param) {
     if (param === inNewHtml) { // New page
         var status = JSON.parse(localStorage.getItem(itemGoWhere));
         if (!status.isLogined) { // Not login.
-            createElement(newDiv, 'h3', 'NO USER LOGINED.');
+            createElement(newDiv, 'h3', 'NOT LOGINED.');
             parent.append(newDiv);
             return;
         } else {
@@ -3954,7 +4249,7 @@ function displayCounterparties(param) {
 
     } else {
         if (!isLogined) { // Not login.
-            createElement(newDiv, 'h3', 'NO USER LOGINED.');
+            createElement(newDiv, 'h3', 'NOT LOGINED.');
             parent.append(newDiv);
             return;
         }
@@ -4219,7 +4514,7 @@ function displayChannelCreation(param) {
     if (param === inNewHtml) {
         var status = JSON.parse(localStorage.getItem(saveGoWhere));
         if (!status.isLogined) { // Not login.
-            createElement(parent, 'text', 'NO USER LOGINED.');
+            createElement(parent, 'text', 'NOT LOGINED.');
             return;
         } else {
             userID = status.userID;
@@ -4227,7 +4522,7 @@ function displayChannelCreation(param) {
         
     } else {
         if (!isLogined) { // Not login.
-            createElement(parent, 'text', 'NO USER LOGINED.');
+            createElement(parent, 'text', 'NOT LOGINED.');
             return;
         }
     }
@@ -4273,7 +4568,7 @@ function channelID(parent, list, i) {
         var msgType = list.result[i].omniAsset[0].msgType;
     } catch (error) {}
 
-    if (msgType === enumMsgType.MsgType_FundingSign_AssetFundingSigned_N35) {
+    if (msgType === enumMsgType.MsgType_FundingSign_SendAssetFundingSigned_35) {
         createElement(parent, 'text', 'DONE - Channel ID : ');
     } else {
         createElement(parent, 'text', 'TEMP - Channel ID : ');
@@ -4348,13 +4643,13 @@ function btcRecord(parent, list, i) {
 
             var status;
             switch (list.result[i].btc[i2].msgType) {
-                case enumMsgType.MsgType_Core_FundingBTC_1009:
+                case enumMsgType.MsgType_Core_FundingBTC_2109:
                     status = 'Precharge (1009)';
                     break;
-                case enumMsgType.MsgType_FundingCreate_BtcCreate_N3400:
+                case enumMsgType.MsgType_FundingCreate_SendBtcFundingCreated_340:
                     status = 'Noticed (-3400)';
                     break;
-                case enumMsgType.MsgType_FundingSign_BtcSign_N3500:
+                case enumMsgType.MsgType_FundingSign_SendBtcSign_350:
                     status = 'Confirmed (-3500)';
                     break;
                 default:
@@ -4396,13 +4691,13 @@ function omniAssetRecord(parent, list, i) {
         for (let i2 = 0; i2 < list.result[i].omniAsset.length; i2++) {
             var status;
             switch (list.result[i].omniAsset[i2].msgType) {
-                case enumMsgType.MsgType_Core_Omni_FundingAsset_2001:
+                case enumMsgType.MsgType_Core_Omni_FundingAsset_2120:
                     status = 'Precharge (2001)';
                     break;
-                case enumMsgType.MsgType_FundingCreate_AssetFundingCreated_N34:
+                case enumMsgType.MsgType_FundingCreate_SendAssetFundingCreated_34:
                     status = 'Noticed (-34)';
                     break;
-                case enumMsgType.MsgType_FundingSign_AssetFundingSigned_N35:
+                case enumMsgType.MsgType_FundingSign_SendAssetFundingSigned_35:
                     status = 'Confirmed (-35)';
                     break;
             }
@@ -4456,10 +4751,10 @@ function rsmcRecord(parent, list, i) {
 
             var status;
             switch (list.result[i].transfer[i2].msgType) {
-                case enumMsgType.MsgType_CommitmentTx_CommitmentTransactionCreated_N351:
+                case enumMsgType.MsgType_CommitmentTx_SendCommitmentTransactionCreated_351:
                     status = 'Pre-transfer (-351)';
                     break;
-                case enumMsgType.MsgType_CommitmentTxSigned_RevokeAndAcknowledgeCommitmentTransaction_N352:
+                case enumMsgType.MsgType_CommitmentTxSigned_SendRevokeAndAcknowledgeCommitmentTransaction_352:
                     status = 'Done transfer (-352)';
                     break;
             }
@@ -4505,22 +4800,22 @@ function htlcRecord(parent, list, i) {
 
             var status;
             switch (list.result[i].htlc[i2].msgType) {
-                case enumMsgType.MsgType_HTLC_AddHTLC_N40:
+                case enumMsgType.MsgType_HTLC_SendAddHTLC_40:
                     status = 'HTLC-Created (-40)';
                     break;
-                case enumMsgType.MsgType_HTLC_AddHTLCSigned_N41:
+                case enumMsgType.MsgType_HTLC_SendAddHTLCSigned_41:
                     status = 'HTLC-Signed (-41)';
                     break;
-                case enumMsgType.MsgType_HTLC_SendR_N45:
+                case enumMsgType.MsgType_HTLC_SendVerifyR_45:
                     status = 'Send R (-45)';
                     break;
-                case enumMsgType.MsgType_HTLC_VerifyR_N46:
+                case enumMsgType.MsgType_HTLC_SendSignVerifyR_46:
                     status = 'Verify R (-46)';
                     break;
-                case enumMsgType.MsgType_HTLC_RequestCloseCurrTx_N49:
+                case enumMsgType.MsgType_HTLC_SendRequestCloseCurrTx_49:
                     status = 'Request Close (-49)';
                     break;
-                case enumMsgType.MsgType_HTLC_CloseSigned_N50:
+                case enumMsgType.MsgType_HTLC_SendCloseSigned_50:
                     status = 'Closed (-50)';
                     break;
             }
@@ -4531,8 +4826,8 @@ function htlcRecord(parent, list, i) {
             createElement(parent, 'p', '---------------------------------------------');
 
             switch (list.result[i].htlc[i2].msgType) {
-                case enumMsgType.MsgType_HTLC_RequestCloseCurrTx_N49:
-                case enumMsgType.MsgType_HTLC_CloseSigned_N50:
+                case enumMsgType.MsgType_HTLC_SendRequestCloseCurrTx_49:
+                case enumMsgType.MsgType_HTLC_SendCloseSigned_50:
                     arrData = [
                         'channel_id : ' + list.result[i].htlc[i2].channel_id,
                         'create_at : ' + list.result[i].htlc[i2].create_at,
@@ -4580,9 +4875,9 @@ function htlcRecord(parent, list, i) {
 // Functions of Common Util.
 
 // create html elements
-function createElement(parent, elementName, myInnerText, css) {
+function createElement(parent, elementName, myInnerText, css, elementID) {
 
-    var element = document.createElement(elementName);
+    let element = document.createElement(elementName);
 
     if (myInnerText) {
         element.innerText = myInnerText;
@@ -4592,6 +4887,10 @@ function createElement(parent, elementName, myInnerText, css) {
         element.setAttribute('class', css);
     }
 
+    if (elementID) {
+        element.id = elementID;
+    }
+
     parent.append(element);
 }
 
@@ -4599,7 +4898,7 @@ function createElement(parent, elementName, myInnerText, css) {
 function displayUserDataInNewHtml(goWhere) {
     saveGoWhere(goWhere);
     window.open('userData.html', 'data', 'height=600, width=800, top=150, ' +
-        'left=500, toolbar=no, menubar=no, scrollbars=no, resizable=no, ' +
+        'left=300, toolbar=no, menubar=no, scrollbars=no, resizable=no, ' +
         'location=no, status=no');
 }
 
@@ -4864,4 +5163,75 @@ function formatTime(time) {
     }
 
     return time.substring(0, 19).replace('T', ' ');
+}
+
+//
+function autoMode(obj) {
+    if (obj.checked) {
+        isAutoMode = true;
+    } else {
+        isAutoMode = false;
+    }
+    console.info('CLICK - isAutoMode = ' + isAutoMode);
+}
+
+/**
+ * MsgType_GetMnemonic_2004
+ * This is a OBD JS API. Will be moved to obdapi.js file.
+ */
+function genMnemonic() {
+    return btctool.generateMnemonic(128);
+}
+
+/**
+ * MsgType_Mnemonic_CreateAddress_3000
+ * genAddressFromMnemonic by local js library
+ * This is a OBD JS API. Will be moved to obdapi.js file.
+ */
+function genAddressFromMnemonic() {
+    if (!isLogined) { // Not logined
+        alert('Please login first.');
+        return '';
+    }
+
+    let newIndex = getNewAddrIndex();
+    // console.info('mnemonicWithLogined = ' + mnemonicWithLogined);
+    // console.info('addr index = ' + newIndex);
+
+    // True: testnet  False: mainnet
+    let result = btctool.generateWalletInfo(mnemonicWithLogined, newIndex, true);
+    console.info('local addr data = ' + JSON.stringify(result));
+
+    return result;
+}
+
+/**
+ * MsgType_Mnemonic_GetAddressByIndex_3001
+ * get Address Info by local js library
+ * This is a OBD JS API. Will be moved to obdapi.js file.
+ */
+function getAddressInfo() {
+    if (!isLogined) { // Not logined
+        alert('Please login first.');
+        return '';
+    }
+
+    var index = $("#index").val();
+    console.info('index = ' + index);
+
+    try {
+        // True: testnet  False: mainnet
+        var result = btctool.generateWalletInfo(mnemonicWithLogined, index, true);
+        console.info('local addr data = ' + JSON.stringify(result));
+    } catch (error) {
+        alert('Please input a valid index of address.');
+        return '';
+    }
+
+    if (!result.status) { // status = false
+        alert('Please input a valid index of address.');
+        return '';
+    }
+
+    return result;
 }

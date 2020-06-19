@@ -76,6 +76,13 @@ pre {
     margin-left: 10px;
 }
 
+.input_color {
+    color: rgb(126, 109, 109);
+    background: rgb(245, 239, 239);
+    border-radius: 3px;
+    border: 1px solid;
+}
+
 .disabled {
     cursor: not-allowed;
 }
@@ -110,7 +117,7 @@ pre {
 }
 
 .button_log {
-    margin-left: 145px;
+    margin-left: 30px;
 }
 
 .button_clear_history {
@@ -314,4 +321,16 @@ pre {
     color: #45474e;
     font-weight: 600;
     margin-top: -10px;
+}
+
+.str_invoice {
+    margin-left:30px;
+    margin-right:30px;
+    margin-top:30px;
+} 
+
+.qrcode {
+    height:200px;
+    margin-left:200px;
+    margin-top:50px;
 }
