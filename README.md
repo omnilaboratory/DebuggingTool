@@ -1,5 +1,5 @@
 # OBD GUI Tool
-[![](https://img.shields.io/badge/license-MIT-blue)](https://github.com/omnilaboratory/obd/blob/master/LICENSE) [![](https://img.shields.io/badge/standard%20readme-OK-brightgreen)](https://github.com/omnilaboratory/obd/blob/master/README.md) [![](https://img.shields.io/badge/golang-%3E%3D1.9.0-orange)](https://golang.org/dl/) [![](https://img.shields.io/badge/protocol-OmniBOLT-brightgreen)](https://github.com/omnilaboratory/OmniBOLT-spec) 
+[![](https://img.shields.io/badge/license-MIT-blue)](https://github.com/omnilaboratory/obd/blob/master/LICENSE) [![](https://img.shields.io/badge/standard%20readme-OK-brightgreen)](https://github.com/omnilaboratory/obd/blob/master/README.md) [![](https://img.shields.io/badge/protocol-OmniBOLT-brightgreen)](https://github.com/omnilaboratory/OmniBOLT-spec) 
 [![](https://img.shields.io/badge/API%20V0.3-Document-blue)](https://api.omnilab.online) 
 
 
@@ -17,9 +17,11 @@ In this tutorial, you can connect either your own OBD node, or the node we confi
 * [Operations](https://github.com/omnilaboratory/DebuggingTool#operations) 
 	* [Step 1: connect to an OBD node](https://github.com/omnilaboratory/DebuggingTool#step-1-connect-to-an-obd-node)
 	* [Step 2: signup a new user](https://github.com/omnilaboratory/DebuggingTool#step-2-signup-a-new-user)
-	* [Step 3: Login using mnemonic words](https://github.com/omnilaboratory/DebuggingTool#step-3-login-using-mnemonic-words)
+	* [Step 3: login using mnemonic words](https://github.com/omnilaboratory/DebuggingTool#step-3-login-using-mnemonic-words)
 	* [Step 4: connect another user](https://github.com/omnilaboratory/DebuggingTool#step-4-connect-another-user)
-	* [Step 5: channel operations](https://github.com/omnilaboratory/DebuggingTool#step-5-channel-operations)
+	* [Step 5: open channel](https://github.com/omnilaboratory/DebuggingTool#step-5-open-channel)
+	* [Step 6: create an invoice](https://github.com/omnilaboratory/DebuggingTool#step-6-create-an-invoice)
+	* [Step 7: channel operations](https://github.com/omnilaboratory/DebuggingTool#step-7-channel-operations)
  	
 
 ## Installation: clone this project and run it by Chrome
@@ -61,7 +63,7 @@ If you want to build and deploy your own OBD, you shall go through the installat
 3. OBD responses the new set of mnemonic words for the currently connected new user. The mnemonic words is the identity to carry out all the following operations in obd network; Record this mnemonic words in somewhere safe. For example, write it down on a paper.  
 
 
-### Step 3: Login using mnemonic words
+### Step 3: login using mnemonic words
 
 <p align="center">
   <img width="750" alt="login" src="https://github.com/omnilaboratory/DebuggingTool/blob/master/doc/img/login.png">
@@ -104,7 +106,29 @@ Switch back to Alice's window, we shall input Bob's `nodeAddress` and `userPeerI
 3. input the `nodeAddress` into the "NodeAddress" input box;  
 4. click "invoke API";  
 
+### Step 5: open channel
 
-### Step 5: Channel Operations
+Click openChannel, input the arguments required by this function and click "invoke API", wait Bob's response. 
 
-Online API documents lists all the channel operations step by step, and testing demo data as well. Please visit OBD [online API documentation](https://api.omnilab.online) for the lastest update.  
+In the other window you just opened in step 4 for Bob, you will see an incoming message asking for opening a channel with Bob. Click "acceptChannel", leave the default values that the js SDK filled for you, response Alice to accept the "openChannel" request.  
+
+### Step 6: create an invoice
+
+<p align="center">
+  <img width="750" alt="connectNode" src="https://github.com/omnilaboratory/DebuggingTool/blob/master/doc/img/createInvoice.png">
+</p>
+
+
+1. switch back to Alice's window;  
+2. click "createInvoice";  
+3. input the `property_id`, `amount`, `h` `expiry_time` and short memo; into the "NodeAddress" input box;  
+4. click "invoke API", you will see the beth32 encoded invoice string and QR code are created;  
+
+Share ths invoice string or QR code to anyone (not only Bob) who is going to pay you. 
+
+
+### Step 7: channel operations
+
+Then you are able to keep going with other operations to dive deeper into OmniBOLT.  
+
+Online API documents lists all the channel operations step by step, and testing demo data as well. Please visit OBD [online API documentation](https://api.omnilab.online) to learn how to fill in arguments to work with OBD.  
