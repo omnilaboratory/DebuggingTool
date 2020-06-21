@@ -45,10 +45,16 @@ var itemMnemonic = 'mnemonic';
 var itemGoWhere = 'go_where';
 
 //
-var itemChannelID = 'channel_id';
+var itemTempChannelID = 'temp_channel_id';
 
 //
 var itemFundingBtcHex = 'FundingBtcHex';
+
+//
+var itemFundingAssetHex = 'FundingAssetHex';
+
+//
+var itemFundingBtcTxid = 'FundingBtcTxid';
 
 // the info save to local storage [ChannelList].
 var channelInfo;
@@ -130,7 +136,7 @@ function listeningN45(e, msgType) {
 // listening to -110032 and send -100033 acceptChannel
 function listening110032(e, msgType) {
     console.info('NOW isAutoMode = ' + isAutoMode);
-    saveChannelID(e.temporary_channel_id);
+    saveTempChannelID(e.temporary_channel_id);
 
     if (!isAutoMode) return;
     
@@ -163,7 +169,11 @@ function listening110032(e, msgType) {
 // listening to -110340 and send -100350 BTCFundingSigned
 function listening110340(e, msgType) {
     console.info('NOW isAutoMode = ' + isAutoMode);
+
+    saveFundingBtcTxid(e.funding_txid);
+
     if (!isAutoMode) return;
+    
     console.info('listening110340 = ' + JSON.stringify(e));
 
     // will send -100350 BTCFundingSigned
@@ -197,7 +207,14 @@ function listening110034(e, msgType) {
     obdApi.channelFundingSigned(e.funder_node_address, e.funder_peer_id, info, function(e) {
         console.info('-100035 AssetFundingSigned = ' + JSON.stringify(e));
         saveChannelList(e, e.channel_id, msgType);
+        saveTempPrivKey(FundingPrivKey, e.channel_id, info.fundee_channel_address_private_key);
     });
+}
+
+// save funding private key of Alice side
+function listening110035(e, msgType) {
+    console.info('listening110035 = ' + JSON.stringify(e));
+    // saveTempPrivKey(FundingPrivKey, e.channel_id, ????);
 }
 
 // auto response to -100351 (RSMCCTxCreated)
@@ -956,9 +973,9 @@ function assetFundingSigned(msgType) {
 
     // OBD API
     obdApi.channelFundingSigned(p2pID, name, info, function(e) {
-        console.info('-100035 - OBD Response = ' + JSON.stringify(e));
-        saveChannelList(e, channel_id, msgType);
-        // createOBDResponseDiv(e, msgType);
+        console.info('-100035 - assetFundingSigned = ' + JSON.stringify(e));
+        saveChannelList(e, e.channel_id, msgType);
+        saveTempPrivKey(FundingPrivKey, e.channel_id, privkey);
     });
 }
 
@@ -985,8 +1002,9 @@ function fundingBTC(msgType) {
     btcAmount = amount;
     btcMinerFee = miner_fee;
 
-    // Get temporary_channel_id with channel_address.
-    // WILL BE UPDATE....
+    // Get temporary_channel_id
+    let tempChID = getTempChannelID();
+
     // var tempChID;
     // var list = JSON.parse(localStorage.getItem(itemChannelList));
     // for (let i = 0; i < list.result.length; i++) {
@@ -1005,7 +1023,7 @@ function fundingBTC(msgType) {
     });
 }
 
-// funding Omni Asset API at local.
+//  -102120 funding Omni Asset API at local.
 function fundingAsset(msgType) {
 
     var from_address = $("#from_address").val();
@@ -1022,21 +1040,22 @@ function fundingAsset(msgType) {
     info.property_id = Number(property_id);
 
     // Get temporary_channel_id with channel_address.
-    var tempChID;
-    var list = JSON.parse(localStorage.getItem(itemChannelList));
-    for (let i = 0; i < list.result.length; i++) {
-        for (let i2 = 0; i2 < list.result[i].data.length; i2++) {
-            if (to_address === list.result[i].data[i2].channel_address) {
-                tempChID = list.result[i].data[i2].temporary_channel_id;
-            }
-        }
-    }
+    let tempChID = getTempChannelID();
+    // var tempChID;
+    // var list = JSON.parse(localStorage.getItem(itemChannelList));
+    // for (let i = 0; i < list.result.length; i++) {
+    //     for (let i2 = 0; i2 < list.result[i].data.length; i2++) {
+    //         if (to_address === list.result[i].data[i2].channel_address) {
+    //             tempChID = list.result[i].data[i2].temporary_channel_id;
+    //         }
+    //     }
+    // }
 
     // OBD API
     obdApi.fundingAssetOfOmni(info, function(e) {
-        console.info('fundingAssetOfOmni - OBD Response = ' + JSON.stringify(e));
+        console.info(' -102120 fundingAssetOfOmni = ' + JSON.stringify(e));
         saveChannelList(e, tempChID, msgType);
-        // createOBDResponseDiv(e, msgType);
+        saveFundingAssetcHex(e.hex);
     });
 }
 
@@ -1204,8 +1223,8 @@ function htlcFindPath(msgType) {
     });
 }
 
-// Commitment Transaction Created -351 API at local.
-function RSMCCTxCreated(msgType) {
+// -100351 Commitment Transaction Created API at local.
+function rsmcCTxCreated(msgType) {
 
     var p2pID    = $("#recipient_node_peer_id").val();
     var name     = $("#recipient_user_peer_id").val();
@@ -1226,14 +1245,13 @@ function RSMCCTxCreated(msgType) {
 
     // OBD API
     obdApi.commitmentTransactionCreated(p2pID, name, info, function(e) {
-        console.info('-351 RSMCCTxCreated - OBD Response = ' + JSON.stringify(e));
-        // saveChannelList in listening351 func.
-        // createOBDResponseDiv(e, msgType);
+        console.info('-100351 RSMCCTxCreated = ' + JSON.stringify(e));
+        saveTempPrivKey(TempPrivKey, channel_id, curr_temp_address_private_key);
     });
 }
 
 // Revoke and Acknowledge Commitment Transaction -100352 API at local.
-function RSMCCTxSigned(msgType) {
+function rsmcCTxSigned(msgType) {
 
     var p2pID    = $("#recipient_node_peer_id").val();
     var name     = $("#recipient_user_peer_id").val();
@@ -1361,10 +1379,10 @@ function invokeAPIs(objSelf) {
             assetFundingSigned(msgType);
             break;
         case enumMsgType.MsgType_CommitmentTx_SendCommitmentTransactionCreated_351:
-            RSMCCTxCreated(msgType);
+            rsmcCTxCreated(msgType);
             break;
         case enumMsgType.MsgType_CommitmentTxSigned_SendRevokeAndAcknowledgeCommitmentTransaction_352:
-            RSMCCTxSigned(msgType);
+            rsmcCTxSigned(msgType);
             break;
         case enumMsgType.MsgType_Core_Omni_GetTransaction_2118:
             txid = "c76710920860456dff2433197db79dd030f9b527e83a2e253f5bc6ab7d197e73";
@@ -1915,29 +1933,60 @@ function autoFillValue(arrParams, obj) {
             $("#recipient_node_peer_id").val(result.p2pID);
             $("#recipient_user_peer_id").val(result.name);
             
-            channelID = getChannelID();
+            channelID = getTempChannelID();
             if (channelID === '') return;
             $("#temporary_channel_id").val(channelID);
             break;
 
         case enumMsgType.MsgType_FundingCreate_SendBtcFundingCreated_340:
+        case enumMsgType.MsgType_FundingSign_SendBtcSign_350:
             if (!isLogined) return;  // Not logined
+
             result = getLastCounterparty();
             if (result === '') return;
             $("#recipient_node_peer_id").val(result.p2pID);
             $("#recipient_user_peer_id").val(result.name);
             
-            channelID = getChannelID();
+            channelID = getTempChannelID();
             if (channelID === '') return;
             $("#temporary_channel_id").val(channelID);
             
             privkey = getTempPrivKey(FundingPrivKey, channelID);
             if (privkey === '') return;
             $("#channel_address_private_key").val(privkey);
+            
+            if (msgType === enumMsgType.MsgType_FundingSign_SendBtcSign_350) {
+                let txid = getFundingBtcTxid();
+                if (txid === '') return;
+                $("#funding_txid").val(txid);
+            } else {
+                let hex = getFundingBtcHex();
+                if (hex === '') return;
+                $("#funding_tx_hex").val(hex);
+            }
+
             break;
 
         case enumMsgType.MsgType_FundingCreate_SendAssetFundingCreated_34:
             if (!isLogined) return;  // Not logined
+
+            result = getLastCounterparty();
+            if (result === '') return;
+            $("#recipient_node_peer_id").val(result.p2pID);
+            $("#recipient_user_peer_id").val(result.name);
+
+            channelID = getTempChannelID();
+            if (channelID === '') return;
+            $("#temporary_channel_id").val(channelID);
+
+            privkey = getTempPrivKey(FundingPrivKey, channelID);
+            if (privkey === '') return;
+            $("#channel_address_private_key").val(privkey);
+
+            let hex = getFundingAssetcHex();
+            if (hex === '') return;
+            $("#funding_tx_hex").val(hex);
+
             result = genAddressFromMnemonic();
             if (result === '') return;
             $("#temp_address_pub_key").val(result.result.pubkey);
@@ -3496,34 +3545,57 @@ function getNewAddrIndex() {
 
 /**
  * Save channelID to local storage
- * @param channelID
+ * @param tempChannelID
  */
-function saveChannelID(channelID) {
+function saveTempChannelID(tempChannelID) {
 
-    let resp = JSON.parse(localStorage.getItem(itemChannelID));
+    let resp = JSON.parse(localStorage.getItem(itemTempChannelID));
 
     // If has data.
     if (resp) {
-        resp.channelID = channelID;
-        localStorage.setItem(itemChannelID, JSON.stringify(resp));
+        for (let i = 0; i < resp.result.length; i++) {
+            if (userID === resp.result[i].userID) {
+                resp.result[i].tempChannelID = tempChannelID;
+                localStorage.setItem(itemTempChannelID, JSON.stringify(resp));
+                return;
+            }
+        }
+
+        // A new User ID.
+        let new_data = {
+            userID:  userID,
+            tempChannelID: tempChannelID,
+        }
+        resp.result.push(new_data);
+        localStorage.setItem(itemTempChannelID, JSON.stringify(resp));
+
     } else {
         let data = {
-            channelID: channelID
+            result: [{
+                userID:  userID,
+                tempChannelID: tempChannelID,
+            }]
         }
-        localStorage.setItem(itemChannelID, JSON.stringify(data));
+        localStorage.setItem(itemTempChannelID, JSON.stringify(data));
     }
 }
+
 
 /**
  * Get channelID from local storage
  */
-function getChannelID() {
+function getTempChannelID() {
 
-    let resp = JSON.parse(localStorage.getItem(itemChannelID));
+    let resp = JSON.parse(localStorage.getItem(itemTempChannelID));
 
     // If has data.
     if (resp) {
-        return resp.channelID;
+        for (let i = 0; i < resp.result.length; i++) {
+            if (userID === resp.result[i].userID) {
+                return resp.result[i].tempChannelID;
+            }
+        }
+        return '';
     } else {
         return '';
     }
@@ -4130,6 +4202,36 @@ function getLastCounterparty() {
     }
 }
 
+// get funding_tx_hex from FundingAsset type ( -102120 ) return
+function getFundingAssetcHex() {
+
+    let resp = JSON.parse(localStorage.getItem(itemFundingAssetHex));
+
+    // If has data.
+    if (resp) {
+        return resp.hex;
+    } else {
+        return '';
+    }
+}
+
+// save funding_tx_hex from FundingAsset type ( -102120 ) return
+function saveFundingAssetcHex(hex) {
+
+    let resp = JSON.parse(localStorage.getItem(itemFundingAssetHex));
+
+    // If has data.
+    if (resp) {
+        resp.hex = hex;
+        localStorage.setItem(itemFundingAssetHex, JSON.stringify(resp));
+    } else {
+        let data = {
+            hex: hex
+        }
+        localStorage.setItem(itemFundingAssetHex, JSON.stringify(data));
+    }
+}
+
 // get funding_tx_hex from fundingBTC -102109 return
 function getFundingBtcHex() {
 
@@ -4157,6 +4259,36 @@ function saveFundingBtcHex(hex) {
             hex: hex
         }
         localStorage.setItem(itemFundingBtcHex, JSON.stringify(data));
+    }
+}
+
+// get funding_txid from BTCFundingCreated type ( -100340 ) return
+function getFundingBtcTxid() {
+
+    let resp = JSON.parse(localStorage.getItem(itemFundingBtcTxid));
+
+    // If has data.
+    if (resp) {
+        return resp.txid;
+    } else {
+        return '';
+    }
+}
+
+// save funding_txid from BTCFundingCreated type ( -100340 ) return
+function saveFundingBtcTxid(txid) {
+
+    let resp = JSON.parse(localStorage.getItem(itemFundingBtcTxid));
+
+    // If has data.
+    if (resp) {
+        resp.txid = txid;
+        localStorage.setItem(itemFundingBtcTxid, JSON.stringify(resp));
+    } else {
+        let data = {
+            txid: txid
+        }
+        localStorage.setItem(itemFundingBtcTxid, JSON.stringify(data));
     }
 }
 
