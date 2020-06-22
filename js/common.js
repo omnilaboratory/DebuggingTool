@@ -45,7 +45,7 @@ var itemMnemonic = 'mnemonic';
 var itemGoWhere = 'go_where';
 
 //
-var itemTempChannelID = 'temp_channel_id';
+var itemChannelID = 'temp_channel_id';
 
 //
 var itemFundingBtcHex = 'FundingBtcHex';
@@ -55,6 +55,12 @@ var itemFundingAssetHex = 'FundingAssetHex';
 
 //
 var itemFundingBtcTxid = 'FundingBtcTxid';
+
+//
+var itemRsmcMsgHash = 'RsmcMsgHash';
+
+//
+var itemHtlcRequestHash = 'HtlcRequestHash';
 
 // the info save to local storage [ChannelList].
 var channelInfo;
@@ -103,19 +109,40 @@ function getSaveName() {
     return itemGoWhere;
 }
 
-// 
-function listeningN351(e, msgType) {
-    console.info('listeningN351 = ' + JSON.stringify(e));
-    console.info('listeningN351 msgType = ' + msgType);
-    saveChannelList(e, e.channelId, msgType);
-    // saveMsgFromCounterparty(e);
-}
+// auto response to -100040 (HTLCCreated) 
+// listening to -110040 and send -100041 HTLCSigned
+function listening110040(e, msgType) {
+    console.info('NOW isAutoMode = ' + isAutoMode);
 
-// 
-function listeningN40(e, msgType) {
-    console.info('listeningN40 = ' + JSON.stringify(e));
-    saveChannelList(e, e.channelId, msgType);
-    // saveMsgFromCounterparty(e);
+    saveHtlcRequestHash(e.request_hash);
+
+    if (!isAutoMode) return;
+    
+    console.info('listening110040 = ' + JSON.stringify(e));
+
+    // Generate an address by local js library.
+    let addr_1 = genAddressFromMnemonic();
+    let addr_2 = genAddressFromMnemonic();
+    saveAddresses(addr_1);
+    saveAddresses(addr_2);
+
+    // will send -100041 HTLCSigned
+    let info                                = new HtlcSignedInfo();
+    info.request_hash                       = e.request_hash;
+    info.channel_address_private_key        = getTempPrivKey(FundingPrivKey, e.channel_id);;
+    info.last_temp_address_private_key      = getTempPrivKey(TempPrivKey, e.channel_id);;
+    info.curr_rsmc_temp_address_pub_key     = addr_1.result.pubkey;
+    info.curr_rsmc_temp_address_private_key = addr_1.result.wif;
+    info.curr_htlc_temp_address_pub_key     = addr_2.result.pubkey;
+    info.curr_htlc_temp_address_private_key = addr_2.result.wif;
+
+    // OBD API
+    obdApi.htlcSigned(e.funder_node_address, e.funder_peer_id, info, function(e) {
+        console.info('-100041 htlcSigned = ' + JSON.stringify(e));
+        saveChannelList(e, e.channel_id, msgType);
+        saveTempPrivKey(RsmcTempPrivKey, e.channel_id, addr_1.result.wif);
+        saveTempPrivKey(HtlcTempPrivKey, e.channel_id, addr_2.result.wif);
+    });
 }
 
 // 
@@ -136,7 +163,7 @@ function listeningN45(e, msgType) {
 // listening to -110032 and send -100033 acceptChannel
 function listening110032(e, msgType) {
     console.info('NOW isAutoMode = ' + isAutoMode);
-    saveTempChannelID(e.temporary_channel_id);
+    saveChannelID(e.temporary_channel_id);
 
     if (!isAutoMode) return;
     
@@ -207,27 +234,43 @@ function listening110034(e, msgType) {
     obdApi.channelFundingSigned(e.funder_node_address, e.funder_peer_id, info, function(e) {
         console.info('-100035 AssetFundingSigned = ' + JSON.stringify(e));
         saveChannelList(e, e.channel_id, msgType);
+
+        // Once sent -100035 AssetFundingSigned , the final channel_id has generated.
+        // So need update the local saved data for funding private key and channel_id.
         saveTempPrivKey(FundingPrivKey, e.channel_id, info.fundee_channel_address_private_key);
+        saveChannelID(e.channel_id);
     });
 }
 
 // save funding private key of Alice side
+// Once sent -100035 AssetFundingSigned , the final channel_id has generated.
+// So need update the local saved data for funding private key and channel_id.
 function listening110035(e, msgType) {
     console.info('listening110035 = ' + JSON.stringify(e));
-    // saveTempPrivKey(FundingPrivKey, e.channel_id, ????);
+
+    let fundingPrivKey = getTempPrivKey(FundingPrivKey, e.temporary_channel_id);
+    saveTempPrivKey(FundingPrivKey, e.channel_id, fundingPrivKey);
+    
+    let tempPrivKey = getTempPrivKey(TempPrivKey, e.temporary_channel_id);
+    saveTempPrivKey(TempPrivKey, e.channel_id, tempPrivKey);
+
+    saveChannelID(e.channel_id);
 }
 
 // auto response to -100351 (RSMCCTxCreated)
 // listening to -110351 and send -100352 RSMCCTxSigned
 function listening110351(e, msgType) {
     console.info('NOW isAutoMode = ' + isAutoMode);
+
+    saveRsmcMsgHash(e.msg_hash);
+
     if (!isAutoMode) return;
+
     console.info('listening110351 = ' + JSON.stringify(e));
 
     // Generate an address by local js library.
     let result = genAddressFromMnemonic();
     saveAddresses(result);
-    saveTempPrivKey(TempPrivKey, e.channel_id, result.result.wif);
 
     // will send -100352 RSMCCTxSigned
     let info                           = new CommitmentTxSigned();
@@ -244,6 +287,7 @@ function listening110351(e, msgType) {
         e.funder_node_address, e.funder_peer_id, info, function(e) {
         console.info('-100352 RSMCCTxSigned = ' + JSON.stringify(e));
         saveChannelList(e, e.channel_id, msgType);
+        saveTempPrivKey(TempPrivKey, e.channel_id, info.curr_temp_address_private_key);
     });
 }
 
@@ -272,17 +316,11 @@ function registerEvent() {
     obdApi.registerEvent(msg_110351, function(e) {
         listening110351(e, msg_110351);
     });
-
-
-
-    var msgTypeN351 = enumMsgType.MsgType_CommitmentTx_SendCommitmentTransactionCreated_351;
-    obdApi.registerEvent(msgTypeN351, function(e) {
-        listeningN351(e, msgTypeN351);
-    });
-
-    var msgTypeN40 = enumMsgType.MsgType_HTLC_SendAddHTLC_40;
-    obdApi.registerEvent(msgTypeN40, function(e) {
-        listeningN40(e, msgTypeN40);
+    
+    // auto response mode
+    let msg_110040 = enumMsgType.MsgType_HTLC_RecvAddHTLC_40;
+    obdApi.registerEvent(msg_110040, function(e) {
+        listening110040(e, msg_110040);
     });
 
     var msgTypeN41 = enumMsgType.MsgType_HTLC_SendAddHTLCSigned_41;
@@ -381,6 +419,7 @@ function acceptChannel(msgType) {
         console.info('-100033 acceptChannel = ' + JSON.stringify(e));
         saveChannelList(e);
         saveCounterparties(name, p2pID);
+
         let privkey = getFundingPrivKeyFromPubKey(pubkey);
         console.info('FundingPrivKey = ' + privkey);
         saveTempPrivKey(FundingPrivKey, temp_cid, privkey);
@@ -953,7 +992,7 @@ function assetFundingCreated(msgType) {
     obdApi.channelFundingCreated(p2pID, name, info, function(e) {
         console.info('-100034 - assetFundingCreated = ' + JSON.stringify(e));
         saveChannelList(e, temp_cid, msgType);
-        saveTempPrivKey(TempPrivKey, temp_cid, privkey);
+        saveTempPrivKey(TempPrivKey, temp_cid, t_ad_prk);
     });
 }
 
@@ -1003,7 +1042,7 @@ function fundingBTC(msgType) {
     btcMinerFee = miner_fee;
 
     // Get temporary_channel_id
-    let tempChID = getTempChannelID();
+    let tempChID = getChannelID();
 
     // var tempChID;
     // var list = JSON.parse(localStorage.getItem(itemChannelList));
@@ -1040,7 +1079,7 @@ function fundingAsset(msgType) {
     info.property_id = Number(property_id);
 
     // Get temporary_channel_id with channel_address.
-    let tempChID = getTempChannelID();
+    let tempChID = getChannelID();
     // var tempChID;
     // var list = JSON.parse(localStorage.getItem(itemChannelList));
     // for (let i = 0; i < list.result.length; i++) {
@@ -1101,7 +1140,7 @@ function createInvoice(msgType) {
     });
 }
 
-// -40 htlcCreated API at local.
+// -100040 htlcCreated API at local.
 function htlcCreated(msgType) {
 
     var recipient_node_peer_id  = $("#recipient_node_peer_id").val();
@@ -1138,9 +1177,11 @@ function htlcCreated(msgType) {
 
     // OBD API
     obdApi.htlcCreated(recipient_node_peer_id, recipient_user_peer_id, info, function(e) {
-        console.info('-40 htlcCreated - OBD Response = ' + JSON.stringify(e));
-        // saveChannelList in listeningN40 func.
-        // createOBDResponseDiv(e, msgType);
+        console.info('-100040 htlcCreated = ' + JSON.stringify(e));
+        // save 3 privkeys
+        saveTempPrivKey(RsmcTempPrivKey, e.channel_id, info.curr_rsmc_temp_address_private_key);
+        saveTempPrivKey(HtlcTempPrivKey, e.channel_id, info.curr_htlc_temp_address_private_key);
+        saveTempPrivKey(HtlcHtnxTempPrivKey, e.channel_id, info.curr_htlc_temp_address_for_ht1a_private_key);
     });
 }
 
@@ -1253,15 +1294,15 @@ function rsmcCTxCreated(msgType) {
 // Revoke and Acknowledge Commitment Transaction -100352 API at local.
 function rsmcCTxSigned(msgType) {
 
-    var p2pID    = $("#recipient_node_peer_id").val();
-    var name     = $("#recipient_user_peer_id").val();
-    var channel_id = $("#channel_id").val();
-    var curr_temp_address_pub_key = $("#curr_temp_address_pub_key").val();
-    var curr_temp_address_private_key = $("#curr_temp_address_private_key").val();
-    var channel_address_private_key = $("#channel_address_private_key").val();
-    var last_temp_address_private_key = $("#last_temp_address_private_key").val();
-    var msg_hash = $("#msg_hash").val();
-    var approval = $("#checkbox_n352").prop("checked");
+    let p2pID    = $("#recipient_node_peer_id").val();
+    let name     = $("#recipient_user_peer_id").val();
+    let channel_id = $("#channel_id").val();
+    let curr_temp_address_pub_key = $("#curr_temp_address_pub_key").val();
+    let curr_temp_address_private_key = $("#curr_temp_address_private_key").val();
+    let channel_address_private_key = $("#channel_address_private_key").val();
+    let last_temp_address_private_key = $("#last_temp_address_private_key").val();
+    let msg_hash = $("#msg_hash").val();
+    let approval = $("#checkbox_n352").prop("checked");
 
     let info = new CommitmentTxSigned();
     info.channel_id = channel_id;
@@ -1276,7 +1317,7 @@ function rsmcCTxSigned(msgType) {
     obdApi.revokeAndAcknowledgeCommitmentTransaction(p2pID, name, info, function(e) {
         console.info('-100352 RSMCCTxSigned = ' + JSON.stringify(e));
         saveChannelList(e, channel_id, msgType);
-        // createOBDResponseDiv(e, msgType);
+        saveTempPrivKey(TempPrivKey, channel_id, curr_temp_address_private_key);
     });
 }
 
@@ -1903,19 +1944,13 @@ function autoFillValue(arrParams, obj) {
     }
 
     // Auto generate addresses and fill pubkey and privkey to input box
-    let result, channelID, privkey;
+    let result, channelID, fundingPrivKey, tempPrivKey;
     let msgType = Number(obj.getAttribute("type_id"));
     switch (msgType) {
         case enumMsgType.MsgType_HTLC_Invoice_402:
             let date = new Date().toJSON().substr(0, 10).replace('T', ' ');
             $("#expiry_time").val(date);
             $("#expiry_time").attr("type", "date");
-        //     if (isLogined) {
-        //         $("#recipient_node_peer_id").val(nodeID);
-        //         $("#recipient_user_peer_id").val(userID);
-        //         $("#recipient_node_peer_id").attr("class", "input input_color");
-        //         $("#recipient_user_peer_id").attr("class", "input input_color");
-        //     }
             break;
 
         case enumMsgType.MsgType_SendChannelOpen_32:
@@ -1933,8 +1968,7 @@ function autoFillValue(arrParams, obj) {
             $("#recipient_node_peer_id").val(result.p2pID);
             $("#recipient_user_peer_id").val(result.name);
             
-            channelID = getTempChannelID();
-            if (channelID === '') return;
+            channelID = getChannelID();
             $("#temporary_channel_id").val(channelID);
             break;
 
@@ -1947,21 +1981,17 @@ function autoFillValue(arrParams, obj) {
             $("#recipient_node_peer_id").val(result.p2pID);
             $("#recipient_user_peer_id").val(result.name);
             
-            channelID = getTempChannelID();
-            if (channelID === '') return;
+            channelID = getChannelID();
             $("#temporary_channel_id").val(channelID);
             
-            privkey = getTempPrivKey(FundingPrivKey, channelID);
-            if (privkey === '') return;
-            $("#channel_address_private_key").val(privkey);
+            fundingPrivKey = getTempPrivKey(FundingPrivKey, channelID);
+            $("#channel_address_private_key").val(fundingPrivKey);
             
             if (msgType === enumMsgType.MsgType_FundingSign_SendBtcSign_350) {
                 let txid = getFundingBtcTxid();
-                if (txid === '') return;
                 $("#funding_txid").val(txid);
             } else {
                 let hex = getFundingBtcHex();
-                if (hex === '') return;
                 $("#funding_tx_hex").val(hex);
             }
 
@@ -1975,16 +2005,13 @@ function autoFillValue(arrParams, obj) {
             $("#recipient_node_peer_id").val(result.p2pID);
             $("#recipient_user_peer_id").val(result.name);
 
-            channelID = getTempChannelID();
-            if (channelID === '') return;
+            channelID = getChannelID();
             $("#temporary_channel_id").val(channelID);
 
-            privkey = getTempPrivKey(FundingPrivKey, channelID);
-            if (privkey === '') return;
-            $("#channel_address_private_key").val(privkey);
+            fundingPrivKey = getTempPrivKey(FundingPrivKey, channelID);
+            $("#channel_address_private_key").val(fundingPrivKey);
 
             let hex = getFundingAssetcHex();
-            if (hex === '') return;
             $("#funding_tx_hex").val(hex);
 
             result = genAddressFromMnemonic();
@@ -1999,6 +2026,25 @@ function autoFillValue(arrParams, obj) {
         case enumMsgType.MsgType_CommitmentTx_SendCommitmentTransactionCreated_351:
         case enumMsgType.MsgType_CommitmentTxSigned_SendRevokeAndAcknowledgeCommitmentTransaction_352:
             if (!isLogined) return;  // Not logined
+
+            result = getLastCounterparty();
+            $("#recipient_node_peer_id").val(result.p2pID);
+            $("#recipient_user_peer_id").val(result.name);
+
+            channelID = getChannelID();
+            $("#channel_id").val(channelID);
+
+            fundingPrivKey = getTempPrivKey(FundingPrivKey, channelID);
+            $("#channel_address_private_key").val(fundingPrivKey);
+
+            tempPrivKey = getTempPrivKey(TempPrivKey, channelID);
+            $("#last_temp_address_private_key").val(tempPrivKey);
+            
+            if (msgType === enumMsgType.MsgType_CommitmentTxSigned_SendRevokeAndAcknowledgeCommitmentTransaction_352) {
+                let msgHash = getRsmcMsgHash();
+                $("#msg_hash").val(msgHash);
+            }
+
             result = genAddressFromMnemonic();
             if (result === '') return;
             $("#curr_temp_address_pub_key").val(result.result.pubkey);
@@ -2007,9 +2053,28 @@ function autoFillValue(arrParams, obj) {
             $("#curr_temp_address_private_key").attr("class", "input input_color");
             saveAddresses(result);
             break;
+            
+        case enumMsgType.MsgType_HTLC_FindPath_401:
+            if (!isLogined) return;  // Not logined
+            result = getLastCounterparty();
+            $("#recipient_node_peer_id").val(result.p2pID);
+            $("#recipient_user_peer_id").val(result.name);
+            break;
 
         case enumMsgType.MsgType_HTLC_SendAddHTLC_40:
             if (!isLogined) return;  // Not logined
+
+            result = getLastCounterparty();
+            $("#recipient_node_peer_id").val(result.p2pID);
+            $("#recipient_user_peer_id").val(result.name);
+
+            channelID = getChannelID();
+            fundingPrivKey = getTempPrivKey(FundingPrivKey, channelID);
+            $("#channel_address_private_key").val(fundingPrivKey);
+
+            tempPrivKey = getTempPrivKey(TempPrivKey, channelID);
+            $("#last_temp_address_private_key").val(tempPrivKey);
+            
             result = genAddressFromMnemonic();
             if (result === '') return;
             $("#curr_rsmc_temp_address_pub_key").val(result.result.pubkey);
@@ -2037,6 +2102,7 @@ function autoFillValue(arrParams, obj) {
 
         case enumMsgType.MsgType_HTLC_SendAddHTLCSigned_41:
             if (!isLogined) return;  // Not logined
+            
             result = genAddressFromMnemonic();
             if (result === '') return;
             $("#curr_rsmc_temp_address_pub_key").val(result.result.pubkey);
@@ -3545,54 +3611,53 @@ function getNewAddrIndex() {
 
 /**
  * Save channelID to local storage
- * @param tempChannelID
+ * @param channelID
  */
-function saveTempChannelID(tempChannelID) {
+function saveChannelID(channelID) {
 
-    let resp = JSON.parse(localStorage.getItem(itemTempChannelID));
+    let resp = JSON.parse(localStorage.getItem(itemChannelID));
 
     // If has data.
     if (resp) {
         for (let i = 0; i < resp.result.length; i++) {
             if (userID === resp.result[i].userID) {
-                resp.result[i].tempChannelID = tempChannelID;
-                localStorage.setItem(itemTempChannelID, JSON.stringify(resp));
+                resp.result[i].channelID = channelID;
+                localStorage.setItem(itemChannelID, JSON.stringify(resp));
                 return;
             }
         }
 
         // A new User ID.
         let new_data = {
-            userID:  userID,
-            tempChannelID: tempChannelID,
+            userID:    userID,
+            channelID: channelID,
         }
         resp.result.push(new_data);
-        localStorage.setItem(itemTempChannelID, JSON.stringify(resp));
+        localStorage.setItem(itemChannelID, JSON.stringify(resp));
 
     } else {
         let data = {
             result: [{
-                userID:  userID,
-                tempChannelID: tempChannelID,
+                userID:    userID,
+                channelID: channelID,
             }]
         }
-        localStorage.setItem(itemTempChannelID, JSON.stringify(data));
+        localStorage.setItem(itemChannelID, JSON.stringify(data));
     }
 }
-
 
 /**
  * Get channelID from local storage
  */
-function getTempChannelID() {
+function getChannelID() {
 
-    let resp = JSON.parse(localStorage.getItem(itemTempChannelID));
+    let resp = JSON.parse(localStorage.getItem(itemChannelID));
 
     // If has data.
     if (resp) {
         for (let i = 0; i < resp.result.length; i++) {
             if (userID === resp.result[i].userID) {
-                return resp.result[i].tempChannelID;
+                return resp.result[i].channelID;
             }
         }
         return '';
@@ -4289,6 +4354,66 @@ function saveFundingBtcTxid(txid) {
             txid: txid
         }
         localStorage.setItem(itemFundingBtcTxid, JSON.stringify(data));
+    }
+}
+
+// save msg_hash from RSMCCTxCreated type ( -100351 ) return
+function saveRsmcMsgHash(msgHash) {
+
+    let resp = JSON.parse(localStorage.getItem(itemRsmcMsgHash));
+
+    // If has data.
+    if (resp) {
+        resp.msgHash = msgHash;
+        localStorage.setItem(itemRsmcMsgHash, JSON.stringify(resp));
+    } else {
+        let data = {
+            msgHash: msgHash
+        }
+        localStorage.setItem(itemRsmcMsgHash, JSON.stringify(data));
+    }
+}
+
+// get msg_hash from RSMCCTxCreated type ( -100351 ) return
+function getRsmcMsgHash() {
+
+    let resp = JSON.parse(localStorage.getItem(itemRsmcMsgHash));
+
+    // If has data.
+    if (resp) {
+        return resp.msgHash;
+    } else {
+        return '';
+    }
+}
+
+// save request_hash from HTLCCreated type ( -100040 ) return
+function saveHtlcRequestHash(requestHash) {
+
+    let resp = JSON.parse(localStorage.getItem(itemHtlcRequestHash));
+
+    // If has data.
+    if (resp) {
+        resp.requestHash = requestHash;
+        localStorage.setItem(itemHtlcRequestHash, JSON.stringify(resp));
+    } else {
+        let data = {
+            requestHash: requestHash
+        }
+        localStorage.setItem(itemHtlcRequestHash, JSON.stringify(data));
+    }
+}
+
+// get request_hash from HTLCCreated type ( -100040 ) return
+function getHtlcRequestHash() {
+
+    let resp = JSON.parse(localStorage.getItem(itemHtlcRequestHash));
+
+    // If has data.
+    if (resp) {
+        return resp.requestHash;
+    } else {
+        return '';
     }
 }
 
