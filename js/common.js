@@ -62,6 +62,9 @@ var itemRsmcMsgHash = 'RsmcMsgHash';
 //
 var itemHtlcRequestHash = 'HtlcRequestHash';
 
+//
+var itemHtlcVerifyR = 'HtlcVerifyR';
+
 // the info save to local storage [ChannelList].
 var channelInfo;
 
@@ -114,7 +117,7 @@ function getSaveName() {
 function listening110040(e, msgType) {
     console.info('NOW isAutoMode = ' + isAutoMode);
 
-    saveHtlcRequestHash(e.request_hash);
+    saveHtlcTxHash(e.commitment_tx_hash);
 
     if (!isAutoMode) return;
     
@@ -128,16 +131,16 @@ function listening110040(e, msgType) {
 
     // will send -100041 HTLCSigned
     let info                                = new HtlcSignedInfo();
-    info.request_hash                       = e.request_hash;
-    info.channel_address_private_key        = getTempPrivKey(FundingPrivKey, e.channel_id);;
-    info.last_temp_address_private_key      = getTempPrivKey(TempPrivKey, e.channel_id);;
+    info.commitment_tx_hash                 = e.commitment_tx_hash;
+    info.channel_address_private_key        = getTempPrivKey(FundingPrivKey, e.channel_id);
+    info.last_temp_address_private_key      = getTempPrivKey(TempPrivKey, e.channel_id);
     info.curr_rsmc_temp_address_pub_key     = addr_1.result.pubkey;
     info.curr_rsmc_temp_address_private_key = addr_1.result.wif;
     info.curr_htlc_temp_address_pub_key     = addr_2.result.pubkey;
     info.curr_htlc_temp_address_private_key = addr_2.result.wif;
 
     // OBD API
-    obdApi.htlcSigned(e.funder_node_address, e.funder_peer_id, info, function(e) {
+    obdApi.htlcSigned(e.payer_node_address, e.payer_peer_id, info, function(e) {
         console.info('-100041 htlcSigned = ' + JSON.stringify(e));
         saveChannelList(e, e.channel_id, msgType);
         saveTempPrivKey(RsmcTempPrivKey, e.channel_id, addr_1.result.wif);
@@ -145,18 +148,62 @@ function listening110040(e, msgType) {
     });
 }
 
-// 
-function listeningN41(e, msgType) {
-    console.info('listeningN41 = ' + JSON.stringify(e));
-    saveChannelList(e, e.channel_id, msgType);
-    // saveMsgFromCounterparty(e);
+// auto response to -100045 (HTLCSendVerifyR) 
+// listening to -110045 and send -100046 HTLCSendSignVerifyR
+function listening110045(e, msgType) {
+    console.info('NOW isAutoMode = ' + isAutoMode);
+
+    saveHtlcTxHash(e.msg_hash);
+    saveHtlcVerifyR(e.r);
+
+    if (!isAutoMode) return;
+    
+    console.info('listening110045 = ' + JSON.stringify(e));
+
+    // Alice will send -100046 HTLCSendSignVerifyR
+    let info                         = new HtlcSendSignVerifyRInfo();
+    info.channel_id                  = e.channel_id;
+    info.r                           = e.r;
+    info.msg_hash                    = e.msg_hash;
+    info.channel_address_private_key = getTempPrivKey(FundingPrivKey, e.channel_id);
+
+    // OBD API
+    obdApi.htlcSendSignVerifyR(e.payer_node_address, e.payer_peer_id, info, function(e) {
+        console.info('-100046 htlcSendSignVerifyR = ' + JSON.stringify(e));
+        saveChannelList(e, e.channel_id, msgType);
+    });
 }
 
-// 
-function listeningN45(e, msgType) {
-    console.info('listeningN45 = ' + JSON.stringify(e));
-    saveChannelList(e, e.channel_id, msgType);
-    // saveMsgFromCounterparty(e);
+// auto response to -100049 (CloseHTLC) 
+// listening to -110049 and send -100050 CloseHTLCSigned
+function listening110049(e, msgType) {
+    console.info('NOW isAutoMode = ' + isAutoMode);
+
+    saveHtlcTxHash(e.msg_hash);
+
+    if (!isAutoMode) return;
+    
+    console.info('listening110049 = ' + JSON.stringify(e));
+
+    // Generate an address by local js library.
+    let addr = genAddressFromMnemonic();
+    saveAddresses(addr);
+    
+    // will send -100050 CloseHTLCSigned
+    let info                                         = new CloseHtlcTxInfoSigned();
+    info.msg_hash                                    = e.msg_hash;
+    info.channel_address_private_key                 = getTempPrivKey(FundingPrivKey, e.channel_id);
+    info.last_rsmc_temp_address_private_key          = getTempPrivKey(RsmcTempPrivKey, e.channel_id);
+    info.last_htlc_temp_address_private_key          = getTempPrivKey(HtlcTempPrivKey, e.channel_id);
+    info.last_htlc_temp_address_for_htnx_private_key = getTempPrivKey(HtlcHtnxTempPrivKey, e.channel_id);
+    info.curr_rsmc_temp_address_pub_key              = addr.result.pubkey;
+    info.curr_rsmc_temp_address_private_key          = addr.result.wif;
+
+    // OBD API
+    obdApi.closeHTLCSigned(e.sender_node_address, e.sender_peer_id, info, function(e) {
+        console.info('-100050 closeHTLCSigned = ' + JSON.stringify(e));
+        saveTempPrivKey(RsmcTempPrivKey, e.channel_id, info.curr_rsmc_temp_address_private_key);
+    });
 }
 
 // auto response to -100032 (openChannel) 
@@ -174,13 +221,13 @@ function listening110032(e, msgType) {
     let temp_cid = e.temporary_channel_id;
 
     // Generate an address by local js library.
-    let result = genAddressFromMnemonic();
-    saveAddresses(result);
+    let addr = genAddressFromMnemonic();
+    saveAddresses(addr);
 
     // will send -100033 acceptChannel
     let info                  = new AcceptChannelInfo();
     info.temporary_channel_id = temp_cid;
-    info.funding_pubkey       = result.result.pubkey;
+    info.funding_pubkey       = addr.result.pubkey;
     info.approval             = true;
 
     // OBD API
@@ -188,7 +235,7 @@ function listening110032(e, msgType) {
         console.info('-100033 acceptChannel = ' + JSON.stringify(e));
         saveChannelList(e);
         saveCounterparties(name, p2pID);
-        saveTempPrivKey(FundingPrivKey, temp_cid, result.result.wif);
+        saveTempPrivKey(FundingPrivKey, temp_cid, addr.result.wif);
     });
 }
 
@@ -284,7 +331,7 @@ function listening110351(e, msgType) {
 
     // OBD API
     obdApi.revokeAndAcknowledgeCommitmentTransaction(
-        e.funder_node_address, e.funder_peer_id, info, function(e) {
+        e.payer_node_address, e.payer_peer_id, info, function(e) {
         console.info('-100352 RSMCCTxSigned = ' + JSON.stringify(e));
         saveChannelList(e, e.channel_id, msgType);
         saveTempPrivKey(TempPrivKey, e.channel_id, info.curr_temp_address_private_key);
@@ -323,14 +370,10 @@ function registerEvent() {
         listening110040(e, msg_110040);
     });
 
-    var msgTypeN41 = enumMsgType.MsgType_HTLC_SendAddHTLCSigned_41;
-    obdApi.registerEvent(msgTypeN41, function(e) {
-        listeningN41(e, msgTypeN41);
-    });
-
-    var msgTypeN45 = enumMsgType.MsgType_HTLC_SendVerifyR_45;
-    obdApi.registerEvent(msgTypeN45, function(e) {
-        listeningN45(e, msgTypeN45);
+    // auto response mode
+    let msg_110045 = enumMsgType.MsgType_HTLC_SendVerifyR_45;
+    obdApi.registerEvent(msg_110045, function(e) {
+        listening110045(e, msg_110045);
     });
 }
 
@@ -385,17 +428,16 @@ function connectP2PPeer(msgType) {
 // -100032 openChannel API at local.
 function openChannel(msgType) {
 
-    var p2pID  = $("#recipient_node_peer_id").val();
-    var name   = $("#recipient_user_peer_id").val();
-    var pubkey = $("#funding_pubkey").val();
+    let nodeID  = $("#recipient_node_peer_id").val();
+    let userID  = $("#recipient_user_peer_id").val();
+    let pubkey  = $("#funding_pubkey").val();
 
     // OBD API
-    obdApi.openChannel(p2pID, name, pubkey, function(e) {
+    obdApi.openChannel(nodeID, userID, pubkey, function(e) {
         console.info('-100032 openChannel = ' + JSON.stringify(e));
         saveChannelList(e);
-        saveCounterparties(name, p2pID);
+        saveCounterparties(userID, nodeID);
         let privkey = getFundingPrivKeyFromPubKey(pubkey);
-        console.info('FundingPrivKey = ' + privkey);
         saveTempPrivKey(FundingPrivKey, e.temporary_channel_id, privkey);
     });
 }
@@ -403,293 +445,198 @@ function openChannel(msgType) {
 // -100033 accept Channel API at local.
 function acceptChannel(msgType) {
 
-    var p2pID    = $("#recipient_node_peer_id").val();
-    var name     = $("#recipient_user_peer_id").val();
-    var temp_cid = $("#temporary_channel_id").val();
-    var pubkey   = $("#funding_pubkey").val();
-    var approval = $("#checkbox_n33").prop("checked");
+    let nodeID  = $("#recipient_node_peer_id").val();
+    let userID  = $("#recipient_user_peer_id").val();
 
-    let info = new AcceptChannelInfo();
-    info.temporary_channel_id = temp_cid;
-    info.funding_pubkey = pubkey;
-    info.approval = approval;
+    let info                  = new AcceptChannelInfo();
+    info.temporary_channel_id = $("#temporary_channel_id").val();
+    info.funding_pubkey       = $("#funding_pubkey").val();
+    info.approval             = $("#checkbox_n33").prop("checked");
 
     // OBD API
-    obdApi.acceptChannel(p2pID, name, info, function(e) {
+    obdApi.acceptChannel(nodeID, userID, info, function(e) {
         console.info('-100033 acceptChannel = ' + JSON.stringify(e));
         saveChannelList(e);
-        saveCounterparties(name, p2pID);
-
-        let privkey = getFundingPrivKeyFromPubKey(pubkey);
-        console.info('FundingPrivKey = ' + privkey);
-        saveTempPrivKey(FundingPrivKey, temp_cid, privkey);
+        saveCounterparties(userID, nodeID);
+        let privkey = getFundingPrivKeyFromPubKey(info.funding_pubkey);
+        saveTempPrivKey(FundingPrivKey, info.temporary_channel_id, privkey);
     });
 }
 
 /** 
- * -45 htlcSendR API at local.
+ * -100045 htlcSendVerifyR API at local.
  * @param msgType
  */
-function htlcSendR(msgType) {
+function htlcSendVerifyR(msgType) {
 
-    var recipient_node_peer_id    = $("#recipient_node_peer_id").val();
-    var recipient_user_peer_id     = $("#recipient_user_peer_id").val();
-    var channel_id = $("#channel_id").val();
-    var r = $("#r").val();
-    var channel_address_private_key = $("#channel_address_private_key").val();
-    var curr_htlc_temp_address_for_he1b_pub_key = $("#curr_htlc_temp_address_for_he1b_pub_key").val();
-    var curr_htlc_temp_address_for_he1b_private_key = $("#curr_htlc_temp_address_for_he1b_private_key").val();
+    let nodeID      = $("#recipient_node_peer_id").val();
+    let userID      = $("#recipient_user_peer_id").val();
 
-    let info = new HtlcSendRInfo();
-    info.channel_id = channel_id;
-    info.r = r;
-    info.channel_address_private_key = channel_address_private_key;
-    info.curr_htlc_temp_address_for_he1b_pub_key = curr_htlc_temp_address_for_he1b_pub_key;
-    info.curr_htlc_temp_address_for_he1b_private_key = curr_htlc_temp_address_for_he1b_private_key;
-
-    // Get channel_id with request_hash.
-    // var tempChID;
-    // var list = JSON.parse(localStorage.getItem(itemChannelList));
-    // for (let i = 0; i < list.result.length; i++) {
-    //     for (let i2 = 0; i2 < list.result[i].htlc.length; i2++) {
-    //         if (request_hash === list.result[i].htlc[i2].request_hash) {
-    //             tempChID = list.result[i].htlc[i2].channelId;
-    //         }
-    //     }
-    // }
+    let info        = new HtlcSendVerifyRInfo();
+    info.channel_id = $("#channel_id").val();
+    info.r          = $("#r").val();
+    info.channel_address_private_key                 = $("#channel_address_private_key").val();
+    info.curr_htlc_temp_address_for_he1b_pub_key     = $("#curr_htlc_temp_address_for_he1b_pub_key").val();
+    info.curr_htlc_temp_address_for_he1b_private_key = $("#curr_htlc_temp_address_for_he1b_private_key").val();
 
     // OBD API
-    obdApi.htlcSendR(recipient_node_peer_id, recipient_user_peer_id, info, function(e) {
-        console.info('-45 htlcSendR - OBD Response = ' + JSON.stringify(e));
-        saveChannelList(e, channel_id, msgType);
-        // createOBDResponseDiv(e, msgType);
+    obdApi.htlcSendVerifyR(nodeID, userID, info, function(e) {
+        console.info('-100045 htlcSendVerifyR = ' + JSON.stringify(e));
+        saveChannelList(e, info.channel_id, msgType);
+        saveTempPrivKey(HtlcHtnxTempPrivKey, info.channel_id, info.curr_htlc_temp_address_for_he1b_private_key);
     });
 }
 
 /** 
- * -46 htlcVerifyR API at local.
+ * -100046 htlcSendSignVerifyR API at local.
  * @param msgType
  */
-function htlcVerifyR(msgType) {
+function htlcSendSignVerifyR(msgType) {
 
-    var recipient_node_peer_id    = $("#recipient_node_peer_id").val();
-    var recipient_user_peer_id    = $("#recipient_user_peer_id").val();
-    var channel_id = $("#channel_id").val();
-    var r = $("#r").val();
-    var request_hash = $("#request_hash").val();
-    var channel_address_private_key = $("#channel_address_private_key").val();
+    let nodeID = $("#recipient_node_peer_id").val();
+    let userID = $("#recipient_user_peer_id").val();
 
-    let info = new HtlcVerifyRInfo();
-    info.channel_id = channel_id;
-    info.r = r;
-    info.request_hash = request_hash;
-    info.channel_address_private_key = channel_address_private_key;
-
-    // Get channel_id with request_hash.
-    // var tempChID;
-    // var list = JSON.parse(localStorage.getItem(itemChannelList));
-    // for (let i = 0; i < list.result.length; i++) {
-    //     for (let i2 = 0; i2 < list.result[i].htlc.length; i2++) {
-    //         if (request_hash === list.result[i].htlc[i2].request_hash) {
-    //             tempChID = list.result[i].htlc[i2].channelId;
-    //         }
-    //     }
-    // }
+    let info                         = new HtlcSendSignVerifyRInfo();
+    info.channel_id                  = $("#channel_id").val();
+    info.r                           = $("#r").val();
+    info.msg_hash                    = $("#msg_hash").val();
+    info.channel_address_private_key = $("#channel_address_private_key").val();
 
     // OBD API
-    obdApi.htlcVerifyR(recipient_node_peer_id, recipient_user_peer_id, info, function(e) {
-        console.info('-46 htlcVerifyR - OBD Response = ' + JSON.stringify(e));
-        saveChannelList(e, channel_id, msgType);
-        // createOBDResponseDiv(e, msgType);
+    obdApi.htlcSendSignVerifyR(nodeID, userID, info, function(e) {
+        console.info('-100046 htlcSendSignVerifyR = ' + JSON.stringify(e));
+        saveChannelList(e, info.channel_id, msgType);
     });
 }
 
 /** 
- * -49 closeHTLC API at local.
+ * -100049 closeHTLC API at local.
  * @param msgType
  */
 function closeHTLC(msgType) {
 
-    var recipient_node_peer_id    = $("#recipient_node_peer_id").val();
-    var recipient_user_peer_id    = $("#recipient_user_peer_id").val();
-    var channel_id = $("#channel_id").val();
-    var channel_address_private_key = $("#channel_address_private_key").val();
-    var last_rsmc_temp_address_private_key = $("#last_rsmc_temp_address_private_key").val();
-    var last_htlc_temp_address_private_key = $("#last_htlc_temp_address_private_key").val();
-    var last_htlc_temp_address_for_htnx_private_key = $("#last_htlc_temp_address_for_htnx_private_key").val();
-    var curr_rsmc_temp_address_pub_key = $("#curr_rsmc_temp_address_pub_key").val();
-    var curr_rsmc_temp_address_private_key = $("#curr_rsmc_temp_address_private_key").val();
+    let nodeID    = $("#recipient_node_peer_id").val();
+    let userID    = $("#recipient_user_peer_id").val();
 
-    let info = new CloseHtlcTxInfo();
-    info.channel_id = channel_id;
-    info.channel_address_private_key = channel_address_private_key;
-    info.last_rsmc_temp_address_private_key = last_rsmc_temp_address_private_key;
-    info.last_htlc_temp_address_private_key = last_htlc_temp_address_private_key;
-    info.last_htlc_temp_address_for_htnx_private_key = last_htlc_temp_address_for_htnx_private_key;
-    info.curr_rsmc_temp_address_pub_key = curr_rsmc_temp_address_pub_key;
-    info.curr_rsmc_temp_address_private_key = curr_rsmc_temp_address_private_key;
+    let info                                         = new CloseHtlcTxInfo();
+    info.channel_id                                  = $("#channel_id").val();
+    info.channel_address_private_key                 = $("#channel_address_private_key").val();
+    info.last_rsmc_temp_address_private_key          = $("#last_rsmc_temp_address_private_key").val();
+    info.last_htlc_temp_address_private_key          = $("#last_htlc_temp_address_private_key").val();
+    info.last_htlc_temp_address_for_htnx_private_key = $("#last_htlc_temp_address_for_htnx_private_key").val();
+    info.curr_rsmc_temp_address_pub_key              = $("#curr_rsmc_temp_address_pub_key").val();
+    info.curr_rsmc_temp_address_private_key          = $("#curr_rsmc_temp_address_private_key").val();
 
     // OBD API
-    obdApi.closeHTLC(recipient_node_peer_id, recipient_user_peer_id, info, function(e) {
-        console.info('-49 closeHTLC - OBD Response = ' + JSON.stringify(e));
-        saveChannelList(e, channel_id, msgType);
-        // createOBDResponseDiv(e, msgType);
+    obdApi.closeHTLC(nodeID, userID, info, function(e) {
+        console.info('-100049 closeHTLC = ' + JSON.stringify(e));
+        saveChannelList(e, e.channel_id, msgType);
+        saveTempPrivKey(RsmcTempPrivKey, e.channel_id, info.curr_rsmc_temp_address_private_key);
     });
 }
 
 /** 
- * -50 closeHTLCSigned API at local.
+ * -100050 closeHTLCSigned API at local.
  * @param msgType
  */
 function closeHTLCSigned(msgType) {
 
-    var recipient_node_peer_id    = $("#recipient_node_peer_id").val();
-    var recipient_user_peer_id    = $("#recipient_user_peer_id").val();
-    var request_hash = $("#request_hash").val();
-    var channel_address_private_key = $("#channel_address_private_key").val();
-    var last_rsmc_temp_address_private_key = $("#last_rsmc_temp_address_private_key").val();
-    var last_htlc_temp_address_private_key = $("#last_htlc_temp_address_private_key").val();
-    var last_htlc_temp_address_for_htnx_private_key = $("#last_htlc_temp_address_for_htnx_private_key").val();
-    var curr_rsmc_temp_address_pub_key = $("#curr_rsmc_temp_address_pub_key").val();
-    var curr_rsmc_temp_address_private_key = $("#curr_rsmc_temp_address_private_key").val();
+    let nodeID    = $("#recipient_node_peer_id").val();
+    let userID    = $("#recipient_user_peer_id").val();
 
-    let info = new CloseHtlcTxInfoSigned();
-    info.request_hash = request_hash;
-    info.channel_address_private_key = channel_address_private_key;
-    info.last_rsmc_temp_address_private_key = last_rsmc_temp_address_private_key;
-    info.last_htlc_temp_address_private_key = last_htlc_temp_address_private_key;
-    info.last_htlc_temp_address_for_htnx_private_key = last_htlc_temp_address_for_htnx_private_key;
-    info.curr_rsmc_temp_address_pub_key = curr_rsmc_temp_address_pub_key;
-    info.curr_rsmc_temp_address_private_key = curr_rsmc_temp_address_private_key;
-
-    // Get channel_id with request_hash.
-    // var channel_id;
-    // var list = JSON.parse(localStorage.getItem(itemChannelList));
-    // for (let i = 0; i < list.result.length; i++) {
-    //     for (let i2 = 0; i2 < list.result[i].htlc.length; i2++) {
-    //         if (request_close_htlc_hash === list.result[i].htlc[i2].request_hash) {
-    //             channel_id = list.result[i].htlc[i2].channel_id;
-    //         }
-    //     }
-    // }
+    let info                                         = new CloseHtlcTxInfoSigned();
+    info.msg_hash                                    = $("#msg_hash").val();
+    info.channel_address_private_key                 = $("#channel_address_private_key").val();
+    info.last_rsmc_temp_address_private_key          = $("#last_rsmc_temp_address_private_key").val();
+    info.last_htlc_temp_address_private_key          = $("#last_htlc_temp_address_private_key").val();
+    info.last_htlc_temp_address_for_htnx_private_key = $("#last_htlc_temp_address_for_htnx_private_key").val();
+    info.curr_rsmc_temp_address_pub_key              = $("#curr_rsmc_temp_address_pub_key").val();
+    info.curr_rsmc_temp_address_private_key          = $("#curr_rsmc_temp_address_private_key").val();
 
     // OBD API
-    obdApi.closeHTLCSigned(recipient_node_peer_id, recipient_user_peer_id, info, function(e) {
-        console.info('-50 closeHTLCSigned - OBD Response = ' + JSON.stringify(e));
-        // saveChannelList(e, channel_id, msgType);
-        // createOBDResponseDiv(e, msgType);
+    obdApi.closeHTLCSigned(nodeID, userID, info, function(e) {
+        console.info('-100050 closeHTLCSigned = ' + JSON.stringify(e));
+        saveTempPrivKey(RsmcTempPrivKey, e.channel_id, info.curr_rsmc_temp_address_private_key);
     });
 }
 
 /** 
- * -80 atomicSwap API at local.
+ * -100080 atomicSwap API at local.
  * @param msgType
  */
 function atomicSwap(msgType) {
 
-    var channel_id_from = $("#channel_id_from").val();
-    var channel_id_to = $("#channel_id_to").val();
-    var recipient_user_peer_id = $("#recipient_user_peer_id").val();
-    var property_sent = $("#property_sent").val();
-    var amount = $("#amount").val();
-    var exchange_rate = $("#exchange_rate").val();
-    var property_received = $("#property_received").val();
-    var transaction_id = $("#transaction_id").val();
-    var time_locker = $("#time_locker").val();
-
-
-    let info = new AtomicSwapRequest();
-    info.channel_id_from = channel_id_from;
-    info.channel_id_to = channel_id_to;
-    info.recipient_user_peer_id = recipient_user_peer_id;
-    info.property_sent = Number(property_sent);
-    info.amount = Number(amount);
-    info.exchange_rate = Number(exchange_rate);
-    info.property_received = Number(property_received);
-    info.transaction_id = transaction_id;
-    info.time_locker = Number(time_locker);
+    let info                    = new AtomicSwapRequest();
+    info.channel_id_from        = $("#channel_id_from").val();
+    info.channel_id_to          = $("#channel_id_to").val();
+    info.recipient_user_peer_id = $("#recipient_user_peer_id").val();
+    info.property_sent          = Number($("#property_sent").val());
+    info.amount                 = Number($("#amount").val());
+    info.exchange_rate          = Number($("#exchange_rate").val());
+    info.property_received      = Number($("#property_received").val());
+    info.transaction_id         = $("#transaction_id").val();
+    info.time_locker            = Number($("#time_locker").val());
 
     // OBD API
     obdApi.atomicSwap(info, function(e) {
-        console.info('-80 atomicSwap - OBD Response = ' + JSON.stringify(e));
-        // saveChannelList(e, channel_id, msgType);
-        // createOBDResponseDiv(e, msgType);
+        console.info('-100080 atomicSwap = ' + JSON.stringify(e));
     });
 }
 
 /** 
- * -81 atomicSwapAccepted API at local.
+ * -100081 atomicSwapAccepted API at local.
  * @param msgType
  */
 function atomicSwapAccepted(msgType) {
 
-    var channel_id_from = $("#channel_id_from").val();
-    var channel_id_to = $("#channel_id_to").val();
-    var recipient_user_peer_id = $("#recipient_user_peer_id").val();
-    var property_sent = $("#property_sent").val();
-    var amount = $("#amount").val();
-    var exchange_rate = $("#exchange_rate").val();
-    var property_received = $("#property_received").val();
-    var transaction_id = $("#transaction_id").val();
-    var target_transaction_id = $("#target_transaction_id").val();
-    var time_locker = $("#time_locker").val();
-
-    let info = new AtomicSwapAccepted();
-    info.channel_id_from = channel_id_from;
-    info.channel_id_to = channel_id_to;
-    info.recipient_user_peer_id = recipient_user_peer_id;
-    info.property_sent = Number(property_sent);
-    info.amount = Number(amount);
-    info.exchange_rate = Number(exchange_rate);
-    info.property_received = Number(property_received);
-    info.transaction_id = transaction_id;
-    info.target_transaction_id = target_transaction_id;
-    info.time_locker = Number(time_locker);
+    let info                    = new AtomicSwapAccepted();
+    info.channel_id_from        = $("#channel_id_from").val();
+    info.channel_id_to          = $("#channel_id_to").val();
+    info.recipient_user_peer_id = $("#recipient_user_peer_id").val();
+    info.property_sent          = Number($("#property_sent").val());
+    info.amount                 = Number($("#amount").val());
+    info.exchange_rate          = Number($("#exchange_rate").val());
+    info.property_received      = Number($("#property_received").val());
+    info.transaction_id         = $("#transaction_id").val();
+    info.target_transaction_id  = $("#target_transaction_id").val();
+    info.time_locker            = Number($("#time_locker").val());
 
     // OBD API
     obdApi.atomicSwapAccepted(info, function(e) {
-        console.info('-81 atomicSwapAccepted - OBD Response = ' + JSON.stringify(e));
-        // saveChannelList(e, channel_id, msgType);
-        // createOBDResponseDiv(e, msgType);
+        console.info('-100081 atomicSwapAccepted = ' + JSON.stringify(e));
     });
 }
 
 /** 
- * -38 closeChannel API at local.
+ * -100038 closeChannel API at local.
  * @param msgType
  */
 function closeChannel(msgType) {
 
-    var channel_id = $("#channel_id").val();
+    let channel_id = $("#channel_id").val();
 
     // OBD API
     obdApi.closeChannel(channel_id, function(e) {
-        console.info('-38 closeChannel - OBD Response = ' + JSON.stringify(e));
+        console.info('-100038 closeChannel = ' + JSON.stringify(e));
         saveChannelList(e, channel_id, msgType);
-        // createOBDResponseDiv(e, msgType);
     });
 }
 
 /** 
- * -39 closeChannelSigned API at local.
+ * -100039 closeChannelSigned API at local.
  * @param msgType
  */
 function closeChannelSigned(msgType) {
 
-    var channel_id = $("#channel_id").val();
-    var request_close_channel_hash = $("#request_close_channel_hash").val();
-    var approval = $("#checkbox_n39").prop("checked");
-
-    let info = new CloseChannelSign();
-    info.channel_id = channel_id;
-    info.request_close_channel_hash = request_close_channel_hash;
-    info.approval = approval;
+    let info                        = new CloseChannelSign();
+    info.channel_id                 = $("#channel_id").val();
+    info.request_close_channel_hash = $("#request_close_channel_hash").val();
+    info.approval                   = $("#checkbox_n39").prop("checked");
 
     // OBD API
     obdApi.closeChannelSign(info, function(e) {
-        console.info('-39 closeChannelSign - OBD Response = ' + JSON.stringify(e));
-        saveChannelList(e, channel_id, msgType);
-        // createOBDResponseDiv(e, msgType);
+        console.info('-100039 closeChannelSign = ' + JSON.stringify(e));
+        saveChannelList(e, info.channel_id, msgType);
     });
 }
 
@@ -699,7 +646,7 @@ function closeChannelSigned(msgType) {
  */
 function getBalanceForOmni(msgType) {
 
-    var address = $("#address").val();
+    let address = $("#address").val();
 
     // OBD API
     obdApi.omniGetAllBalancesForAddress(address, function(e) {
@@ -709,272 +656,236 @@ function getBalanceForOmni(msgType) {
 }
 
 /** 
- * 1201 issuanceFixed API at local.
+ * -102113 issuanceFixed API at local.
  * @param msgType
  */
 function issuanceFixed(msgType) {
 
-    var from_address = $("#from_address").val();
-    var name = $("#name").val();
-    var ecosystem = $("#ecosystem").val();
-    var divisible_type = $("#divisible_type").val();
-    var data = $("#data").val();
-    var amount = $("#amount").val();
-
-    let info = new OmniSendIssuanceFixed();
-    info.from_address = from_address;
-    info.name = name;
-    info.ecosystem = Number(ecosystem);
-    info.divisible_type = Number(divisible_type);
-    info.data = data;
-    info.amount = Number(amount);
+    let info            = new OmniSendIssuanceFixed();
+    info.from_address   = $("#from_address").val();
+    info.name           = $("#name").val();
+    info.ecosystem      = Number($("#ecosystem").val());
+    info.divisible_type = Number($("#divisible_type").val());
+    info.data           = $("#data").val();
+    info.amount         = Number($("#amount").val());
 
     // OBD API
     obdApi.createNewTokenFixed(info, function(e) {
-        console.info('1201 createNewTokenFixed - OBD Response = ' + JSON.stringify(e));
-        // createOBDResponseDiv(e, msgType);
+        console.info('-102113 createNewTokenFixed = ' + JSON.stringify(e));
     });
 }
 
 /** 
- * 1202 issuanceManaged API at local.
+ * -102114 issuanceManaged API at local.
  * @param msgType
  */
 function issuanceManaged(msgType) {
 
-    var from_address = $("#from_address").val();
-    var name = $("#name").val();
-    var ecosystem = $("#ecosystem").val();
-    var divisible_type = $("#divisible_type").val();
-    var data = $("#data").val();
-
-    let info = new OmniSendIssuanceManaged();
-    info.from_address = from_address;
-    info.name = name;
-    info.ecosystem = Number(ecosystem);
-    info.divisible_type = Number(divisible_type);
-    info.data = data;
+    let info            = new OmniSendIssuanceManaged();
+    info.from_address   = $("#from_address").val();
+    info.name           = $("#name").val();
+    info.ecosystem      = Number($("#ecosystem").val());
+    info.divisible_type = Number($("#divisible_type").val());
+    info.data           = $("#data").val();
 
     // OBD API
     obdApi.createNewTokenManaged(info, function(e) {
-        console.info('1202 issuanceManaged - OBD Response = ' + JSON.stringify(e));
-        // createOBDResponseDiv(e, msgType);
+        console.info('-102114 issuanceManaged = ' + JSON.stringify(e));
     });
 }
 
 /** 
- * 1203 sendGrant API at local.
+ * -102115 sendGrant API at local.
  * @param msgType
  */
 function sendGrant(msgType) {
 
-    var from_address = $("#from_address").val();
-    var property_id = $("#property_id").val();
-    var amount = $("#amount").val();
-    var memo = $("#memo").val();
-
-    let info = new OmniSendGrant();
-    info.from_address = from_address;
-    info.property_id = Number(property_id);
-    info.amount = Number(amount);
-    info.memo = memo;
+    let info          = new OmniSendGrant();
+    info.from_address = $("#from_address").val();
+    info.property_id  = Number($("#property_id").val());
+    info.amount       = Number($("#amount").val());
+    info.memo         = $("#memo").val();
 
     // OBD API
     obdApi.omniSendGrant(info, function(e) {
-        console.info('1203 sendGrant - OBD Response = ' + JSON.stringify(e));
-        // createOBDResponseDiv(e, msgType);
+        console.info('-102115 sendGrant = ' + JSON.stringify(e));
     });
 }
 
 /** 
- * 1204 sendRevoke API at local.
+ * -102116 sendRevoke API at local.
  * @param msgType
  */
 function sendRevoke(msgType) {
 
-    var from_address = $("#from_address").val();
-    var property_id = $("#property_id").val();
-    var amount = $("#amount").val();
-    var memo = $("#memo").val();
-
-    let info = new OmniSendRevoke();
-    info.from_address = from_address;
-    info.property_id = Number(property_id);
-    info.amount = Number(amount);
-    info.memo = memo;
+    let info          = new OmniSendRevoke();
+    info.from_address = $("#from_address").val();
+    info.property_id  = Number($("#property_id").val());
+    info.amount       = Number($("#amount").val());
+    info.memo         = $("#memo").val();
 
     // OBD API
     obdApi.omniSendRevoke(info, function(e) {
-        console.info('1204 sendRevoke - OBD Response = ' + JSON.stringify(e));
-        // createOBDResponseDiv(e, msgType);
+        console.info('-102116 sendRevoke = ' + JSON.stringify(e));
     });
 }
 
 /** 
- * 1205 listProperties API at local.
+ * -102117 listProperties API at local.
  * @param msgType
  */
 function listProperties(msgType) {
     // OBD API
     obdApi.listProperties(function(e) {
-        console.info('1205 listProperties - OBD Response = ' + JSON.stringify(e));
+        console.info('-102117 listProperties = ' + JSON.stringify(e));
         // createOBDResponseDiv(e, msgType);
     });
 }
 
 /** 
- * 1206 getTransaction API at local.
+ * -102118 getTransaction API at local.
  * @param msgType
  */
 function getTransaction(msgType) {
 
-    var txid = $("#txid").val();
+    let txid = $("#txid").val();
 
     // OBD API
     obdApi.getOmniTxByTxid(txid, function(e) {
-        console.info('1206 getTransaction - OBD Response = ' + JSON.stringify(e));
+        console.info('-102118 getTransaction = ' + JSON.stringify(e));
         // createOBDResponseDiv(e, msgType);
     });
 }
 
 /** 
- * 1207 getAssetNameByID API at local.
+ * -102119 getAssetNameByID API at local.
  * @param msgType
  */
 function getAssetNameByID(msgType) {
 
-    var propertyId = $("#PropertyID").val();
+    let propertyId = $("#PropertyID").val();
 
     // OBD API
     obdApi.omniGetAssetNameByID(propertyId, function(e) {
-        console.info('1207 getAssetNameByID - OBD Response = ' + JSON.stringify(e));
+        console.info('-102119 getAssetNameByID = ' + JSON.stringify(e));
         // createOBDResponseDiv(e, msgType);
     });
 }
 
 /** 
- * -35109 getAllBRTx API at local.
+ * -103208 getAllBRTx API at local.
  * @param msgType
  */
 function getAllBRTx(msgType) {
 
-    var channel_id = $("#channel_id").val();
+    let channel_id = $("#channel_id").val();
 
     // OBD API
     obdApi.getAllBRTx(channel_id, function(e) {
-        console.info('-35109 getAllBRTx - OBD Response = ' + JSON.stringify(e));
+        console.info('-103208 getAllBRTx = ' + JSON.stringify(e));
         createOBDResponseDiv(e, msgType);
     });
 }
 
 /** 
- * -3207 GetChannelDetail API at local.
+ * -103154 GetChannelDetail API at local.
  * @param msgType
  */
 function getChannelDetail(msgType) {
 
-    var id = $("#id").val();
+    let id = $("#id").val();
 
     // OBD API
     obdApi.getChannelById(Number(id), function(e) {
-        console.info('-3207 GetChannelDetail - OBD Response = ' + JSON.stringify(e));
+        console.info('-103154 GetChannelDetail = ' + JSON.stringify(e));
         createOBDResponseDiv(e, msgType);
     });
 }
 
 /** 
- * -3202 getAllChannels API at local.
+ * -103150 getAllChannels API at local.
  * @param msgType
  */
 function getAllChannels(msgType) {
     // OBD API
     obdApi.getAllChannels(function(e) {
-        console.info('-3202 getAllChannels - OBD Response = ' + JSON.stringify(e));
+        console.info('-103150 getAllChannels = ' + JSON.stringify(e));
         createOBDResponseDiv(e, msgType);
     });
 }
 
 /** 
- * -35101 GetAllCommitmentTransactions API at local.
+ * -103200 GetAllCommitmentTransactions API at local.
  * @param msgType
  */
 function getAllCommitmentTransactions(msgType) {
 
-    var channel_id = $("#channel_id").val();
+    let channel_id = $("#channel_id").val();
 
     // OBD API
     obdApi.getItemsByChannelId(channel_id, function(e) {
-        console.info('-35101 GetAllCommitmentTransactions - OBD Response = ' + JSON.stringify(e));
+        console.info('-103200 GetAllCommitmentTransactions = ' + JSON.stringify(e));
         createOBDResponseDiv(e, msgType);
     });
 }
 
 /** 
- * -35104 getLatestCommitmentTx API at local.
+ * -103203 getLatestCommitmentTx API at local.
  * @param msgType
  */
 function getLatestCommitmentTx(msgType) {
 
-    var channel_id = $("#channel_id").val();
+    let channel_id = $("#channel_id").val();
 
     // OBD API
     obdApi.getLatestCommitmentTxByChannelId(channel_id, function(e) {
-        console.info('-35104 getLatestCommitmentTx - OBD Response = ' + JSON.stringify(e));
+        console.info('-103203 getLatestCommitmentTx = ' + JSON.stringify(e));
         createOBDResponseDiv(e, msgType);
     });
 }
 
-// BTC Funding Created -3400 API at local.
+// -100340 BTC Funding Created API at local.
 function btcFundingCreated(msgType) {
 
-    var p2pID    = $("#recipient_node_peer_id").val();
-    var name     = $("#recipient_user_peer_id").val();
-    var temp_cid = $("#temporary_channel_id").val();
-    var privkey  = $("#channel_address_private_key").val();
-    var tx_hex   = $("#funding_tx_hex").val();
+    let nodeID = $("#recipient_node_peer_id").val();
+    let userID = $("#recipient_user_peer_id").val();
 
-    let info = new FundingBtcCreated();
-    info.temporary_channel_id = temp_cid;
-    info.channel_address_private_key = privkey;
-    info.funding_tx_hex = tx_hex;
+    let info                         = new FundingBtcCreated();
+    info.temporary_channel_id        = $("#temporary_channel_id").val();
+    info.channel_address_private_key = $("#channel_address_private_key").val();
+    info.funding_tx_hex              = $("#funding_tx_hex").val();
 
     // OBD API
-    obdApi.btcFundingCreated(p2pID, name, info, function(e) {
-        console.info('btcFundingCreated - OBD Response = ' + JSON.stringify(e));
-        saveChannelList(e, temp_cid, msgType);
-        // createOBDResponseDiv(e, msgType);
+    obdApi.btcFundingCreated(nodeID, userID, info, function(e) {
+        console.info('-100340 btcFundingCreated = ' + JSON.stringify(e));
+        saveChannelList(e, info.temporary_channel_id, msgType);
     });
 }
 
-// BTC Funding Signed -100350 API at local.
+// -100350 BTC Funding Signed API at local.
 function btcFundingSigned(msgType) {
 
-    var p2pID    = $("#recipient_node_peer_id").val();
-    var name     = $("#recipient_user_peer_id").val();
-    var temp_cid = $("#temporary_channel_id").val();
-    var privkey  = $("#channel_address_private_key").val();
-    var tx_id    = $("#funding_txid").val();
-    var approval = $("#checkbox_n3500").prop("checked");
+    let nodeID = $("#recipient_node_peer_id").val();
+    let userID = $("#recipient_user_peer_id").val();
 
-    let info = new FundingBtcSigned();
-    info.temporary_channel_id = temp_cid;
-    info.channel_address_private_key = privkey;
-    info.funding_txid = tx_id;
-    info.approval = approval;
+    let info                         = new FundingBtcSigned();
+    info.temporary_channel_id        = $("#temporary_channel_id").val();
+    info.channel_address_private_key = $("#channel_address_private_key").val();
+    info.funding_txid                = $("#funding_txid").val();
+    info.approval                    = $("#checkbox_n3500").prop("checked");
 
     // OBD API
-    obdApi.btcFundingSigned(p2pID, name, info, function(e) {
-        console.info('btcFundingSigned - OBD Response = ' + JSON.stringify(e));
-        saveChannelList(e, temp_cid, msgType);
-        // createOBDResponseDiv(e, msgType);
+    obdApi.btcFundingSigned(nodeID, userID, info, function(e) {
+        console.info('-100350 btcFundingSigned = ' + JSON.stringify(e));
+        saveChannelList(e, info.temporary_channel_id, msgType);
     });
 }
 
-// Omni Asset Funding Created -100034 API at local.
+// -100034 Omni Asset Funding Created API at local.
 function assetFundingCreated(msgType) {
 
-    let p2pID    = $("#recipient_node_peer_id").val();
-    let name     = $("#recipient_user_peer_id").val();
+    let nodeID   = $("#recipient_node_peer_id").val();
+    let userID   = $("#recipient_user_peer_id").val();
     let temp_cid = $("#temporary_channel_id").val();
     let t_ad_pbk = $("#temp_address_pub_key").val();
     let t_ad_prk = $("#temp_address_private_key").val();
@@ -989,29 +900,29 @@ function assetFundingCreated(msgType) {
     info.funding_tx_hex              = tx_hex;
 
     // OBD API
-    obdApi.channelFundingCreated(p2pID, name, info, function(e) {
+    obdApi.channelFundingCreated(nodeID, userID, info, function(e) {
         console.info('-100034 - assetFundingCreated = ' + JSON.stringify(e));
         saveChannelList(e, temp_cid, msgType);
         saveTempPrivKey(TempPrivKey, temp_cid, t_ad_prk);
     });
 }
 
-// Omni Asset Funding Signed -100035 API at local.
+// -100035 Omni Asset Funding Signed API at local.
 function assetFundingSigned(msgType) {
 
-    let p2pID      = $("#recipient_node_peer_id").val();
-    let name       = $("#recipient_user_peer_id").val();
-    let temporary_channel_id = $("#temporary_channel_id").val();
-    let privkey    = $("#fundee_channel_address_private_key").val();
+    let nodeID    = $("#recipient_node_peer_id").val();
+    let userID    = $("#recipient_user_peer_id").val();
+    let temp_cid  = $("#temporary_channel_id").val();
+    let privkey   = $("#fundee_channel_address_private_key").val();
     // let approval   = $("#checkbox_n35").prop("checked");
 
-    let info = new ChannelFundingSignedInfo();
-    info.temporary_channel_id = temporary_channel_id;
+    let info                                = new ChannelFundingSignedInfo();
+    info.temporary_channel_id               = temp_cid;
     info.fundee_channel_address_private_key = privkey;
     // info.approval = approval;
 
     // OBD API
-    obdApi.channelFundingSigned(p2pID, name, info, function(e) {
+    obdApi.channelFundingSigned(nodeID, userID, info, function(e) {
         console.info('-100035 - assetFundingSigned = ' + JSON.stringify(e));
         saveChannelList(e, e.channel_id, msgType);
         saveTempPrivKey(FundingPrivKey, e.channel_id, privkey);
@@ -1021,38 +932,28 @@ function assetFundingSigned(msgType) {
 // -102109 funding BTC API at local.
 function fundingBTC(msgType) {
 
-    var from_address = $("#from_address").val();
-    var from_address_private_key = $("#from_address_private_key").val();
-    var to_address  = $("#to_address").val();
-    var amount      = $("#amount").val();
-    var miner_fee   = $("#miner_fee").val();
+    let from_address             = $("#from_address").val();
+    let from_address_private_key = $("#from_address_private_key").val();
+    let to_address               = $("#to_address").val();
+    let amount                   = $("#amount").val();
+    let miner_fee                = $("#miner_fee").val();
 
-    let info = new BtcFundingInfo();
-    info.from_address = from_address;
+    let info                      = new BtcFundingInfo();
+    info.from_address             = from_address;
     info.from_address_private_key = from_address_private_key;
-    info.to_address = to_address;
-    info.amount = Number(amount);
-    info.miner_fee = Number(miner_fee);
+    info.to_address               = to_address;
+    info.amount                   = Number(amount);
+    info.miner_fee                = Number(miner_fee);
 
     //Save value to variable
-    btcFromAddr = from_address;
+    btcFromAddr        = from_address;
     btcFromAddrPrivKey = from_address_private_key;
-    btcToAddr = to_address;
-    btcAmount = amount;
-    btcMinerFee = miner_fee;
+    btcToAddr          = to_address;
+    btcAmount          = amount;
+    btcMinerFee        = miner_fee;
 
     // Get temporary_channel_id
     let tempChID = getChannelID();
-
-    // var tempChID;
-    // var list = JSON.parse(localStorage.getItem(itemChannelList));
-    // for (let i = 0; i < list.result.length; i++) {
-    //     for (let i2 = 0; i2 < list.result[i].data.length; i2++) {
-    //         if (to_address === list.result[i].data[i2].channel_address) {
-    //             tempChID = list.result[i].data[i2].temporary_channel_id;
-    //         }
-    //     }
-    // }
 
     // OBD API
     obdApi.fundingBTC(info, function(e) {
@@ -1065,30 +966,15 @@ function fundingBTC(msgType) {
 //  -102120 funding Omni Asset API at local.
 function fundingAsset(msgType) {
 
-    var from_address = $("#from_address").val();
-    var from_address_private_key = $("#from_address_private_key").val();
-    var to_address = $("#to_address").val();
-    var amount = $("#amount").val();
-    var property_id = $("#property_id").val();
+    let info                      = new OmniFundingAssetInfo();
+    info.from_address             = $("#from_address").val();
+    info.from_address_private_key = $("#from_address_private_key").val();
+    info.to_address               = $("#to_address").val();
+    info.amount                   = Number($("#amount").val());
+    info.property_id              = Number($("#property_id").val());
 
-    let info = new OmniFundingAssetInfo();
-    info.from_address = from_address;
-    info.from_address_private_key = from_address_private_key;
-    info.to_address = to_address;
-    info.amount = Number(amount);
-    info.property_id = Number(property_id);
-
-    // Get temporary_channel_id with channel_address.
+    // Get temporary_channel_id
     let tempChID = getChannelID();
-    // var tempChID;
-    // var list = JSON.parse(localStorage.getItem(itemChannelList));
-    // for (let i = 0; i < list.result.length; i++) {
-    //     for (let i2 = 0; i2 < list.result[i].data.length; i2++) {
-    //         if (to_address === list.result[i].data[i2].channel_address) {
-    //             tempChID = list.result[i].data[i2].temporary_channel_id;
-    //         }
-    //     }
-    // }
 
     // OBD API
     obdApi.fundingAssetOfOmni(info, function(e) {
@@ -1098,28 +984,19 @@ function fundingAsset(msgType) {
     });
 }
 
-// createInvoice API at local.
+// -100402 createInvoice API at local.
 function createInvoice(msgType) {
 
-    let property_id = $("#property_id").val();
-    let amount      = $("#amount").val();
-    let h           = $("#h").val();
-    let expiry_time = $("#expiry_time").val();
-    let description = $("#description").val();
-
     let info         = new InvoiceInfo();
-    info.property_id = Number(property_id);
-    info.amount      = Number(amount);
-    info.h           = h;
-    info.expiry_time = expiry_time;
-    console.info('info.expiry_time = ' + info.expiry_time);
-    info.description = description;
+    info.property_id = Number($("#property_id").val());
+    info.amount      = Number($("#amount").val());
+    info.h           = $("#h").val();
+    info.expiry_time = $("#expiry_time").val();
+    info.description = $("#description").val();
 
     // OBD API
     obdApi.htlcInvoice(info, function(e) {
-        console.info('createInvoice - OBD Response = ' + JSON.stringify(e));
-        // saveChannelList(e, tempChID, msgType);
-        // createOBDResponseDiv(e, msgType);
+        console.info('-100402 createInvoice = ' + JSON.stringify(e));
 
         $("#newDiv").remove();
         createElement($("#name_req_div"), 'div', '', 'panelItem', 'newDiv');
@@ -1143,40 +1020,27 @@ function createInvoice(msgType) {
 // -100040 htlcCreated API at local.
 function htlcCreated(msgType) {
 
-    var recipient_node_peer_id  = $("#recipient_node_peer_id").val();
-    var recipient_user_peer_id  = $("#recipient_user_peer_id").val();
-    var property_id = $("#property_id").val();
-    var amount      = $("#amount").val();
-    var memo        = $("#memo").val();
-    var h           = $("#h").val();
-    var htlc_channel_path = $("#htlc_channel_path").val();
-    var channel_address_private_key = $("#channel_address_private_key").val();
-    var last_temp_address_private_key = $("#last_temp_address_private_key").val();
-    var curr_rsmc_temp_address_pub_key = $("#curr_rsmc_temp_address_pub_key").val();
-    var curr_rsmc_temp_address_private_key = $("#curr_rsmc_temp_address_private_key").val();
-    var curr_htlc_temp_address_pub_key = $("#curr_htlc_temp_address_pub_key").val();
-    var curr_htlc_temp_address_private_key = $("#curr_htlc_temp_address_private_key").val();
-    var curr_htlc_temp_address_for_ht1a_pub_key = $("#curr_htlc_temp_address_for_ht1a_pub_key").val();
-    var curr_htlc_temp_address_for_ht1a_private_key = $("#curr_htlc_temp_address_for_ht1a_private_key").val();
+    let nodeID  = $("#recipient_node_peer_id").val();
+    let userID  = $("#recipient_user_peer_id").val();
 
-    let info = new HtlcCreatedInfo();
-    info.recipient_user_peer_id = recipient_user_peer_id;
-    info.property_id = Number(property_id);
-    info.amount = Number(amount);
-    info.memo = memo;
-    info.h = h;
-    info.htlc_channel_path = htlc_channel_path;
-    info.channel_address_private_key = channel_address_private_key;
-    info.last_temp_address_private_key = last_temp_address_private_key;
-    info.curr_rsmc_temp_address_pub_key = curr_rsmc_temp_address_pub_key;
-    info.curr_rsmc_temp_address_private_key = curr_rsmc_temp_address_private_key;
-    info.curr_htlc_temp_address_pub_key = curr_htlc_temp_address_pub_key;
-    info.curr_htlc_temp_address_private_key = curr_htlc_temp_address_private_key;
-    info.curr_htlc_temp_address_for_ht1a_pub_key = curr_htlc_temp_address_for_ht1a_pub_key;
-    info.curr_htlc_temp_address_for_ht1a_private_key = curr_htlc_temp_address_for_ht1a_private_key;
+    let info                                         = new HtlcCreatedInfo();
+    info.recipient_user_peer_id                      = userID;
+    info.property_id                                 = Number($("#property_id").val());
+    info.amount                                      = Number($("#amount").val());
+    info.memo                                        = $("#memo").val();
+    info.h                                           = $("#h").val();
+    info.htlc_channel_path                           = $("#htlc_channel_path").val();
+    info.channel_address_private_key                 = $("#channel_address_private_key").val();
+    info.last_temp_address_private_key               = $("#last_temp_address_private_key").val();
+    info.curr_rsmc_temp_address_pub_key              = $("#curr_rsmc_temp_address_pub_key").val();
+    info.curr_rsmc_temp_address_private_key          = $("#curr_rsmc_temp_address_private_key").val();
+    info.curr_htlc_temp_address_pub_key              = $("#curr_htlc_temp_address_pub_key").val();
+    info.curr_htlc_temp_address_private_key          = $("#curr_htlc_temp_address_private_key").val();
+    info.curr_htlc_temp_address_for_ht1a_pub_key     = $("#curr_htlc_temp_address_for_ht1a_pub_key").val();
+    info.curr_htlc_temp_address_for_ht1a_private_key = $("#curr_htlc_temp_address_for_ht1a_private_key").val();
 
     // OBD API
-    obdApi.htlcCreated(recipient_node_peer_id, recipient_user_peer_id, info, function(e) {
+    obdApi.htlcCreated(nodeID, userID, info, function(e) {
         console.info('-100040 htlcCreated = ' + JSON.stringify(e));
         // save 3 privkeys
         saveTempPrivKey(RsmcTempPrivKey, e.channel_id, info.curr_rsmc_temp_address_private_key);
@@ -1188,136 +1052,83 @@ function htlcCreated(msgType) {
 // -100041 htlcSigned API at local.
 function htlcSigned(msgType) {
 
-    var recipient_node_peer_id  = $("#recipient_node_peer_id").val();
-    var recipient_user_peer_id  = $("#recipient_user_peer_id").val();
-    var request_hash = $("#request_hash").val();
-    var channel_address_private_key = $("#channel_address_private_key").val();
-    var last_temp_address_private_key = $("#last_temp_address_private_key").val();
-    var curr_rsmc_temp_address_pub_key = $("#curr_rsmc_temp_address_pub_key").val();
-    var curr_rsmc_temp_address_private_key = $("#curr_rsmc_temp_address_private_key").val();
-    var curr_htlc_temp_address_pub_key = $("#curr_htlc_temp_address_pub_key").val();
-    var curr_htlc_temp_address_private_key = $("#curr_htlc_temp_address_private_key").val();
-    // var approval = $("#checkbox_n41").prop("checked");
+    let nodeID  = $("#recipient_node_peer_id").val();
+    let userID  = $("#recipient_user_peer_id").val();
 
-    let info = new HtlcSignedInfo();
-    info.request_hash = request_hash;
-    info.channel_address_private_key = channel_address_private_key;
-    info.last_temp_address_private_key = last_temp_address_private_key;
-    info.curr_rsmc_temp_address_pub_key = curr_rsmc_temp_address_pub_key;
-    info.curr_rsmc_temp_address_private_key = curr_rsmc_temp_address_private_key;
-    info.curr_htlc_temp_address_pub_key = curr_htlc_temp_address_pub_key;
-    info.curr_htlc_temp_address_private_key = curr_htlc_temp_address_private_key;
-    // info.approval = approval;
-
-    // Get channel_id by request_hash.
-    // var channelId;
-    // var list = JSON.parse(localStorage.getItem(itemChannelList));
-    // for (let i = 0; i < list.result.length; i++) {
-    //     for (let i2 = 0; i2 < list.result[i].htlc.length; i2++) {
-    //         if (request_hash === list.result[i].htlc[i2].msgHash) {
-    //             channelId =  list.result[i].htlc[i2].channelId;
-    //         }
-    //     }
-    // }
+    let info                                = new HtlcSignedInfo();
+    info.commitment_tx_hash                 = $("#commitment_tx_hash").val();
+    info.channel_address_private_key        = $("#channel_address_private_key").val();
+    info.last_temp_address_private_key      = $("#last_temp_address_private_key").val();
+    info.curr_rsmc_temp_address_pub_key     = $("#curr_rsmc_temp_address_pub_key").val();
+    info.curr_rsmc_temp_address_private_key = $("#curr_rsmc_temp_address_private_key").val();
+    info.curr_htlc_temp_address_pub_key     = $("#curr_htlc_temp_address_pub_key").val();
+    info.curr_htlc_temp_address_private_key = $("#curr_htlc_temp_address_private_key").val();
 
     // OBD API
-    obdApi.htlcSigned(recipient_node_peer_id, recipient_user_peer_id, info, function(e) {
-        console.info('-100041 htlcSigned - OBD Response = ' + JSON.stringify(e));
+    obdApi.htlcSigned(nodeID, userID, info, function(e) {
+        console.info('-100041 htlcSigned = ' + JSON.stringify(e));
         saveChannelList(e, e.channel_id, msgType);
-        // createOBDResponseDiv(e, msgType);
+        saveTempPrivKey(RsmcTempPrivKey, e.channel_id, info.curr_rsmc_temp_address_private_key);
+        saveTempPrivKey(HtlcTempPrivKey, e.channel_id, info.curr_htlc_temp_address_private_key);
     });
 }
 
-// -43 htlcSendH API at local.
-function htlcSendH(msgType) {
-
-    var h = $("#h").val();
-    var request_hash = $("#request_hash").val();
-
-    // OBD API
-    obdApi.htlcSendH(h, request_hash, function(e) {
-        console.info('-43 htlcSendH - OBD Response = ' + JSON.stringify(e));
-        // saveChannelList(e);
-        // createOBDResponseDiv(e, msgType);
-    });
-}
-
-// 
+// -100401 htlcSigned API at local.
 function htlcFindPath(msgType) {
 
-    var recipient_node_peer_id = $("#recipient_node_peer_id").val();
-    var recipient_user_peer_id = $("#recipient_user_peer_id").val();
-    var property_id            = $("#property_id").val();
-    var amount                 = $("#amount").val();
-
-    let info = new HtlcFindPathInfo();
-    info.recipient_node_peer_id = recipient_node_peer_id;
-    info.recipient_user_peer_id = recipient_user_peer_id;
-    info.property_id            = Number(property_id);
-    info.amount                 = Number(amount);
+    let info                    = new HtlcFindPathInfo();
+    info.recipient_node_peer_id = $("#recipient_node_peer_id").val();
+    info.recipient_user_peer_id = $("#recipient_user_peer_id").val();
+    info.property_id            = Number($("#property_id").val());
+    info.amount                 = Number($("#amount").val());
 
     // OBD API
     obdApi.htlcFindPath(info, function(e) {
-        console.info('N4001 - htlcFindPath - OBD Response = ' + JSON.stringify(e));
-        // saveChannelList(e, tempChID, msgType);
-        // createOBDResponseDiv(e, msgType);
+        console.info('-100401 - htlcFindPath = ' + JSON.stringify(e));
     });
 }
 
 // -100351 Commitment Transaction Created API at local.
 function rsmcCTxCreated(msgType) {
 
-    var p2pID    = $("#recipient_node_peer_id").val();
-    var name     = $("#recipient_user_peer_id").val();
-    var channel_id = $("#channel_id").val();
-    var amount = $("#amount").val();
-    var curr_temp_address_pub_key = $("#curr_temp_address_pub_key").val();
-    var curr_temp_address_private_key = $("#curr_temp_address_private_key").val();
-    var channel_address_private_key = $("#channel_address_private_key").val();
-    var last_temp_address_private_key = $("#last_temp_address_private_key").val();
-
-    let info = new CommitmentTx();
-    info.channel_id = channel_id;
-    info.amount = Number(amount);
-    info.curr_temp_address_pub_key = curr_temp_address_pub_key;
-    info.curr_temp_address_private_key = curr_temp_address_private_key;
-    info.channel_address_private_key = channel_address_private_key;
-    info.last_temp_address_private_key = last_temp_address_private_key;
+    let nodeID = $("#recipient_node_peer_id").val();
+    let userID = $("#recipient_user_peer_id").val();
+    
+    let info                           = new CommitmentTx();
+    info.channel_id                    = $("#channel_id").val();
+    info.amount                        = Number($("#amount").val());
+    info.channel_address_private_key   = $("#channel_address_private_key").val();
+    info.curr_temp_address_pub_key     = $("#curr_temp_address_pub_key").val();
+    info.curr_temp_address_private_key = $("#curr_temp_address_private_key").val();
+    info.last_temp_address_private_key = $("#last_temp_address_private_key").val();
 
     // OBD API
-    obdApi.commitmentTransactionCreated(p2pID, name, info, function(e) {
-        console.info('-100351 RSMCCTxCreated = ' + JSON.stringify(e));
-        saveTempPrivKey(TempPrivKey, channel_id, curr_temp_address_private_key);
+    obdApi.commitmentTransactionCreated(nodeID, userID, info, function(e) {
+        console.info('-100351 rsmcCTxCreated = ' + JSON.stringify(e));
+        saveTempPrivKey(TempPrivKey, e.channel_id, info.curr_temp_address_private_key);
     });
 }
 
-// Revoke and Acknowledge Commitment Transaction -100352 API at local.
+// -100352 Revoke and Acknowledge Commitment Transaction API at local.
 function rsmcCTxSigned(msgType) {
 
-    let p2pID    = $("#recipient_node_peer_id").val();
-    let name     = $("#recipient_user_peer_id").val();
-    let channel_id = $("#channel_id").val();
-    let curr_temp_address_pub_key = $("#curr_temp_address_pub_key").val();
-    let curr_temp_address_private_key = $("#curr_temp_address_private_key").val();
-    let channel_address_private_key = $("#channel_address_private_key").val();
-    let last_temp_address_private_key = $("#last_temp_address_private_key").val();
-    let msg_hash = $("#msg_hash").val();
-    let approval = $("#checkbox_n352").prop("checked");
+    let nodeID = $("#recipient_node_peer_id").val();
+    let userID = $("#recipient_user_peer_id").val();
 
-    let info = new CommitmentTxSigned();
-    info.channel_id = channel_id;
-    info.curr_temp_address_pub_key = curr_temp_address_pub_key;
-    info.curr_temp_address_private_key = curr_temp_address_private_key;
-    info.channel_address_private_key = channel_address_private_key;
-    info.last_temp_address_private_key = last_temp_address_private_key;
-    info.msg_hash = msg_hash;
-    info.approval = approval;
+    let info                           = new CommitmentTxSigned();
+    info.channel_id                    = $("#channel_id").val();
+    info.channel_address_private_key   = $("#channel_address_private_key").val();
+    info.curr_temp_address_pub_key     = $("#curr_temp_address_pub_key").val();
+    info.curr_temp_address_private_key = $("#curr_temp_address_private_key").val();
+    info.last_temp_address_private_key = $("#last_temp_address_private_key").val();
+    info.msg_hash                      = $("#msg_hash").val();
+    info.approval                      = $("#checkbox_n352").prop("checked");
 
     // OBD API
-    obdApi.revokeAndAcknowledgeCommitmentTransaction(p2pID, name, info, function(e) {
-        console.info('-100352 RSMCCTxSigned = ' + JSON.stringify(e));
-        saveChannelList(e, channel_id, msgType);
-        saveTempPrivKey(TempPrivKey, channel_id, curr_temp_address_private_key);
+    obdApi.revokeAndAcknowledgeCommitmentTransaction(nodeID, userID, info, function(e) {
+        console.info('-100352 rsmcCTxSigned = ' + JSON.stringify(e));
+        saveChannelList(e, e.channel_id, msgType);
+        saveTempPrivKey(TempPrivKey, e.channel_id, info.curr_temp_address_private_key);
     });
 }
 
@@ -1450,10 +1261,10 @@ function invokeAPIs(objSelf) {
             htlcSigned(msgType);
             break;
         case enumMsgType.MsgType_HTLC_SendVerifyR_45:
-            htlcSendR(msgType);
+            htlcSendVerifyR(msgType);
             break;
         case enumMsgType.MsgType_HTLC_SendSignVerifyR_46:
-            htlcVerifyR(msgType);
+            htlcSendSignVerifyR(msgType);
             break;
         case enumMsgType.MsgType_HTLC_SendRequestCloseCurrTx_49:
             closeHTLC(msgType);
@@ -1523,22 +1334,6 @@ function displayOBDMessages(msg) {
         fullMsg = jsonFormat(fullMsg);
 
     switch (Number(content.type)) {
-        // case enumMsgType.MsgType_Error_0:
-        // case enumMsgType.MsgType_Mnemonic_CreateAddress_3000:
-        // case enumMsgType.MsgType_Mnemonic_GetAddressByIndex_3001:
-        // case enumMsgType.MsgType_GetMnemonic_2004:
-        // case enumMsgType.MsgType_Core_BalanceByAddress_2108:
-        // case enumMsgType.MsgType_Core_FundingBTC_2109:
-        // case enumMsgType.MsgType_Core_Omni_Getbalance_2112:
-        // case enumMsgType.MsgType_Core_Omni_GetProperty_2119:
-        // case enumMsgType.MsgType_Core_Omni_FundingAsset_2120:
-        // case enumMsgType.MsgType_HTLC_Invoice_402:
-        // case enumMsgType.MsgType_CommitmentTx_LatestCommitmentTxByChanId_3203:
-        // case enumMsgType.MsgType_CommitmentTx_ItemsByChanId_3200:
-        // case enumMsgType.MsgType_ChannelOpen_AllItem_3150:
-        // case enumMsgType.MsgType_GetChannelInfoByChannelId_3154:
-        // case enumMsgType.MsgType_CommitmentTx_AllBRByChanId_3208:
-        //     return;
         case enumMsgType.MsgType_UserLogin_2001:
             content.result = 'Logged In - ' + content.from;
             msgHead = msgTime +  '  - Logged In.';
@@ -1550,29 +1345,17 @@ function displayOBDMessages(msg) {
         case enumMsgType.MsgType_SendChannelOpen_32:
             content.result = 'LAUNCH - ' + content.from +
                 ' - launch an Open Channel request. ';
-
             msgHead = msgTime +  '  - launch an Open Channel request.';
-
-            // 'The [temporary_channel_id] is : ' + 
-            // content.result.temporary_channel_id;
             break;
         case enumMsgType.MsgType_SendChannelAccept_33:
             if (content.result.curr_state === 11) { // Accept
                 content.result = 'ACCEPT - ' + content.from +
                     ' - accept Open Channel request. ';
-                // 'The [temporary_channel_id] is : ' + 
-                // content.result.temporary_channel_id;
-
                 msgHead = msgTime +  '  - accept Open Channel request.';
-
             } else if (content.result.curr_state === 30) { // Not Accept
                 content.result = 'DECLINE - ' + content.from +
                     ' - decline Open Channel request. ';
-
                 msgHead = msgTime +  '  - decline Open Channel request.';
-
-                // 'The [temporary_channel_id] is : ' + 
-                // content.result.temporary_channel_id;
             }
             break;
         case enumMsgType.MsgType_FundingCreate_SendBtcFundingCreated_340:
@@ -2102,6 +1885,20 @@ function autoFillValue(arrParams, obj) {
 
         case enumMsgType.MsgType_HTLC_SendAddHTLCSigned_41:
             if (!isLogined) return;  // Not logined
+
+            result = getLastCounterparty();
+            $("#recipient_node_peer_id").val(result.p2pID);
+            $("#recipient_user_peer_id").val(result.name);
+
+            let hash = getHtlcTxHash();
+            $("#commitment_tx_hash").val(hash);
+
+            channelID = getChannelID();
+            fundingPrivKey = getTempPrivKey(FundingPrivKey, channelID);
+            $("#channel_address_private_key").val(fundingPrivKey);
+
+            tempPrivKey = getTempPrivKey(TempPrivKey, channelID);
+            $("#last_temp_address_private_key").val(tempPrivKey);
             
             result = genAddressFromMnemonic();
             if (result === '') return;
@@ -2122,6 +1919,17 @@ function autoFillValue(arrParams, obj) {
         
         case enumMsgType.MsgType_HTLC_SendVerifyR_45:
             if (!isLogined) return;  // Not logined
+
+            result = getLastCounterparty();
+            $("#recipient_node_peer_id").val(result.p2pID);
+            $("#recipient_user_peer_id").val(result.name);
+
+            channelID = getChannelID();
+            $("#channel_id").val(channelID);
+
+            fundingPrivKey = getTempPrivKey(FundingPrivKey, channelID);
+            $("#channel_address_private_key").val(fundingPrivKey);
+
             result = genAddressFromMnemonic();
             if (result === '') return;
             $("#curr_htlc_temp_address_for_he1b_pub_key").val(result.result.pubkey);
@@ -2131,8 +1939,53 @@ function autoFillValue(arrParams, obj) {
             saveAddresses(result);
             break;
 
-        case enumMsgType.MsgType_HTLC_SendRequestCloseCurrTx_49:
+        case enumMsgType.MsgType_HTLC_SendSignVerifyR_46:
             if (!isLogined) return;  // Not logined
+
+            result = getLastCounterparty();
+            $("#recipient_node_peer_id").val(result.p2pID);
+            $("#recipient_user_peer_id").val(result.name);
+            
+            channelID = getChannelID();
+            $("#channel_id").val(channelID);
+
+            let hash = getHtlcTxHash();
+            $("#msg_hash").val(hash);
+
+            let r = getHtlcVerifyR();
+            $("#r").val(r);
+            
+            fundingPrivKey = getTempPrivKey(FundingPrivKey, channelID);
+            $("#channel_address_private_key").val(fundingPrivKey);
+            break;
+
+        case enumMsgType.MsgType_HTLC_SendRequestCloseCurrTx_49:
+        case enumMsgType.MsgType_HTLC_SendCloseSigned_50:
+            if (!isLogined) return;  // Not logined
+
+            result = getLastCounterparty();
+            $("#recipient_node_peer_id").val(result.p2pID);
+            $("#recipient_user_peer_id").val(result.name);
+            
+            if (msgType === enumMsgType.MsgType_HTLC_SendCloseSigned_50) {
+                let msgHash = getHtlcTxHash();
+                $("#msg_hash").val(msgHash);
+            }
+
+            channelID = getChannelID();
+
+            fundingPrivKey = getTempPrivKey(FundingPrivKey, channelID);
+            $("#channel_address_private_key").val(fundingPrivKey);
+
+            let privkey_1 = getTempPrivKey(RsmcTempPrivKey, channelID);
+            $("#last_rsmc_temp_address_private_key").val(privkey_1);
+
+            let privkey_2 = getTempPrivKey(HtlcTempPrivKey, channelID);
+            $("#last_htlc_temp_address_private_key").val(privkey_2);
+
+            let privkey_3 = getTempPrivKey(HtlcHtnxTempPrivKey, channelID);
+            $("#last_htlc_temp_address_for_htnx_private_key").val(privkey_3);
+
             result = genAddressFromMnemonic();
             if (result === '') return;
             $("#curr_rsmc_temp_address_pub_key").val(result.result.pubkey);
@@ -2142,16 +1995,6 @@ function autoFillValue(arrParams, obj) {
             saveAddresses(result);
             break;
 
-        case enumMsgType.MsgType_HTLC_SendCloseSigned_50:
-            if (!isLogined) return;  // Not logined
-            result = genAddressFromMnemonic();
-            if (result === '') return;
-            $("#curr_rsmc_temp_address_pub_key").val(result.result.pubkey);
-            $("#curr_rsmc_temp_address_private_key").val(result.result.wif);
-            $("#curr_rsmc_temp_address_pub_key").attr("class", "input input_color");
-            $("#curr_rsmc_temp_address_private_key").attr("class", "input input_color");
-            saveAddresses(result);
-            break;
     }
 }
 
@@ -4387,31 +4230,61 @@ function getRsmcMsgHash() {
     }
 }
 
-// save request_hash from HTLCCreated type ( -100040 ) return
-function saveHtlcRequestHash(requestHash) {
+// save commitment_tx_hash from HTLCCreated type ( -100040 ) return
+function saveHtlcTxHash(commitment_tx_hash) {
 
     let resp = JSON.parse(localStorage.getItem(itemHtlcRequestHash));
 
     // If has data.
     if (resp) {
-        resp.requestHash = requestHash;
+        resp.commitment_tx_hash = commitment_tx_hash;
         localStorage.setItem(itemHtlcRequestHash, JSON.stringify(resp));
     } else {
         let data = {
-            requestHash: requestHash
+            commitment_tx_hash: commitment_tx_hash
         }
         localStorage.setItem(itemHtlcRequestHash, JSON.stringify(data));
     }
 }
 
-// get request_hash from HTLCCreated type ( -100040 ) return
-function getHtlcRequestHash() {
+// get commitment_tx_hash from HTLCCreated type ( -100040 ) return
+function getHtlcTxHash() {
 
     let resp = JSON.parse(localStorage.getItem(itemHtlcRequestHash));
 
     // If has data.
     if (resp) {
-        return resp.requestHash;
+        return resp.commitment_tx_hash;
+    } else {
+        return '';
+    }
+}
+
+// save r from HTLCSendVerifyR type ( -100045 ) return
+function saveHtlcVerifyR(r) {
+
+    let resp = JSON.parse(localStorage.getItem(itemHtlcVerifyR));
+
+    // If has data.
+    if (resp) {
+        resp.r = r;
+        localStorage.setItem(itemHtlcVerifyR, JSON.stringify(resp));
+    } else {
+        let data = {
+            r: r
+        }
+        localStorage.setItem(itemHtlcVerifyR, JSON.stringify(data));
+    }
+}
+
+// get r from HTLCSendVerifyR type ( -100045 ) return
+function getHtlcVerifyR() {
+
+    let resp = JSON.parse(localStorage.getItem(itemHtlcVerifyR));
+
+    // If has data.
+    if (resp) {
+        return resp.r;
     } else {
         return '';
     }

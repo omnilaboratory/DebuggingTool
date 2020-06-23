@@ -120,7 +120,7 @@ class HtlcCreatedInfo {
 }
 class HtlcSignedInfo {
     constructor() {
-        this.request_hash = "";
+        this.commitment_tx_hash = "";
         // approval: boolean = false;
         this.channel_address_private_key = "";
         this.last_temp_address_private_key = "";
@@ -128,15 +128,6 @@ class HtlcSignedInfo {
         this.curr_rsmc_temp_address_private_key = "";
         this.curr_htlc_temp_address_pub_key = "";
         this.curr_htlc_temp_address_private_key = "";
-    }
-}
-class HtlcHSignInfo {
-    constructor() {
-        this.request_hash = "";
-        this.property_id = 0;
-        this.amount = 0;
-        this.h = "";
-        this.approval = false;
     }
 }
 class SignGetHInfo {
@@ -164,7 +155,7 @@ class HtlcRequestOpen {
         this.curr_htlc_temp_address_for_ht1a_private_key = "";
     }
 }
-class HtlcSendRInfo {
+class HtlcSendVerifyRInfo {
     constructor() {
         this.channel_id = "";
         this.r = "";
@@ -173,10 +164,10 @@ class HtlcSendRInfo {
         this.curr_htlc_temp_address_for_he1b_private_key = "";
     }
 }
-class HtlcVerifyRInfo {
+class HtlcSendSignVerifyRInfo {
     constructor() {
         this.channel_id = "";
-        this.request_hash = "";
+        this.msg_hash = "";
         this.r = "";
         this.channel_address_private_key = "";
     }
@@ -194,7 +185,7 @@ class CloseHtlcTxInfo {
 }
 class CloseHtlcTxInfoSigned {
     constructor() {
-        this.request_hash = "";
+        this.msg_hash = "";
         this.channel_address_private_key = "";
         this.last_rsmc_temp_address_private_key = "";
         this.last_htlc_temp_address_private_key = "";

@@ -925,7 +925,7 @@
                     ]
                 },
                 {
-                    "name": "request_hash",
+                    "name": "commitment_tx_hash",
                     "help": "The hash of commitment transaction created in HTLCCreated (type -40).",
                     "buttons": [
                         {
@@ -1124,7 +1124,7 @@
                     ]
                 },
                 {
-                    "name": "request_hash",
+                    "name": "msg_hash",
                     "help": "The hash of commitment transaction created in HTLCSendR (type -45).",
                     "buttons": [
                         {
@@ -1279,7 +1279,7 @@
                     ]
                 },
                 {
-                    "name": "request_hash",
+                    "name": "msg_hash",
                     "help": "The hash of commitment transaction created in CloseHTLC (type -49).",
                     "buttons": [
                         {

@@ -106,7 +106,7 @@ class HtlcCreatedInfo {
 }
 
 class HtlcSignedInfo {
-  request_hash: string = "";
+  commitment_tx_hash: string = "";
   // approval: boolean = false;
   channel_address_private_key: string = "";
   last_temp_address_private_key: string = "";
@@ -114,14 +114,6 @@ class HtlcSignedInfo {
   curr_rsmc_temp_address_private_key: string = "";
   curr_htlc_temp_address_pub_key: string = "";
   curr_htlc_temp_address_private_key: string = "";
-}
-
-class HtlcHSignInfo {
-  request_hash: string = "";
-  property_id: number = 0;
-  amount: number = 0;
-  h: string = "";
-  approval: boolean = false;
 }
 
 class SignGetHInfo {
@@ -147,7 +139,7 @@ class HtlcRequestOpen {
   curr_htlc_temp_address_for_ht1a_private_key: string = "";
 }
 
-class HtlcSendRInfo {
+class HtlcSendVerifyRInfo {
   channel_id: string = "";
   r: string = "";
   channel_address_private_key: string = "";
@@ -155,9 +147,9 @@ class HtlcSendRInfo {
   curr_htlc_temp_address_for_he1b_private_key: string = "";
 }
 
-class HtlcVerifyRInfo {
+class HtlcSendSignVerifyRInfo {
   channel_id: string = "";
-  request_hash: string = "";
+  msg_hash: string = "";
   r: string = "";
   channel_address_private_key: string = "";
 }
@@ -173,7 +165,7 @@ class CloseHtlcTxInfo {
 }
 
 class CloseHtlcTxInfoSigned {
-  request_hash: string = "";
+  msg_hash: string = "";
   channel_address_private_key: string = "";
   last_rsmc_temp_address_private_key: string = "";
   last_htlc_temp_address_private_key: string = "";

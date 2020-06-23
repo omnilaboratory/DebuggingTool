@@ -230,10 +230,10 @@ class ObdApi {
                 this.onHtlcSigned(resultData);
                 break;
             case this.messageType.MsgType_HTLC_SendVerifyR_45:
-                this.onHtlcSendR(resultData);
+                this.onHtlcSendVerifyR(resultData);
                 break;
             case this.messageType.MsgType_HTLC_SendSignVerifyR_46:
-                this.onHtlcVerifyR(resultData);
+                this.onHtlcSendSignVerifyR(resultData);
                 break;
             case this.messageType.MsgType_HTLC_SendRequestCloseCurrTx_49:
                 this.onCloseHTLC(resultData);
@@ -885,8 +885,8 @@ class ObdApi {
             alert("error recipient_user_peer_id");
             return;
         }
-        if (this.isNotString(info.request_hash)) {
-            alert("empty request_hash");
+        if (this.isNotString(info.commitment_tx_hash)) {
+            alert("empty commitment_tx_hash");
             return;
         }
         // if (info.approval == null) {
@@ -931,10 +931,10 @@ class ObdApi {
      * MsgType_HTLC_SendVerifyR_45
      * @param recipient_node_peer_id string
      * @param recipient_user_peer_id string
-     * @param info HtlcSendRInfo
+     * @param info htlcSendVerifyR
      * @param callback function
      */
-    htlcSendR(recipient_node_peer_id, recipient_user_peer_id, info, callback) {
+    htlcSendVerifyR(recipient_node_peer_id, recipient_user_peer_id, info, callback) {
         if (this.isNotString(recipient_node_peer_id)) {
             alert("error recipient_node_peer_id");
             return;
@@ -970,15 +970,15 @@ class ObdApi {
         msg.recipient_node_peer_id = recipient_node_peer_id;
         this.sendData(msg, callback);
     }
-    onHtlcSendR(jsonData) { }
+    onHtlcSendVerifyR(jsonData) { }
     /**
      * MsgType_HTLC_SendSignVerifyR_46
      * @param recipient_node_peer_id string
      * @param recipient_user_peer_id string
-     * @param info HtlcVerifyRInfo
+     * @param info HtlcSendSignVerifyRInfo
      * @param callback function
      */
-    htlcVerifyR(recipient_node_peer_id, recipient_user_peer_id, info, callback) {
+    htlcSendSignVerifyR(recipient_node_peer_id, recipient_user_peer_id, info, callback) {
         if (this.isNotString(recipient_node_peer_id)) {
             alert("error recipient_node_peer_id");
             return;
@@ -991,8 +991,8 @@ class ObdApi {
             alert("empty channel_id");
             return;
         }
-        if (this.isNotString(info.request_hash)) {
-            alert("empty request_hash");
+        if (this.isNotString(info.msg_hash)) {
+            alert("empty msg_hash");
             return;
         }
         if (this.isNotString(info.r)) {
@@ -1010,7 +1010,7 @@ class ObdApi {
         msg.recipient_node_peer_id = recipient_node_peer_id;
         this.sendData(msg, callback);
     }
-    onHtlcVerifyR(jsonData) { }
+    onHtlcSendSignVerifyR(jsonData) { }
     /* ***************** backward R end*****************/
     /* ***************** close htlc tx begin*****************/
     /**
@@ -1081,8 +1081,8 @@ class ObdApi {
             alert("error recipient_user_peer_id");
             return;
         }
-        if (this.isNotString(info.request_hash)) {
-            alert("empty request_close_htlc_hash");
+        if (this.isNotString(info.msg_hash)) {
+            alert("empty msg_hash");
             return;
         }
         if (this.isNotString(info.channel_address_private_key)) {
