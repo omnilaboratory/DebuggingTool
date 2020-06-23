@@ -141,7 +141,7 @@ Online API documents lists all the channel operations step by step, and testing 
 During forwarding HTLCs, a channel shall construct tens of temporary unbroadcast transactions, so lots of private keys needed to be manually managed. Enable this mode, the obd will be your surrogate, will help you fill in all the private keys, and automatically answer the remote requests.
 
 <p align="center">
-  <img width="150" alt="connectNode" src="https://github.com/omnilaboratory/DebuggingTool/blob/master/doc/img/auto_pilot_mode.png">
+  <img width="150" alt="auto_pilot_mode" src="https://github.com/omnilaboratory/DebuggingTool/blob/master/doc/img/auto_pilot_mode.png">
 </p>
 
 ## JS SDK
