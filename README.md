@@ -22,6 +22,7 @@ In this tutorial, you can connect either your own OBD node, or the node we confi
 	* [Step 5: open channel](https://github.com/omnilaboratory/DebuggingTool#step-5-open-channel)
 	* [Step 6: create an invoice](https://github.com/omnilaboratory/DebuggingTool#step-6-create-an-invoice)
 	* [Step 7: channel operations](https://github.com/omnilaboratory/DebuggingTool#step-7-channel-operations)
+* [Auto pilot mode](https://github.com/omnilaboratory/DebuggingTool#auto-pilot-mode)
 * [JS-SDK](https://github.com/omnilaboratory/DebuggingTool#js-sdk)
 * [how to use APIs](https://github.com/omnilaboratory/DebuggingTool#how-to-use-apis)
  	
@@ -135,6 +136,13 @@ Then you are able to keep going with other operations to dive deeper into OmniBO
 
 Online API documents lists all the channel operations step by step, and testing demo data as well. Please visit OBD [online API documentation](https://api.omnilab.online) to learn how to fill in arguments to work with OBD.  
 
+## Auto pilot mode
+
+During forwarding HTLCs, a channel shall construct tens of temporary unbroadcast transactions, so lots of private keys needed to be manually managed. Enable this mode, the obd will be your surrogate, will help you fill in all the private keys, and automatically answer the remote requests.
+
+<p align="center">
+  <img width="150" alt="connectNode" src="https://github.com/omnilaboratory/DebuggingTool/blob/master/doc/img/auto_pilot_mode.png">
+</p>
 
 ## JS SDK
 
