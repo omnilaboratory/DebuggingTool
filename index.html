@@ -20,6 +20,7 @@
 
 <script>
     // invoked when page refresh.
+    openDB();
     getUtilList();
     getAPIList();
     getUserDataList();
@@ -64,7 +65,7 @@
                             RSMCCTxCreated, HTLCCreated.</label></div>
                     </div>
                     <div class="auto_mode">
-                        <label for="auto_mode">Auto Mode</label>
+                        <label for="auto_mode">Auto Pilot</label>
                         <input id="auto_mode" type="checkbox" class="switch" onclick="autoMode(this)">
                     </div>
                 </div>
@@ -75,6 +76,11 @@
                 <div class="menuTitle">Custom Mode</div>
                 <a href="#" class="url" onclick="displayCustomMode()">Debugging APIs</a>
 
+                <div class="menuTitle">Tracker Data</div>
+                <div class="bottom_margin"><a href="#" class="url" onclick="getTrackerData('getObdNodes', 1, 10)">Nodes</a></div>
+                <div class="bottom_margin"><a href="#" class="url" onclick="getTrackerData('getUsers', 1, 10)">Users</a></div>
+                <div class="bottom_margin"><a href="#" class="url" onclick="getTrackerData('getChannels', 1, 10)">Channels</a></div>
+                
                 <!-- APIs for Debugging - Dynamic create -->
                 <div class="menuTitle">APIs for Debugging</div>
                 <div id="api_list"></div>
@@ -91,10 +97,6 @@
                 <div class="menuTitle">Manage Assets</div>
                 <div id="manage_assets_list"></div>
 
-                <div class="menuTitle">Tracker Data</div>
-                <div class="bottom_margin"><a href="#" class="url" onclick="getTrackerData('getObdNodes', 1, 10)">Nodes</a></div>
-                <div class="bottom_margin"><a href="#" class="url" onclick="getTrackerData('getUsers', 1, 10)">Users</a></div>
-                <div class="bottom_margin"><a href="#" class="url" onclick="getTrackerData('getChannels', 1, 10)">Channels</a></div>
             </div>
 
             <!-- API invoked area, click left side menu to display. -->

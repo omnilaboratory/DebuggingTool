@@ -21,52 +21,62 @@ var arrObdMsg = [];
 var mnemonicWithLogined = '';
 
 //
-var inNewHtml = 'in_new_html';
+const inNewHtml = 'in_new_html';
 
 //
-var itemChannelList = 'channel_list';
+const itemChannelList = 'channel_list';
 
 //
-var itemAddr = 'addr';
+const itemAddr = 'addr';
 
 //
-var itemCounterparties = 'counterparties';
+const itemCounterparties = 'counterparties';
 
 //
-var itemOBDList = 'obd_list';
+const itemOBDList = 'obd_list';
 
 //
-var invokeHistory = 'invoke_history';
+const invokeHistory = 'invoke_history';
 
 //
-var itemMnemonic = 'mnemonic';
+const itemMnemonic = 'mnemonic';
 
 //
-var itemGoWhere = 'go_where';
+const itemGoWhere = 'go_where';
 
 //
-var itemChannelID = 'temp_channel_id';
+const itemChannelID = 'temp_channel_id';
 
 //
-var itemFundingBtcHex = 'FundingBtcHex';
+const itemFundingBtcHex = 'FundingBtcHex';
 
 //
-var itemFundingAssetHex = 'FundingAssetHex';
+const itemFundingAssetHex = 'FundingAssetHex';
 
 //
-var itemFundingBtcTxid = 'FundingBtcTxid';
+const itemFundingBtcTxid = 'FundingBtcTxid';
 
 //
-var itemRsmcMsgHash = 'RsmcMsgHash';
+const itemRsmcMsgHash = 'RsmcMsgHash';
 
 //
-var itemHtlcRequestHash = 'HtlcRequestHash';
+const itemHtlcRequestHash = 'HtlcRequestHash';
 
 //
-var itemHtlcVerifyR = 'HtlcVerifyR';
+const itemHtlcVerifyR = 'HtlcVerifyR';
 
 // the info save to local storage [ChannelList].
 var channelInfo;
+
+/**
+ * Object of IndexedDB.
+ */
+var db;
+
+/**
+ * Object Store (table) name of IndexedDB.
+ */
+const dbOS = 'global_msg';
 
 // word wrap code.
 // result.setAttribute('style', 'word-break: break-all;white-space: normal;');
@@ -84,27 +94,27 @@ var isAutoMode = false;
 /**
  * Save funding private key to local storage
  */
-var FundingPrivKey = 'FundingPrivKey';
+const FundingPrivKey = 'FundingPrivKey';
 
 /**
  * Save temporary private key to local storage
  */
-var TempPrivKey = 'TempPrivKey';
+const TempPrivKey = 'TempPrivKey';
 
 /**
  * Save RSMC tx temporary private key to local storage
  */
-var RsmcTempPrivKey = 'RsmcTempPrivKey';
+const RsmcTempPrivKey = 'RsmcTempPrivKey';
 
 /**
  * Save HTLC tx temporary private key to local storage
  */
-var HtlcTempPrivKey = 'HtlcTempPrivKey';
+const HtlcTempPrivKey = 'HtlcTempPrivKey';
 
 /**
  * Save HTLC htnx tx temporary private key to local storage
  */
-var HtlcHtnxTempPrivKey = 'HtlcHtnxTempPrivKey';
+const HtlcHtnxTempPrivKey = 'HtlcHtnxTempPrivKey';
 
 
 // Get name of saveGoWhere variable.
@@ -380,7 +390,7 @@ function registerEvent() {
 // logIn API at local.
 function logIn(msgType) {
 
-    var mnemonic = $("#mnemonic").val();
+    let mnemonic = $("#mnemonic").val();
     // console.info('mnemonic = ' + mnemonic);
 
     if (mnemonic === '') {
@@ -412,15 +422,15 @@ function logIn(msgType) {
     });
 }
 
-// connectP2PPeer API at local.
+// -102003 connectP2PPeer API at local.
 function connectP2PPeer(msgType) {
-    let remote_node_address = $("#remote_node_address").val();
-    let info = new P2PPeer();
-    info.remote_node_address = remote_node_address;
+    
+    let info                 = new P2PPeer();
+    info.remote_node_address = $("#remote_node_address").val();
 
     // OBD API
     obdApi.connectP2PPeer(info, function(e) {
-        console.info('connectP2PPeer - OBD Response = ' + JSON.stringify(e));
+        console.info('-102003 connectP2PPeer = ' + JSON.stringify(e));
         createOBDResponseDiv(e, msgType);
     });
 }
@@ -1293,31 +1303,6 @@ function invokeAPIs(objSelf) {
     }
 }
 
-// 
-function saveMsgFromCounterparty(e) {
-    console.info("saveMsgFromCounterparty:", JSON.stringify(e));
-
-    var data = localStorage.getItem('broadcast_info');
-
-    var msgTime = new Date().toLocaleString();
-    var fullMsg = JSON.stringify(e, null, 2);
-        fullMsg = jsonFormat(fullMsg);
-
-    arrObdMsg.push(data);
-    arrObdMsg.push(fullMsg);
-    arrObdMsg.push('------------------------------------');
-    arrObdMsg.push(msgTime);
-    arrObdMsg.push('------------------------------------');
-    
-    var showMsg = '';
-    for (let i = arrObdMsg.length - 1; i >= 0; i--) {
-        showMsg += arrObdMsg[i] + '\n\n';
-    }
-    
-    // SAVE broadcast info TO LOCAL STORAGE
-    localStorage.setItem('broadcast_info', showMsg);
-}
-
 // get a copy of an object
 function getNewObjectOf(src) {
     return Object.assign({}, src);
@@ -1328,9 +1313,16 @@ function displayOBDMessages(msg) {
     let content = getNewObjectOf(msg);
     console.info("broadcast info:", JSON.stringify(content));
 
-    var msgHead;
-    var msgTime = new Date().toLocaleString();
-    var fullMsg = JSON.stringify(content, null, 2);
+    // For Save all broadcast info to IndexedDB
+    let user_id = $("#logined").text();
+    // console.info("user_id ===== " + user_id);
+    if (content.type === -102001) {
+        user_id = content.result.userPeerId;
+    }
+
+    let msgHead;
+    let msgTime = new Date().toLocaleString();
+    let fullMsg = JSON.stringify(content, null, 2);
         fullMsg = jsonFormat(fullMsg);
 
     switch (Number(content.type)) {
@@ -1438,6 +1430,15 @@ function displayOBDMessages(msg) {
             break;
     }
 
+    //-----------------
+    // Save all broadcast info to IndexedDB
+    let newMsg =           '------------------------------------';
+        newMsg += '\n\n' + msgHead;
+        newMsg += '\n\n' + '------------------------------------';
+        newMsg += '\n\n' + fullMsg;
+    addData(user_id, newMsg);
+
+    //-----------------
     content = JSON.stringify(content.result);
     if (Number(msg.type) != enumMsgType.MsgType_Error_0) {
         content = content.replace("\"", "").replace("\"", "");
@@ -1457,30 +1458,13 @@ function displayOBDMessages(msg) {
     arrObdMsg.push(msgHead);
     arrObdMsg.push('------------------------------------');
     
-    var showMsg = '';
+    let showMsg = '';
     for (let i = arrObdMsg.length - 1; i >= 0; i--) {
         showMsg += arrObdMsg[i] + '\n\n';
     }
     
     $("#obd_messages").html(showMsg);
-
-    // SAVE all broadcast info TO LOCAL STORAGE
-    // Get old messages
-    var data = localStorage.getItem('broadcast_info');
-    if (data) {
-        var newMsg = '------------------------------------';
-        newMsg += '\n\n' + msgHead;
-        newMsg += '\n\n' + '------------------------------------';
-        newMsg += '\n\n' + fullMsg;
-        newMsg += '\n\n\n\n' + data;
-        showMsg = newMsg;
-    }
-    // testNum++;
-    // console.info('INFO --> testNum = ' + testNum);
-    // console.info('INFO --> showMsg = ' + showMsg);
-    localStorage.setItem('broadcast_info', showMsg);
 }
-// var testNum = 0;
 
 // 
 function getUserDataList(goWhere) {
@@ -1949,7 +1933,7 @@ function autoFillValue(arrParams, obj) {
             channelID = getChannelID();
             $("#channel_id").val(channelID);
 
-            let hash = getHtlcTxHash();
+            hash = getHtlcTxHash();
             $("#msg_hash").val(hash);
 
             let r = getHtlcVerifyR();
@@ -5260,13 +5244,22 @@ function historyCustomInNewHtml() {
 
 // 
 function openLogPage() {
+    // Send params to new page
+    let user_id = $("#logined").text();
+    let params  = { "user_id": user_id };
+    window["params"] = params;
     window.open('log.html');
 }
 
-// Show complete log of OBD messages.
+// Show complete log of OBD messages in log page.
 function showLog() {
-    var list = localStorage.getItem('broadcast_info');
-    $("#log").html(list);
+    // Receive params to new page
+    let receive = window.opener["params"];
+    let user_id = receive["user_id"];
+    console.log('Sent user_id = ' + user_id);
+
+    // Read log data from IndexedDB
+    openDBAndShowData(user_id);
 }
 
 //
@@ -5585,4 +5578,102 @@ function getAddressInfo() {
     }
 
     return result;
+}
+
+/**
+ * Open IndexedDB
+ */
+function openDB() {
+
+    let request = window.indexedDB.open('log');
+    
+    request.onerror = function (e) {
+        console.log('DB open error!');
+    };
+
+    request.onsuccess = function (e) {
+        db = request.result;
+        console.log('DB open success!');
+    };
+
+    // Create table and index
+    request.onupgradeneeded = function (e) {
+        db = e.target.result;
+        let objectStore;
+        if (!db.objectStoreNames.contains(dbOS)) {
+            objectStore = db.createObjectStore(dbOS, { autoIncrement: true });
+            objectStore.createIndex('user_id', 'user_id', { unique: false });
+        }
+    }
+}
+
+/**
+ * Add a record to IndexedDB
+ */
+function addData(user_id, msg) {
+
+    let request = db.transaction([dbOS], 'readwrite')
+        .objectStore(dbOS)
+        .add({ user_id: user_id, msg: msg });
+  
+    request.onsuccess = function (e) {
+        console.log('Data write success.');
+    };
+  
+    request.onerror = function (e) {
+        console.log('Data write false.');
+    }
+}
+
+/**
+ * Open a new IndexedDB instance for log page.
+ * And read data belong one user.
+ */
+function openDBAndShowData(user_id) {
+
+    let request = window.indexedDB.open('log');
+    
+    request.onerror = function (e) {
+        console.log('LOG PAGE DB open error!');
+    };
+
+    request.onsuccess = function (e) {
+        console.log('LOG PAGE DB open success!');
+        readData(request.result, user_id);
+    };
+}
+
+/**
+ * Read data belong one user from IndexedDB
+ */
+function readData(logDB, user_id) {
+
+    let showMsg     = '';
+    let data        = [];
+    let transaction = logDB.transaction([dbOS], 'readonly');
+    let store       = transaction.objectStore(dbOS);
+    let index       = store.index('user_id');
+    let request     = index.get(user_id);
+        request     = index.openCursor(user_id);
+
+    request.onerror = function(e) {
+        console.log('Read data false.');
+    };
+
+    request.onsuccess = function (e) {
+        let result = e.target.result;
+        if (result) {
+            // console.log('msg: ' + result.value.msg);
+            console.log('Read data success.');
+            data.push(result.value.msg);
+            result.continue();
+        } else {
+            console.log('No More Data.');
+            for (let i = data.length - 1; i >= 0; i--) {
+                showMsg += data[i] + '\n\n\n\n';
+            }
+            // console.log('showMsg data = ' + showMsg);
+            $("#log").html(showMsg);
+        }
+    }
 }
