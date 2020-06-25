@@ -146,7 +146,7 @@ During forwarding HTLCs, a channel shall construct tens of temporary unbroadcast
 
 ## JS SDK
 
-The JS SDK is located under [js/obdapi.js](https://github.com/omnilaboratory/DebuggingTool/blob/master/js/obdapi.js). It implments a complete set of APIs for HD wallets and client applications. It manages pub/priv keys genertion and helps developers automatically fill in the arguments which is hardly manually finished.
+The JS SDK is located under [js/obdapi.js](https://github.com/omnilaboratory/DebuggingTool/blob/master/js/obdapi.js). It implments a complete set of APIs for HD wallets and client applications. It manages pub/priv keys genertion and helps developers automatically fill in the OBD arguments which is hardly manually to be finished.
 
 ## How to use APIs
 
