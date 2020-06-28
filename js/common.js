@@ -45,22 +45,22 @@ const itemMnemonic = 'mnemonic';
 const itemGoWhere = 'go_where';
 
 //
-const itemChannelID = 'temp_channel_id';
+const itemChannelID = 'channel_id';
 
 //
-const itemFundingBtcHex = 'FundingBtcHex';
+const itemTempHash = 'TempHash';
 
 //
-const itemFundingAssetHex = 'FundingAssetHex';
+// const itemFundingAssetHex = 'FundingAssetHex';
 
 //
-const itemFundingBtcTxid = 'FundingBtcTxid';
+// const itemFundingBtcTxid = 'FundingBtcTxid';
 
 //
-const itemRsmcMsgHash = 'RsmcMsgHash';
+// const itemRsmcMsgHash = 'RsmcMsgHash';
 
 //
-const itemHtlcRequestHash = 'HtlcRequestHash';
+// const itemHtlcRequestHash = 'HtlcRequestHash';
 
 //
 const itemHtlcVerifyR = 'HtlcVerifyR';
@@ -127,7 +127,7 @@ function getSaveName() {
 function listening110040(e, msgType) {
     console.info('NOW isAutoMode = ' + isAutoMode);
 
-    saveHtlcTxHash(e.commitment_tx_hash);
+    saveTempHash(e.commitment_tx_hash);
 
     if (!isAutoMode) return;
     
@@ -163,7 +163,7 @@ function listening110040(e, msgType) {
 function listening110045(e, msgType) {
     console.info('NOW isAutoMode = ' + isAutoMode);
 
-    saveHtlcTxHash(e.msg_hash);
+    saveTempHash(e.msg_hash);
     saveHtlcVerifyR(e.r);
 
     if (!isAutoMode) return;
@@ -189,7 +189,7 @@ function listening110045(e, msgType) {
 function listening110049(e, msgType) {
     console.info('NOW isAutoMode = ' + isAutoMode);
 
-    saveHtlcTxHash(e.msg_hash);
+    saveTempHash(e.msg_hash);
 
     if (!isAutoMode) return;
     
@@ -254,7 +254,7 @@ function listening110032(e, msgType) {
 function listening110340(e, msgType) {
     console.info('NOW isAutoMode = ' + isAutoMode);
 
-    saveFundingBtcTxid(e.funding_txid);
+    saveTempHash(e.funding_txid);
 
     if (!isAutoMode) return;
     
@@ -319,7 +319,7 @@ function listening110035(e, msgType) {
 function listening110351(e, msgType) {
     console.info('NOW isAutoMode = ' + isAutoMode);
 
-    saveRsmcMsgHash(e.msg_hash);
+    saveTempHash(e.msg_hash);
 
     if (!isAutoMode) return;
 
@@ -416,8 +416,6 @@ function logIn(msgType) {
         nodeID = e.nodePeerId;
         userID = e.userPeerId;
         $("#logined").text(userID);
-        // $("#logined").text(userID.substring(0, 10) + '...');
-        // createOBDResponseDiv(e, msgType);
         isLogined = true;
     });
 }
@@ -661,7 +659,6 @@ function getBalanceForOmni(msgType) {
     // OBD API
     obdApi.omniGetAllBalancesForAddress(address, function(e) {
         console.info('1200 getBalanceForOmni - OBD Response = ' + JSON.stringify(e));
-        // createOBDResponseDiv(e, msgType);
     });
 }
 
@@ -748,7 +745,6 @@ function listProperties(msgType) {
     // OBD API
     obdApi.listProperties(function(e) {
         console.info('-102117 listProperties = ' + JSON.stringify(e));
-        // createOBDResponseDiv(e, msgType);
     });
 }
 
@@ -763,7 +759,6 @@ function getTransaction(msgType) {
     // OBD API
     obdApi.getOmniTxByTxid(txid, function(e) {
         console.info('-102118 getTransaction = ' + JSON.stringify(e));
-        // createOBDResponseDiv(e, msgType);
     });
 }
 
@@ -778,7 +773,6 @@ function getAssetNameByID(msgType) {
     // OBD API
     obdApi.omniGetAssetNameByID(propertyId, function(e) {
         console.info('-102119 getAssetNameByID = ' + JSON.stringify(e));
-        // createOBDResponseDiv(e, msgType);
     });
 }
 
@@ -793,7 +787,6 @@ function getAllBRTx(msgType) {
     // OBD API
     obdApi.getAllBRTx(channel_id, function(e) {
         console.info('-103208 getAllBRTx = ' + JSON.stringify(e));
-        createOBDResponseDiv(e, msgType);
     });
 }
 
@@ -808,7 +801,6 @@ function getChannelDetail(msgType) {
     // OBD API
     obdApi.getChannelById(Number(id), function(e) {
         console.info('-103154 GetChannelDetail = ' + JSON.stringify(e));
-        createOBDResponseDiv(e, msgType);
     });
 }
 
@@ -820,7 +812,6 @@ function getAllChannels(msgType) {
     // OBD API
     obdApi.getAllChannels(function(e) {
         console.info('-103150 getAllChannels = ' + JSON.stringify(e));
-        createOBDResponseDiv(e, msgType);
     });
 }
 
@@ -835,7 +826,6 @@ function getAllCommitmentTransactions(msgType) {
     // OBD API
     obdApi.getItemsByChannelId(channel_id, function(e) {
         console.info('-103200 GetAllCommitmentTransactions = ' + JSON.stringify(e));
-        createOBDResponseDiv(e, msgType);
     });
 }
 
@@ -850,7 +840,6 @@ function getLatestCommitmentTx(msgType) {
     // OBD API
     obdApi.getLatestCommitmentTxByChannelId(channel_id, function(e) {
         console.info('-103203 getLatestCommitmentTx = ' + JSON.stringify(e));
-        createOBDResponseDiv(e, msgType);
     });
 }
 
@@ -969,7 +958,7 @@ function fundingBTC(msgType) {
     obdApi.fundingBTC(info, function(e) {
         console.info('-102109 fundingBTC = ' + JSON.stringify(e));
         saveChannelList(e, tempChID, msgType);
-        saveFundingBtcHex(e.hex);
+        saveTempHash(e.hex);
     });
 }
 
@@ -990,7 +979,7 @@ function fundingAsset(msgType) {
     obdApi.fundingAssetOfOmni(info, function(e) {
         console.info(' -102120 fundingAssetOfOmni = ' + JSON.stringify(e));
         saveChannelList(e, tempChID, msgType);
-        saveFundingAssetcHex(e.hex);
+        saveTempHash(e.hex);
     });
 }
 
@@ -1189,12 +1178,6 @@ function invokeAPIs(objSelf) {
         case enumMsgType.MsgType_CommitmentTx_LatestCommitmentTxByChanId_3203:
             getLatestCommitmentTx(msgType);
             break;
-        // case enumMsgType.MsgType_Core_GetNewAddress_2101:
-        //     obdApi.getNewAddress(function(e) {
-        //         console.info('OBD Response = ' + e);
-        //         createOBDResponseDiv(e);
-        //     });
-        //     break;
         case enumMsgType.MsgType_Mnemonic_CreateAddress_3000:
             var result = genAddressFromMnemonic();
             if (result === '') return;
@@ -1562,8 +1545,8 @@ function createLeftSideMenu(jsonFile, divName) {
 
             apiItem = document.createElement('a');
             apiItem.id = api_id;
-            apiItem.href = '#';
-            // apiItem.href = 'javascript:void(0);';
+            // apiItem.href = '#';
+            apiItem.href = 'javascript:void(0);';
             apiItem.setAttribute('class', 'url');
             apiItem.setAttribute('type_id', type_id);
             apiItem.setAttribute('description', description);
@@ -1697,6 +1680,103 @@ function createInputParamDiv(obj, jsonFile) {
 }
 
 //
+function fillCounterparty() {
+    let result = getLastCounterparty();
+    if (result === '') return;
+    $("#recipient_node_peer_id").val(result.p2pID);
+    $("#recipient_user_peer_id").val(result.name);
+}
+
+//
+function fillChannelIDAndFundingPrivKey() {
+    let channelID = getChannelID();
+    $("#channel_id").val(channelID);
+    let fundingPrivKey = getTempPrivKey(FundingPrivKey, channelID);
+    $("#channel_address_private_key").val(fundingPrivKey);
+}
+
+//
+function fillChannelFundingLastTempKeys() {
+    fillChannelIDAndFundingPrivKey();
+    let tempPrivKey = getTempPrivKey(TempPrivKey, getChannelID());
+    $("#last_temp_address_private_key").val(tempPrivKey);
+}
+
+//
+function fillTempChannelIDAndFundingPrivKey() {
+    let channelID = getChannelID();
+    $("#temporary_channel_id").val(channelID);
+    let fundingPrivKey = getTempPrivKey(FundingPrivKey, channelID);
+    $("#channel_address_private_key").val(fundingPrivKey);
+}
+
+//
+function fillTempAddrKey() {
+    let result = genAddressFromMnemonic();
+    if (result === '') return;
+    $("#temp_address_pub_key").val(result.result.pubkey);
+    $("#temp_address_private_key").val(result.result.wif);
+    $("#temp_address_pub_key").attr("class", "input input_color");
+    $("#temp_address_private_key").attr("class", "input input_color");
+    saveAddresses(result);
+}
+
+//
+function fillCurrTempAddrKey() {
+    let result = genAddressFromMnemonic();
+    if (result === '') return;
+    $("#curr_temp_address_pub_key").val(result.result.pubkey);
+    $("#curr_temp_address_private_key").val(result.result.wif);
+    $("#curr_temp_address_pub_key").attr("class", "input input_color");
+    $("#curr_temp_address_private_key").attr("class", "input input_color");
+    saveAddresses(result);
+}
+
+//
+function fillCurrRsmcTempKey() {
+    let result = genAddressFromMnemonic();
+    if (result === '') return;
+    $("#curr_rsmc_temp_address_pub_key").val(result.result.pubkey);
+    $("#curr_rsmc_temp_address_private_key").val(result.result.wif);
+    $("#curr_rsmc_temp_address_pub_key").attr("class", "input input_color");
+    $("#curr_rsmc_temp_address_private_key").attr("class", "input input_color");
+    saveAddresses(result);
+}
+
+//
+function fillCurrHtlcTempKey() {
+    let result = genAddressFromMnemonic();
+    if (result === '') return;
+    $("#curr_htlc_temp_address_pub_key").val(result.result.pubkey);
+    $("#curr_htlc_temp_address_private_key").val(result.result.wif);
+    $("#curr_htlc_temp_address_pub_key").attr("class", "input input_color");
+    $("#curr_htlc_temp_address_private_key").attr("class", "input input_color");
+    saveAddresses(result);
+}
+
+//
+function fillCurrHtlcHe1bTempKey() {
+    let result = genAddressFromMnemonic();
+    if (result === '') return;
+    $("#curr_htlc_temp_address_for_he1b_pub_key").val(result.result.pubkey);
+    $("#curr_htlc_temp_address_for_he1b_private_key").val(result.result.wif);
+    $("#curr_htlc_temp_address_for_he1b_pub_key").attr("class", "input input_color");
+    $("#curr_htlc_temp_address_for_he1b_private_key").attr("class", "input input_color");
+    saveAddresses(result);
+}
+
+//
+function fillCurrHtlcHt1aTempKey() {
+    let result = genAddressFromMnemonic();
+    if (result === '') return;
+    $("#curr_htlc_temp_address_for_ht1a_pub_key").val(result.result.pubkey);
+    $("#curr_htlc_temp_address_for_ht1a_private_key").val(result.result.wif);
+    $("#curr_htlc_temp_address_for_ht1a_pub_key").attr("class", "input input_color");
+    $("#curr_htlc_temp_address_for_ht1a_private_key").attr("class", "input input_color");
+    saveAddresses(result);
+}
+
+//
 function autoFillValue(arrParams, obj) {
 
     // Only for fundingBTC api.
@@ -1710,8 +1790,8 @@ function autoFillValue(arrParams, obj) {
         }
     }
 
-    // Auto generate addresses and fill pubkey and privkey to input box
-    let result, channelID, fundingPrivKey, tempPrivKey;
+    // Auto fill some values
+    let channelID, fundingPrivKey;
     let msgType = Number(obj.getAttribute("type_id"));
     switch (msgType) {
         case enumMsgType.MsgType_HTLC_Invoice_402:
@@ -1722,238 +1802,100 @@ function autoFillValue(arrParams, obj) {
 
         case enumMsgType.MsgType_SendChannelOpen_32:
             if (!isLogined) return;  // Not logined
-            result = getLastCounterparty();
-            if (result === '') return;
-            $("#recipient_node_peer_id").val(result.p2pID);
-            $("#recipient_user_peer_id").val(result.name);
+            fillCounterparty();
             break;
 
         case enumMsgType.MsgType_SendChannelAccept_33:
             if (!isLogined) return;  // Not logined
-            result = getLastCounterparty();
-            if (result === '') return;
-            $("#recipient_node_peer_id").val(result.p2pID);
-            $("#recipient_user_peer_id").val(result.name);
-            
-            channelID = getChannelID();
-            $("#temporary_channel_id").val(channelID);
+            fillCounterparty();
+            // channelID = getChannelID();
+            $("#temporary_channel_id").val(getChannelID());
             break;
 
         case enumMsgType.MsgType_FundingCreate_SendBtcFundingCreated_340:
         case enumMsgType.MsgType_FundingSign_SendBtcSign_350:
             if (!isLogined) return;  // Not logined
+            fillCounterparty();
+            fillTempChannelIDAndFundingPrivKey();
 
-            result = getLastCounterparty();
-            if (result === '') return;
-            $("#recipient_node_peer_id").val(result.p2pID);
-            $("#recipient_user_peer_id").val(result.name);
-            
-            channelID = getChannelID();
-            $("#temporary_channel_id").val(channelID);
-            
-            fundingPrivKey = getTempPrivKey(FundingPrivKey, channelID);
-            $("#channel_address_private_key").val(fundingPrivKey);
-            
+            // tempHash = getTempHash();
             if (msgType === enumMsgType.MsgType_FundingSign_SendBtcSign_350) {
-                let txid = getFundingBtcTxid();
-                $("#funding_txid").val(txid);
+                $("#funding_txid").val(getTempHash());
             } else {
-                let hex = getFundingBtcHex();
-                $("#funding_tx_hex").val(hex);
+                $("#funding_tx_hex").val(getTempHash());
             }
-
             break;
 
         case enumMsgType.MsgType_FundingCreate_SendAssetFundingCreated_34:
             if (!isLogined) return;  // Not logined
-
-            result = getLastCounterparty();
-            if (result === '') return;
-            $("#recipient_node_peer_id").val(result.p2pID);
-            $("#recipient_user_peer_id").val(result.name);
-
-            channelID = getChannelID();
-            $("#temporary_channel_id").val(channelID);
-
-            fundingPrivKey = getTempPrivKey(FundingPrivKey, channelID);
-            $("#channel_address_private_key").val(fundingPrivKey);
-
-            let hex = getFundingAssetcHex();
-            $("#funding_tx_hex").val(hex);
-
-            result = genAddressFromMnemonic();
-            if (result === '') return;
-            $("#temp_address_pub_key").val(result.result.pubkey);
-            $("#temp_address_private_key").val(result.result.wif);
-            $("#temp_address_pub_key").attr("class", "input input_color");
-            $("#temp_address_private_key").attr("class", "input input_color");
-            saveAddresses(result);
+            fillCounterparty();
+            fillTempChannelIDAndFundingPrivKey();
+            // tempHash = getTempHash();
+            $("#funding_tx_hex").val(getTempHash());
+            fillTempAddrKey();
             break;
 
         case enumMsgType.MsgType_CommitmentTx_SendCommitmentTransactionCreated_351:
         case enumMsgType.MsgType_CommitmentTxSigned_SendRevokeAndAcknowledgeCommitmentTransaction_352:
             if (!isLogined) return;  // Not logined
-
-            result = getLastCounterparty();
-            $("#recipient_node_peer_id").val(result.p2pID);
-            $("#recipient_user_peer_id").val(result.name);
-
-            channelID = getChannelID();
-            $("#channel_id").val(channelID);
-
-            fundingPrivKey = getTempPrivKey(FundingPrivKey, channelID);
-            $("#channel_address_private_key").val(fundingPrivKey);
-
-            tempPrivKey = getTempPrivKey(TempPrivKey, channelID);
-            $("#last_temp_address_private_key").val(tempPrivKey);
-            
+            fillCounterparty();
+            fillChannelFundingLastTempKeys();
             if (msgType === enumMsgType.MsgType_CommitmentTxSigned_SendRevokeAndAcknowledgeCommitmentTransaction_352) {
-                let msgHash = getRsmcMsgHash();
-                $("#msg_hash").val(msgHash);
+                // tempHash = getTempHash();
+                $("#msg_hash").val(getTempHash());
             }
-
-            result = genAddressFromMnemonic();
-            if (result === '') return;
-            $("#curr_temp_address_pub_key").val(result.result.pubkey);
-            $("#curr_temp_address_private_key").val(result.result.wif);
-            $("#curr_temp_address_pub_key").attr("class", "input input_color");
-            $("#curr_temp_address_private_key").attr("class", "input input_color");
-            saveAddresses(result);
+            fillCurrTempAddrKey();
             break;
             
         case enumMsgType.MsgType_HTLC_FindPath_401:
             if (!isLogined) return;  // Not logined
-            result = getLastCounterparty();
-            $("#recipient_node_peer_id").val(result.p2pID);
-            $("#recipient_user_peer_id").val(result.name);
+            fillCounterparty();
             break;
 
         case enumMsgType.MsgType_HTLC_SendAddHTLC_40:
             if (!isLogined) return;  // Not logined
-
-            result = getLastCounterparty();
-            $("#recipient_node_peer_id").val(result.p2pID);
-            $("#recipient_user_peer_id").val(result.name);
-
-            channelID = getChannelID();
-            fundingPrivKey = getTempPrivKey(FundingPrivKey, channelID);
-            $("#channel_address_private_key").val(fundingPrivKey);
-
-            tempPrivKey = getTempPrivKey(TempPrivKey, channelID);
-            $("#last_temp_address_private_key").val(tempPrivKey);
-            
-            result = genAddressFromMnemonic();
-            if (result === '') return;
-            $("#curr_rsmc_temp_address_pub_key").val(result.result.pubkey);
-            $("#curr_rsmc_temp_address_private_key").val(result.result.wif);
-            $("#curr_rsmc_temp_address_pub_key").attr("class", "input input_color");
-            $("#curr_rsmc_temp_address_private_key").attr("class", "input input_color");
-            saveAddresses(result);
-
-            result = genAddressFromMnemonic();
-            if (result === '') return;
-            $("#curr_htlc_temp_address_pub_key").val(result.result.pubkey);
-            $("#curr_htlc_temp_address_private_key").val(result.result.wif);
-            $("#curr_htlc_temp_address_pub_key").attr("class", "input input_color");
-            $("#curr_htlc_temp_address_private_key").attr("class", "input input_color");
-            saveAddresses(result);
-
-            result = genAddressFromMnemonic();
-            if (result === '') return;
-            $("#curr_htlc_temp_address_for_ht1a_pub_key").val(result.result.pubkey);
-            $("#curr_htlc_temp_address_for_ht1a_private_key").val(result.result.wif);
-            $("#curr_htlc_temp_address_for_ht1a_pub_key").attr("class", "input input_color");
-            $("#curr_htlc_temp_address_for_ht1a_private_key").attr("class", "input input_color");
-            saveAddresses(result);
+            fillCounterparty();
+            fillChannelFundingLastTempKeys();
+            fillCurrRsmcTempKey();
+            fillCurrHtlcTempKey();
+            fillCurrHtlcHt1aTempKey();
             break;
 
         case enumMsgType.MsgType_HTLC_SendAddHTLCSigned_41:
             if (!isLogined) return;  // Not logined
-
-            result = getLastCounterparty();
-            $("#recipient_node_peer_id").val(result.p2pID);
-            $("#recipient_user_peer_id").val(result.name);
-
-            let hash = getHtlcTxHash();
-            $("#commitment_tx_hash").val(hash);
-
-            channelID = getChannelID();
-            fundingPrivKey = getTempPrivKey(FundingPrivKey, channelID);
-            $("#channel_address_private_key").val(fundingPrivKey);
-
-            tempPrivKey = getTempPrivKey(TempPrivKey, channelID);
-            $("#last_temp_address_private_key").val(tempPrivKey);
-            
-            result = genAddressFromMnemonic();
-            if (result === '') return;
-            $("#curr_rsmc_temp_address_pub_key").val(result.result.pubkey);
-            $("#curr_rsmc_temp_address_private_key").val(result.result.wif);
-            $("#curr_rsmc_temp_address_pub_key").attr("class", "input input_color");
-            $("#curr_rsmc_temp_address_private_key").attr("class", "input input_color");
-            saveAddresses(result);
-
-            result = genAddressFromMnemonic();
-            if (result === '') return;
-            $("#curr_htlc_temp_address_pub_key").val(result.result.pubkey);
-            $("#curr_htlc_temp_address_private_key").val(result.result.wif);
-            $("#curr_htlc_temp_address_pub_key").attr("class", "input input_color");
-            $("#curr_htlc_temp_address_private_key").attr("class", "input input_color");
-            saveAddresses(result);
+            fillCounterparty();
+            // tempHash = getTempHash();
+            $("#commitment_tx_hash").val(getTempHash());
+            fillChannelFundingLastTempKeys();
+            fillCurrRsmcTempKey();
+            fillCurrHtlcTempKey();
             break;
         
         case enumMsgType.MsgType_HTLC_SendVerifyR_45:
             if (!isLogined) return;  // Not logined
-
-            result = getLastCounterparty();
-            $("#recipient_node_peer_id").val(result.p2pID);
-            $("#recipient_user_peer_id").val(result.name);
-
-            channelID = getChannelID();
-            $("#channel_id").val(channelID);
-
-            fundingPrivKey = getTempPrivKey(FundingPrivKey, channelID);
-            $("#channel_address_private_key").val(fundingPrivKey);
-
-            result = genAddressFromMnemonic();
-            if (result === '') return;
-            $("#curr_htlc_temp_address_for_he1b_pub_key").val(result.result.pubkey);
-            $("#curr_htlc_temp_address_for_he1b_private_key").val(result.result.wif);
-            $("#curr_htlc_temp_address_for_he1b_pub_key").attr("class", "input input_color");
-            $("#curr_htlc_temp_address_for_he1b_private_key").attr("class", "input input_color");
-            saveAddresses(result);
+            fillCounterparty();
+            fillChannelIDAndFundingPrivKey();
+            fillCurrHtlcHe1bTempKey();
             break;
 
         case enumMsgType.MsgType_HTLC_SendSignVerifyR_46:
             if (!isLogined) return;  // Not logined
-
-            result = getLastCounterparty();
-            $("#recipient_node_peer_id").val(result.p2pID);
-            $("#recipient_user_peer_id").val(result.name);
-            
-            channelID = getChannelID();
-            $("#channel_id").val(channelID);
-
-            hash = getHtlcTxHash();
-            $("#msg_hash").val(hash);
-
-            let r = getHtlcVerifyR();
-            $("#r").val(r);
-            
-            fundingPrivKey = getTempPrivKey(FundingPrivKey, channelID);
-            $("#channel_address_private_key").val(fundingPrivKey);
+            fillCounterparty();
+            fillChannelIDAndFundingPrivKey();
+            // tempHash = getTempHash();
+            $("#msg_hash").val(getTempHash());
+            // let r = getHtlcVerifyR();
+            $("#r").val(getHtlcVerifyR());
             break;
 
         case enumMsgType.MsgType_HTLC_SendRequestCloseCurrTx_49:
         case enumMsgType.MsgType_HTLC_SendCloseSigned_50:
             if (!isLogined) return;  // Not logined
+            fillCounterparty();
 
-            result = getLastCounterparty();
-            $("#recipient_node_peer_id").val(result.p2pID);
-            $("#recipient_user_peer_id").val(result.name);
-            
             if (msgType === enumMsgType.MsgType_HTLC_SendCloseSigned_50) {
-                let msgHash = getHtlcTxHash();
-                $("#msg_hash").val(msgHash);
+                // tempHash = getTempHash();
+                $("#msg_hash").val(getTempHash());
             }
 
             channelID = getChannelID();
@@ -1970,15 +1912,8 @@ function autoFillValue(arrParams, obj) {
             let privkey_3 = getTempPrivKey(HtlcHtnxTempPrivKey, channelID);
             $("#last_htlc_temp_address_for_htnx_private_key").val(privkey_3);
 
-            result = genAddressFromMnemonic();
-            if (result === '') return;
-            $("#curr_rsmc_temp_address_pub_key").val(result.result.pubkey);
-            $("#curr_rsmc_temp_address_private_key").val(result.result.wif);
-            $("#curr_rsmc_temp_address_pub_key").attr("class", "input input_color");
-            $("#curr_rsmc_temp_address_private_key").attr("class", "input input_color");
-            saveAddresses(result);
+            fillCurrRsmcTempKey();
             break;
-
     }
 }
 
@@ -2123,11 +2058,15 @@ function showTooltip(content, parent, imgPath) {
     var div_help = document.createElement('div');
     div_help.setAttribute('class', 'wrapper');
 
-    var help = document.createElement('img');
-    help.setAttribute('class', 'btn_help');
-    help.setAttribute('src', 'doc/tooltip/help.png');
-    help.setAttribute('alt', 'help');
+    var help = document.createElement('i');
+    help.setAttribute('class', 'btn_help fa fa-info-circle');
     div_help.append(help);
+
+    // var help = document.createElement('img');
+    // help.setAttribute('class', 'btn_help');
+    // help.setAttribute('src', 'doc/tooltip/help.png');
+    // help.setAttribute('alt', 'help');
+    // div_help.append(help);
 
     var div_tooltip = document.createElement('div');
     div_tooltip.setAttribute('class', 'tooltip_help');
@@ -2349,7 +2288,7 @@ function createCustomModeDiv() {
     var request = document.createElement('textarea');
     request.id = 'custom_request';
     request.setAttribute('class', 'custom_textarea');
-    request.setAttribute('cols', '70');
+    request.setAttribute('cols', '62');
     request.setAttribute('rows', '20');
     request.placeholder = 'Input custom request infomation. (type protocol)';
     newDiv.append(request);
@@ -2402,13 +2341,9 @@ function connectOBDInCustomMode() {
         console.info('connectOBDInCustomMode - OBD Response = ' + response);
         $("#status").text("Connected");
         $("#status_tooltip").text("Connected to " + nodeAddress);
-
-        // isConnectToOBD = true; // already connected.
-        // createOBDResponseDiv(response, 'connect_node_resp');
         changeConnectButtonStatus();
         saveOBDConnectHistory(nodeAddress);
         historyInCustom();
-
     }, function(globalResponse) {
         displayOBDMessages(globalResponse);
     });
@@ -2416,12 +2351,10 @@ function connectOBDInCustomMode() {
 
 //
 function changeConnectButtonStatus() {
-    // $("#button_connect").remove();
     var button = $("#button_connect");
     button.text("Disconnect");
     button.attr('class', 'button_small disabled');
     button.attr("disabled", "disabled");
-
     $("#NodeAddress").attr("class", "input_conn_node disabled");
     $("#NodeAddress").attr("disabled", "disabled");
 }
@@ -2453,102 +2386,15 @@ function createOBDResponseDiv(response, msgType) {
             var msg = response + '. Please refresh the page if you want to connect again.';
             createElement(obd_response_div, 'p', msg);
             break;
-        case enumMsgType.MsgType_Core_Omni_Getbalance_2112:
-            parseData1200(response);
-            break;
-        case enumMsgType.MsgType_Core_Omni_GetProperty_2119:
-            parseData1207(response);
-            break;
-        case enumMsgType.MsgType_CommitmentTx_AllBRByChanId_3208:
-            parseDataN35109(response);
-            break;
-        case enumMsgType.MsgType_GetChannelInfoByChannelId_3154:
-            parseDataN3207(response);
-            break;
-        case enumMsgType.MsgType_ChannelOpen_AllItem_3150:
-            parseDataN3202(response);
-            break;
-        case enumMsgType.MsgType_CommitmentTx_ItemsByChanId_3200:
-            parseDataN35101(response);
-            break;
-        case enumMsgType.MsgType_CommitmentTx_LatestCommitmentTxByChanId_3203:
-            parseDataN35104(response);
-            break;
         case enumMsgType.MsgType_Mnemonic_CreateAddress_3000:
         case enumMsgType.MsgType_Mnemonic_GetAddressByIndex_3001:
-            parseDataN200(response);
-            break;
-        case enumMsgType.MsgType_SendChannelOpen_32:
-            parseDataN32(response);
-            break;
-        case enumMsgType.MsgType_SendChannelAccept_33:
-            parseDataN33(response);
-            break;
-        case enumMsgType.MsgType_Core_FundingBTC_2109:
-            parseData1009(response);
-            break;
-        case enumMsgType.MsgType_FundingCreate_SendBtcFundingCreated_340:
-            parseDataN3400(response);
-            break;
-        case enumMsgType.MsgType_FundingSign_SendBtcSign_350:
-            parseDataN3500(response);
-            break;
-        case enumMsgType.MsgType_Core_Omni_FundingAsset_2120:
-            parseData2001(response);
-            break;
-        case enumMsgType.MsgType_FundingCreate_SendAssetFundingCreated_34:
-            parseDataN34(response);
-            break;
-        case enumMsgType.MsgType_FundingSign_SendAssetFundingSigned_35:
-            parseDataN35(response);
-            break;
-        case enumMsgType.MsgType_CommitmentTx_SendCommitmentTransactionCreated_351:
-            parseDataN351(response);
-            break;
-        case enumMsgType.MsgType_CommitmentTxSigned_SendRevokeAndAcknowledgeCommitmentTransaction_352:
-            parseDataN352(response);
-            break;
-        case enumMsgType.MsgType_HTLC_Invoice_402:
-            parseDataN4003(response);
-            break;
-        case enumMsgType.MsgType_HTLC_FindPath_401:
-            parseDataN4001(response);
-            break;
-        case enumMsgType.MsgType_HTLC_SendAddHTLC_40:
-            parseDataN40(response);
-            break;
-        case enumMsgType.MsgType_HTLC_SendAddHTLCSigned_41:
-            parseDataN41(response);
-            break;
-        case enumMsgType.MsgType_HTLC_SendVerifyR_45:
-            parseDataN45(response);
-            break;
-        case enumMsgType.MsgType_HTLC_SendSignVerifyR_46:
-            parseDataN46(response);
-            break;
-        case enumMsgType.MsgType_HTLC_SendRequestCloseCurrTx_49:
-            parseDataN49(response);
-            break;
-        case enumMsgType.MsgType_HTLC_SendCloseSigned_50:
-            parseDataN50(response);
-            break;
-        case enumMsgType.MsgType_SendCloseChannelRequest_38:
-            parseDataN38(response);
-            break;
-        case enumMsgType.MsgType_SendCloseChannelSign_39:
-            parseDataN39(response);
-            break;
-        case enumMsgType.MsgType_Atomic_SendSwap_80:
-            parseDataN80(response);
-            break;
-        case enumMsgType.MsgType_Atomic_SendSwapAccept_81:
-            parseDataN81(response);
+            parseData3000_3001(response);
             break;
         case enumMsgType.MsgType_UserLogin_2001:
-            parseData1(response);
+            parseData2001(response);
             break;
         case enumMsgType.MsgType_p2p_ConnectPeer_2003:
-            parseData3(response);
+            parseData2003(response);
             break;
         default:
             createElement(obd_response_div, 'p', response);
@@ -2559,8 +2405,8 @@ function createOBDResponseDiv(response, msgType) {
 //----------------------------------------------------------------
 // Functions of processing each response from invoke APIs.
 
-// parseData3 - 
-function parseData3(response) {
+// 
+function parseData2003(response) {
     var arrData = [
         'Connect success.',
     ];
@@ -2570,18 +2416,12 @@ function parseData3(response) {
     }
 }
 
-// parseData1 - 
-function parseData1(response) {
+// 
+function parseData2001(response) {
     if (isLogined) {
         var arrData = [
             'Status : ' + response,
         ];
-    } else {
-        // var arrData = [
-        //     'NodeAddress : ' + response.nodeAddress,
-        //     'NodePeerID : '  + response.nodePeerId,
-        //     'UserPeerID : '     + response.userPeerId,
-        // ];
     }
 
     for (let i = 0; i < arrData.length; i++) {
@@ -2593,812 +2433,13 @@ function parseData1(response) {
     }
 }
 
-// parseDataN81 - 
-function parseDataN81(response) {
-    var arrData = [
-        // 'channel_id : ' + response.channel_id,
-        // 'request_close_channel_hash : ' + response.request_close_channel_hash,
-    ];
-
-    for (let i = 0; i < arrData.length; i++) {
-        createElement(obd_response_div, 'p', arrData[i]);
-    }
-}
-
-// parseDataN80 - 
-function parseDataN80(response) {
-    var arrData = [
-        // 'channel_id : ' + response.channel_id,
-        // 'request_close_channel_hash : ' + response.request_close_channel_hash,
-    ];
-
-    for (let i = 0; i < arrData.length; i++) {
-        createElement(obd_response_div, 'p', arrData[i]);
-    }
-}
-
-// parseData1200 - 
-function parseData1200(response) {
-
-    var arrData;
-
-    createElement(obd_response_div, 'p', 'Total Count = ' + response.length);
-
-    for (let i = 0; i < response.length; i++) {
-        arrData = [
-            'balance : ' + response[i].balance,
-            'frozen : ' + response[i].frozen,
-            'name : ' + response[i].name,
-            'propertyid : ' + response[i].propertyid,
-            'reserved : ' + response[i].reserved,
-        ];
-        
-        createElement(obd_response_div, 'h4', 'NO. ' + (i + 1), 'responseText');
-
-        for (let i2 = 0; i2 < arrData.length; i2++) {
-            var point   = arrData[i2].indexOf(':') + 1;
-            var title   = arrData[i2].substring(0, point);
-            var content = arrData[i2].substring(point);
-            createElement(obd_response_div, 'text', title);
-            createElement(obd_response_div, 'p', content, 'responseText');
-        }
-    }
-}
-
-// parseData1207 - 
-function parseData1207(response) {
-    var arrData = [
-        'propertyid : ' + response.propertyid,
-        'name : ' + response.name,
-        'totaltokens : ' + response.totaltokens,
-        'issuer : ' + response.issuer,
-        'category : ' + response.category,
-        'subcategory : ' + response.subcategory,
-        'creationtxid : ' + response.creationtxid,
-        'data : ' + response.data,
-        'divisible : ' + response.divisible,
-        'fixedissuance : ' + response.fixedissuance,
-        'managedissuance : ' + response.managedissuance,
-        'url : ' + response.url,
-    ];
-
-    for (let i = 0; i < arrData.length; i++) {
-        var point   = arrData[i].indexOf(':') + 1;
-        var title   = arrData[i].substring(0, point);
-        var content = arrData[i].substring(point);
-        createElement(obd_response_div, 'text', title);
-        createElement(obd_response_div, 'p', content, 'responseText');
-    }
-}
-
-// parseDataN3207 - 
-function parseDataN3207(response) {
-    var arrData = [
-        'accept_at : ' + response.accept_at,
-        'address_a : ' + response.address_a,
-        'address_b : ' + response.address_b,
-        'chain_hash : ' + response.chain_hash,
-        'channel_address : ' + response.channel_address,
-        'channel_address_redeem_script : ' + response.channel_address_redeem_script,
-        'channel_address_script_pub_key : ' + response.channel_address_script_pub_key,
-        'channel_id : ' + response.channel_id,
-        'channel_reserve_satoshis : ' + response.channel_reserve_satoshis,
-        'close_at : ' + response.close_at,
-        'create_at : ' + response.create_at,
-        'create_by : ' + response.create_by,
-        'curr_state : ' + response.curr_state,
-        'delayed_payment_base_point : ' + response.delayed_payment_base_point,
-        'dust_limit_satoshis : ' + response.dust_limit_satoshis,
-        'fee_rate_per_kw : ' + response.fee_rate_per_kw,
-        'funding_address : ' + response.funding_address,
-        'funding_pubkey : ' + response.funding_pubkey,
-        'funding_satoshis : ' + response.funding_satoshis,
-        'htlc_base_point : ' + response.htlc_base_point,
-        'htlc_minimum_msat : ' + response.htlc_minimum_msat,
-        'id : ' + response.id,
-        'max_accepted_htlcs : ' + response.max_accepted_htlcs,
-        'max_htlc_value_in_flight_msat : ' + response.max_htlc_value_in_flight_msat,
-        'payment_base_point : ' + response.payment_base_point,
-        'peer_id_a : ' + response.peer_id_a,
-        'peer_id_b : ' + response.peer_id_b,
-        'property_id : ' + response.property_id,
-        'pub_key_a : ' + response.pub_key_a,
-        'pub_key_b : ' + response.pub_key_b,
-        'push_msat : ' + response.push_msat,
-        'revocation_base_point : ' + response.revocation_base_point,
-        'temporary_channel_id : ' + response.temporary_channel_id,
-        'to_self_delay : ' + response.to_self_delay,
-    ];
-
-    for (let i = 0; i < arrData.length; i++) {
-        var point   = arrData[i].indexOf(':') + 1;
-        var title   = arrData[i].substring(0, point);
-        var content = arrData[i].substring(point);
-        createElement(obd_response_div, 'text', title);
-        createElement(obd_response_div, 'p', content, 'responseText');
-    }
-}
-
-// parseDataN3202 - 
-function parseDataN3202(response) {
-
-    var arrData;
-
-    createElement(obd_response_div, 'p', 'Total Count = ' + response.count);
-
-    for (let i = 0; i < response.body.length; i++) {
-        arrData = [
-            'accept_at : ' + response.body[i].accept_at,
-            'address_a : ' + response.body[i].address_a,
-            'address_b : ' + response.body[i].address_b,
-            'chain_hash : ' + response.body[i].chain_hash,
-            'channel_address : ' + response.body[i].channel_address,
-            'channel_address_redeem_script : ' + response.body[i].channel_address_redeem_script,
-            'channel_address_script_pub_key : ' + response.body[i].channel_address_script_pub_key,
-            'channel_id : ' + response.body[i].channel_id,
-            'channel_reserve_satoshis : ' + response.body[i].channel_reserve_satoshis,
-            'close_at : ' + response.body[i].close_at,
-            'create_at : ' + response.body[i].create_at,
-            'create_by : ' + response.body[i].create_by,
-            'curr_state : ' + response.body[i].curr_state,
-            'delayed_payment_base_point : ' + response.body[i].delayed_payment_base_point,
-            'dust_limit_satoshis : ' + response.body[i].dust_limit_satoshis,
-            'fee_rate_per_kw : ' + response.body[i].fee_rate_per_kw,
-            'funding_address : ' + response.body[i].funding_address,
-            'funding_pubkey : ' + response.body[i].funding_pubkey,
-            'funding_satoshis : ' + response.body[i].funding_satoshis,
-            'htlc_base_point : ' + response.body[i].htlc_base_point,
-            'htlc_minimum_msat : ' + response.body[i].htlc_minimum_msat,
-            'id : ' + response.body[i].id,
-            'max_accepted_htlcs : ' + response.body[i].max_accepted_htlcs,
-            'max_htlc_value_in_flight_msat : ' + response.body[i].max_htlc_value_in_flight_msat,
-            'payment_base_point : ' + response.body[i].payment_base_point,
-            'peer_id_a : ' + response.body[i].peer_id_a,
-            'peer_id_b : ' + response.body[i].peer_id_b,
-            'property_id : ' + response.body[i].property_id,
-            'pub_key_a : ' + response.body[i].pub_key_a,
-            'pub_key_b : ' + response.body[i].pub_key_b,
-            'push_msat : ' + response.body[i].push_msat,
-            'revocation_base_point : ' + response.body[i].revocation_base_point,
-            'temporary_channel_id : ' + response.body[i].temporary_channel_id,
-            'to_self_delay : ' + response.body[i].to_self_delay,
-        ];
-
-        createElement(obd_response_div, 'h4', 'NO. ' + (i + 1));
-
-        for (let i2 = 0; i2 < arrData.length; i2++) {
-            var point   = arrData[i2].indexOf(':') + 1;
-            var title   = arrData[i2].substring(0, point);
-            var content = arrData[i2].substring(point);
-            createElement(obd_response_div, 'text', title);
-            createElement(obd_response_div, 'p', content, 'responseText');
-        }
-    }
-}
-
-// parseDataN35109 - 
-function parseDataN35109(response) {
-
-    var arrData;
-
-    createElement(obd_response_div, 'p', 'Total Count = ' + response.length);
-
-    for (let i = 0; i < response.length; i++) {
-        arrData = [
-            'channel_id : ' + response[i].channel_id,
-            'amount : ' + response[i].amount,
-            'commitment_tx_id : ' + response[i].commitment_tx_id,
-            'create_at : ' + response[i].create_at,
-            'create_by : ' + response[i].create_by,
-            'curr_state : ' + response[i].curr_state,
-            'id : ' + response[i].id,
-            'input_amount : ' + response[i].input_amount,
-            'input_txid : ' + response[i].input_txid,
-            'input_vout : ' + response[i].input_vout,
-            'last_edit_time : ' + response[i].last_edit_time,
-            'owner : ' + response[i].owner,
-            'peer_id_a : ' + response[i].peer_id_a,
-            'peer_id_b : ' + response[i].peer_id_b,
-            'property_id : ' + response[i].property_id,
-            'send_at : ' + response[i].send_at,
-            'sign_at : ' + response[i].sign_at,
-            'transaction_sign_hex : ' + response[i].transaction_sign_hex,
-            'txid : ' + response[i].txid,
-        ];
-
-        createElement(obd_response_div, 'h4', 'NO. ' + (i + 1));
-
-        for (let i2 = 0; i2 < arrData.length; i2++) {
-            var point   = arrData[i2].indexOf(':') + 1;
-            var title   = arrData[i2].substring(0, point);
-            var content = arrData[i2].substring(point);
-            createElement(obd_response_div, 'text', title);
-            createElement(obd_response_div, 'p', content, 'responseText');
-        }
-    }
-}
-
-// parseDataN35101 - 
-function parseDataN35101(response) {
-
-    var arrData;
-
-    createElement(obd_response_div, 'p', 'Total Count = ' + response.totalCount);
-
-    for (let i = 0; i < response.body.length; i++) {
-        arrData = [
-            'channel_id : ' + response.body[i].channel_id,
-            'amount_to_htlc : ' + response.body[i].amount_to_htlc,
-            'amount_to_counterparty : ' + response.body[i].amount_to_counterparty,
-            'amount_to_rsmc : ' + response.body[i].amount_to_rsmc,
-            'create_at : ' + response.body[i].create_at,
-            'create_by : ' + response.body[i].create_by,
-            'curr_hash : ' + response.body[i].curr_hash,
-            'curr_state : ' + response.body[i].curr_state,
-            'htlc_h : ' + response.body[i].htlc_h,
-            'htlc_multi_address : ' + response.body[i].htlc_multi_address,
-            'htlc_multi_address_script_pub_key : ' + response.body[i].htlc_multi_address_script_pub_key,
-            'htlc_r : ' + response.body[i].htlc_r,
-            'htlc_redeem_script : ' + response.body[i].htlc_redeem_script,
-            'htlc_sender : ' + response.body[i].htlc_sender,
-            'htlc_temp_address_pub_key : ' + response.body[i].htlc_temp_address_pub_key,
-            'htlc_tx_hash : ' + response.body[i].htlc_tx_hash,
-            'htlc_txid : ' + response.body[i].htlc_txid,
-            'id : ' + response.body[i].id,
-            'input_amount : ' + response.body[i].input_amount,
-            'input_txid : ' + response.body[i].input_txid,
-            'input_vout : ' + response.body[i].input_vout,
-            'last_commitment_tx_id : ' + response.body[i].last_commitment_tx_id,
-            'last_edit_time : ' + response.body[i].last_edit_time,
-            'last_hash : ' + response.body[i].last_hash,
-            'owner : ' + response.body[i].owner,
-            'peer_id_a : ' + response.body[i].peer_id_a,
-            'peer_id_b : ' + response.body[i].peer_id_b,
-            'property_id : ' + response.body[i].property_id,
-            'rsmc_multi_address : ' + response.body[i].rsmc_multi_address,
-            'rsmc_multi_address_script_pub_key : ' + response.body[i].rsmc_multi_address_script_pub_key,
-            'rsmc_redeem_script : ' + response.body[i].rsmc_redeem_script,
-            'rsmc_temp_address_pub_key : ' + response.body[i].rsmc_temp_address_pub_key,
-            'rsmc_tx_hash : ' + response.body[i].rsmc_tx_hash,
-            'rsmc_txid : ' + response.body[i].rsmc_txid,
-            'send_at : ' + response.body[i].send_at,
-            'sign_at : ' + response.body[i].sign_at,
-            'to_other_tx_hash : ' + response.body[i].to_other_tx_hash,
-            'to_other_txid : ' + response.body[i].to_other_txid,
-            'tx_type : ' + response.body[i].tx_type,
-        ];
-
-        createElement(obd_response_div, 'h4', 'NO. ' + (i + 1));
-
-        for (let i2 = 0; i2 < arrData.length; i2++) {
-            var point   = arrData[i2].indexOf(':') + 1;
-            var title   = arrData[i2].substring(0, point);
-            var content = arrData[i2].substring(point);
-            createElement(obd_response_div, 'text', title);
-            createElement(obd_response_div, 'p', content, 'responseText');
-        }
-    }
-}
-
-// parseDataN35104 - 
-function parseDataN35104(response) {
-    var arrData = [
-        'channel_id : ' + response.channel_id,
-        'id : ' + response.id,
-        'property_id : ' + response.property_id,
-        'input_amount : ' + response.input_amount,
-        'amount_to_rsmc : ' + response.amount_to_rsmc,
-        'amount_to_counterparty : ' + response.amount_to_counterparty,
-        'amount_to_htlc : ' + response.amount_to_htlc,
-        'owner : ' + response.owner,
-        'peer_id_a : ' + response.peer_id_a,
-        'peer_id_b : ' + response.peer_id_b,
-        'create_at : ' + response.create_at,
-        'create_by : ' + response.create_by,
-        'curr_hash : ' + response.curr_hash,
-        'curr_state : ' + response.curr_state,
-        'htlc_h : ' + response.htlc_h,
-        'htlc_multi_address : ' + response.htlc_multi_address,
-        'htlc_multi_address_script_pub_key : ' + response.htlc_multi_address_script_pub_key,
-        'htlc_r : ' + response.htlc_r,
-        'htlc_redeem_script : ' + response.htlc_redeem_script,
-        'htlc_sender : ' + response.htlc_sender,
-        'htlc_temp_address_pub_key : ' + response.htlc_temp_address_pub_key,
-        'htlc_tx_hex : ' + response.htlc_tx_hex,
-        'htlc_txid : ' + response.htlc_txid,
-        'input_txid : ' + response.input_txid,
-        'input_vout : ' + response.input_vout,
-        'last_commitment_tx_id : ' + response.last_commitment_tx_id,
-        'last_edit_time : ' + response.last_edit_time,
-        'last_hash : ' + response.last_hash,
-        'rsmc_multi_address : ' + response.rsmc_multi_address,
-        'rsmc_multi_address_script_pub_key : ' + response.rsmc_multi_address_script_pub_key,
-        'rsmc_redeem_script : ' + response.rsmc_redeem_script,
-        'rsmc_temp_address_pub_key : ' + response.rsmc_temp_address_pub_key,
-        'rsmc_tx_hex : ' + response.rsmc_tx_hex,
-        'rsmc_txid : ' + response.rsmc_txid,
-        'send_at : ' + response.send_at,
-        'sign_at : ' + response.sign_at,
-        'to_other_tx_hex : ' + response.to_other_tx_hex,
-        'to_other_txid : ' + response.to_other_txid,
-        'tx_type : ' + response.tx_type,
-    ];
-
-    for (let i = 0; i < arrData.length; i++) {
-        var point   = arrData[i].indexOf(':') + 1;
-        var title   = arrData[i].substring(0, point);
-        var content = arrData[i].substring(point);
-        createElement(obd_response_div, 'text', title);
-        createElement(obd_response_div, 'p', content, 'responseText');
-    }
-}
-
-// parseDataN39 - 
-function parseDataN39(response) {
-    var arrData = [
-        'channel_id : ' + response.channel_id,
-        'request_close_channel_hash : ' + response.request_close_channel_hash,
-    ];
-
-    for (let i = 0; i < arrData.length; i++) {
-        var point   = arrData[i].indexOf(':') + 1;
-        var title   = arrData[i].substring(0, point);
-        var content = arrData[i].substring(point);
-        createElement(obd_response_div, 'text', title);
-        createElement(obd_response_div, 'p', content, 'responseText');
-    }
-}
-
-// parseDataN38 - 
-function parseDataN38(response) {
-    var arrData = [
-        'channel_id : ' + response.channel_id,
-        'request_close_channel_hash : ' + response.request_close_channel_hash,
-    ];
-
-    for (let i = 0; i < arrData.length; i++) {
-        var point   = arrData[i].indexOf(':') + 1;
-        var title   = arrData[i].substring(0, point);
-        var content = arrData[i].substring(point);
-        createElement(obd_response_div, 'text', title);
-        createElement(obd_response_div, 'p', content, 'responseText');
-    }
-}
-
-// parseDataN50 - 
-function parseDataN50(response) {
-    var arrData = [
-        'msg : ' + response.msg,
-    ];
-
-    for (let i = 0; i < arrData.length; i++) {
-        var point   = arrData[i].indexOf(':') + 1;
-        var title   = arrData[i].substring(0, point);
-        var content = arrData[i].substring(point);
-        createElement(obd_response_div, 'text', title);
-        createElement(obd_response_div, 'p', content, 'responseText');
-    }
-}
-
-// parseDataN49 - 
-function parseDataN49(response) {
-    var arrData = [
-        'channel_id : ' + response.channel_id,
-        'create_at : ' + response.create_at,
-        'create_by : ' + response.create_by,
-        'curr_rsmc_temp_address_pub_key : ' + response.curr_rsmc_temp_address_pub_key,
-        'curr_state : ' + response.curr_state,
-        'id : ' + response.id,
-        'request_hash : ' + response.request_hash,
-    ];
-
-    for (let i = 0; i < arrData.length; i++) {
-        var point   = arrData[i].indexOf(':') + 1;
-        var title   = arrData[i].substring(0, point);
-        var content = arrData[i].substring(point);
-        createElement(obd_response_div, 'text', title);
-        createElement(obd_response_div, 'p', content, 'responseText');
-    }
-}
-
-// parseDataN46 - 
-function parseDataN46(response) {
-    var arrData = [
-        'r : ' + response.r,
-        'request_hash : ' + response.request_hash,
-    ];
-
-    for (let i = 0; i < arrData.length; i++) {
-        var point   = arrData[i].indexOf(':') + 1;
-        var title   = arrData[i].substring(0, point);
-        var content = arrData[i].substring(point);
-        createElement(obd_response_div, 'text', title);
-        createElement(obd_response_div, 'p', content, 'responseText');
-    }
-}
-
-// parseDataN45 - 
-function parseDataN45(response) {
-    var arrData = [
-        'h : ' + response.h,
-        'request_hash : ' + response.request_hash,
-    ];
-
-    for (let i = 0; i < arrData.length; i++) {
-        var point   = arrData[i].indexOf(':') + 1;
-        var title   = arrData[i].substring(0, point);
-        var content = arrData[i].substring(point);
-        createElement(obd_response_div, 'text', title);
-        createElement(obd_response_div, 'p', content, 'responseText');
-    }
-}
-
-// parseDataN40 - 
-function parseDataN40(response) {
-    var arrData = [
-        'channelId : ' + response.channelId,
-        'amount : ' + response.amount,
-        'commitmentTxHash : ' + response.commitmentTxHash,
-        'currHtlcTempAddressForHt1aPubKey : ' + response.currHtlcTempAddressForHt1aPubKey,
-        'currHtlcTempAddressPubKey : ' + response.currHtlcTempAddressPubKey,
-        'currRsmcTempAddressPubKey : ' + response.currRsmcTempAddressPubKey,
-        'h : ' + response.h,
-        'htlcChannelPath : ' + response.htlcChannelPath,
-        'htlcTxHex : ' + response.htlcTxHex,
-        'lastTempAddressPrivateKey : ' + response.lastTempAddressPrivateKey,
-        'memo : ' + response.memo,
-        'rsmcTxHex : ' + response.rsmcTxHex,
-        'toOtherHex : ' + response.toOtherHex,
-    ];
-
-    for (let i = 0; i < arrData.length; i++) {
-        var point   = arrData[i].indexOf(':') + 1;
-        var title   = arrData[i].substring(0, point);
-        var content = arrData[i].substring(point);
-        createElement(obd_response_div, 'text', title);
-        createElement(obd_response_div, 'p', content, 'responseText');
-    }
-}
-
-// parseDataN41 - 
-function parseDataN41(response) {
-    var arrData = [
-        'channelId : ' + response.channelId,
-        'amount : ' + response.amount,
-        'htlcChannelPath : ' + response.htlcChannelPath,
-        'htlcTxHex : ' + response.htlcTxHex,
-        'msgHash : ' + response.msgHash,
-        'rsmcTxHex : ' + response.rsmcTxHex,
-        'toOtherHex : ' + response.toOtherHex,
-    ];
-
-    for (let i = 0; i < arrData.length; i++) {
-        var point   = arrData[i].indexOf(':') + 1;
-        var title   = arrData[i].substring(0, point);
-        var content = arrData[i].substring(point);
-        createElement(obd_response_div, 'text', title);
-        createElement(obd_response_div, 'p', content, 'responseText');
-    }
-}
-
-//
-function parseDataN4001(response) {
-    var arrData = [
-        'channelPath : '    + response.channelPath,
-        'nextNodePeerId : ' + response.nextNodePeerId,
-    ];
-
-    for (let i = 0; i < arrData.length; i++) {
-        var point   = arrData[i].indexOf(':') + 1;
-        var title   = arrData[i].substring(0, point);
-        var content = arrData[i].substring(point);
-        createElement(obd_response_div, 'text', title);
-        createElement(obd_response_div, 'p', content, 'responseText');
-    }
-}
-
-// parseDataN4003 - 
-function parseDataN4003(response) {
-    var arrData = [
-        'recipient_user_peer_id : ' + response.recipient_user_peer_id,
-        'amount : ' + response.amount,
-        'property_id : ' + response.propertyId,
-        'msg : ' + response.msg,
-    ];
-
-    for (let i = 0; i < arrData.length; i++) {
-        var point   = arrData[i].indexOf(':') + 1;
-        var title   = arrData[i].substring(0, point);
-        var content = arrData[i].substring(point);
-        createElement(obd_response_div, 'text', title);
-        createElement(obd_response_div, 'p', content, 'responseText');
-    }
-}
-
-// parseDataN352 - 
-function parseDataN352(response) {
-
-    var arrData = [
-        'channel_id : ' + response.latestCcommitmentTxInfo.channel_id,
-        'id : ' + response.latestCcommitmentTxInfo.id,
-        'property_id : ' + response.latestCcommitmentTxInfo.property_id,
-        'input_amount : ' + response.latestCcommitmentTxInfo.input_amount,
-        'amount_to_rsmc : ' + response.latestCcommitmentTxInfo.amount_to_rsmc,
-        'amount_to_counterparty : ' + response.latestCcommitmentTxInfo.amount_to_counterparty,
-        'amount_to_htlc : ' + response.latestCcommitmentTxInfo.amount_to_htlc,
-        'owner : ' + response.latestCcommitmentTxInfo.owner,
-        'peer_id_a : ' + response.latestCcommitmentTxInfo.peer_id_a,
-        'peer_id_b : ' + response.latestCcommitmentTxInfo.peer_id_b,
-        'create_at : ' + response.latestCcommitmentTxInfo.create_at,
-        'create_by : ' + response.latestCcommitmentTxInfo.create_by,
-        'curr_hash : ' + response.latestCcommitmentTxInfo.curr_hash,
-        'curr_state : ' + response.latestCcommitmentTxInfo.curr_state,
-        'htlc_h : ' + response.latestCcommitmentTxInfo.htlc_h,
-        'htlc_multi_address : ' + response.latestCcommitmentTxInfo.htlc_multi_address,
-        'htlc_multi_address_script_pub_key : ' + response.latestCcommitmentTxInfo.htlc_multi_address_script_pub_key,
-        'htlc_r : ' + response.latestCcommitmentTxInfo.htlc_r,
-        'htlc_redeem_script : ' + response.latestCcommitmentTxInfo.htlc_redeem_script,
-        'htlc_sender : ' + response.latestCcommitmentTxInfo.htlc_sender,
-        'htlc_temp_address_pub_key : ' + response.latestCcommitmentTxInfo.htlc_temp_address_pub_key,
-        'htlc_tx_hex : ' + response.latestCcommitmentTxInfo.htlc_tx_hex,
-        'htlc_txid : ' + response.latestCcommitmentTxInfo.htlc_txid,
-        'input_txid : ' + response.latestCcommitmentTxInfo.input_txid,
-        'input_vout : ' + response.latestCcommitmentTxInfo.input_vout,
-        'last_commitment_tx_id : ' + response.latestCcommitmentTxInfo.last_commitment_tx_id,
-        'last_edit_time : ' + response.latestCcommitmentTxInfo.last_edit_time,
-        'last_hash : ' + response.latestCcommitmentTxInfo.last_hash,
-        'rsmc_input_txid : ' + response.latestCcommitmentTxInfo.rsmc_input_txid,
-        'rsmc_multi_address : ' + response.latestCcommitmentTxInfo.rsmc_multi_address,
-        'rsmc_multi_address_script_pub_key : ' + response.latestCcommitmentTxInfo.rsmc_multi_address_script_pub_key,
-        'rsmc_redeem_script : ' + response.latestCcommitmentTxInfo.rsmc_redeem_script,
-        'rsmc_temp_address_pub_key : ' + response.latestCcommitmentTxInfo.rsmc_temp_address_pub_key,
-        'rsmc_tx_hex : ' + response.latestCcommitmentTxInfo.rsmc_tx_hex,
-        'rsmc_txid : ' + response.latestCcommitmentTxInfo.rsmc_txid,
-        'send_at : ' + response.latestCcommitmentTxInfo.send_at,
-        'sign_at : ' + response.latestCcommitmentTxInfo.ign_at,
-        'to_other_tx_hex : ' + response.latestCcommitmentTxInfo.to_other_tx_hex,
-        'to_other_txid : ' + response.latestCcommitmentTxInfo.to_other_txid,
-        'tx_type : ' + response.latestCcommitmentTxInfo.tx_type,
-    ];
-
-    for (let i = 0; i < arrData.length; i++) {
-        var point   = arrData[i].indexOf(':') + 1;
-        var title   = arrData[i].substring(0, point);
-        var content = arrData[i].substring(point);
-        createElement(obd_response_div, 'text', title);
-        createElement(obd_response_div, 'p', content, 'responseText');
-    }
-}
-
-// parseDataN351 - 
-function parseDataN351(response) {
-    var arrData = [
-        // TO BOB INFO
-        // 'channelId : ' + response.channelId,
-        // 'amount : ' + response.amount,
-        // 'msgHash : ' + response.msgHash,
-        // 'rsmcHex : ' + response.rsmcHex,
-        // 'toOtherHex : ' + response.toOtherHex,
-        
-        // ALICE LOOK INFO
-        'channelId : ' + response.channelId,
-        'amount : ' + response.amount,
-        'commitmentHash : ' + response.commitmentHash,
-        'currTempAddressPubKey : ' + response.currTempAddressPubKey,
-        'lastTempAddressPrivateKey : ' + response.lastTempAddressPrivateKey,
-        'rsmcHex : ' + response.rsmcHex,
-        'toOtherHex : ' + response.toOtherHex,
-    ];
-
-    for (let i = 0; i < arrData.length; i++) {
-        var point   = arrData[i].indexOf(':') + 1;
-        var title   = arrData[i].substring(0, point);
-        var content = arrData[i].substring(point);
-        createElement(obd_response_div, 'text', title);
-        createElement(obd_response_div, 'p', content, 'responseText');
-    }
-}
-
-// parseDataN34 - 
-function parseDataN34(response) {
-    var arrData = [
-        'channel_id : ' + response.channel_id,
-        'temporary_channel_id : ' + response.temporary_channel_id,
-        'c1a_rsmc_hex : ' + response.c1a_rsmc_hex,
-        'funding_omni_hex : ' + response.funding_omni_hex,
-        'rsmc_temp_address_pub_key : ' + response.rsmc_temp_address_pub_key,
-    ];
-
-    for (let i = 0; i < arrData.length; i++) {
-        var point   = arrData[i].indexOf(':') + 1;
-        var title   = arrData[i].substring(0, point);
-        var content = arrData[i].substring(point);
-        createElement(obd_response_div, 'text', title);
-        createElement(obd_response_div, 'p', content, 'responseText');
-    }
-}
-
-// parseDataN35 - 
-function parseDataN35(response) {
-    var arrData = [
-        'channel_id : ' + response.channel_id,
-        'rd_hex : ' + response.rd_hex,
-        'rsmc_signed_hex : ' + response.rsmc_signed_hex,
-        'approval : ' + response.approval,
-    ];
-
-    for (let i = 0; i < arrData.length; i++) {
-        var point   = arrData[i].indexOf(':') + 1;
-        var title   = arrData[i].substring(0, point);
-        var content = arrData[i].substring(point);
-        createElement(obd_response_div, 'text', title);
-        createElement(obd_response_div, 'p', content, 'responseText');
-    }
-}
-
-// parseDataN2001 - 
-function parseData2001(response) {
-    var arrData = [
-        'hex : ' + response.hex,
-    ];
-
-    for (let i = 0; i < arrData.length; i++) {
-        var point   = arrData[i].indexOf(':') + 1;
-        var title   = arrData[i].substring(0, point);
-        var content = arrData[i].substring(point);
-        createElement(obd_response_div, 'text', title);
-        createElement(obd_response_div, 'p', content, 'responseText');
-    }
-}
-
-// parseDataN3500 - 
-function parseDataN3500(response) {
-    var arrData = [
-        // 'channel_id : ' + response.channel_id,
-        // 'temporary_channel_id : ' + response.temporary_channel_id,
-        // 'create_at : ' + response.create_at,
-        // 'id : ' + response.id,
-        // 'owner : ' + response.owner,
-        // 'txid : ' + response.txid,
-        // 'tx_hash : ' + response.tx_hash,
-
-        'approval : ' + response.approval,
-        'funding_redeem_hex : ' + response.funding_redeem_hex,
-        'funding_txid : ' + response.funding_txid,
-        'temporary_channel_id : ' + response.temporary_channel_id,
-    ];
-
-    for (let i = 0; i < arrData.length; i++) {
-        var point   = arrData[i].indexOf(':') + 1;
-        var title   = arrData[i].substring(0, point);
-        var content = arrData[i].substring(point);
-        createElement(obd_response_div, 'text', title);
-        createElement(obd_response_div, 'p', content, 'responseText');
-    }
-}
-
-// parseDataN3400 - 
-function parseDataN3400(response) {
-    var arrData = [
-        'temporary_channel_id : ' + response.temporary_channel_id,
-        'funding_txid : ' + response.funding_txid,
-        'funding_btc_hex : ' + response.funding_btc_hex,
-        'funding_redeem_hex : ' + response.funding_redeem_hex,
-        // 'amount : ' + response.amount,
-    ];
-
-    for (let i = 0; i < arrData.length; i++) {
-        var point   = arrData[i].indexOf(':') + 1;
-        var title   = arrData[i].substring(0, point);
-        var content = arrData[i].substring(point);
-        createElement(obd_response_div, 'text', title);
-        createElement(obd_response_div, 'p', content, 'responseText');
-    }
-}
-
-// parseData1009 - 
-function parseData1009(response) {
-    var arrData = [
-        'hex : ' + response.hex,
-        'txid : ' + response.txid,
-    ];
-
-    for (let i = 0; i < arrData.length; i++) {
-        var point   = arrData[i].indexOf(':') + 1;
-        var title   = arrData[i].substring(0, point);
-        var content = arrData[i].substring(point);
-        createElement(obd_response_div, 'text', title);
-        createElement(obd_response_div, 'p', content, 'responseText');
-    }
-}
-
-// parseDataN200 - genAddressFromMnemonic
-function parseDataN200(response) {
+// genAddressFromMnemonic
+function parseData3000_3001(response) {
     var arrData = [
         'ADDRESS : ' + response.result.address,
         'INDEX : ' + response.result.index,
         'PUB_KEY : ' + response.result.pubkey,
         'WIF : ' + response.result.wif
-    ];
-
-    for (let i = 0; i < arrData.length; i++) {
-        var point   = arrData[i].indexOf(':') + 1;
-        var title   = arrData[i].substring(0, point);
-        var content = arrData[i].substring(point);
-        createElement(obd_response_div, 'text', title);
-        createElement(obd_response_div, 'p', content, 'responseText');
-    }
-}
-
-// processing -32 openChannel data.
-function parseDataN32(response) {
-    var arrData = [
-        'chain_hash : ' + response.chain_hash,
-        'channel_reserve_satoshis : ' + response.channel_reserve_satoshis,
-        'delayed_payment_base_point : ' + response.delayed_payment_base_point,
-        'dust_limit_satoshis : ' + response.dust_limit_satoshis,
-        'fee_rate_per_kw : ' + response.fee_rate_per_kw,
-        'funding_address : ' + response.funding_address,
-        'funding_pubkey : ' + response.funding_pubkey,
-        'funding_satoshis : ' + response.funding_satoshis,
-        'htlc_base_point : ' + response.htlc_base_point,
-        'htlc_minimum_msat : ' + response.htlc_minimum_msat,
-        'max_accepted_htlcs : ' + response.max_accepted_htlcs,
-        'max_htlc_value_in_flight_msat : ' + response.max_htlc_value_in_flight_msat,
-        'payment_base_point : ' + response.payment_base_point,
-        'push_msat : ' + response.push_msat,
-        'revocation_base_point : ' + response.revocation_base_point,
-        'temporary_channel_id : ' + response.temporary_channel_id,
-        'to_self_delay : ' + response.to_self_delay,
-    ];
-
-    for (let i = 0; i < arrData.length; i++) {
-        var point   = arrData[i].indexOf(':') + 1;
-        var title   = arrData[i].substring(0, point);
-        var content = arrData[i].substring(point);
-        createElement(obd_response_div, 'text', title);
-        createElement(obd_response_div, 'p', content, 'responseText');
-    }
-}
-
-// processing -33 Accept Channel data.
-function parseDataN33(response) {
-    // curr_state = 20 is accept open channel request.
-    // curr_state = 30 is NOT accept open channel request.
-    var arrData = [
-        'accept_at : ' + response.accept_at,
-        'address_a : ' + response.address_a,
-        'address_b : ' + response.address_b,
-        'chain_hash : ' + response.chain_hash,
-        'channel_address : ' + response.channel_address,
-        'channel_address_redeem_script : ' + response.channel_address_redeem_script,
-        'channel_address_script_pub_key : ' + response.channel_address_script_pub_key,
-        'channel_id : ' + response.channel_id,
-        'channel_reserve_satoshis : ' + response.channel_reserve_satoshis,
-        'close_at : ' + response.close_at,
-        'create_at : ' + response.create_at,
-        'create_by : ' + response.create_by,
-        'curr_state : ' + response.curr_state,
-        'delayed_payment_base_point : ' + response.delayed_payment_base_point,
-        'dust_limit_satoshis : ' + response.dust_limit_satoshis,
-        'fee_rate_per_kw : ' + response.fee_rate_per_kw,
-        'funding_address : ' + response.funding_address,
-        'funding_pubkey : ' + response.funding_pubkey,
-        'funding_satoshis : ' + response.funding_satoshis,
-        'htlc_base_point : ' + response.htlc_base_point,
-        'htlc_minimum_msat : ' + response.htlc_minimum_msat,
-        'id : ' + response.id,
-        'max_accepted_htlcs : ' + response.max_accepted_htlcs,
-        'max_htlc_value_in_flight_msat : ' + response.max_htlc_value_in_flight_msat,
-        'payment_base_point : ' + response.payment_base_point,
-        'peer_id_a : ' + response.peer_id_a,
-        'peer_id_b : ' + response.peer_id_b,
-        'pub_key_a : ' + response.pub_key_a,
-        'pub_key_b : ' + response.pub_key_b,
-        'push_msat : ' + response.push_msat,
-        'revocation_base_point : ' + response.revocation_base_point,
-        'temporary_channel_id : ' + response.temporary_channel_id,
-        'to_self_delay : ' + response.to_self_delay,
     ];
 
     for (let i = 0; i < arrData.length; i++) {
@@ -4094,10 +3135,17 @@ function getLastCounterparty() {
     }
 }
 
-// get funding_tx_hex from FundingAsset type ( -102120 ) return
-function getFundingAssetcHex() {
+/**
+ * get temp hash from:
+ * 1) fundingBTC -102109 return
+ * 2) BTCFundingCreated type ( -100340 ) return
+ * 3) FundingAsset type ( -102120 ) return
+ * 4) RSMCCTxCreated type ( -100351 ) return
+ * 5) HTLCCreated type ( -100040 ) return
+ */
+function getTempHash() {
 
-    let resp = JSON.parse(localStorage.getItem(itemFundingAssetHex));
+    let resp = JSON.parse(localStorage.getItem(itemTempHash));
 
     // If has data.
     if (resp) {
@@ -4106,159 +3154,177 @@ function getFundingAssetcHex() {
         return '';
     }
 }
+
+/**
+ * save temp hash from:
+ * @param hex
+ * 1) fundingBTC -102109 return
+ * 2) BTCFundingCreated type ( -100340 ) return
+ * 3) FundingAsset type ( -102120 ) return
+ * 4) RSMCCTxCreated type ( -100351 ) return
+ * 5) HTLCCreated type ( -100040 ) return
+ */
+function saveTempHash(hex) {
+
+    // let resp = JSON.parse(localStorage.getItem(itemTempHash));
+    let data = {
+        hex: hex
+    }
+    localStorage.setItem(itemTempHash, JSON.stringify(data));
+
+    // If has data.
+    // if (resp) {
+    //     resp.hex = hex;
+    //     localStorage.setItem(itemTempHash, JSON.stringify(resp));
+    // } else {
+    //     let data = {
+    //         hex: hex
+    //     }
+    //     localStorage.setItem(itemTempHash, JSON.stringify(data));
+    // }
+}
+
+
+// get funding_tx_hex from FundingAsset type ( -102120 ) return
+// function getTempHash() {
+
+//     let resp = JSON.parse(localStorage.getItem(itemFundingAssetHex));
+
+//     // If has data.
+//     if (resp) {
+//         return resp.hex;
+//     } else {
+//         return '';
+//     }
+// }
 
 // save funding_tx_hex from FundingAsset type ( -102120 ) return
-function saveFundingAssetcHex(hex) {
+// function saveTempHash(hex) {
 
-    let resp = JSON.parse(localStorage.getItem(itemFundingAssetHex));
+//     let resp = JSON.parse(localStorage.getItem(itemFundingAssetHex));
 
-    // If has data.
-    if (resp) {
-        resp.hex = hex;
-        localStorage.setItem(itemFundingAssetHex, JSON.stringify(resp));
-    } else {
-        let data = {
-            hex: hex
-        }
-        localStorage.setItem(itemFundingAssetHex, JSON.stringify(data));
-    }
-}
-
-// get funding_tx_hex from fundingBTC -102109 return
-function getFundingBtcHex() {
-
-    let resp = JSON.parse(localStorage.getItem(itemFundingBtcHex));
-
-    // If has data.
-    if (resp) {
-        return resp.hex;
-    } else {
-        return '';
-    }
-}
-
-// save funding_tx_hex from fundingBTC -102109 return
-function saveFundingBtcHex(hex) {
-
-    let resp = JSON.parse(localStorage.getItem(itemFundingBtcHex));
-
-    // If has data.
-    if (resp) {
-        resp.hex = hex;
-        localStorage.setItem(itemFundingBtcHex, JSON.stringify(resp));
-    } else {
-        let data = {
-            hex: hex
-        }
-        localStorage.setItem(itemFundingBtcHex, JSON.stringify(data));
-    }
-}
+//     // If has data.
+//     if (resp) {
+//         resp.hex = hex;
+//         localStorage.setItem(itemFundingAssetHex, JSON.stringify(resp));
+//     } else {
+//         let data = {
+//             hex: hex
+//         }
+//         localStorage.setItem(itemFundingAssetHex, JSON.stringify(data));
+//     }
+// }
 
 // get funding_txid from BTCFundingCreated type ( -100340 ) return
-function getFundingBtcTxid() {
+// function getTempHash() {
 
-    let resp = JSON.parse(localStorage.getItem(itemFundingBtcTxid));
+//     let resp = JSON.parse(localStorage.getItem(itemFundingBtcTxid));
 
-    // If has data.
-    if (resp) {
-        return resp.txid;
-    } else {
-        return '';
-    }
-}
+//     // If has data.
+//     if (resp) {
+//         return resp.txid;
+//     } else {
+//         return '';
+//     }
+// }
 
 // save funding_txid from BTCFundingCreated type ( -100340 ) return
-function saveFundingBtcTxid(txid) {
+// function saveTempHash(txid) {
 
-    let resp = JSON.parse(localStorage.getItem(itemFundingBtcTxid));
+//     let resp = JSON.parse(localStorage.getItem(itemFundingBtcTxid));
 
-    // If has data.
-    if (resp) {
-        resp.txid = txid;
-        localStorage.setItem(itemFundingBtcTxid, JSON.stringify(resp));
-    } else {
-        let data = {
-            txid: txid
-        }
-        localStorage.setItem(itemFundingBtcTxid, JSON.stringify(data));
-    }
-}
+//     // If has data.
+//     if (resp) {
+//         resp.txid = txid;
+//         localStorage.setItem(itemFundingBtcTxid, JSON.stringify(resp));
+//     } else {
+//         let data = {
+//             txid: txid
+//         }
+//         localStorage.setItem(itemFundingBtcTxid, JSON.stringify(data));
+//     }
+// }
 
 // save msg_hash from RSMCCTxCreated type ( -100351 ) return
-function saveRsmcMsgHash(msgHash) {
+// function saveTempHash(msgHash) {
 
-    let resp = JSON.parse(localStorage.getItem(itemRsmcMsgHash));
+//     let resp = JSON.parse(localStorage.getItem(itemRsmcMsgHash));
 
-    // If has data.
-    if (resp) {
-        resp.msgHash = msgHash;
-        localStorage.setItem(itemRsmcMsgHash, JSON.stringify(resp));
-    } else {
-        let data = {
-            msgHash: msgHash
-        }
-        localStorage.setItem(itemRsmcMsgHash, JSON.stringify(data));
-    }
-}
+//     // If has data.
+//     if (resp) {
+//         resp.msgHash = msgHash;
+//         localStorage.setItem(itemRsmcMsgHash, JSON.stringify(resp));
+//     } else {
+//         let data = {
+//             msgHash: msgHash
+//         }
+//         localStorage.setItem(itemRsmcMsgHash, JSON.stringify(data));
+//     }
+// }
 
 // get msg_hash from RSMCCTxCreated type ( -100351 ) return
-function getRsmcMsgHash() {
+// function getTempHash() {
 
-    let resp = JSON.parse(localStorage.getItem(itemRsmcMsgHash));
+//     let resp = JSON.parse(localStorage.getItem(itemRsmcMsgHash));
 
-    // If has data.
-    if (resp) {
-        return resp.msgHash;
-    } else {
-        return '';
-    }
-}
+//     // If has data.
+//     if (resp) {
+//         return resp.msgHash;
+//     } else {
+//         return '';
+//     }
+// }
 
 // save commitment_tx_hash from HTLCCreated type ( -100040 ) return
-function saveHtlcTxHash(commitment_tx_hash) {
+// function saveTempHash(commitment_tx_hash) {
 
-    let resp = JSON.parse(localStorage.getItem(itemHtlcRequestHash));
+//     let resp = JSON.parse(localStorage.getItem(itemHtlcRequestHash));
 
-    // If has data.
-    if (resp) {
-        resp.commitment_tx_hash = commitment_tx_hash;
-        localStorage.setItem(itemHtlcRequestHash, JSON.stringify(resp));
-    } else {
-        let data = {
-            commitment_tx_hash: commitment_tx_hash
-        }
-        localStorage.setItem(itemHtlcRequestHash, JSON.stringify(data));
-    }
-}
+//     // If has data.
+//     if (resp) {
+//         resp.commitment_tx_hash = commitment_tx_hash;
+//         localStorage.setItem(itemHtlcRequestHash, JSON.stringify(resp));
+//     } else {
+//         let data = {
+//             commitment_tx_hash: commitment_tx_hash
+//         }
+//         localStorage.setItem(itemHtlcRequestHash, JSON.stringify(data));
+//     }
+// }
 
 // get commitment_tx_hash from HTLCCreated type ( -100040 ) return
-function getHtlcTxHash() {
+// function getTempHash() {
 
-    let resp = JSON.parse(localStorage.getItem(itemHtlcRequestHash));
+//     let resp = JSON.parse(localStorage.getItem(itemHtlcRequestHash));
 
-    // If has data.
-    if (resp) {
-        return resp.commitment_tx_hash;
-    } else {
-        return '';
-    }
-}
+//     // If has data.
+//     if (resp) {
+//         return resp.commitment_tx_hash;
+//     } else {
+//         return '';
+//     }
+// }
 
 // save r from HTLCSendVerifyR type ( -100045 ) return
 function saveHtlcVerifyR(r) {
 
-    let resp = JSON.parse(localStorage.getItem(itemHtlcVerifyR));
+    // let resp = JSON.parse(localStorage.getItem(itemHtlcVerifyR));
+
+    let data = {
+        r: r
+    }
+    localStorage.setItem(itemHtlcVerifyR, JSON.stringify(data));
 
     // If has data.
-    if (resp) {
-        resp.r = r;
-        localStorage.setItem(itemHtlcVerifyR, JSON.stringify(resp));
-    } else {
-        let data = {
-            r: r
-        }
-        localStorage.setItem(itemHtlcVerifyR, JSON.stringify(data));
-    }
+    // if (resp) {
+    //     resp.r = r;
+    //     localStorage.setItem(itemHtlcVerifyR, JSON.stringify(resp));
+    // } else {
+    //     let data = {
+    //         r: r
+    //     }
+    //     localStorage.setItem(itemHtlcVerifyR, JSON.stringify(data));
+    // }
 }
 
 // get r from HTLCSendVerifyR type ( -100045 ) return
@@ -4818,7 +3884,7 @@ function sendCustomRequest() {
         historyInCustom();
 
         // Display user id on screen top.
-        if (Number(type) === 1) {  // Login func
+        if (Number(type) === -102001) {  // Login func
             $('#cm_logined').text(e.userPeerId);
         }
 
@@ -5664,7 +4730,6 @@ function readData(logDB, user_id) {
         let result = e.target.result;
         if (result) {
             // console.log('msg: ' + result.value.msg);
-            console.log('Read data success.');
             data.push(result.value.msg);
             result.continue();
         } else {
