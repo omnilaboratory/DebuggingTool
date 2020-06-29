@@ -8,10 +8,10 @@ var isConnectToOBD = false;
 var isLogined = false;
 
 // Save obd node id.
-var nodeID;
+// var globalNodeID;
 
 // Save userID of a user already logined.
-var userID;
+// var globalUserID;
 
 // save OBD messages
 var obdMessages = '';
@@ -51,6 +51,12 @@ const itemChannelID = 'channel_id';
 const itemTempHash = 'TempHash';
 
 //
+const itemChannelAddress = 'ChannelAddress';
+
+//
+const itemFundingBtcData = 'FundingBtcData';
+
+//
 // const itemFundingAssetHex = 'FundingAssetHex';
 
 //
@@ -84,7 +90,7 @@ const dbOS = 'global_msg';
 /**
  * Save fundingBTC parameters value.
  */
-var btcFromAddr, btcFromAddrPrivKey, btcToAddr, btcAmount, btcMinerFee;
+// var btcFromAddr, btcFromAddrPrivKey, btcToAddr, btcAmount, btcMinerFee;
 
 /**
  * open / close auto mode.
@@ -245,6 +251,7 @@ function listening110032(e, msgType) {
         console.info('-100033 acceptChannel = ' + JSON.stringify(e));
         saveChannelList(e);
         saveCounterparties(name, p2pID);
+        saveChannelAddress(e.channel_address);
         saveTempPrivKey(FundingPrivKey, temp_cid, addr.result.wif);
     });
 }
@@ -369,6 +376,12 @@ function registerEvent() {
     });
 
     // auto response mode
+    let msg_110035 = enumMsgType.MsgType_FundingSign_RecvAssetFundingSigned_35;
+    obdApi.registerEvent(msg_110035, function(e) {
+        listening110035(e, msg_110035);
+    });
+
+    // auto response mode
     let msg_110351 = enumMsgType.MsgType_CommitmentTx_RecvCommitmentTransactionCreated_351;
     obdApi.registerEvent(msg_110351, function(e) {
         listening110351(e, msg_110351);
@@ -384,6 +397,12 @@ function registerEvent() {
     let msg_110045 = enumMsgType.MsgType_HTLC_SendVerifyR_45;
     obdApi.registerEvent(msg_110045, function(e) {
         listening110045(e, msg_110045);
+    });
+
+    // auto response mode
+    let msg_110049 = enumMsgType.MsgType_HTLC_RecvRequestCloseCurrTx_49;
+    obdApi.registerEvent(msg_110049, function(e) {
+        listening110049(e, msg_110049);
     });
 }
 
@@ -413,9 +432,9 @@ function logIn(msgType) {
 
         // Otherwise, a new loginning, update the userID.
         mnemonicWithLogined = mnemonic;
-        nodeID = e.nodePeerId;
-        userID = e.userPeerId;
-        $("#logined").text(userID);
+        // nodeID              = e.nodePeerId;
+        // globalUserID        = e.userPeerId;
+        $("#logined").text(e.userPeerId);
         isLogined = true;
     });
 }
@@ -447,6 +466,7 @@ function openChannel(msgType) {
         saveCounterparties(userID, nodeID);
         let privkey = getFundingPrivKeyFromPubKey(pubkey);
         saveTempPrivKey(FundingPrivKey, e.temporary_channel_id, privkey);
+        saveChannelID(e.temporary_channel_id);
     });
 }
 
@@ -466,6 +486,7 @@ function acceptChannel(msgType) {
         console.info('-100033 acceptChannel = ' + JSON.stringify(e));
         saveChannelList(e);
         saveCounterparties(userID, nodeID);
+        saveChannelAddress(e.channel_address);
         let privkey = getFundingPrivKeyFromPubKey(info.funding_pubkey);
         saveTempPrivKey(FundingPrivKey, info.temporary_channel_id, privkey);
     });
@@ -945,11 +966,11 @@ function fundingBTC(msgType) {
     info.miner_fee                = Number(miner_fee);
 
     //Save value to variable
-    btcFromAddr        = from_address;
-    btcFromAddrPrivKey = from_address_private_key;
-    btcToAddr          = to_address;
-    btcAmount          = amount;
-    btcMinerFee        = miner_fee;
+    // btcFromAddr        = from_address;
+    // btcFromAddrPrivKey = from_address_private_key;
+    // btcToAddr          = to_address;
+    // btcAmount          = amount;
+    // btcMinerFee        = miner_fee;
 
     // Get temporary_channel_id
     let tempChID = getChannelID();
@@ -959,6 +980,7 @@ function fundingBTC(msgType) {
         console.info('-102109 fundingBTC = ' + JSON.stringify(e));
         saveChannelList(e, tempChID, msgType);
         saveTempHash(e.hex);
+        saveFundingBtcData(info);
     });
 }
 
@@ -1777,18 +1799,27 @@ function fillCurrHtlcHt1aTempKey() {
 }
 
 //
-function autoFillValue(arrParams, obj) {
+function fillFundingBtcData() {
+    let result = getFundingBtcData();
+    if (result === '') return;
+    $("#from_address").val(result.from_address);
+    $("#from_address_private_key").val(result.from_address_private_key);
+    $("#to_address").val(getChannelAddress());
+    $("#amount").val(result.amount);
+    $("#miner_fee").val(result.miner_fee);
+}
 
-    // Only for fundingBTC api.
-    if (arrParams[0].name === 'from_address') {
-        if (btcFromAddr) {
-            $("#from_address").val(btcFromAddr);
-            $("#from_address_private_key").val(btcFromAddrPrivKey);
-            $("#to_address").val(btcToAddr);
-            $("#amount").val(btcAmount);
-            $("#miner_fee").val(btcMinerFee);
-        }
-    }
+//
+function fillFundingAssetData() {
+    let result = getFundingBtcData();
+    if (result === '') return;
+    $("#from_address").val(result.from_address);
+    $("#from_address_private_key").val(result.from_address_private_key);
+    $("#to_address").val(getChannelAddress());
+}
+
+//
+function autoFillValue(arrParams, obj) {
 
     // Auto fill some values
     let channelID, fundingPrivKey;
@@ -1810,6 +1841,16 @@ function autoFillValue(arrParams, obj) {
             fillCounterparty();
             // channelID = getChannelID();
             $("#temporary_channel_id").val(getChannelID());
+            break;
+
+        case enumMsgType.MsgType_Core_FundingBTC_2109:
+            if (!isLogined) return;  // Not logined
+            fillFundingBtcData();
+            break;
+
+        case enumMsgType.MsgType_Core_Omni_FundingAsset_2120:
+            if (!isLogined) return;  // Not logined
+            fillFundingAssetData();
             break;
 
         case enumMsgType.MsgType_FundingCreate_SendBtcFundingCreated_340:
@@ -2461,7 +2502,7 @@ function getNewAddrIndex() {
     if (addr) {
         // console.info('HAS DATA');
         for (let i = 0; i < addr.result.length; i++) {
-            if (userID === addr.result[i].userID) {
+            if ($("#logined").text() === addr.result[i].userID) {
                 maxIndex = addr.result[i].data.length - 1;
                 newIndex = addr.result[i].data[maxIndex].index + 1;
                 return newIndex;
@@ -2482,13 +2523,14 @@ function getNewAddrIndex() {
  * @param channelID
  */
 function saveChannelID(channelID) {
-
+    console.log('logined userid == ' + $("#logined").text());
+    
     let resp = JSON.parse(localStorage.getItem(itemChannelID));
 
     // If has data.
     if (resp) {
         for (let i = 0; i < resp.result.length; i++) {
-            if (userID === resp.result[i].userID) {
+            if ($("#logined").text() === resp.result[i].userID) {
                 resp.result[i].channelID = channelID;
                 localStorage.setItem(itemChannelID, JSON.stringify(resp));
                 return;
@@ -2497,7 +2539,7 @@ function saveChannelID(channelID) {
 
         // A new User ID.
         let new_data = {
-            userID:    userID,
+            userID:    $("#logined").text(),
             channelID: channelID,
         }
         resp.result.push(new_data);
@@ -2506,7 +2548,7 @@ function saveChannelID(channelID) {
     } else {
         let data = {
             result: [{
-                userID:    userID,
+                userID:    $("#logined").text(),
                 channelID: channelID,
             }]
         }
@@ -2524,7 +2566,7 @@ function getChannelID() {
     // If has data.
     if (resp) {
         for (let i = 0; i < resp.result.length; i++) {
-            if (userID === resp.result[i].userID) {
+            if ($("#logined").text() === resp.result[i].userID) {
                 return resp.result[i].channelID;
             }
         }
@@ -2543,7 +2585,7 @@ function getFundingPrivKeyFromPubKey(pubkey) {
     if (addr) {
         // console.info('HAS DATA');
         for (let i = 0; i < addr.result.length; i++) {
-            if (userID === addr.result[i].userID) {
+            if ($("#logined").text() === addr.result[i].userID) {
                 for (let j = 0; j < addr.result[i].data.length; j++) {
                     if (pubkey === addr.result[i].data[j].pubkey) {
                         return addr.result[i].data[j].wif;
@@ -2571,7 +2613,7 @@ function saveTempPrivKey(saveKey, channelID, privkey) {
     if (addr) {
         // console.info('HAS DATA');
         for (let i = 0; i < addr.result.length; i++) {
-            if (userID === addr.result[i].userID) {
+            if ($("#logined").text() === addr.result[i].userID) {
                 for (let j = 0; j < addr.result[i].data.length; j++) {
                     if (channelID === addr.result[i].data[j].channelID) {
                         // update privkey 
@@ -2594,7 +2636,7 @@ function saveTempPrivKey(saveKey, channelID, privkey) {
 
         // A new User ID.
         let new_data = {
-            userID:  userID,
+            userID:  $("#logined").text(),
             data: [{
                 channelID: channelID,
                 privkey:   privkey
@@ -2607,7 +2649,7 @@ function saveTempPrivKey(saveKey, channelID, privkey) {
         // console.info('FIRST DATA');
         let data = {
             result: [{
-                userID:  userID,
+                userID:  $("#logined").text(),
                 data: [{
                     channelID: channelID,
                     privkey:   privkey
@@ -2631,7 +2673,7 @@ function getTempPrivKey(saveKey, channelID) {
     if (addr) {
         // console.info('HAS DATA');
         for (let i = 0; i < addr.result.length; i++) {
-            if (userID === addr.result[i].userID) {
+            if ($("#logined").text() === addr.result[i].userID) {
                 for (let j = 0; j < addr.result[i].data.length; j++) {
                     if (channelID === addr.result[i].data[j].channelID) {
                         return addr.result[i].data[j].privkey;
@@ -2654,7 +2696,7 @@ function saveAddresses(response) {
     if (addr) {
         // console.info('HAS DATA');
         for (let i = 0; i < addr.result.length; i++) {
-            if (userID === addr.result[i].userID) {
+            if ($("#logined").text() === addr.result[i].userID) {
                 // Add new dato to 
                 let new_data = {
                     address: response.result.address,
@@ -2670,7 +2712,7 @@ function saveAddresses(response) {
 
         // A new User ID.
         let new_data = {
-            userID: userID,
+            userID: $("#logined").text(),
             data: [{
                 address: response.result.address,
                 index: response.result.index,
@@ -2685,7 +2727,7 @@ function saveAddresses(response) {
         // console.info('FIRST DATA');
         let data = {
             result: [{
-                userID: userID,
+                userID: $("#logined").text(),
                 data: [{
                     address: response.result.address,
                     index: response.result.index,
@@ -2819,7 +2861,7 @@ function dataConstruct(response, tempChID, msgType) {
     if (msgType) {
         data = {
             temporary_channel_id: tempChID,
-            userID: userID,
+            userID: $("#logined").text(),
             data: [channelData(response)],
             btc: [btcData(response, msgType)],
             omniAsset: [omniAssetData(response, msgType)],
@@ -2829,7 +2871,7 @@ function dataConstruct(response, tempChID, msgType) {
     } else {
         data = {
             temporary_channel_id: tempChID,
-            userID: userID,
+            userID: $("#logined").text(),
             data: [channelData(response)],
             btc: [],
             omniAsset: [],
@@ -3124,12 +3166,99 @@ function getLastCounterparty() {
     if (data) {
         // console.info('HAS DATA');
         for (let i = 0; i < data.result.length; i++) {
-            if (userID === data.result[i].userID) {
+            if ($("#logined").text() === data.result[i].userID) {
                 let lastIndex = data.result[i].data.length - 1;
                 return data.result[i].data[lastIndex];
             }
         }
         return '';
+    } else {
+        return '';
+    }
+}
+
+// 
+function saveFundingBtcData(info) {
+
+    let resp = JSON.parse(localStorage.getItem(itemFundingBtcData));
+
+    // If has data.
+    if (resp) {
+        // console.info('HAS DATA');
+        for (let i = 0; i < resp.result.length; i++) {
+            if ($("#logined").text() === resp.result[i].userID) {
+                // Remove
+                resp.result.splice(i, 1);
+            }
+        }
+
+        // A new User ID.
+        let new_data = {
+            userID:                   $("#logined").text(),
+            from_address:             info.from_address,
+            from_address_private_key: info.from_address_private_key,
+            to_address:               info.to_address,
+            amount:                   info.amount,
+            miner_fee:                info.miner_fee
+        }
+        resp.result.push(new_data);
+        localStorage.setItem(itemFundingBtcData, JSON.stringify(resp));
+
+    } else {
+        // console.info('FIRST DATA');
+        let data = {
+            result: [{
+                userID:                   $("#logined").text(),
+                from_address:             info.from_address,
+                from_address_private_key: info.from_address_private_key,
+                to_address:               info.to_address,
+                amount:                   info.amount,
+                miner_fee:                info.miner_fee
+            }]
+        }
+        localStorage.setItem(itemFundingBtcData, JSON.stringify(data));
+    }
+}
+
+//
+function getFundingBtcData() {
+
+    let resp = JSON.parse(localStorage.getItem(itemFundingBtcData));
+
+    // If has data.
+    if (resp) {
+        for (let i = 0; i < resp.result.length; i++) {
+            if ($("#logined").text() === resp.result[i].userID) {
+                return resp.result[i];
+            }
+        }
+        return '';
+    } else {
+        return '';
+    }
+}
+
+/**
+ * save Channel ddress to localStorage
+ * @param address
+ */
+function saveChannelAddress(address) {
+    let data = {
+        address: address
+    }
+    localStorage.setItem(itemChannelAddress, JSON.stringify(data));
+}
+
+/**
+ * get Channel ddress from localStorage
+ */
+function getChannelAddress() {
+
+    let resp = JSON.parse(localStorage.getItem(itemChannelAddress));
+
+    // If has data.
+    if (resp) {
+        return resp.address;
     } else {
         return '';
     }
@@ -3350,7 +3479,7 @@ function saveCounterparties(name, p2pID) {
         // console.info('HAS DATA');
         for (let i = 0; i < list.result.length; i++) {
             // same userID
-            if (userID === list.result[i].userID) {
+            if ($("#logined").text() === list.result[i].userID) {
                 for (let i2 = 0; i2 < list.result[i].data.length; i2++) {
                     // if UserPeerID is same, then NodePeerID is updated.
                     if (list.result[i].data[i2].name === name) {
@@ -3373,7 +3502,7 @@ function saveCounterparties(name, p2pID) {
 
         // A new User ID.
         let new_data = {
-            userID: userID,
+            userID: $("#logined").text(),
             data: [{
                 name:  name,
                 p2pID: p2pID
@@ -3386,7 +3515,7 @@ function saveCounterparties(name, p2pID) {
         // console.info('FIRST DATA');
         let data = {
             result: [{
-                userID: userID,
+                userID: $("#logined").text(),
                 data: [{
                     name:  name,
                     p2pID: p2pID
@@ -3539,8 +3668,9 @@ function displayMnemonic() {
 
 //
 function displayAddresses(param) {
-    var parent = $("#name_req_div");
-    var newDiv = document.createElement('div');
+    let userID = $("#logined").text();
+    let parent = $("#name_req_div");
+    let newDiv = document.createElement('div');
     newDiv.setAttribute('class', 'panelItem');
 
     if (param === inNewHtml) { // New page
@@ -3645,7 +3775,7 @@ function displayCounterparties(param) {
             parent.append(newDiv);
             return;
         } else {
-            userID = status.userID;
+            // globalUserID = status.userID;
         }
 
     } else {
@@ -3659,7 +3789,7 @@ function displayCounterparties(param) {
     // If has data
     if (list) {
         for (let i = 0; i < list.result.length; i++) {
-            if (userID === list.result[i].userID) {
+            if ($("#logined").text() === list.result[i].userID) {
                 for (let i2 = 0; i2 < list.result[i].data.length; i2++) {
                     createElement(newDiv, 'h3', 'NO. ' + (i2 + 1), 'responseText');
                     arrData = [
@@ -4322,6 +4452,8 @@ function showLog() {
     // Receive params to new page
     let receive = window.opener["params"];
     let user_id = receive["user_id"];
+    $("#log_page_logined").text(user_id);
+
     console.log('Sent user_id = ' + user_id);
 
     // Read log data from IndexedDB
@@ -4331,9 +4463,9 @@ function showLog() {
 //
 function saveGoWhere(goWhere) {
     let data = {
-        goWhere: goWhere,
+        goWhere:   goWhere,
         isLogined: isLogined,
-        userID: userID
+        userID:    $("#logined").text()
     }
     localStorage.setItem(itemGoWhere, JSON.stringify(data));
 }

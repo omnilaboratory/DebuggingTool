@@ -35,6 +35,18 @@ pre {
     /* display: flex; */
 }
 
+.topDataKey{
+    padding-left: 100px;
+    font-size: 16px;
+    font-weight: 300;
+}
+
+.topDataVal{
+    padding-left: 10px;
+    font-size: 16px;
+    font-weight: 600;
+}
+
 .copyright {
     background-color:#1E222A;
     color: #eeeff5;
