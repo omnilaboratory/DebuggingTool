@@ -81,8 +81,15 @@ var db;
 
 /**
  * Object Store (table) name of IndexedDB.
+ * Global messages
  */
-const dbOS = 'global_msg';
+const tbGlobalMsg = 'global_msg';
+
+/**
+ * Object Store (table) name of IndexedDB.
+ * Funding private key
+ */
+const tbFundingPrivkey = 'funding_privkey';
 
 // word wrap code.
 // result.setAttribute('style', 'word-break: break-all;white-space: normal;');
@@ -148,7 +155,8 @@ function listening110040(e, msgType) {
     // will send -100041 HTLCSigned
     let info                                = new HtlcSignedInfo();
     info.commitment_tx_hash                 = e.commitment_tx_hash;
-    info.channel_address_private_key        = getTempPrivKey(FundingPrivKey, e.channel_id);
+    // info.channel_address_private_key        = getTempPrivKey(FundingPrivKey, e.channel_id);
+    info.channel_address_private_key        = readDataFromTbFPK(db, e.channel_id);
     info.last_temp_address_private_key      = getTempPrivKey(TempPrivKey, e.channel_id);
     info.curr_rsmc_temp_address_pub_key     = addr_1.result.pubkey;
     info.curr_rsmc_temp_address_private_key = addr_1.result.wif;
@@ -181,7 +189,8 @@ function listening110045(e, msgType) {
     info.channel_id                  = e.channel_id;
     info.r                           = e.r;
     info.msg_hash                    = e.msg_hash;
-    info.channel_address_private_key = getTempPrivKey(FundingPrivKey, e.channel_id);
+    // info.channel_address_private_key = getTempPrivKey(FundingPrivKey, e.channel_id);
+    info.channel_address_private_key = readDataFromTbFPK(db, e.channel_id);
 
     // OBD API
     obdApi.htlcSendSignVerifyR(e.payer_node_address, e.payer_peer_id, info, function(e) {
@@ -208,7 +217,8 @@ function listening110049(e, msgType) {
     // will send -100050 CloseHTLCSigned
     let info                                         = new CloseHtlcTxInfoSigned();
     info.msg_hash                                    = e.msg_hash;
-    info.channel_address_private_key                 = getTempPrivKey(FundingPrivKey, e.channel_id);
+    // info.channel_address_private_key                 = getTempPrivKey(FundingPrivKey, e.channel_id);
+    info.channel_address_private_key                 = readDataFromTbFPK(db, e.channel_id);
     info.last_rsmc_temp_address_private_key          = getTempPrivKey(RsmcTempPrivKey, e.channel_id);
     info.last_htlc_temp_address_private_key          = getTempPrivKey(HtlcTempPrivKey, e.channel_id);
     info.last_htlc_temp_address_for_htnx_private_key = getTempPrivKey(HtlcHtnxTempPrivKey, e.channel_id);
@@ -252,7 +262,8 @@ function listening110032(e, msgType) {
         saveChannelList(e);
         saveCounterparties(name, p2pID);
         saveChannelAddress(e.channel_address);
-        saveTempPrivKey(FundingPrivKey, temp_cid, addr.result.wif);
+        // saveTempPrivKey(FundingPrivKey, temp_cid, addr.result.wif);
+        addData2TbFundingPrivkey($("#logined").text(), temp_cid, addr.result.wif);
     });
 }
 
@@ -271,7 +282,8 @@ function listening110340(e, msgType) {
     let temp_cid                      = e.temporary_channel_id;
     let info                          = new FundingBtcSigned();
     info.temporary_channel_id         = temp_cid;
-    info.channel_address_private_key  = getTempPrivKey(FundingPrivKey, temp_cid);
+    // info.channel_address_private_key  = getTempPrivKey(FundingPrivKey, temp_cid);
+    info.channel_address_private_key  = readDataFromTbFPK(db, temp_cid);
     info.funding_txid                 = e.funding_txid;
     info.approval                     = true;
 
@@ -292,7 +304,8 @@ function listening110034(e, msgType) {
     // will send -100035 AssetFundingSigned
     let info                                = new ChannelFundingSignedInfo();
     info.temporary_channel_id               = e.temporary_channel_id;
-    info.fundee_channel_address_private_key = getTempPrivKey(FundingPrivKey, e.temporary_channel_id);
+    // info.fundee_channel_address_private_key = getTempPrivKey(FundingPrivKey, e.temporary_channel_id);
+    info.fundee_channel_address_private_key = readDataFromTbFPK(db, e.temporary_channel_id);
 
     // OBD API
     obdApi.channelFundingSigned(e.funder_node_address, e.funder_peer_id, info, function(e) {
@@ -301,7 +314,9 @@ function listening110034(e, msgType) {
 
         // Once sent -100035 AssetFundingSigned , the final channel_id has generated.
         // So need update the local saved data for funding private key and channel_id.
-        saveTempPrivKey(FundingPrivKey, e.channel_id, info.fundee_channel_address_private_key);
+        // saveTempPrivKey(FundingPrivKey, e.channel_id, info.fundee_channel_address_private_key);
+        addData2TbFundingPrivkey($("#logined").text(), e.channel_id, 
+            info.fundee_channel_address_private_key);
         saveChannelID(e.channel_id);
     });
 }
@@ -312,9 +327,11 @@ function listening110034(e, msgType) {
 function listening110035(e, msgType) {
     console.info('listening110035 = ' + JSON.stringify(e));
 
-    let fundingPrivKey = getTempPrivKey(FundingPrivKey, e.temporary_channel_id);
-    saveTempPrivKey(FundingPrivKey, e.channel_id, fundingPrivKey);
-    
+    // let fundingPrivKey = getTempPrivKey(FundingPrivKey, e.temporary_channel_id);
+    let fundingPrivKey = readDataFromTbFPK(db, e.temporary_channel_id);
+    // saveTempPrivKey(FundingPrivKey, e.channel_id, fundingPrivKey);
+    addData2TbFundingPrivkey($("#logined").text(), e.channel_id, fundingPrivKey);
+
     let tempPrivKey = getTempPrivKey(TempPrivKey, e.temporary_channel_id);
     saveTempPrivKey(TempPrivKey, e.channel_id, tempPrivKey);
 
@@ -342,7 +359,8 @@ function listening110351(e, msgType) {
     info.msg_hash                      = e.msg_hash;
     info.curr_temp_address_pub_key     = result.result.pubkey;
     info.curr_temp_address_private_key = result.result.wif;
-    info.channel_address_private_key   = getTempPrivKey(FundingPrivKey, e.channel_id);
+    // info.channel_address_private_key   = getTempPrivKey(FundingPrivKey, e.channel_id);
+    info.channel_address_private_key   = readDataFromTbFPK(db, e.channel_id);
     info.last_temp_address_private_key = getTempPrivKey(TempPrivKey, e.channel_id);
     info.approval                      = true;
 
@@ -465,7 +483,8 @@ function openChannel(msgType) {
         saveChannelList(e);
         saveCounterparties(userID, nodeID);
         let privkey = getFundingPrivKeyFromPubKey(pubkey);
-        saveTempPrivKey(FundingPrivKey, e.temporary_channel_id, privkey);
+        // saveTempPrivKey(FundingPrivKey, e.temporary_channel_id, privkey);
+        addData2TbFundingPrivkey($("#logined").text(), e.temporary_channel_id, privkey);
         saveChannelID(e.temporary_channel_id);
     });
 }
@@ -488,7 +507,8 @@ function acceptChannel(msgType) {
         saveCounterparties(userID, nodeID);
         saveChannelAddress(e.channel_address);
         let privkey = getFundingPrivKeyFromPubKey(info.funding_pubkey);
-        saveTempPrivKey(FundingPrivKey, info.temporary_channel_id, privkey);
+        // saveTempPrivKey(FundingPrivKey, info.temporary_channel_id, privkey);
+        addData2TbFundingPrivkey($("#logined").text(), info.temporary_channel_id, privkey);
     });
 }
 
@@ -945,7 +965,12 @@ function assetFundingSigned(msgType) {
     obdApi.channelFundingSigned(nodeID, userID, info, function(e) {
         console.info('-100035 - assetFundingSigned = ' + JSON.stringify(e));
         saveChannelList(e, e.channel_id, msgType);
-        saveTempPrivKey(FundingPrivKey, e.channel_id, privkey);
+        
+        // Once sent -100035 AssetFundingSigned , the final channel_id has generated.
+        // So need update the local saved data for funding private key and channel_id.
+        // saveTempPrivKey(FundingPrivKey, e.channel_id, privkey);
+        addData2TbFundingPrivkey($("#logined").text(), e.channel_id, privkey);
+        saveChannelID(e.channel_id);
     });
 }
 
@@ -1713,7 +1738,8 @@ function fillCounterparty() {
 function fillChannelIDAndFundingPrivKey() {
     let channelID = getChannelID();
     $("#channel_id").val(channelID);
-    let fundingPrivKey = getTempPrivKey(FundingPrivKey, channelID);
+    // let fundingPrivKey = getTempPrivKey(FundingPrivKey, channelID);
+    let fundingPrivKey = readDataFromTbFPK(db, channelID);
     $("#channel_address_private_key").val(fundingPrivKey);
 }
 
@@ -1723,13 +1749,25 @@ function fillChannelFundingLastTempKeys() {
     let tempPrivKey = getTempPrivKey(TempPrivKey, getChannelID());
     $("#last_temp_address_private_key").val(tempPrivKey);
 }
-
+// var currFPK;
 //
-function fillTempChannelIDAndFundingPrivKey() {
+function fillTempChannelIDAndFundingPrivKey(msgType) {
     let channelID = getChannelID();
     $("#temporary_channel_id").val(channelID);
-    let fundingPrivKey = getTempPrivKey(FundingPrivKey, channelID);
-    $("#channel_address_private_key").val(fundingPrivKey);
+
+    // let fundingPrivKey = getTempPrivKey(FundingPrivKey, channelID);
+    // let fundingPrivKey = await readDataFromTbFPK(db, channelID);
+
+    let fundingPrivKey = getFPKByAsync(db, channelID);
+    console.log('FINAL fundingPrivKey = ' + JSON.stringify(fundingPrivKey));
+
+    // getFPKByAsync(db, channelID).then(v => console.log(v));
+
+    // if (msgType === 35) {
+    //     $("#fundee_channel_address_private_key").val(fundingPrivKey);
+    // } else {
+    //     $("#channel_address_private_key").val(fundingPrivKey);
+    // }
 }
 
 //
@@ -1876,6 +1914,12 @@ function autoFillValue(arrParams, obj) {
             fillTempAddrKey();
             break;
 
+        case enumMsgType.MsgType_FundingSign_SendAssetFundingSigned_35:
+            if (!isLogined) return;  // Not logined
+            fillCounterparty();
+            fillTempChannelIDAndFundingPrivKey(35);
+            break;
+
         case enumMsgType.MsgType_CommitmentTx_SendCommitmentTransactionCreated_351:
         case enumMsgType.MsgType_CommitmentTxSigned_SendRevokeAndAcknowledgeCommitmentTransaction_352:
             if (!isLogined) return;  // Not logined
@@ -1941,7 +1985,8 @@ function autoFillValue(arrParams, obj) {
 
             channelID = getChannelID();
 
-            fundingPrivKey = getTempPrivKey(FundingPrivKey, channelID);
+            // fundingPrivKey = getTempPrivKey(FundingPrivKey, channelID);
+            fundingPrivKey = readDataFromTbFPK(db, channelID);
             $("#channel_address_private_key").val(fundingPrivKey);
 
             let privkey_1 = getTempPrivKey(RsmcTempPrivKey, channelID);
@@ -2523,37 +2568,42 @@ function getNewAddrIndex() {
  * @param channelID
  */
 function saveChannelID(channelID) {
-    console.log('logined userid == ' + $("#logined").text());
-    
-    let resp = JSON.parse(localStorage.getItem(itemChannelID));
-
-    // If has data.
-    if (resp) {
-        for (let i = 0; i < resp.result.length; i++) {
-            if ($("#logined").text() === resp.result[i].userID) {
-                resp.result[i].channelID = channelID;
-                localStorage.setItem(itemChannelID, JSON.stringify(resp));
-                return;
-            }
-        }
-
-        // A new User ID.
-        let new_data = {
-            userID:    $("#logined").text(),
-            channelID: channelID,
-        }
-        resp.result.push(new_data);
-        localStorage.setItem(itemChannelID, JSON.stringify(resp));
-
-    } else {
-        let data = {
-            result: [{
-                userID:    $("#logined").text(),
-                channelID: channelID,
-            }]
-        }
-        localStorage.setItem(itemChannelID, JSON.stringify(data));
+    let data = {
+        channelID: channelID,
     }
+    localStorage.setItem(itemChannelID, JSON.stringify(data));
+
+    // console.log('logined userid == ' + $("#logined").text());
+    
+    // let resp = JSON.parse(localStorage.getItem(itemChannelID));
+
+    // // If has data.
+    // if (resp) {
+    //     for (let i = 0; i < resp.result.length; i++) {
+    //         if ($("#logined").text() === resp.result[i].userID) {
+    //             resp.result[i].channelID = channelID;
+    //             localStorage.setItem(itemChannelID, JSON.stringify(resp));
+    //             return;
+    //         }
+    //     }
+
+    //     // A new User ID.
+    //     let new_data = {
+    //         userID:    $("#logined").text(),
+    //         channelID: channelID,
+    //     }
+    //     resp.result.push(new_data);
+    //     localStorage.setItem(itemChannelID, JSON.stringify(resp));
+
+    // } else {
+    //     let data = {
+    //         result: [{
+    //             userID:    $("#logined").text(),
+    //             channelID: channelID,
+    //         }]
+    //     }
+    //     localStorage.setItem(itemChannelID, JSON.stringify(data));
+    // }
 }
 
 /**
@@ -2565,15 +2615,24 @@ function getChannelID() {
 
     // If has data.
     if (resp) {
-        for (let i = 0; i < resp.result.length; i++) {
-            if ($("#logined").text() === resp.result[i].userID) {
-                return resp.result[i].channelID;
-            }
-        }
-        return '';
+        return resp.channelID;
     } else {
         return '';
     }
+
+    // let resp = JSON.parse(localStorage.getItem(itemChannelID));
+
+    // // If has data.
+    // if (resp) {
+    //     for (let i = 0; i < resp.result.length; i++) {
+    //         if ($("#logined").text() === resp.result[i].userID) {
+    //             return resp.result[i].channelID;
+    //         }
+    //     }
+    //     return '';
+    // } else {
+    //     return '';
+    // }
 }
 
 //
@@ -3762,10 +3821,11 @@ function createBalanceElement(parent, strAddr) {
 
 // List of Counterparties who have interacted
 function displayCounterparties(param) {
-    var arrData;
-    var parent = $("#name_req_div");
-    var list   = JSON.parse(localStorage.getItem(itemCounterparties));
-    var newDiv = document.createElement('div');
+    let userID = $("#logined").text();
+    let arrData;
+    let parent = $("#name_req_div");
+    let list   = JSON.parse(localStorage.getItem(itemCounterparties));
+    let newDiv = document.createElement('div');
     newDiv.setAttribute('class', 'panelItem');
 
     if (param === inNewHtml) { // New page
@@ -3775,7 +3835,7 @@ function displayCounterparties(param) {
             parent.append(newDiv);
             return;
         } else {
-            // globalUserID = status.userID;
+            userID = status.userID;
         }
 
     } else {
@@ -3789,7 +3849,7 @@ function displayCounterparties(param) {
     // If has data
     if (list) {
         for (let i = 0; i < list.result.length; i++) {
-            if ($("#logined").text() === list.result[i].userID) {
+            if (userID === list.result[i].userID) {
                 for (let i2 = 0; i2 < list.result[i].data.length; i2++) {
                     createElement(newDiv, 'h3', 'NO. ' + (i2 + 1), 'responseText');
                     arrData = [
@@ -4797,29 +4857,18 @@ function openDB() {
     // Create table and index
     request.onupgradeneeded = function (e) {
         db = e.target.result;
-        let objectStore;
-        if (!db.objectStoreNames.contains(dbOS)) {
-            objectStore = db.createObjectStore(dbOS, { autoIncrement: true });
-            objectStore.createIndex('user_id', 'user_id', { unique: false });
+
+        let os1;
+        if (!db.objectStoreNames.contains(tbGlobalMsg)) {
+            os1 = db.createObjectStore(tbGlobalMsg, { autoIncrement: true });
+            os1.createIndex('user_id', 'user_id', { unique: false });
         }
-    }
-}
 
-/**
- * Add a record to IndexedDB
- */
-function addData(user_id, msg) {
-
-    let request = db.transaction([dbOS], 'readwrite')
-        .objectStore(dbOS)
-        .add({ user_id: user_id, msg: msg });
-  
-    request.onsuccess = function (e) {
-        console.log('Data write success.');
-    };
-  
-    request.onerror = function (e) {
-        console.log('Data write false.');
+        let os2;
+        if (!db.objectStoreNames.contains(tbFundingPrivkey)) {
+            os2 = db.createObjectStore(tbFundingPrivkey, { autoIncrement: true });
+            os2.createIndex('channel_id', 'channel_id', { unique: false });
+        }
     }
 }
 
@@ -4842,14 +4891,50 @@ function openDBAndShowData(user_id) {
 }
 
 /**
+ * Add a record to table GlobalMsg
+ */
+function addData(user_id, msg) {
+
+    let request = db.transaction([tbGlobalMsg], 'readwrite')
+        .objectStore(tbGlobalMsg)
+        .add({ user_id: user_id, msg: msg });
+  
+    request.onsuccess = function (e) {
+        console.log('Data write success.');
+    };
+  
+    request.onerror = function (e) {
+        console.log('Data write false.');
+    }
+}
+
+/**
+ * Add a record to table Funding private key
+ */
+function addData2TbFundingPrivkey(user_id, channel_id, privkey) {
+
+    let request = db.transaction([tbFundingPrivkey], 'readwrite')
+        .objectStore(tbFundingPrivkey)
+        .add({ user_id: user_id, channel_id: channel_id, privkey: privkey });
+  
+    request.onsuccess = function (e) {
+        console.log('Data write success.');
+    };
+  
+    request.onerror = function (e) {
+        console.log('Data write false.');
+    }
+}
+
+/**
  * Read data belong one user from IndexedDB
  */
 function readData(logDB, user_id) {
 
     let showMsg     = '';
     let data        = [];
-    let transaction = logDB.transaction([dbOS], 'readonly');
-    let store       = transaction.objectStore(dbOS);
+    let transaction = logDB.transaction([tbGlobalMsg], 'readonly');
+    let store       = transaction.objectStore(tbGlobalMsg);
     let index       = store.index('user_id');
     let request     = index.get(user_id);
         request     = index.openCursor(user_id);
@@ -4873,4 +4958,70 @@ function readData(logDB, user_id) {
             $("#log").html(showMsg);
         }
     }
+}
+
+/**
+ * Read data from table funding private key
+ */
+function readDataFromTbFPK(logDB, channel_id) {
+
+    let data        = [];
+    let transaction = logDB.transaction([tbFundingPrivkey], 'readonly');
+    let store       = transaction.objectStore(tbFundingPrivkey);
+    let index       = store.index('channel_id');
+    let request     = index.get(channel_id);
+        request     = index.openCursor(channel_id);
+
+    request.onerror = function(e) {
+        console.log('Read data false.');
+    };
+
+    request.onsuccess = function (e) {
+        let result = e.target.result;
+        if (result) {
+            console.log('user_id: ' + result.value.user_id);
+            console.log('privkey: ' + result.value.privkey);
+            let value = {
+                user_id: result.value.user_id,
+                privkey: result.value.privkey
+            };
+
+            data.push(value);
+            result.continue();
+        } else {
+            console.log('No More Data.');
+            for (let i = 0; i < data.length; i++) {
+                if ($("#logined").text() === data[i].user_id) {
+                    console.log('FINAL privkey: ' + data[i].privkey);
+                    return data[i].privkey;
+                }
+            }
+        }
+    }
+}
+
+function getFundingPrivKeyFromIndexedDB(logDB, channel_id) {
+    return new Promise((resolve, reject) => {
+        let data = readDataFromTbFPK(logDB, channel_id);
+        console.log('FINAL data: ' + data);
+        resolve(data);
+    });
+
+    // return new Promise((resolve, reject) => {
+    //     readDataFromTbFPK(logDB, channel_id)
+    //     .then((data) => {
+    //         console.log('FINAL data: ' + data);
+    //         resolve(data);
+    //     }, (error) => {
+    //         reject(error);
+    //     })
+    // });
+}
+
+/**
+ * async
+ */
+async function getFPKByAsync(logDB, channel_id){
+    let privkey = await getFundingPrivKeyFromIndexedDB(logDB, channel_id);
+    return privkey;
 }
