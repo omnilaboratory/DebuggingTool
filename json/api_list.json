@@ -170,7 +170,7 @@
         {
             "id": "fundingBTC",
             "type_id": -102109,
-            "description": "FundingBTC is used for depositing bitcoin into a channel. Since the basic Omnilayer protocal uses BTC as miner fee in transferring assets, this message 1009 is special for depositing BTC for future transactions.  NOTE: For the current design, [FundingBTC] need to be run 3 times. And every time [FundingBTC] done, [BTCFundingCreated] and [BTCFundingSigned] need to be run in order.",
+            "description": "FundingBTC is used for depositing bitcoin into a channel. Since the basic Omnilayer protocal uses BTC as miner fee in transferring assets, this message -102109 is special for depositing BTC for future transactions.  NOTE: For the current design, [FundingBTC] need to be run 3 times. And every time [FundingBTC] done, [BTCFundingCreated] and [BTCFundingSigned] need to be run in order. Omni Core will support sendmany soon, so the 3 times BTC funding will not be required in the next version of OBD.",
             "parameters": [
                 {
                     "name": "from_address",
@@ -705,35 +705,7 @@
             "description": "HTLCFindPath is used to find a routing between A and B node for launch a HTLC transfer.",
             "parameters": [
                 {
-                    "name": "recipient_node_peer_id",
-                    "buttons": [
-                        {
-                            "innerText": "Counterparties",
-                            "onclick": "displayUserDataInNewHtml('Counterparties')"
-                        }
-                    ]
-                },
-                {
-                    "name": "recipient_user_peer_id",
-                    "buttons": [
-                        {
-                            "innerText": "Counterparties",
-                            "onclick": "displayUserDataInNewHtml('Counterparties')"
-                        }
-                    ]
-                },
-                {
-                    "name": "property_id",
-                    "help": "The property id of an omni asset.",
-                    "buttons": [
-                        {
-                            "innerText": "Display",
-                            "onclick": "displayUserDataInNewHtml('MyAddresses')"
-                        }
-                    ]
-                },
-                {
-                    "name": "amount",
+                    "name": "invoice",
                     "buttons": []
                 }
             ]
@@ -790,7 +762,7 @@
                     ]
                 },
                 {
-                    "name": "htlc_channel_path",
+                    "name": "routing_packet",
                     "help": "The path from sender to final receiver.",
                     "buttons": [
                         {
@@ -798,6 +770,11 @@
                             "onclick": "displayUserDataInNewHtml('ChannelList')"
                         }
                     ]
+                },
+                {
+                    "name": "cltv_expiry",
+                    "help": "The.",
+                    "buttons": []
                 },
                 {
                     "name": "channel_address_private_key",

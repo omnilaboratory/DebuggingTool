@@ -153,22 +153,23 @@ function listening110040(e, msgType) {
     saveAddresses(addr_2);
 
     // will send -100041 HTLCSigned
-    let info                                = new HtlcSignedInfo();
-    info.commitment_tx_hash                 = e.commitment_tx_hash;
-    // info.channel_address_private_key        = getTempPrivKey(FundingPrivKey, e.channel_id);
-    info.channel_address_private_key        = readDataFromTbFPK(db, e.channel_id);
-    info.last_temp_address_private_key      = getTempPrivKey(TempPrivKey, e.channel_id);
-    info.curr_rsmc_temp_address_pub_key     = addr_1.result.pubkey;
-    info.curr_rsmc_temp_address_private_key = addr_1.result.wif;
-    info.curr_htlc_temp_address_pub_key     = addr_2.result.pubkey;
-    info.curr_htlc_temp_address_private_key = addr_2.result.wif;
-
-    // OBD API
-    obdApi.htlcSigned(e.payer_node_address, e.payer_peer_id, info, function(e) {
-        console.info('-100041 htlcSigned = ' + JSON.stringify(e));
-        saveChannelList(e, e.channel_id, msgType);
-        saveTempPrivKey(RsmcTempPrivKey, e.channel_id, addr_1.result.wif);
-        saveTempPrivKey(HtlcTempPrivKey, e.channel_id, addr_2.result.wif);
+    getFPKByAsync(db, e.channel_id).then(function (result) {
+        let info                                = new HtlcSignedInfo();
+        info.commitment_tx_hash                 = e.commitment_tx_hash;
+        info.channel_address_private_key        = result;
+        info.last_temp_address_private_key      = getTempPrivKey(TempPrivKey, e.channel_id);
+        info.curr_rsmc_temp_address_pub_key     = addr_1.result.pubkey;
+        info.curr_rsmc_temp_address_private_key = addr_1.result.wif;
+        info.curr_htlc_temp_address_pub_key     = addr_2.result.pubkey;
+        info.curr_htlc_temp_address_private_key = addr_2.result.wif;
+    
+        // OBD API
+        obdApi.htlcSigned(e.payer_node_address, e.payer_peer_id, info, function(e) {
+            console.info('-100041 htlcSigned = ' + JSON.stringify(e));
+            saveChannelList(e, e.channel_id, msgType);
+            saveTempPrivKey(RsmcTempPrivKey, e.channel_id, addr_1.result.wif);
+            saveTempPrivKey(HtlcTempPrivKey, e.channel_id, addr_2.result.wif);
+        });
     });
 }
 
@@ -185,17 +186,18 @@ function listening110045(e, msgType) {
     console.info('listening110045 = ' + JSON.stringify(e));
 
     // Alice will send -100046 HTLCSendSignVerifyR
-    let info                         = new HtlcSendSignVerifyRInfo();
-    info.channel_id                  = e.channel_id;
-    info.r                           = e.r;
-    info.msg_hash                    = e.msg_hash;
-    // info.channel_address_private_key = getTempPrivKey(FundingPrivKey, e.channel_id);
-    info.channel_address_private_key = readDataFromTbFPK(db, e.channel_id);
-
-    // OBD API
-    obdApi.htlcSendSignVerifyR(e.payer_node_address, e.payer_peer_id, info, function(e) {
-        console.info('-100046 htlcSendSignVerifyR = ' + JSON.stringify(e));
-        saveChannelList(e, e.channel_id, msgType);
+    getFPKByAsync(db, e.channel_id).then(function (result) {
+        let info                         = new HtlcSendSignVerifyRInfo();
+        info.channel_id                  = e.channel_id;
+        info.r                           = e.r;
+        info.msg_hash                    = e.msg_hash;
+        info.channel_address_private_key = result;
+    
+        // OBD API
+        obdApi.htlcSendSignVerifyR(e.payer_node_address, e.payer_peer_id, info, function(e) {
+            console.info('-100046 htlcSendSignVerifyR = ' + JSON.stringify(e));
+            saveChannelList(e, e.channel_id, msgType);
+        });
     });
 }
 
@@ -215,20 +217,21 @@ function listening110049(e, msgType) {
     saveAddresses(addr);
     
     // will send -100050 CloseHTLCSigned
-    let info                                         = new CloseHtlcTxInfoSigned();
-    info.msg_hash                                    = e.msg_hash;
-    // info.channel_address_private_key                 = getTempPrivKey(FundingPrivKey, e.channel_id);
-    info.channel_address_private_key                 = readDataFromTbFPK(db, e.channel_id);
-    info.last_rsmc_temp_address_private_key          = getTempPrivKey(RsmcTempPrivKey, e.channel_id);
-    info.last_htlc_temp_address_private_key          = getTempPrivKey(HtlcTempPrivKey, e.channel_id);
-    info.last_htlc_temp_address_for_htnx_private_key = getTempPrivKey(HtlcHtnxTempPrivKey, e.channel_id);
-    info.curr_rsmc_temp_address_pub_key              = addr.result.pubkey;
-    info.curr_rsmc_temp_address_private_key          = addr.result.wif;
-
-    // OBD API
-    obdApi.closeHTLCSigned(e.sender_node_address, e.sender_peer_id, info, function(e) {
-        console.info('-100050 closeHTLCSigned = ' + JSON.stringify(e));
-        saveTempPrivKey(RsmcTempPrivKey, e.channel_id, info.curr_rsmc_temp_address_private_key);
+    getFPKByAsync(db, e.channel_id).then(function (result) {
+        let info                                         = new CloseHtlcTxInfoSigned();
+        info.msg_hash                                    = e.msg_hash;
+        info.channel_address_private_key                 = result;
+        info.last_rsmc_temp_address_private_key          = getTempPrivKey(RsmcTempPrivKey, e.channel_id);
+        info.last_htlc_temp_address_private_key          = getTempPrivKey(HtlcTempPrivKey, e.channel_id);
+        info.last_htlc_temp_address_for_htnx_private_key = getTempPrivKey(HtlcHtnxTempPrivKey, e.channel_id);
+        info.curr_rsmc_temp_address_pub_key              = addr.result.pubkey;
+        info.curr_rsmc_temp_address_private_key          = addr.result.wif;
+    
+        // OBD API
+        obdApi.closeHTLCSigned(e.sender_node_address, e.sender_peer_id, info, function(e) {
+            console.info('-100050 closeHTLCSigned = ' + JSON.stringify(e));
+            saveTempPrivKey(RsmcTempPrivKey, e.channel_id, info.curr_rsmc_temp_address_private_key);
+        });
     });
 }
 
@@ -262,7 +265,6 @@ function listening110032(e, msgType) {
         saveChannelList(e);
         saveCounterparties(name, p2pID);
         saveChannelAddress(e.channel_address);
-        // saveTempPrivKey(FundingPrivKey, temp_cid, addr.result.wif);
         addData2TbFundingPrivkey($("#logined").text(), temp_cid, addr.result.wif);
     });
 }
@@ -279,18 +281,18 @@ function listening110340(e, msgType) {
     console.info('listening110340 = ' + JSON.stringify(e));
 
     // will send -100350 BTCFundingSigned
-    let temp_cid                      = e.temporary_channel_id;
-    let info                          = new FundingBtcSigned();
-    info.temporary_channel_id         = temp_cid;
-    // info.channel_address_private_key  = getTempPrivKey(FundingPrivKey, temp_cid);
-    info.channel_address_private_key  = readDataFromTbFPK(db, temp_cid);
-    info.funding_txid                 = e.funding_txid;
-    info.approval                     = true;
-
-    // OBD API
-    obdApi.btcFundingSigned(e.funder_node_address, e.funder_peer_id, info, function(e) {
-        console.info('-100350 btcFundingSigned = ' + JSON.stringify(e));
-        saveChannelList(e, temp_cid, msgType);
+    getFPKByAsync(db, e.temporary_channel_id).then(function (result) {
+        let info                          = new FundingBtcSigned();
+        info.temporary_channel_id         = e.temporary_channel_id;
+        info.channel_address_private_key  = result;
+        info.funding_txid                 = e.funding_txid;
+        info.approval                     = true;
+    
+        // OBD API
+        obdApi.btcFundingSigned(e.funder_node_address, e.funder_peer_id, info, function(e) {
+            console.info('-100350 btcFundingSigned = ' + JSON.stringify(e));
+            saveChannelList(e, e.temporary_channel_id, msgType);
+        });
     });
 }
 
@@ -302,22 +304,22 @@ function listening110034(e, msgType) {
     console.info('listening110034 = ' + JSON.stringify(e));
 
     // will send -100035 AssetFundingSigned
-    let info                                = new ChannelFundingSignedInfo();
-    info.temporary_channel_id               = e.temporary_channel_id;
-    // info.fundee_channel_address_private_key = getTempPrivKey(FundingPrivKey, e.temporary_channel_id);
-    info.fundee_channel_address_private_key = readDataFromTbFPK(db, e.temporary_channel_id);
-
-    // OBD API
-    obdApi.channelFundingSigned(e.funder_node_address, e.funder_peer_id, info, function(e) {
-        console.info('-100035 AssetFundingSigned = ' + JSON.stringify(e));
-        saveChannelList(e, e.channel_id, msgType);
-
-        // Once sent -100035 AssetFundingSigned , the final channel_id has generated.
-        // So need update the local saved data for funding private key and channel_id.
-        // saveTempPrivKey(FundingPrivKey, e.channel_id, info.fundee_channel_address_private_key);
-        addData2TbFundingPrivkey($("#logined").text(), e.channel_id, 
-            info.fundee_channel_address_private_key);
-        saveChannelID(e.channel_id);
+    getFPKByAsync(db, e.temporary_channel_id).then(function (result) {
+        let info                                = new ChannelFundingSignedInfo();
+        info.temporary_channel_id               = e.temporary_channel_id;
+        info.fundee_channel_address_private_key = result;
+    
+        // OBD API
+        obdApi.channelFundingSigned(e.funder_node_address, e.funder_peer_id, info, function(e) {
+            console.info('-100035 AssetFundingSigned = ' + JSON.stringify(e));
+            saveChannelList(e, e.channel_id, msgType);
+    
+            // Once sent -100035 AssetFundingSigned , the final channel_id has generated.
+            // So need update the local saved data for funding private key and channel_id.
+            addData2TbFundingPrivkey($("#logined").text(), e.channel_id, 
+                info.fundee_channel_address_private_key);
+            saveChannelID(e.channel_id);
+        });
     });
 }
 
@@ -327,10 +329,9 @@ function listening110034(e, msgType) {
 function listening110035(e, msgType) {
     console.info('listening110035 = ' + JSON.stringify(e));
 
-    // let fundingPrivKey = getTempPrivKey(FundingPrivKey, e.temporary_channel_id);
-    let fundingPrivKey = readDataFromTbFPK(db, e.temporary_channel_id);
-    // saveTempPrivKey(FundingPrivKey, e.channel_id, fundingPrivKey);
-    addData2TbFundingPrivkey($("#logined").text(), e.channel_id, fundingPrivKey);
+    getFPKByAsync(db, e.temporary_channel_id).then(function (result) {
+        addData2TbFundingPrivkey($("#logined").text(), e.channel_id, result);
+    });
 
     let tempPrivKey = getTempPrivKey(TempPrivKey, e.temporary_channel_id);
     saveTempPrivKey(TempPrivKey, e.channel_id, tempPrivKey);
@@ -350,26 +351,27 @@ function listening110351(e, msgType) {
     console.info('listening110351 = ' + JSON.stringify(e));
 
     // Generate an address by local js library.
-    let result = genAddressFromMnemonic();
-    saveAddresses(result);
+    let addr = genAddressFromMnemonic();
+    saveAddresses(addr);
 
     // will send -100352 RSMCCTxSigned
-    let info                           = new CommitmentTxSigned();
-    info.channel_id                    = e.channel_id;
-    info.msg_hash                      = e.msg_hash;
-    info.curr_temp_address_pub_key     = result.result.pubkey;
-    info.curr_temp_address_private_key = result.result.wif;
-    // info.channel_address_private_key   = getTempPrivKey(FundingPrivKey, e.channel_id);
-    info.channel_address_private_key   = readDataFromTbFPK(db, e.channel_id);
-    info.last_temp_address_private_key = getTempPrivKey(TempPrivKey, e.channel_id);
-    info.approval                      = true;
-
-    // OBD API
-    obdApi.revokeAndAcknowledgeCommitmentTransaction(
-        e.payer_node_address, e.payer_peer_id, info, function(e) {
-        console.info('-100352 RSMCCTxSigned = ' + JSON.stringify(e));
-        saveChannelList(e, e.channel_id, msgType);
-        saveTempPrivKey(TempPrivKey, e.channel_id, info.curr_temp_address_private_key);
+    getFPKByAsync(db, e.channel_id).then(function (resp) {
+        let info                           = new CommitmentTxSigned();
+        info.channel_id                    = e.channel_id;
+        info.msg_hash                      = e.msg_hash;
+        info.curr_temp_address_pub_key     = addr.result.pubkey;
+        info.curr_temp_address_private_key = addr.result.wif;
+        info.channel_address_private_key   = resp;
+        info.last_temp_address_private_key = getTempPrivKey(TempPrivKey, e.channel_id);
+        info.approval                      = true;
+    
+        // OBD API
+        obdApi.revokeAndAcknowledgeCommitmentTransaction(
+            e.payer_node_address, e.payer_peer_id, info, function(e) {
+            console.info('-100352 RSMCCTxSigned = ' + JSON.stringify(e));
+            saveChannelList(e, e.channel_id, msgType);
+            saveTempPrivKey(TempPrivKey, e.channel_id, info.curr_temp_address_private_key);
+        });
     });
 }
 
@@ -483,7 +485,6 @@ function openChannel(msgType) {
         saveChannelList(e);
         saveCounterparties(userID, nodeID);
         let privkey = getFundingPrivKeyFromPubKey(pubkey);
-        // saveTempPrivKey(FundingPrivKey, e.temporary_channel_id, privkey);
         addData2TbFundingPrivkey($("#logined").text(), e.temporary_channel_id, privkey);
         saveChannelID(e.temporary_channel_id);
     });
@@ -507,7 +508,6 @@ function acceptChannel(msgType) {
         saveCounterparties(userID, nodeID);
         saveChannelAddress(e.channel_address);
         let privkey = getFundingPrivKeyFromPubKey(info.funding_pubkey);
-        // saveTempPrivKey(FundingPrivKey, info.temporary_channel_id, privkey);
         addData2TbFundingPrivkey($("#logined").text(), info.temporary_channel_id, privkey);
     });
 }
@@ -968,7 +968,6 @@ function assetFundingSigned(msgType) {
         
         // Once sent -100035 AssetFundingSigned , the final channel_id has generated.
         // So need update the local saved data for funding private key and channel_id.
-        // saveTempPrivKey(FundingPrivKey, e.channel_id, privkey);
         addData2TbFundingPrivkey($("#logined").text(), e.channel_id, privkey);
         saveChannelID(e.channel_id);
     });
@@ -1075,7 +1074,7 @@ function htlcCreated(msgType) {
     info.amount                                      = Number($("#amount").val());
     info.memo                                        = $("#memo").val();
     info.h                                           = $("#h").val();
-    info.htlc_channel_path                           = $("#htlc_channel_path").val();
+    info.routing_packet                              = $("#routing_packet").val();
     info.channel_address_private_key                 = $("#channel_address_private_key").val();
     info.last_temp_address_private_key               = $("#last_temp_address_private_key").val();
     info.curr_rsmc_temp_address_pub_key              = $("#curr_rsmc_temp_address_pub_key").val();
@@ -1122,11 +1121,12 @@ function htlcSigned(msgType) {
 // -100401 htlcSigned API at local.
 function htlcFindPath(msgType) {
 
-    let info                    = new HtlcFindPathInfo();
-    info.recipient_node_peer_id = $("#recipient_node_peer_id").val();
-    info.recipient_user_peer_id = $("#recipient_user_peer_id").val();
-    info.property_id            = Number($("#property_id").val());
-    info.amount                 = Number($("#amount").val());
+    let info     = new HtlcFindPathInfo();
+    info.invoice = $("#invoice").val();
+    // info.recipient_node_peer_id = $("#recipient_node_peer_id").val();
+    // info.recipient_user_peer_id = $("#recipient_user_peer_id").val();
+    // info.property_id            = Number($("#property_id").val());
+    // info.amount                 = Number($("#amount").val());
 
     // OBD API
     obdApi.htlcFindPath(info, function(e) {
@@ -1738,9 +1738,9 @@ function fillCounterparty() {
 function fillChannelIDAndFundingPrivKey() {
     let channelID = getChannelID();
     $("#channel_id").val(channelID);
-    // let fundingPrivKey = getTempPrivKey(FundingPrivKey, channelID);
-    let fundingPrivKey = readDataFromTbFPK(db, channelID);
-    $("#channel_address_private_key").val(fundingPrivKey);
+    getFPKByAsync(db, channelID).then(function (result) {
+        $("#channel_address_private_key").val(result);
+    });
 }
 
 //
@@ -1749,25 +1749,20 @@ function fillChannelFundingLastTempKeys() {
     let tempPrivKey = getTempPrivKey(TempPrivKey, getChannelID());
     $("#last_temp_address_private_key").val(tempPrivKey);
 }
-// var currFPK;
+
 //
 function fillTempChannelIDAndFundingPrivKey(msgType) {
     let channelID = getChannelID();
     $("#temporary_channel_id").val(channelID);
 
-    // let fundingPrivKey = getTempPrivKey(FundingPrivKey, channelID);
-    // let fundingPrivKey = await readDataFromTbFPK(db, channelID);
-
-    let fundingPrivKey = getFPKByAsync(db, channelID);
-    console.log('FINAL fundingPrivKey = ' + JSON.stringify(fundingPrivKey));
-
-    // getFPKByAsync(db, channelID).then(v => console.log(v));
-
-    // if (msgType === 35) {
-    //     $("#fundee_channel_address_private_key").val(fundingPrivKey);
-    // } else {
-    //     $("#channel_address_private_key").val(fundingPrivKey);
-    // }
+    getFPKByAsync(db, channelID).then(function (result) {
+        // console.log('FINAL RESULT = ' + result);
+        if (msgType === 35) {
+            $("#fundee_channel_address_private_key").val(result);
+        } else {
+            $("#channel_address_private_key").val(result);
+        }
+    });
 }
 
 //
@@ -1984,10 +1979,9 @@ function autoFillValue(arrParams, obj) {
             }
 
             channelID = getChannelID();
-
-            // fundingPrivKey = getTempPrivKey(FundingPrivKey, channelID);
-            fundingPrivKey = readDataFromTbFPK(db, channelID);
-            $("#channel_address_private_key").val(fundingPrivKey);
+            getFPKByAsync(db, channelID).then(function (result) {
+                $("#channel_address_private_key").val(result);
+            });
 
             let privkey_1 = getTempPrivKey(RsmcTempPrivKey, channelID);
             $("#last_rsmc_temp_address_private_key").val(privkey_1);
@@ -3590,9 +3584,8 @@ function saveCounterparties(name, p2pID) {
 
 // get balance of btc and omni assets of an address.
 function getBalance(strAddr) {
-    // console.info('strAddr = ' + strAddr);
 
-    var result;
+    let result;
 
     // OBD API
     obdApi.getBtcBalanceByAddress(strAddr, function(e) {
@@ -3606,13 +3599,14 @@ function getBalance(strAddr) {
 
     // for omni assets
     obdApi.omniGetAllBalancesForAddress(strAddr, function(e) {
-        console.info('omniGetAllBalancesForAddress - OBD Response = ' + JSON.stringify(e));
+        console.info('-102112 omniGetAllBalancesForAddress = ' + JSON.stringify(e));
 
         if (e != "") {
             for (let i = 0; i < e.length; i++) {
                 result += ' *** ' + parseFloat(e[i].balance) + ' ' + e[i].name +
                     ' (Property ID: ' + e[i].propertyid + ')';
             }
+
             $("#" + strAddr).text(result);
         }
     });
@@ -4965,63 +4959,51 @@ function readData(logDB, user_id) {
  */
 function readDataFromTbFPK(logDB, channel_id) {
 
-    let data        = [];
-    let transaction = logDB.transaction([tbFundingPrivkey], 'readonly');
-    let store       = transaction.objectStore(tbFundingPrivkey);
-    let index       = store.index('channel_id');
-    let request     = index.get(channel_id);
-        request     = index.openCursor(channel_id);
+    return new Promise((resolve, reject) => {
 
-    request.onerror = function(e) {
-        console.log('Read data false.');
-    };
+        let data        = [];
+        let transaction = logDB.transaction([tbFundingPrivkey], 'readonly');
+        let store       = transaction.objectStore(tbFundingPrivkey);
+        let index       = store.index('channel_id');
+        let request     = index.get(channel_id);
+            request     = index.openCursor(channel_id);
 
-    request.onsuccess = function (e) {
-        let result = e.target.result;
-        if (result) {
-            console.log('user_id: ' + result.value.user_id);
-            console.log('privkey: ' + result.value.privkey);
-            let value = {
-                user_id: result.value.user_id,
-                privkey: result.value.privkey
-            };
+        request.onerror = function(e) {
+            console.log('Read data false.');
+            reject('Read data false.');
+        }
 
-            data.push(value);
-            result.continue();
-        } else {
-            console.log('No More Data.');
-            for (let i = 0; i < data.length; i++) {
-                if ($("#logined").text() === data[i].user_id) {
-                    console.log('FINAL privkey: ' + data[i].privkey);
-                    return data[i].privkey;
+        request.onsuccess = function (e) {
+            let result = e.target.result;
+            if (result) {
+                // console.log('user_id: ' + result.value.user_id);
+                // console.log('privkey: ' + result.value.privkey);
+                let value = {
+                    user_id: result.value.user_id,
+                    privkey: result.value.privkey
+                };
+
+                data.push(value);
+                result.continue();
+            } else {
+                console.log('No More Data.');
+                for (let i = 0; i < data.length; i++) {
+                    if ($("#logined").text() === data[i].user_id) {
+                        console.log('FINAL privkey: ' + data[i].privkey);
+                        // return data[i].privkey;
+                        resolve(data[i].privkey);
+                    }
                 }
             }
         }
-    }
-}
 
-function getFundingPrivKeyFromIndexedDB(logDB, channel_id) {
-    return new Promise((resolve, reject) => {
-        let data = readDataFromTbFPK(logDB, channel_id);
-        console.log('FINAL data: ' + data);
-        resolve(data);
-    });
-
-    // return new Promise((resolve, reject) => {
-    //     readDataFromTbFPK(logDB, channel_id)
-    //     .then((data) => {
-    //         console.log('FINAL data: ' + data);
-    //         resolve(data);
-    //     }, (error) => {
-    //         reject(error);
-    //     })
-    // });
+    })
 }
 
 /**
- * async
+ * Async read data from table funding private key
  */
 async function getFPKByAsync(logDB, channel_id){
-    let privkey = await getFundingPrivKeyFromIndexedDB(logDB, channel_id);
+    let privkey = await readDataFromTbFPK(logDB, channel_id);
     return privkey;
 }

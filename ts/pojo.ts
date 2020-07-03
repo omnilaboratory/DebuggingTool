@@ -74,10 +74,11 @@ class CommitmentTxSigned {
 }
 
 class HtlcFindPathInfo {
-  recipient_node_peer_id: string = "";
-  recipient_user_peer_id: string = "";
-  property_id: number = 0;
-  amount: number = 0;
+  invoice: string = "";
+  // recipient_node_peer_id: string = "";
+  // recipient_user_peer_id: string = "";
+  // property_id: number = 0;
+  // amount: number = 0;
 }
 
 class InvoiceInfo {
@@ -94,7 +95,7 @@ class HtlcCreatedInfo {
   amount: number = 0;
   memo: string = "";
   h: string = "";
-  htlc_channel_path: string = "";
+  routing_packet: string = "";
   channel_address_private_key: string = "";
   last_temp_address_private_key: string = "";
   curr_rsmc_temp_address_pub_key: string = "";

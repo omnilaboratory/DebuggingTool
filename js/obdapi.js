@@ -772,22 +772,26 @@ class ObdApi {
      * @param callback function
      */
     htlcFindPath(info, callback) {
-        if (this.isNotString(info.recipient_node_peer_id)) {
-            alert("empty recipient_node_peer_id");
+        if (this.isNotString(info.invoice)) {
+            alert("empty invoice");
             return;
         }
-        if (this.isNotString(info.recipient_user_peer_id)) {
-            alert("empty recipient_user_peer_id");
-            return;
-        }
-        if (info.property_id == null || info.property_id <= 0) {
-            alert("empty property_id");
-            return;
-        }
-        if (info.amount == null || info.amount <= 0) {
-            alert("wrong amount");
-            return;
-        }
+        // if (this.isNotString(info.recipient_node_peer_id)) {
+        //   alert("empty recipient_node_peer_id");
+        //   return;
+        // }
+        // if (this.isNotString(info.recipient_user_peer_id)) {
+        //   alert("empty recipient_user_peer_id");
+        //   return;
+        // }
+        // if (info.property_id == null || info.property_id <= 0) {
+        //   alert("empty property_id");
+        //   return;
+        // }
+        // if (info.amount == null || info.amount <= 0) {
+        //   alert("wrong amount");
+        //   return;
+        // }
         let msg = new Message();
         msg.type = this.messageType.MsgType_HTLC_FindPath_401;
         msg.data = info;
@@ -825,8 +829,8 @@ class ObdApi {
         if (this.isNotString(info.memo)) {
             info.memo = "";
         }
-        if (this.isNotString(info.htlc_channel_path)) {
-            alert("empty htlc_channel_path");
+        if (this.isNotString(info.routing_packet)) {
+            alert("empty routing_packet");
             return;
         }
         if (this.isNotString(info.channel_address_private_key)) {

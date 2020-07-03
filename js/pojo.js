@@ -85,10 +85,11 @@ class CommitmentTxSigned {
 }
 class HtlcFindPathInfo {
     constructor() {
-        this.recipient_node_peer_id = "";
-        this.recipient_user_peer_id = "";
-        this.property_id = 0;
-        this.amount = 0;
+        this.invoice = "";
+        // recipient_node_peer_id: string = "";
+        // recipient_user_peer_id: string = "";
+        // property_id: number = 0;
+        // amount: number = 0;
     }
 }
 class InvoiceInfo {
@@ -107,7 +108,7 @@ class HtlcCreatedInfo {
         this.amount = 0;
         this.memo = "";
         this.h = "";
-        this.htlc_channel_path = "";
+        this.routing_packet = "";
         this.channel_address_private_key = "";
         this.last_temp_address_private_key = "";
         this.curr_rsmc_temp_address_pub_key = "";
