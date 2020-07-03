@@ -15,6 +15,7 @@ In this tutorial, you can connect either your own OBD node, or the [nodes in the
 </p>
 
 * [Installation](https://github.com/omnilaboratory/DebuggingTool#installation-clone-this-project-and-run-it-by-chrome)
+* [Nodes in the testnet](https://github.com/omnilaboratory/DebuggingTool#Nodes-in-testnet)
 * [Operations](https://github.com/omnilaboratory/DebuggingTool#operations) 
 	* [Step 1: connect to an OBD node](https://github.com/omnilaboratory/DebuggingTool#step-1-connect-to-an-obd-node)
 	* [Step 2: signup a new user](https://github.com/omnilaboratory/DebuggingTool#step-2-signup-a-new-user)
