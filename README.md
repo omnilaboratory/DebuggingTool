@@ -7,12 +7,7 @@ OmniBOLT Daemon Debugging Tool. This is a graphic user interface for developers.
 
 If you come to this tool in developing modules for OmniBOLT, you must have successfully installed and ran OBD on your local or remote machine. If you do not familiar with the whole process yet, we suggest you [install](https://github.com/omnilaboratory/obd#table-of-contents) OBD first and try to run it for a quick experience.  
 
-In this tutorial, you can connect either your own OBD node, or the nodes in the testnet we configured for our community. Here is the list of nodes in the testnet:   
-
-``` 
-ws://62.234.216.108:60020/wstest
-ws://62.234.188.160:60020/wstest
-```
+In this tutorial, you can connect either your own OBD node, or the [nodes in the testnet](https://github.com/omnilaboratory/DebuggingTool#Nodes-in-testnet) we configured for our community. 
 
 
 <p align="center">
@@ -54,6 +49,17 @@ There are currently three solutions:
 2) Run a web server, put the debugging tool in the corresponding directory, so that Chrome can visit the url normally.  
 3) Use Safari or other browsers to run the debugging tool.  
 
+## Nodes in testnet
+
+Here is the list of nodes in the testnet. will be updating accordingly:   
+
+``` 
+ws://62.234.216.108:60020/wstest
+ws://62.234.188.160:60020/wstest
+```
+
+
+
 ## Operations 
 
 ### Step 1: connect to an OBD node
@@ -63,7 +69,7 @@ There are currently three solutions:
 </p>
 
 1. click "Connect to OBD node";  
-2. on the right panel, appears the input box. We depolyed an example OBD node for developers, the address is: ws://62.234.216.108:60030/ws. Just replace the default 127.0.0.1:60020 by 62.234.216.108:60030  
+2. on the right panel, appears the input box. connect you local obd node or one of the [nodes in the testnet](https://github.com/omnilaboratory/DebuggingTool#Nodes-in-testnet), for example: `ws://62.234.216.108:60020/wstest`. Just replace the default `127.0.0.1:60020` by `62.234.216.108:60020`  
 3. click "connect". wait for several seconds, the status bar on top of the window will show the status "connected".
 
 If you want to build and deploy your own OBD, you shall go through the installation intruction at [obd repository](https://github.com/omnilaboratory/obd#installation).
