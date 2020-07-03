@@ -7,7 +7,13 @@ OmniBOLT Daemon Debugging Tool. This is a graphic user interface for developers.
 
 If you come to this tool in developing modules for OmniBOLT, you must have successfully installed and ran OBD on your local or remote machine. If you do not familiar with the whole process yet, we suggest you [install](https://github.com/omnilaboratory/obd#table-of-contents) OBD first and try to run it for a quick experience.  
 
-In this tutorial, you can connect either your own OBD node, or the node in the testnet we configured for our community: `ws://62.234.216.108:60030/ws`, or both.  
+In this tutorial, you can connect either your own OBD node, or the nodes in the testnet we configured for our community. Here is the list of nodes in the testnet:   
+
+``` 
+ws://62.234.216.108:60020/wstest
+ws://62.234.188.160:60020/wstest
+```
+
 
 <p align="center">
   <img width="500" alt="Debugging Tool Screenshot" src="https://github.com/omnilaboratory/DebuggingTool/blob/master/doc/img/image_screen.png">
@@ -40,6 +46,13 @@ chrome.exe --args --disable-web-security --user-data-dir=/any_temp_directory_for
 
 Then open index.html under the DebuggingTool directory.
 
+> Remark: We use some local json files to store the content of each interface, such as interface name, description, parameter list, etc.
+In the js code, we use jQuery’s `$.getJSON(jsonFile, function(result) {}` method to parse these json files. Chrome by default prohibits the access of this form of cross-domain resource.  
+
+There are currently three solutions:  
+1) Start Chrome by disabling web security policy: --disable-web-security.  
+2) Run a web server, put the debugging tool in the corresponding directory, so that Chrome can visit the url normally.  
+3) Use Safari or other browsers to run the debugging tool.  
 
 ## Operations 
 
