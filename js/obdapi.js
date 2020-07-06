@@ -889,8 +889,8 @@ class ObdApi {
             alert("error recipient_user_peer_id");
             return;
         }
-        if (this.isNotString(info.commitment_tx_hash)) {
-            alert("empty commitment_tx_hash");
+        if (this.isNotString(info.payer_commitment_tx_hash)) {
+            alert("empty payer_commitment_tx_hash");
             return;
         }
         // if (info.approval == null) {

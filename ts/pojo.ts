@@ -107,7 +107,7 @@ class HtlcCreatedInfo {
 }
 
 class HtlcSignedInfo {
-  commitment_tx_hash: string = "";
+  payer_commitment_tx_hash: string = "";
   // approval: boolean = false;
   channel_address_private_key: string = "";
   last_temp_address_private_key: string = "";

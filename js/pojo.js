@@ -121,7 +121,7 @@ class HtlcCreatedInfo {
 }
 class HtlcSignedInfo {
     constructor() {
-        this.commitment_tx_hash = "";
+        this.payer_commitment_tx_hash = "";
         // approval: boolean = false;
         this.channel_address_private_key = "";
         this.last_temp_address_private_key = "";

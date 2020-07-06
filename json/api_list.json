@@ -902,7 +902,7 @@
                     ]
                 },
                 {
-                    "name": "commitment_tx_hash",
+                    "name": "payer_commitment_tx_hash",
                     "help": "The hash of commitment transaction created in HTLCCreated (type -40).",
                     "buttons": [
                         {

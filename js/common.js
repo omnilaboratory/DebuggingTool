@@ -57,6 +57,15 @@ const itemChannelAddress = 'ChannelAddress';
 const itemFundingBtcData = 'FundingBtcData';
 
 //
+const itemRoutingPacket = 'routing_packet';
+
+//
+const itemCltvExpiry = 'cltv_expiry';
+
+//
+const itemHtlcH = 'htlc_h';
+
+//
 // const itemFundingAssetHex = 'FundingAssetHex';
 
 //
@@ -140,7 +149,7 @@ function getSaveName() {
 function listening110040(e, msgType) {
     console.info('NOW isAutoMode = ' + isAutoMode);
 
-    saveTempHash(e.commitment_tx_hash);
+    saveTempHash(e.payer_commitment_tx_hash);
 
     if (!isAutoMode) return;
     
@@ -155,7 +164,7 @@ function listening110040(e, msgType) {
     // will send -100041 HTLCSigned
     getFPKByAsync(db, e.channel_id).then(function (result) {
         let info                                = new HtlcSignedInfo();
-        info.commitment_tx_hash                 = e.commitment_tx_hash;
+        info.payer_commitment_tx_hash           = e.payer_commitment_tx_hash;
         info.channel_address_private_key        = result;
         info.last_temp_address_private_key      = getTempPrivKey(TempPrivKey, e.channel_id);
         info.curr_rsmc_temp_address_pub_key     = addr_1.result.pubkey;
@@ -1101,7 +1110,7 @@ function htlcSigned(msgType) {
     let userID  = $("#recipient_user_peer_id").val();
 
     let info                                = new HtlcSignedInfo();
-    info.commitment_tx_hash                 = $("#commitment_tx_hash").val();
+    info.payer_commitment_tx_hash           = $("#payer_commitment_tx_hash").val();
     info.channel_address_private_key        = $("#channel_address_private_key").val();
     info.last_temp_address_private_key      = $("#last_temp_address_private_key").val();
     info.curr_rsmc_temp_address_pub_key     = $("#curr_rsmc_temp_address_pub_key").val();
@@ -1131,6 +1140,9 @@ function htlcFindPath(msgType) {
     // OBD API
     obdApi.htlcFindPath(info, function(e) {
         console.info('-100401 - htlcFindPath = ' + JSON.stringify(e));
+        saveHtlcH(e.h);
+        saveRoutingPacket(e.routing_packet);
+        saveCltvExpiry(e.min_cltv_expiry);
     });
 }
 
@@ -1734,6 +1746,15 @@ function fillCounterparty() {
     $("#recipient_user_peer_id").val(result.name);
 }
 
+/**
+ * Auto fill h, routing packet, cltv expiry
+ */
+function fillH_RP_CE() {
+    $("#h").val(getHtlcH());
+    $("#routing_packet").val(getRoutingPacket());
+    $("#cltv_expiry").val(getCltvExpiry());
+}
+
 //
 function fillChannelIDAndFundingPrivKey() {
     let channelID = getChannelID();
@@ -1935,6 +1956,7 @@ function autoFillValue(arrParams, obj) {
         case enumMsgType.MsgType_HTLC_SendAddHTLC_40:
             if (!isLogined) return;  // Not logined
             fillCounterparty();
+            fillH_RP_CE();
             fillChannelFundingLastTempKeys();
             fillCurrRsmcTempKey();
             fillCurrHtlcTempKey();
@@ -1944,8 +1966,7 @@ function autoFillValue(arrParams, obj) {
         case enumMsgType.MsgType_HTLC_SendAddHTLCSigned_41:
             if (!isLogined) return;  // Not logined
             fillCounterparty();
-            // tempHash = getTempHash();
-            $("#commitment_tx_hash").val(getTempHash());
+            $("#payer_commitment_tx_hash").val(getTempHash());
             fillChannelFundingLastTempKeys();
             fillCurrRsmcTempKey();
             fillCurrHtlcTempKey();
@@ -2555,6 +2576,52 @@ function getNewAddrIndex() {
         // console.info('FIRST DATA');
         return 1;
     }
+}
+
+
+/**
+ * Save Routing Packet
+ * @param value
+ */
+function saveRoutingPacket(value) {
+    localStorage.setItem(itemRoutingPacket, value);
+}
+
+/**
+ * Get Routing Packet
+ */
+function getRoutingPacket() {
+    return localStorage.getItem(itemRoutingPacket);
+}
+
+/**
+ * Save Cltv Expiry
+ * @param value
+ */
+function saveCltvExpiry(value) {
+    localStorage.setItem(itemCltvExpiry, value);
+}
+
+/**
+ * Get Cltv Expiry
+ */
+function getCltvExpiry() {
+    return localStorage.getItem(itemCltvExpiry);
+}
+
+/**
+ * Save Htlc H
+ * @param value
+ */
+function saveHtlcH(value) {
+    localStorage.setItem(itemHtlcH, value);
+}
+
+/**
+ * Get Htlc H
+ */
+function getHtlcH() {
+    return localStorage.getItem(itemHtlcH);
 }
 
 /**
