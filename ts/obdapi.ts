@@ -1796,42 +1796,83 @@ class ObdApi {
 
   /**
    * MsgType_SendCloseChannelRequest_38
+   * @param recipient_node_peer_id string 
+   * @param recipient_user_peer_id string
    * @param channel_id string
    * @param callback function
    */
-  public closeChannel(channel_id: string, callback: Function) {
-    if (this.isNotString(channel_id)) {
-      alert("empty channel_id");
-      return;
-    }
-    let msg = new Message();
-    msg.type = this.messageType.MsgType_SendCloseChannelRequest_38;
-    msg.data["channel_id"] = channel_id;
-    this.sendData(msg, callback);
+  public closeChannel(
+    recipient_node_peer_id: string,
+    recipient_user_peer_id: string,
+    channel_id: string, callback: Function) {
+
+      if (this.isNotString(recipient_node_peer_id)) {
+        alert("error recipient_node_peer_id");
+        return;
+      }
+      
+      if (this.isNotString(recipient_user_peer_id)) {
+        alert("error recipient_user_peer_id");
+        return;
+      }
+
+      if (this.isNotString(channel_id)) {
+        alert("empty channel_id");
+        return;
+      }
+      let msg = new Message();
+      msg.type = this.messageType.MsgType_SendCloseChannelRequest_38;
+      msg.data["channel_id"] = channel_id;
+      msg.recipient_user_peer_id = recipient_user_peer_id;
+      msg.recipient_node_peer_id = recipient_node_peer_id;
+      this.sendData(msg, callback);
   }
   public onCloseChannel(jsonData: any) {}
 
   /**
    * MsgType_SendCloseChannelSign_39
+   * @param recipient_node_peer_id string 
+   * @param recipient_user_peer_id string
    * @param info CloseChannelSign
    * @param callback function
    */
-  public closeChannelSign(info: CloseChannelSign, callback: Function) {
-    if (this.isNotString(info.channel_id)) {
-      alert("empty channel_id");
-      return;
-    }
-    if (this.isNotString(info.request_close_channel_hash)) {
-      alert("empty request_close_channel_hash");
-      return;
-    }
-    if (info.approval == null) {
-      info.approval = false;
-    }
-    let msg = new Message();
-    msg.type = this.messageType.MsgType_SendCloseChannelSign_39;
-    msg.data = info;
-    this.sendData(msg, callback);
+  public closeChannelSign(
+    recipient_node_peer_id: string,
+    recipient_user_peer_id: string,
+    info: CloseChannelSign, callback: Function) {
+
+      if (this.isNotString(recipient_node_peer_id)) {
+        alert("error recipient_node_peer_id");
+        return;
+      }
+      
+      if (this.isNotString(recipient_user_peer_id)) {
+        alert("error recipient_user_peer_id");
+        return;
+      }
+
+      if (this.isNotString(info.channel_id)) {
+        alert("empty channel_id");
+        return;
+      }
+      
+      if (info.approval == null) {
+          info.approval = false;
+      }
+
+      if (info.approval == true) {
+          if (this.isNotString(info.request_close_channel_hash)) {
+            alert("empty request_close_channel_hash");
+            return;
+          }
+      }
+
+      let msg = new Message();
+      msg.type = this.messageType.MsgType_SendCloseChannelSign_39;
+      msg.data = info;
+      msg.recipient_user_peer_id = recipient_user_peer_id;
+      msg.recipient_node_peer_id = recipient_node_peer_id;
+      this.sendData(msg, callback);
   }
   public onCloseChannelSign(jsonData: any) {}
 

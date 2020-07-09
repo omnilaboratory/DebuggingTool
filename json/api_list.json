@@ -1338,6 +1338,24 @@
             "description": "CloseChannel request to close a channel.",
             "parameters": [
                 {
+                    "name": "recipient_node_peer_id",
+                    "buttons": [
+                        {
+                            "innerText": "Counterparties",
+                            "onclick": "displayUserDataInNewHtml('Counterparties')"
+                        }
+                    ]
+                },
+                {
+                    "name": "recipient_user_peer_id",
+                    "buttons": [
+                        {
+                            "innerText": "Counterparties",
+                            "onclick": "displayUserDataInNewHtml('Counterparties')"
+                        }
+                    ]
+                },
+                {
                     "name": "channel_id",
                     "buttons": [
                         {
@@ -1353,6 +1371,24 @@
             "type_id": -100039,
             "description": "CloseChannelSigned response to request of close a channel.",
             "parameters": [
+                {
+                    "name": "recipient_node_peer_id",
+                    "buttons": [
+                        {
+                            "innerText": "Counterparties",
+                            "onclick": "displayUserDataInNewHtml('Counterparties')"
+                        }
+                    ]
+                },
+                {
+                    "name": "recipient_user_peer_id",
+                    "buttons": [
+                        {
+                            "innerText": "Counterparties",
+                            "onclick": "displayUserDataInNewHtml('Counterparties')"
+                        }
+                    ]
+                },
                 {
                     "name": "channel_id",
                     "buttons": [

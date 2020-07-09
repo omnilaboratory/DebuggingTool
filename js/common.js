@@ -404,6 +404,11 @@ function listening110351(e, msgType) {
     });
 }
 
+// listening to -110038 and save request_close_channel_hash
+function listening110038(e) {
+    saveTempHash(e.request_close_channel_hash);
+}
+
 // 
 function registerEvent() {
     // auto response mode
@@ -452,6 +457,12 @@ function registerEvent() {
     let msg_110049 = enumMsgType.MsgType_HTLC_RecvRequestCloseCurrTx_49;
     obdApi.registerEvent(msg_110049, function(e) {
         listening110049(e, msg_110049);
+    });
+
+    // save request_close_channel_hash
+    let msg_110038 = enumMsgType.MsgType_RecvCloseChannelRequest_38;
+    obdApi.registerEvent(msg_110038, function(e) {
+        listening110038(e);
     });
 }
 
@@ -695,10 +706,12 @@ function atomicSwapAccepted(msgType) {
  */
 function closeChannel(msgType) {
 
+    let nodeID     = $("#recipient_node_peer_id").val();
+    let userID     = $("#recipient_user_peer_id").val();
     let channel_id = $("#channel_id").val();
 
     // OBD API
-    obdApi.closeChannel(channel_id, function(e) {
+    obdApi.closeChannel(nodeID, userID, channel_id, function(e) {
         console.info('-100038 closeChannel = ' + JSON.stringify(e));
         saveChannelList(e, channel_id, msgType);
     });
@@ -710,13 +723,16 @@ function closeChannel(msgType) {
  */
 function closeChannelSigned(msgType) {
 
+    let nodeID = $("#recipient_node_peer_id").val();
+    let userID = $("#recipient_user_peer_id").val();
+
     let info                        = new CloseChannelSign();
     info.channel_id                 = $("#channel_id").val();
     info.request_close_channel_hash = $("#request_close_channel_hash").val();
     info.approval                   = $("#checkbox_n39").prop("checked");
 
     // OBD API
-    obdApi.closeChannelSign(info, function(e) {
+    obdApi.closeChannelSign(nodeID, userID, info, function(e) {
         console.info('-100039 closeChannelSign = ' + JSON.stringify(e));
         saveChannelList(e, info.channel_id, msgType);
     });
@@ -1635,8 +1651,8 @@ function createLeftSideMenu(jsonFile, divName) {
 
             apiItem = document.createElement('a');
             apiItem.id = api_id;
-            // apiItem.href = '#';
-            apiItem.href = 'javascript:void(0);';
+            apiItem.href = '#';
+            // apiItem.href = 'javascript:void(0);';
             apiItem.setAttribute('class', 'url');
             apiItem.setAttribute('type_id', type_id);
             apiItem.setAttribute('description', description);
@@ -1969,6 +1985,16 @@ function autoFillValue(arrParams, obj) {
             if (!isLogined) return;  // Not logined
             fillCounterparty();
             fillTempChannelIDAndFundingPrivKey(35);
+            break;
+
+        case enumMsgType.MsgType_SendCloseChannelRequest_38:
+        case enumMsgType.MsgType_SendCloseChannelSign_39:
+            if (!isLogined) return;  // Not logined
+            fillCounterparty();
+            $("#channel_id").val(getChannelID());
+            if (msgType === enumMsgType.MsgType_SendCloseChannelSign_39) {
+                $("#request_close_channel_hash").val(getTempHash());
+            }
             break;
 
         case enumMsgType.MsgType_CommitmentTx_SendCommitmentTransactionCreated_351:
@@ -2613,7 +2639,6 @@ function getNewAddrIndex() {
     }
 }
 
-
 /**
  * Save Routing Packet
  * @param value
@@ -2668,38 +2693,6 @@ function saveChannelID(channelID) {
         channelID: channelID,
     }
     localStorage.setItem(itemChannelID, JSON.stringify(data));
-
-    // console.log('logined userid == ' + $("#logined").text());
-    
-    // let resp = JSON.parse(localStorage.getItem(itemChannelID));
-
-    // // If has data.
-    // if (resp) {
-    //     for (let i = 0; i < resp.result.length; i++) {
-    //         if ($("#logined").text() === resp.result[i].userID) {
-    //             resp.result[i].channelID = channelID;
-    //             localStorage.setItem(itemChannelID, JSON.stringify(resp));
-    //             return;
-    //         }
-    //     }
-
-    //     // A new User ID.
-    //     let new_data = {
-    //         userID:    $("#logined").text(),
-    //         channelID: channelID,
-    //     }
-    //     resp.result.push(new_data);
-    //     localStorage.setItem(itemChannelID, JSON.stringify(resp));
-
-    // } else {
-    //     let data = {
-    //         result: [{
-    //             userID:    $("#logined").text(),
-    //             channelID: channelID,
-    //         }]
-    //     }
-    //     localStorage.setItem(itemChannelID, JSON.stringify(data));
-    // }
 }
 
 /**
@@ -2715,20 +2708,6 @@ function getChannelID() {
     } else {
         return '';
     }
-
-    // let resp = JSON.parse(localStorage.getItem(itemChannelID));
-
-    // // If has data.
-    // if (resp) {
-    //     for (let i = 0; i < resp.result.length; i++) {
-    //         if ($("#logined").text() === resp.result[i].userID) {
-    //             return resp.result[i].channelID;
-    //         }
-    //     }
-    //     return '';
-    // } else {
-    //     return '';
-    // }
 }
 
 //
@@ -3449,173 +3428,23 @@ function getTempHash() {
  * 5) HTLCCreated type ( -100040 ) return
  */
 function saveTempHash(hex) {
-
-    // let resp = JSON.parse(localStorage.getItem(itemTempHash));
     let data = {
         hex: hex
     }
     localStorage.setItem(itemTempHash, JSON.stringify(data));
-
-    // If has data.
-    // if (resp) {
-    //     resp.hex = hex;
-    //     localStorage.setItem(itemTempHash, JSON.stringify(resp));
-    // } else {
-    //     let data = {
-    //         hex: hex
-    //     }
-    //     localStorage.setItem(itemTempHash, JSON.stringify(data));
-    // }
 }
-
-
-// get funding_tx_hex from FundingAsset type ( -102120 ) return
-// function getTempHash() {
-
-//     let resp = JSON.parse(localStorage.getItem(itemFundingAssetHex));
-
-//     // If has data.
-//     if (resp) {
-//         return resp.hex;
-//     } else {
-//         return '';
-//     }
-// }
-
-// save funding_tx_hex from FundingAsset type ( -102120 ) return
-// function saveTempHash(hex) {
-
-//     let resp = JSON.parse(localStorage.getItem(itemFundingAssetHex));
-
-//     // If has data.
-//     if (resp) {
-//         resp.hex = hex;
-//         localStorage.setItem(itemFundingAssetHex, JSON.stringify(resp));
-//     } else {
-//         let data = {
-//             hex: hex
-//         }
-//         localStorage.setItem(itemFundingAssetHex, JSON.stringify(data));
-//     }
-// }
-
-// get funding_txid from BTCFundingCreated type ( -100340 ) return
-// function getTempHash() {
-
-//     let resp = JSON.parse(localStorage.getItem(itemFundingBtcTxid));
-
-//     // If has data.
-//     if (resp) {
-//         return resp.txid;
-//     } else {
-//         return '';
-//     }
-// }
-
-// save funding_txid from BTCFundingCreated type ( -100340 ) return
-// function saveTempHash(txid) {
-
-//     let resp = JSON.parse(localStorage.getItem(itemFundingBtcTxid));
-
-//     // If has data.
-//     if (resp) {
-//         resp.txid = txid;
-//         localStorage.setItem(itemFundingBtcTxid, JSON.stringify(resp));
-//     } else {
-//         let data = {
-//             txid: txid
-//         }
-//         localStorage.setItem(itemFundingBtcTxid, JSON.stringify(data));
-//     }
-// }
-
-// save msg_hash from RSMCCTxCreated type ( -100351 ) return
-// function saveTempHash(msgHash) {
-
-//     let resp = JSON.parse(localStorage.getItem(itemRsmcMsgHash));
-
-//     // If has data.
-//     if (resp) {
-//         resp.msgHash = msgHash;
-//         localStorage.setItem(itemRsmcMsgHash, JSON.stringify(resp));
-//     } else {
-//         let data = {
-//             msgHash: msgHash
-//         }
-//         localStorage.setItem(itemRsmcMsgHash, JSON.stringify(data));
-//     }
-// }
-
-// get msg_hash from RSMCCTxCreated type ( -100351 ) return
-// function getTempHash() {
-
-//     let resp = JSON.parse(localStorage.getItem(itemRsmcMsgHash));
-
-//     // If has data.
-//     if (resp) {
-//         return resp.msgHash;
-//     } else {
-//         return '';
-//     }
-// }
-
-// save commitment_tx_hash from HTLCCreated type ( -100040 ) return
-// function saveTempHash(commitment_tx_hash) {
-
-//     let resp = JSON.parse(localStorage.getItem(itemHtlcRequestHash));
-
-//     // If has data.
-//     if (resp) {
-//         resp.commitment_tx_hash = commitment_tx_hash;
-//         localStorage.setItem(itemHtlcRequestHash, JSON.stringify(resp));
-//     } else {
-//         let data = {
-//             commitment_tx_hash: commitment_tx_hash
-//         }
-//         localStorage.setItem(itemHtlcRequestHash, JSON.stringify(data));
-//     }
-// }
-
-// get commitment_tx_hash from HTLCCreated type ( -100040 ) return
-// function getTempHash() {
-
-//     let resp = JSON.parse(localStorage.getItem(itemHtlcRequestHash));
-
-//     // If has data.
-//     if (resp) {
-//         return resp.commitment_tx_hash;
-//     } else {
-//         return '';
-//     }
-// }
 
 // save r from HTLCSendVerifyR type ( -100045 ) return
 function saveHtlcVerifyR(r) {
-
-    // let resp = JSON.parse(localStorage.getItem(itemHtlcVerifyR));
-
     let data = {
         r: r
     }
     localStorage.setItem(itemHtlcVerifyR, JSON.stringify(data));
-
-    // If has data.
-    // if (resp) {
-    //     resp.r = r;
-    //     localStorage.setItem(itemHtlcVerifyR, JSON.stringify(resp));
-    // } else {
-    //     let data = {
-    //         r: r
-    //     }
-    //     localStorage.setItem(itemHtlcVerifyR, JSON.stringify(data));
-    // }
 }
 
 // get r from HTLCSendVerifyR type ( -100045 ) return
 function getHtlcVerifyR() {
-
     let resp = JSON.parse(localStorage.getItem(itemHtlcVerifyR));
-
     // If has data.
     if (resp) {
         return resp.r;
