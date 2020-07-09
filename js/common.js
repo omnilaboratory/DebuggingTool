@@ -2033,6 +2033,7 @@ function autoFillValue(arrParams, obj) {
             }
 
             channelID = getChannelID();
+            console.info('-100049 Get Channel ID = ' + channelID);
             $("#channel_id").val(channelID);
             asyncGetPrivKey(db, channelID, tbFundingPrivKey).then(function (result) {
                 $("#channel_address_private_key").val(result);
