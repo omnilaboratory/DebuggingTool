@@ -212,7 +212,7 @@ function listening110045(e, msgType) {
         info.channel_address_private_key = result;
     
         // OBD API
-        obdApi.htlcSendSignVerifyR(e.payer_node_address, e.payer_peer_id, info, function(e) {
+        obdApi.htlcSendSignVerifyR(e.payee_node_address, e.payee_peer_id, info, function(e) {
             console.info('-100046 htlcSendSignVerifyR = ' + JSON.stringify(e));
             saveChannelList(e, e.channel_id, msgType);
         });
@@ -248,7 +248,9 @@ function listening110049(e, msgType) {
         // OBD API
         obdApi.closeHTLCSigned(e.sender_node_address, e.sender_peer_id, info, function(e) {
             console.info('-100050 closeHTLCSigned = ' + JSON.stringify(e));
-            saveTempPrivKey(RsmcTempPrivKey, e.channel_id, info.curr_rsmc_temp_address_private_key);
+            // saveTempPrivKey(RsmcTempPrivKey, e.channel_id, info.curr_rsmc_temp_address_private_key);
+            addDataInTable($("#logined").text(), e.channel_id, 
+                info.curr_rsmc_temp_address_private_key, tbTempPrivKey);
         });
     });
 }
