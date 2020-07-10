@@ -500,8 +500,44 @@ function logIn(msgType) {
         // globalUserID        = e.userPeerId;
         $("#logined").text(e.userPeerId);
         isLogined = true;
+
+
+        // Save message sending to IndexedDB
+        let msgTime = new Date().toLocaleString();
+        let msgSend = {
+            type: -102001,
+            data: {
+                mnemonic: mnemonic
+            }
+        }
+        msgSend = JSON.stringify(msgSend, null, 2);
+        msgSend = jsonFormat(msgSend);
+
+        // messageSent = '------------------------------------';
+        // messageSent += '\n\n' + 'Message sent -  ' + msgTime;
+        // messageSent += '\n\n' + '------------------------------------';
+        // messageSent += '\n\n' + msgSend;
+        let newMsg = '------------------------------------';
+        newMsg += '\n\n' + 'Message sent -  ' + msgTime;
+        newMsg += '\n\n' + '------------------------------------';
+        newMsg += '\n\n' + msgSend;
+        addData(e.userPeerId, newMsg);
+
+
+        // Add message sent to messages box at right side
+        arrObdMsg.push('\n\n');
+        arrObdMsg.push(newMsg);
+
+        let showMsg = '';
+        for (let i = arrObdMsg.length - 1; i >= 0; i--) {
+            showMsg += arrObdMsg[i] + '\n\n';
+        }
+        
+        $("#obd_messages").html(showMsg);
+
     });
 }
+// var messageSent = '';
 
 // -102003 connectP2PPeer API at local.
 function connectP2PPeer(msgType) {
@@ -1533,7 +1569,7 @@ function displayOBDMessages(msg) {
     //-----------------
     // Save all broadcast info to IndexedDB
     let newMsg =           '------------------------------------';
-        newMsg += '\n\n' + msgHead;
+        newMsg += '\n\n' + 'Message received -  ' + msgHead;
         newMsg += '\n\n' + '------------------------------------';
         newMsg += '\n\n' + fullMsg;
     addData(user_id, newMsg);
@@ -1555,15 +1591,15 @@ function displayOBDMessages(msg) {
     arrObdMsg.push('\n');
     arrObdMsg.push(fullMsg);
     arrObdMsg.push('------------------------------------');
-    arrObdMsg.push(msgHead);
+    arrObdMsg.push('Message received -  ' + msgHead);
     arrObdMsg.push('------------------------------------');
     
-    let showMsg = '';
-    for (let i = arrObdMsg.length - 1; i >= 0; i--) {
-        showMsg += arrObdMsg[i] + '\n\n';
-    }
+    // let showMsg = '';
+    // for (let i = arrObdMsg.length - 1; i >= 0; i--) {
+    //     showMsg += arrObdMsg[i] + '\n\n';
+    // }
     
-    $("#obd_messages").html(showMsg);
+    // $("#obd_messages").html(showMsg);
 }
 
 // 
