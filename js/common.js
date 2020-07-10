@@ -183,6 +183,7 @@ function listening110040(e, msgType) {
             // OBD API
             obdApi.htlcSigned(e.payer_node_address, e.payer_peer_id, info, function(e) {
                 console.info('-100041 htlcSigned = ' + JSON.stringify(e));
+                saveChannelID(e.channel_id);
                 saveChannelList(e, e.channel_id, msgType);
                 saveTempPrivKey(RsmcTempPrivKey, e.channel_id, addr_1.result.wif);
                 saveTempPrivKey(HtlcTempPrivKey, e.channel_id, addr_2.result.wif);
@@ -214,6 +215,7 @@ function listening110045(e, msgType) {
         // OBD API
         obdApi.htlcSendSignVerifyR(e.payee_node_address, e.payee_peer_id, info, function(e) {
             console.info('-100046 htlcSendSignVerifyR = ' + JSON.stringify(e));
+            saveChannelID(e.channel_id);
             saveChannelList(e, e.channel_id, msgType);
         });
     });
@@ -248,6 +250,7 @@ function listening110049(e, msgType) {
         // OBD API
         obdApi.closeHTLCSigned(e.sender_node_address, e.sender_peer_id, info, function(e) {
             console.info('-100050 closeHTLCSigned = ' + JSON.stringify(e));
+            saveChannelID(e.channel_id);
             // saveTempPrivKey(RsmcTempPrivKey, e.channel_id, info.curr_rsmc_temp_address_private_key);
             addDataInTable($("#logined").text(), e.channel_id, 
                 info.curr_rsmc_temp_address_private_key, tbTempPrivKey);
@@ -395,9 +398,10 @@ function listening110351(e, msgType) {
             obdApi.revokeAndAcknowledgeCommitmentTransaction(
                 e.payer_node_address, e.payer_peer_id, info, function(e) {
                 // console.info('-100352 RSMCCTxSigned = ' + JSON.stringify(e));
+                saveChannelID(e.channel_id);
                 saveChannelList(e, e.channel_id, msgType);
                 // saveTempPrivKey(TempPrivKey, e.channel_id, info.curr_temp_address_private_key);
-                addDataInTable($("#logined").text(), info.channel_id, 
+                addDataInTable($("#logined").text(), e.channel_id, 
                     info.curr_temp_address_private_key, tbTempPrivKey);
             });
         });
@@ -571,8 +575,9 @@ function htlcSendVerifyR(msgType) {
     // OBD API
     obdApi.htlcSendVerifyR(nodeID, userID, info, function(e) {
         console.info('-100045 htlcSendVerifyR = ' + JSON.stringify(e));
-        saveChannelList(e, info.channel_id, msgType);
-        saveTempPrivKey(HtlcHtnxTempPrivKey, info.channel_id, info.curr_htlc_temp_address_for_he1b_private_key);
+        saveChannelID(e.channel_id);
+        saveChannelList(e, e.channel_id, msgType);
+        saveTempPrivKey(HtlcHtnxTempPrivKey, e.channel_id, info.curr_htlc_temp_address_for_he1b_private_key);
     });
 }
 
@@ -594,7 +599,8 @@ function htlcSendSignVerifyR(msgType) {
     // OBD API
     obdApi.htlcSendSignVerifyR(nodeID, userID, info, function(e) {
         console.info('-100046 htlcSendSignVerifyR = ' + JSON.stringify(e));
-        saveChannelList(e, info.channel_id, msgType);
+        saveChannelID(e.channel_id);
+        saveChannelList(e, e.channel_id, msgType);
     });
 }
 
@@ -619,9 +625,10 @@ function closeHTLC(msgType) {
     // OBD API
     obdApi.closeHTLC(nodeID, userID, info, function(e) {
         console.info('-100049 closeHTLC = ' + JSON.stringify(e));
+        saveChannelID(e.channel_id);
         saveChannelList(e, e.channel_id, msgType);
         // saveTempPrivKey(RsmcTempPrivKey, e.channel_id, info.curr_rsmc_temp_address_private_key);
-        addDataInTable($("#logined").text(), info.channel_id, 
+        addDataInTable($("#logined").text(), e.channel_id, 
             info.curr_rsmc_temp_address_private_key, tbTempPrivKey);
     });
 }
@@ -647,6 +654,7 @@ function closeHTLCSigned(msgType) {
     // OBD API
     obdApi.closeHTLCSigned(nodeID, userID, info, function(e) {
         console.info('-100050 closeHTLCSigned = ' + JSON.stringify(e));
+        saveChannelID(e.channel_id);
         // saveTempPrivKey(RsmcTempPrivKey, e.channel_id, info.curr_rsmc_temp_address_private_key);
         addDataInTable($("#logined").text(), e.channel_id, 
             info.curr_rsmc_temp_address_private_key, tbTempPrivKey);
@@ -1137,6 +1145,7 @@ function htlcCreated(msgType) {
     // OBD API
     obdApi.htlcCreated(nodeID, userID, info, function(e) {
         console.info('-100040 htlcCreated = ' + JSON.stringify(e));
+        saveChannelID(e.channel_id);
         // save 3 privkeys
         saveTempPrivKey(RsmcTempPrivKey, e.channel_id, info.curr_rsmc_temp_address_private_key);
         saveTempPrivKey(HtlcTempPrivKey, e.channel_id, info.curr_htlc_temp_address_private_key);
@@ -1162,8 +1171,8 @@ function htlcSigned(msgType) {
     // OBD API
     obdApi.htlcSigned(nodeID, userID, info, function(e) {
         console.info('-100041 htlcSigned = ' + JSON.stringify(e));
+        saveChannelID(e.channel_id);
         saveChannelList(e, e.channel_id, msgType);
-        console.info('htlcSigned e.channel_id = ' + e.channel_id);
         saveTempPrivKey(RsmcTempPrivKey, e.channel_id, info.curr_rsmc_temp_address_private_key);
         saveTempPrivKey(HtlcTempPrivKey, e.channel_id, info.curr_htlc_temp_address_private_key);
     });
@@ -1205,6 +1214,7 @@ function rsmcCTxCreated(msgType) {
     // OBD API
     obdApi.commitmentTransactionCreated(nodeID, userID, info, function(e) {
         console.info('-100351 rsmcCTxCreated = ' + JSON.stringify(e));
+        saveChannelID(e.channel_id);
         // saveTempPrivKey(TempPrivKey, e.channel_id, info.curr_temp_address_private_key);
         addDataInTable($("#logined").text(), e.channel_id, 
             info.curr_temp_address_private_key, tbTempPrivKey);
@@ -1229,10 +1239,11 @@ function rsmcCTxSigned(msgType) {
     // OBD API
     obdApi.revokeAndAcknowledgeCommitmentTransaction(nodeID, userID, info, function(e) {
         // console.info('-100352 rsmcCTxSigned = ' + JSON.stringify(e));
+        saveChannelID(e.channel_id);
         saveChannelList(e, e.channel_id, msgType);
         // saveTempPrivKey(TempPrivKey, e.channel_id, info.curr_temp_address_private_key);
-        console.info('MANUAL USER ID = ' + $("#logined").text());
-        addDataInTable($("#logined").text(), info.channel_id, 
+        // console.info('MANUAL USER ID = ' + $("#logined").text());
+        addDataInTable($("#logined").text(), e.channel_id, 
             info.curr_temp_address_private_key, tbTempPrivKey);
     });
 }
