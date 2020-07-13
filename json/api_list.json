@@ -1416,6 +1416,24 @@
             "description": "AtomicSwap notifies the counterparty an atomic swap is created. The background and process of atomic swap can be found in chapter 5 of the OmniBOLT specification.",
             "parameters": [
                 {
+                    "name": "recipient_node_peer_id",
+                    "buttons": [
+                        {
+                            "innerText": "Counterparties",
+                            "onclick": "displayUserDataInNewHtml('Counterparties')"
+                        }
+                    ]
+                },
+                {
+                    "name": "recipient_user_peer_id",
+                    "buttons": [
+                        {
+                            "innerText": "Counterparties",
+                            "onclick": "displayUserDataInNewHtml('Counterparties')"
+                        }
+                    ]
+                },
+                {
                     "name": "channel_id_from",
                     "buttons": [
                         {
@@ -1479,6 +1497,24 @@
             "type_id": -100081,
             "description": "AtomicSwapAccepted accepts or rejects a swap.",
             "parameters": [
+                {
+                    "name": "recipient_node_peer_id",
+                    "buttons": [
+                        {
+                            "innerText": "Counterparties",
+                            "onclick": "displayUserDataInNewHtml('Counterparties')"
+                        }
+                    ]
+                },
+                {
+                    "name": "recipient_user_peer_id",
+                    "buttons": [
+                        {
+                            "innerText": "Counterparties",
+                            "onclick": "displayUserDataInNewHtml('Counterparties')"
+                        }
+                    ]
+                },
                 {
                     "name": "channel_id_from",
                     "buttons": [

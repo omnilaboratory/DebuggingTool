@@ -187,6 +187,7 @@ function listening110040(e, msgType) {
                 saveChannelList(e, e.channel_id, msgType);
                 saveTempPrivKey(RsmcTempPrivKey, e.channel_id, addr_1.result.wif);
                 saveTempPrivKey(HtlcTempPrivKey, e.channel_id, addr_2.result.wif);
+                displaySentMessage100041(e.payer_node_address, e.payer_peer_id, info);
             });
         });
     });
@@ -217,6 +218,7 @@ function listening110045(e, msgType) {
             console.info('-100046 htlcSendSignVerifyR = ' + JSON.stringify(e));
             saveChannelID(e.channel_id);
             saveChannelList(e, e.channel_id, msgType);
+            displaySentMessage100046(e.payee_node_address, e.payee_peer_id, info);
         });
     });
 }
@@ -254,6 +256,7 @@ function listening110049(e, msgType) {
             // saveTempPrivKey(RsmcTempPrivKey, e.channel_id, info.curr_rsmc_temp_address_private_key);
             addDataInTable($("#logined").text(), e.channel_id, 
                 info.curr_rsmc_temp_address_private_key, tbTempPrivKey);
+            displaySentMessage100050(e.sender_node_address, e.sender_peer_id, info);
         });
     });
 }
@@ -268,8 +271,8 @@ function listening110032(e, msgType) {
     
     console.info('listening110032 = ' + JSON.stringify(e));
 
-    let p2pID    = e.funder_node_address;
-    let name     = e.funder_peer_id;
+    let nodeID   = e.funder_node_address;
+    let userID   = e.funder_peer_id;
     let temp_cid = e.temporary_channel_id;
 
     // Generate an address by local js library.
@@ -283,12 +286,13 @@ function listening110032(e, msgType) {
     info.approval             = true;
 
     // OBD API
-    obdApi.acceptChannel(p2pID, name, info, function(e) {
+    obdApi.acceptChannel(nodeID, userID, info, function(e) {
         console.info('-100033 acceptChannel = ' + JSON.stringify(e));
         saveChannelList(e);
-        saveCounterparties(name, p2pID);
+        saveCounterparties(userID, nodeID);
         saveChannelAddress(e.channel_address);
         addDataInTable($("#logined").text(), temp_cid, addr.result.wif, tbFundingPrivKey);
+        displaySentMessage100033(nodeID, userID, info);
     });
 }
 
@@ -315,6 +319,7 @@ function listening110340(e, msgType) {
         obdApi.btcFundingSigned(e.funder_node_address, e.funder_peer_id, info, function(e) {
             console.info('-100350 btcFundingSigned = ' + JSON.stringify(e));
             saveChannelList(e, e.temporary_channel_id, msgType);
+            displaySentMessage100350(e.funder_node_address, e.funder_peer_id, info);
         });
     });
 }
@@ -342,6 +347,7 @@ function listening110034(e, msgType) {
             addDataInTable($("#logined").text(), e.channel_id, 
                 info.fundee_channel_address_private_key, tbFundingPrivKey);
             saveChannelID(e.channel_id);
+            displaySentMessage100035(e.funder_node_address, e.funder_peer_id, info);
         });
     });
 }
@@ -403,6 +409,7 @@ function listening110351(e, msgType) {
                 // saveTempPrivKey(TempPrivKey, e.channel_id, info.curr_temp_address_private_key);
                 addDataInTable($("#logined").text(), e.channel_id, 
                     info.curr_temp_address_private_key, tbTempPrivKey);
+                displaySentMessage100352(e.payer_node_address, e.payer_peer_id, info);
             });
         });
     });
@@ -501,43 +508,45 @@ function logIn(msgType) {
         $("#logined").text(e.userPeerId);
         isLogined = true;
 
-
-        // Save message sending to IndexedDB
-        let msgTime = new Date().toLocaleString();
+        // Display the sent message in the message box and save it to the log file
         let msgSend = {
             type: -102001,
             data: {
                 mnemonic: mnemonic
             }
         }
-        msgSend = JSON.stringify(msgSend, null, 2);
-        msgSend = jsonFormat(msgSend);
-
-        // messageSent = '------------------------------------';
-        // messageSent += '\n\n' + 'Message sent -  ' + msgTime;
-        // messageSent += '\n\n' + '------------------------------------';
-        // messageSent += '\n\n' + msgSend;
-        let newMsg = '------------------------------------';
-        newMsg += '\n\n' + 'Message sent -  ' + msgTime;
-        newMsg += '\n\n' + '------------------------------------';
-        newMsg += '\n\n' + msgSend;
-        addData(e.userPeerId, newMsg);
-
-
-        // Add message sent to messages box at right side
-        arrObdMsg.push('\n\n');
-        arrObdMsg.push(newMsg);
-
-        let showMsg = '';
-        for (let i = arrObdMsg.length - 1; i >= 0; i--) {
-            showMsg += arrObdMsg[i] + '\n\n';
-        }
-        
-        $("#obd_messages").html(showMsg);
-
+        displaySentMessage(e.userPeerId, msgSend);
     });
 }
-// var messageSent = '';
+
+/**
+ * Display the sent message in the message box and save it to the log file
+ * @param userID  Logined user id
+ * @param msgSend Sent message
+ */
+function displaySentMessage(userID, msgSend) {
+
+    let msgTime = new Date().toLocaleString();
+    msgSend     = JSON.stringify(msgSend, null, 2);
+    msgSend     = jsonFormat(msgSend);
+
+    let newMsg = '------------------------------------';
+    newMsg += '\n\n' + 'Sent -  ' + msgTime;
+    newMsg += '\n\n' + '------------------------------------';
+    newMsg += '\n\n' + msgSend;
+    addData(userID, newMsg);
+
+    // Add sent message in messages box at right side
+    arrObdMsg.push('\n');
+    arrObdMsg.push(newMsg);
+
+    let showMsg = '';
+    for (let i = arrObdMsg.length - 1; i >= 0; i--) {
+        showMsg += arrObdMsg[i] + '\n\n';
+    }
+    
+    $("#obd_messages").html(showMsg);
+}
 
 // -102003 connectP2PPeer API at local.
 function connectP2PPeer(msgType) {
@@ -567,6 +576,18 @@ function openChannel(msgType) {
         let privkey = getFundingPrivKeyFromPubKey(pubkey);
         addDataInTable($("#logined").text(), e.temporary_channel_id, privkey, tbFundingPrivKey);
         saveChannelID(e.temporary_channel_id);
+
+        // Display the sent message in the message box and save it to the log file
+        let msgSend = {
+            type: -100032,
+            recipient_node_peer_id: nodeID,
+            recipient_user_peer_id: userID,
+            data: {
+                funding_pubkey: pubkey
+            }
+        }
+
+        displaySentMessage($("#logined").text(), msgSend);
     });
 }
 
@@ -589,6 +610,7 @@ function acceptChannel(msgType) {
         saveChannelAddress(e.channel_address);
         let privkey = getFundingPrivKeyFromPubKey(info.funding_pubkey);
         addDataInTable($("#logined").text(), info.temporary_channel_id, privkey, tbFundingPrivKey);
+        displaySentMessage100033(nodeID, userID, info);
     });
 }
 
@@ -614,6 +636,22 @@ function htlcSendVerifyR(msgType) {
         saveChannelID(e.channel_id);
         saveChannelList(e, e.channel_id, msgType);
         saveTempPrivKey(HtlcHtnxTempPrivKey, e.channel_id, info.curr_htlc_temp_address_for_he1b_private_key);
+
+        // Display the sent message in the message box and save it to the log file
+        let msgSend = {
+            type: -100045,
+            recipient_node_peer_id: nodeID,
+            recipient_user_peer_id: userID,
+            data: {
+                channel_id: info.channel_id,
+                r:          info.r,
+                channel_address_private_key: info.channel_address_private_key,
+                curr_htlc_temp_address_for_he1b_pub_key: info.curr_htlc_temp_address_for_he1b_pub_key,
+                curr_htlc_temp_address_for_he1b_private_key: info.curr_htlc_temp_address_for_he1b_private_key,
+            }
+        }
+
+        displaySentMessage($("#logined").text(), msgSend);
     });
 }
 
@@ -637,6 +675,7 @@ function htlcSendSignVerifyR(msgType) {
         console.info('-100046 htlcSendSignVerifyR = ' + JSON.stringify(e));
         saveChannelID(e.channel_id);
         saveChannelList(e, e.channel_id, msgType);
+        displaySentMessage100046(nodeID, userID, info);
     });
 }
 
@@ -666,6 +705,24 @@ function closeHTLC(msgType) {
         // saveTempPrivKey(RsmcTempPrivKey, e.channel_id, info.curr_rsmc_temp_address_private_key);
         addDataInTable($("#logined").text(), e.channel_id, 
             info.curr_rsmc_temp_address_private_key, tbTempPrivKey);
+
+        // Display the sent message in the message box and save it to the log file
+        let msgSend = {
+            type: -100049,
+            recipient_node_peer_id: nodeID,
+            recipient_user_peer_id: userID,
+            data: {
+                channel_id: info.channel_id,
+                channel_address_private_key: info.channel_address_private_key,
+                last_rsmc_temp_address_private_key: info.last_rsmc_temp_address_private_key,
+                last_htlc_temp_address_private_key: info.last_htlc_temp_address_private_key,
+                last_htlc_temp_address_for_htnx_private_key: info.last_htlc_temp_address_for_htnx_private_key,
+                curr_rsmc_temp_address_pub_key: info.curr_rsmc_temp_address_pub_key,
+                curr_rsmc_temp_address_private_key: info.curr_rsmc_temp_address_private_key,
+            }
+        }
+
+        displaySentMessage($("#logined").text(), msgSend);
     });
 }
 
@@ -694,6 +751,7 @@ function closeHTLCSigned(msgType) {
         // saveTempPrivKey(RsmcTempPrivKey, e.channel_id, info.curr_rsmc_temp_address_private_key);
         addDataInTable($("#logined").text(), e.channel_id, 
             info.curr_rsmc_temp_address_private_key, tbTempPrivKey);
+        displaySentMessage100050(nodeID, userID, info);
     });
 }
 
@@ -702,6 +760,9 @@ function closeHTLCSigned(msgType) {
  * @param msgType
  */
 function atomicSwap(msgType) {
+
+    let nodeID  = $("#recipient_node_peer_id").val();
+    let userID  = $("#recipient_user_peer_id").val();
 
     let info                    = new AtomicSwapRequest();
     info.channel_id_from        = $("#channel_id_from").val();
@@ -715,8 +776,28 @@ function atomicSwap(msgType) {
     info.time_locker            = Number($("#time_locker").val());
 
     // OBD API
-    obdApi.atomicSwap(info, function(e) {
+    obdApi.atomicSwap(nodeID, userID, info, function(e) {
         console.info('-100080 atomicSwap = ' + JSON.stringify(e));
+
+        // Display the sent message in the message box and save it to the log file
+        let msgSend = {
+            type: -100080,
+            recipient_node_peer_id: nodeID,
+            recipient_user_peer_id: userID,
+            data: {
+                channel_id_from:        info.channel_id_from,
+                channel_id_to:          info.channel_id_to,
+                recipient_user_peer_id: info.recipient_user_peer_id,
+                property_sent:          info.property_sent,
+                amount:                 info.amount,
+                exchange_rate:          info.exchange_rate,
+                property_received:      info.property_received,
+                transaction_id:         info.transaction_id,
+                time_locker:            info.time_locker,
+            }
+        }
+
+        displaySentMessage($("#logined").text(), msgSend);
     });
 }
 
@@ -725,6 +806,9 @@ function atomicSwap(msgType) {
  * @param msgType
  */
 function atomicSwapAccepted(msgType) {
+
+    let nodeID  = $("#recipient_node_peer_id").val();
+    let userID  = $("#recipient_user_peer_id").val();
 
     let info                    = new AtomicSwapAccepted();
     info.channel_id_from        = $("#channel_id_from").val();
@@ -739,8 +823,29 @@ function atomicSwapAccepted(msgType) {
     info.time_locker            = Number($("#time_locker").val());
 
     // OBD API
-    obdApi.atomicSwapAccepted(info, function(e) {
+    obdApi.atomicSwapAccepted(nodeID, userID, info, function(e) {
         console.info('-100081 atomicSwapAccepted = ' + JSON.stringify(e));
+
+        // Display the sent message in the message box and save it to the log file
+        let msgSend = {
+            type: -100081,
+            recipient_node_peer_id: nodeID,
+            recipient_user_peer_id: userID,
+            data: {
+                channel_id_from:        info.channel_id_from,
+                channel_id_to:          info.channel_id_to,
+                recipient_user_peer_id: info.recipient_user_peer_id,
+                property_sent:          info.property_sent,
+                amount:                 info.amount,
+                exchange_rate:          info.exchange_rate,
+                property_received:      info.property_received,
+                transaction_id:         info.transaction_id,
+                target_transaction_id:  info.target_transaction_id,
+                time_locker:            info.time_locker,
+            }
+        }
+
+        displaySentMessage($("#logined").text(), msgSend);
     });
 }
 
@@ -758,6 +863,16 @@ function closeChannel(msgType) {
     obdApi.closeChannel(nodeID, userID, channel_id, function(e) {
         console.info('-100038 closeChannel = ' + JSON.stringify(e));
         saveChannelList(e, channel_id, msgType);
+
+        // Display the sent message in the message box and save it to the log file
+        let msgSend = {
+            type: -100038,
+            recipient_node_peer_id: nodeID,
+            recipient_user_peer_id: userID,
+            channel_id: channel_id,
+        }
+
+        displaySentMessage($("#logined").text(), msgSend);
     });
 }
 
@@ -779,6 +894,20 @@ function closeChannelSigned(msgType) {
     obdApi.closeChannelSign(nodeID, userID, info, function(e) {
         console.info('-100039 closeChannelSign = ' + JSON.stringify(e));
         saveChannelList(e, info.channel_id, msgType);
+
+        // Display the sent message in the message box and save it to the log file
+        let msgSend = {
+            type: -100039,
+            recipient_node_peer_id: nodeID,
+            recipient_user_peer_id: userID,
+            data: {
+                channel_id:                 info.channel_id,
+                request_close_channel_hash: info.request_close_channel_hash,
+                approval:                   info.approval,
+            }
+        }
+
+        displaySentMessage($("#logined").text(), msgSend);
     });
 }
 
@@ -992,6 +1121,20 @@ function btcFundingCreated(msgType) {
     obdApi.btcFundingCreated(nodeID, userID, info, function(e) {
         console.info('-100340 btcFundingCreated = ' + JSON.stringify(e));
         saveChannelList(e, info.temporary_channel_id, msgType);
+
+        // Display the sent message in the message box and save it to the log file
+        let msgSend = {
+            type: -100340,
+            recipient_node_peer_id: nodeID,
+            recipient_user_peer_id: userID,
+            data: {
+                temporary_channel_id:        info.temporary_channel_id,
+                channel_address_private_key: info.channel_address_private_key,
+                funding_tx_hex:              info.funding_tx_hex,
+            }
+        }
+
+        displaySentMessage($("#logined").text(), msgSend);
     });
 }
 
@@ -1011,6 +1154,7 @@ function btcFundingSigned(msgType) {
     obdApi.btcFundingSigned(nodeID, userID, info, function(e) {
         console.info('-100350 btcFundingSigned = ' + JSON.stringify(e));
         saveChannelList(e, info.temporary_channel_id, msgType);
+        displaySentMessage100350(nodeID, userID, info);
     });
 }
 
@@ -1019,25 +1163,37 @@ function assetFundingCreated(msgType) {
 
     let nodeID   = $("#recipient_node_peer_id").val();
     let userID   = $("#recipient_user_peer_id").val();
-    let temp_cid = $("#temporary_channel_id").val();
-    let t_ad_pbk = $("#temp_address_pub_key").val();
-    let t_ad_prk = $("#temp_address_private_key").val();
-    let privkey  = $("#channel_address_private_key").val();
-    let tx_hex   = $("#funding_tx_hex").val();
 
     let info                         = new ChannelFundingCreatedInfo();
-    info.temporary_channel_id        = temp_cid;
-    info.temp_address_pub_key        = t_ad_pbk;
-    info.temp_address_private_key    = t_ad_prk;
-    info.channel_address_private_key = privkey;
-    info.funding_tx_hex              = tx_hex;
+    info.temporary_channel_id        = $("#temporary_channel_id").val();
+    info.temp_address_pub_key        = $("#temp_address_pub_key").val();
+    info.temp_address_private_key    = $("#temp_address_private_key").val();
+    info.channel_address_private_key = $("#channel_address_private_key").val();
+    info.funding_tx_hex              = $("#funding_tx_hex").val();
 
     // OBD API
     obdApi.channelFundingCreated(nodeID, userID, info, function(e) {
         console.info('-100034 - assetFundingCreated = ' + JSON.stringify(e));
-        saveChannelList(e, temp_cid, msgType);
+        saveChannelList(e, info.temporary_channel_id, msgType);
         // saveTempPrivKey(TempPrivKey, temp_cid, t_ad_prk);
-        addDataInTable($("#logined").text(), temp_cid, t_ad_prk, tbTempPrivKey);
+        addDataInTable($("#logined").text(), info.temporary_channel_id, 
+            info.temp_address_private_key, tbTempPrivKey);
+
+        // Display the sent message in the message box and save it to the log file
+        let msgSend = {
+            type: -100034,
+            recipient_node_peer_id: nodeID,
+            recipient_user_peer_id: userID,
+            data: {
+                temporary_channel_id:        info.temporary_channel_id,
+                temp_address_pub_key:        info.temp_address_pub_key,
+                temp_address_private_key:    info.temp_address_private_key,
+                channel_address_private_key: info.channel_address_private_key,
+                funding_tx_hex:              info.funding_tx_hex,
+            }
+        }
+
+        displaySentMessage($("#logined").text(), msgSend);
     });
 }
 
@@ -1064,41 +1220,39 @@ function assetFundingSigned(msgType) {
         // So need update the local saved data for funding private key and channel_id.
         addDataInTable($("#logined").text(), e.channel_id, privkey, tbFundingPrivKey);
         saveChannelID(e.channel_id);
+        displaySentMessage100035(nodeID, userID, info);
     });
 }
 
 // -102109 funding BTC API at local.
 function fundingBTC(msgType) {
 
-    let from_address             = $("#from_address").val();
-    let from_address_private_key = $("#from_address_private_key").val();
-    let to_address               = $("#to_address").val();
-    let amount                   = $("#amount").val();
-    let miner_fee                = $("#miner_fee").val();
-
     let info                      = new BtcFundingInfo();
-    info.from_address             = from_address;
-    info.from_address_private_key = from_address_private_key;
-    info.to_address               = to_address;
-    info.amount                   = Number(amount);
-    info.miner_fee                = Number(miner_fee);
-
-    //Save value to variable
-    // btcFromAddr        = from_address;
-    // btcFromAddrPrivKey = from_address_private_key;
-    // btcToAddr          = to_address;
-    // btcAmount          = amount;
-    // btcMinerFee        = miner_fee;
-
-    // Get temporary_channel_id
-    let tempChID = getChannelID();
+    info.from_address             = $("#from_address").val();
+    info.from_address_private_key = $("#from_address_private_key").val();
+    info.to_address               = $("#to_address").val();
+    info.amount                   = Number($("#amount").val());
+    info.miner_fee                = Number($("#miner_fee").val());
 
     // OBD API
     obdApi.fundingBTC(info, function(e) {
         console.info('-102109 fundingBTC = ' + JSON.stringify(e));
-        saveChannelList(e, tempChID, msgType);
+        saveChannelList(e, getChannelID(), msgType);
         saveTempHash(e.hex);
         saveFundingBtcData(info);
+
+        // Display the sent message in the message box and save it to the log file
+        let msgSend = {
+            type: -102109,
+            data: {
+                from_address:             info.from_address,
+                from_address_private_key: info.from_address_private_key,
+                to_address:               info.to_address,
+                amount:                   info.amount,
+                miner_fee:                info.miner_fee,
+            }
+        }
+        displaySentMessage($("#logined").text(), msgSend);
     });
 }
 
@@ -1120,6 +1274,19 @@ function fundingAsset(msgType) {
         console.info(' -102120 fundingAssetOfOmni = ' + JSON.stringify(e));
         saveChannelList(e, tempChID, msgType);
         saveTempHash(e.hex);
+
+        // Display the sent message in the message box and save it to the log file
+        let msgSend = {
+            type: -102120,
+            data: {
+                from_address:             info.from_address,
+                from_address_private_key: info.from_address_private_key,
+                to_address:               info.to_address,
+                amount:                   info.amount,
+                property_id:              info.property_id,
+            }
+        }
+        displaySentMessage($("#logined").text(), msgSend);
     });
 }
 
@@ -1137,23 +1304,45 @@ function createInvoice(msgType) {
     obdApi.htlcInvoice(info, function(e) {
         console.info('-100402 createInvoice = ' + JSON.stringify(e));
 
-        $("#newDiv").remove();
-        createElement($("#name_req_div"), 'div', '', 'panelItem', 'newDiv');
-        
-        let newDiv     = $("#newDiv");
-        let strInvoice = JSON.stringify(e);
+        // Display the sent message in the message box and save it to the log file
+        let msgSend = {
+            type: -100402,
+            data: {
+                property_id: info.property_id,
+                amount: info.amount,
+                h: info.h,
+                expiry_time: info.expiry_time,
+                description: info.description,
+            }
+        }
 
-        // Basecode string of invoice
-        strInvoice = strInvoice.replace("\"", "").replace("\"", "");
-        createElement(newDiv, 'div', strInvoice, 'str_invoice');
-
-        // QRCode of invoice
-        createElement(newDiv, 'div', '', 'qrcode', 'qrcode');
-        let qrcode = new QRCode("qrcode", {
-            width : 160, height : 160
-        });
-        qrcode.makeCode(strInvoice);
+        displaySentMessage($("#logined").text(), msgSend);
+        makeQRCode(e);
     });
+}
+
+/**
+ * Make QR code of a invoice
+ * @param e OBD response result
+ */
+function makeQRCode(e) {
+
+    $("#newDiv").remove();
+    createElement($("#name_req_div"), 'div', '', 'panelItem', 'newDiv');
+    
+    let newDiv     = $("#newDiv");
+    let strInvoice = JSON.stringify(e);
+
+    // Basecode string of invoice
+    strInvoice = strInvoice.replace("\"", "").replace("\"", "");
+    createElement(newDiv, 'div', strInvoice, 'str_invoice');
+
+    // QRCode of invoice
+    createElement(newDiv, 'div', '', 'qrcode', 'qrcode');
+    let qrcode = new QRCode("qrcode", {
+        width : 160, height : 160
+    });
+    qrcode.makeCode(strInvoice);
 }
 
 // -100040 htlcCreated API at local.
@@ -1186,6 +1375,31 @@ function htlcCreated(msgType) {
         saveTempPrivKey(RsmcTempPrivKey, e.channel_id, info.curr_rsmc_temp_address_private_key);
         saveTempPrivKey(HtlcTempPrivKey, e.channel_id, info.curr_htlc_temp_address_private_key);
         saveTempPrivKey(HtlcHtnxTempPrivKey, e.channel_id, info.curr_htlc_temp_address_for_ht1a_private_key);
+
+        // Display the sent message in the message box and save it to the log file
+        let msgSend = {
+            type: -100040,
+            recipient_node_peer_id: nodeID,
+            recipient_user_peer_id: userID,
+            data: {
+                recipient_user_peer_id: info.recipient_user_peer_id,
+                property_id: info.property_id,
+                amount: info.amount,
+                memo: info.memo,
+                h: info.h,
+                routing_packet: info.routing_packet,
+                channel_address_private_key: info.channel_address_private_key,
+                last_temp_address_private_key: info.last_temp_address_private_key,
+                curr_rsmc_temp_address_pub_key: info.curr_rsmc_temp_address_pub_key,
+                curr_rsmc_temp_address_private_key: info.curr_rsmc_temp_address_private_key,
+                curr_htlc_temp_address_pub_key: info.curr_htlc_temp_address_pub_key,
+                curr_htlc_temp_address_private_key: info.curr_htlc_temp_address_private_key,
+                curr_htlc_temp_address_for_ht1a_pub_key: info.curr_htlc_temp_address_for_ht1a_pub_key,
+                curr_htlc_temp_address_for_ht1a_private_key: info.curr_htlc_temp_address_for_ht1a_private_key,
+            }
+        }
+
+        displaySentMessage($("#logined").text(), msgSend);
     });
 }
 
@@ -1211,6 +1425,7 @@ function htlcSigned(msgType) {
         saveChannelList(e, e.channel_id, msgType);
         saveTempPrivKey(RsmcTempPrivKey, e.channel_id, info.curr_rsmc_temp_address_private_key);
         saveTempPrivKey(HtlcTempPrivKey, e.channel_id, info.curr_htlc_temp_address_private_key);
+        displaySentMessage100041(nodeID, userID, info);
     });
 }
 
@@ -1219,10 +1434,6 @@ function htlcFindPath(msgType) {
 
     let info     = new HtlcFindPathInfo();
     info.invoice = $("#invoice").val();
-    // info.recipient_node_peer_id = $("#recipient_node_peer_id").val();
-    // info.recipient_user_peer_id = $("#recipient_user_peer_id").val();
-    // info.property_id            = Number($("#property_id").val());
-    // info.amount                 = Number($("#amount").val());
 
     // OBD API
     obdApi.htlcFindPath(info, function(e) {
@@ -1230,6 +1441,16 @@ function htlcFindPath(msgType) {
         saveHtlcH(e.h);
         saveRoutingPacket(e.routing_packet);
         saveCltvExpiry(e.min_cltv_expiry);
+
+        // Display the sent message in the message box and save it to the log file
+        let msgSend = {
+            type: -100401,
+            data: {
+                invoice: info.invoice
+            }
+        }
+
+        displaySentMessage($("#logined").text(), msgSend);
     });
 }
 
@@ -1254,6 +1475,23 @@ function rsmcCTxCreated(msgType) {
         // saveTempPrivKey(TempPrivKey, e.channel_id, info.curr_temp_address_private_key);
         addDataInTable($("#logined").text(), e.channel_id, 
             info.curr_temp_address_private_key, tbTempPrivKey);
+
+        // Display the sent message in the message box and save it to the log file
+        let msgSend = {
+            type: -100351,
+            recipient_node_peer_id: nodeID,
+            recipient_user_peer_id: userID,
+            data: {
+                channel_id:                    info.channel_id,
+                amount:                        info.amount,
+                channel_address_private_key:   info.channel_address_private_key,
+                curr_temp_address_pub_key:     info.curr_temp_address_pub_key,
+                curr_temp_address_private_key: info.curr_temp_address_private_key,
+                last_temp_address_private_key: info.last_temp_address_private_key,
+            }
+        }
+
+        displaySentMessage($("#logined").text(), msgSend);
     });
 }
 
@@ -1278,9 +1516,9 @@ function rsmcCTxSigned(msgType) {
         saveChannelID(e.channel_id);
         saveChannelList(e, e.channel_id, msgType);
         // saveTempPrivKey(TempPrivKey, e.channel_id, info.curr_temp_address_private_key);
-        // console.info('MANUAL USER ID = ' + $("#logined").text());
         addDataInTable($("#logined").text(), e.channel_id, 
             info.curr_temp_address_private_key, tbTempPrivKey);
+        displaySentMessage100352(nodeID, userID, info);
     });
 }
 
@@ -1569,7 +1807,7 @@ function displayOBDMessages(msg) {
     //-----------------
     // Save all broadcast info to IndexedDB
     let newMsg =           '------------------------------------';
-        newMsg += '\n\n' + 'Message received -  ' + msgHead;
+        newMsg += '\n\n' + 'Received -  ' + msgHead;
         newMsg += '\n\n' + '------------------------------------';
         newMsg += '\n\n' + fullMsg;
     addData(user_id, newMsg);
@@ -1591,15 +1829,16 @@ function displayOBDMessages(msg) {
     arrObdMsg.push('\n');
     arrObdMsg.push(fullMsg);
     arrObdMsg.push('------------------------------------');
-    arrObdMsg.push('Message received -  ' + msgHead);
+    arrObdMsg.push('Received -  ' + msgHead);
     arrObdMsg.push('------------------------------------');
+
+    // Show message in message box at right side.
+    let showMsg = '';
+    for (let i = arrObdMsg.length - 1; i >= 0; i--) {
+        showMsg += arrObdMsg[i] + '\n\n';
+    }
     
-    // let showMsg = '';
-    // for (let i = arrObdMsg.length - 1; i >= 0; i--) {
-    //     showMsg += arrObdMsg[i] + '\n\n';
-    // }
-    
-    // $("#obd_messages").html(showMsg);
+    $("#obd_messages").html(showMsg);
 }
 
 // 
@@ -5018,9 +5257,169 @@ function readDataFromTable(dataDB, channel_id, tbName) {
  * Async read data from IndexedDB
  * @param dataDB
  * @param channel_id
- * @param tbName: Funding private key or Last temp private key
+ * @param tbName Funding private key or Last temp private key
  */
 async function asyncGetPrivKey(dataDB, channel_id, tbName){
     let privkey = await readDataFromTable(dataDB, channel_id, tbName);
     return privkey;
+}
+
+/**
+ * -100033 Display the sent message in the message box and save it to the log file
+ * @param nodeID 
+ * @param userID 
+ * @param info 
+ */
+function displaySentMessage100033(nodeID, userID, info) {
+    let msgSend = {
+        type: -100033,
+        recipient_node_peer_id: nodeID,
+        recipient_user_peer_id: userID,
+        data: {
+            temporary_channel_id: info.temporary_channel_id,
+            funding_pubkey:       info.funding_pubkey,
+            approval:             info.approval,
+        }
+    }
+
+    displaySentMessage($("#logined").text(), msgSend);
+}
+
+/**
+ * -100350 Display the sent message in the message box and save it to the log file
+ * @param nodeID 
+ * @param userID 
+ * @param info 
+ */
+function displaySentMessage100350(nodeID, userID, info) {
+    let msgSend = {
+        type: -100350,
+        recipient_node_peer_id: nodeID,
+        recipient_user_peer_id: userID,
+        data: {
+            temporary_channel_id:        info.temporary_channel_id,
+            channel_address_private_key: info.channel_address_private_key,
+            funding_txid:                info.funding_txid,
+            approval:                    info.approval,
+        }
+    }
+
+    displaySentMessage($("#logined").text(), msgSend);
+}
+
+/**
+ * -100035 Display the sent message in the message box and save it to the log file
+ * @param nodeID 
+ * @param userID 
+ * @param info 
+ */
+function displaySentMessage100035(nodeID, userID, info) {
+    let msgSend = {
+        type: -100035,
+        recipient_node_peer_id: nodeID,
+        recipient_user_peer_id: userID,
+        data: {
+            temporary_channel_id:               info.temporary_channel_id,
+            fundee_channel_address_private_key: info.fundee_channel_address_private_key,
+        }
+    }
+
+    displaySentMessage($("#logined").text(), msgSend);
+}
+
+/**
+ * -100352 Display the sent message in the message box and save it to the log file
+ * @param nodeID 
+ * @param userID 
+ * @param info 
+ */
+function displaySentMessage100352(nodeID, userID, info) {
+    let msgSend = {
+        type: -100352,
+        recipient_node_peer_id: nodeID,
+        recipient_user_peer_id: userID,
+        data: {
+            channel_id:                    info.channel_id,
+            msg_hash:                      info.msg_hash,
+            channel_address_private_key:   info.channel_address_private_key,
+            curr_temp_address_pub_key:     info.curr_temp_address_pub_key,
+            curr_temp_address_private_key: info.curr_temp_address_private_key,
+            last_temp_address_private_key: info.last_temp_address_private_key,
+            approval:                      info.approval,
+        }
+    }
+
+    displaySentMessage($("#logined").text(), msgSend);
+}
+
+/**
+ * -100041 Display the sent message in the message box and save it to the log file
+ * @param nodeID 
+ * @param userID 
+ * @param info 
+ */
+function displaySentMessage100041(nodeID, userID, info) {
+    let msgSend = {
+        type: -100041,
+        recipient_node_peer_id: nodeID,
+        recipient_user_peer_id: userID,
+        data: {
+            payer_commitment_tx_hash:           info.payer_commitment_tx_hash,
+            channel_address_private_key:        info.channel_address_private_key,
+            curr_rsmc_temp_address_pub_key:     info.curr_rsmc_temp_address_pub_key,
+            curr_rsmc_temp_address_private_key: info.curr_rsmc_temp_address_private_key,
+            curr_htlc_temp_address_pub_key:     info.curr_htlc_temp_address_pub_key,
+            curr_htlc_temp_address_private_key: info.curr_htlc_temp_address_private_key,
+            last_temp_address_private_key:      info.last_temp_address_private_key,
+        }
+    }
+
+    displaySentMessage($("#logined").text(), msgSend);
+}
+
+/**
+ * -100046 Display the sent message in the message box and save it to the log file
+ * @param nodeID 
+ * @param userID 
+ * @param info 
+ */
+function displaySentMessage100046(nodeID, userID, info) {
+    let msgSend = {
+        type: -100046,
+        recipient_node_peer_id: nodeID,
+        recipient_user_peer_id: userID,
+        data: {
+            channel_id:                  info.channel_id,
+            msg_hash:                    info.msg_hash,
+            r:                           info.r,
+            channel_address_private_key: info.channel_address_private_key,
+        }
+    }
+
+    displaySentMessage($("#logined").text(), msgSend);
+}
+
+/**
+ * -100050 Display the sent message in the message box and save it to the log file
+ * @param nodeID 
+ * @param userID 
+ * @param info 
+ */
+function displaySentMessage100050(nodeID, userID, info) {
+    let msgSend = {
+        type: -100050,
+        recipient_node_peer_id: nodeID,
+        recipient_user_peer_id: userID,
+        data: {
+            msg_hash:                                    info.msg_hash,
+            channel_address_private_key:                 info.channel_address_private_key,
+            last_rsmc_temp_address_private_key:          info.last_rsmc_temp_address_private_key,
+            last_htlc_temp_address_private_key:          info.last_htlc_temp_address_private_key,
+            last_htlc_temp_address_for_htnx_private_key: info.last_htlc_temp_address_for_htnx_private_key,
+            curr_rsmc_temp_address_pub_key:              info.curr_rsmc_temp_address_pub_key,
+            curr_rsmc_temp_address_private_key:          info.curr_rsmc_temp_address_private_key,
+        }
+    }
+
+    displaySentMessage($("#logined").text(), msgSend);
 }

@@ -1611,10 +1611,20 @@ class ObdApi {
     onCloseChannelSign(jsonData) { }
     /**
      * MsgType_Atomic_SendSwap_80
+     * @param recipient_node_peer_id string
+     * @param recipient_user_peer_id string
      * @param info AtomicSwapRequest
      * @param callback function
      */
-    atomicSwap(info, callback) {
+    atomicSwap(recipient_node_peer_id, recipient_user_peer_id, info, callback) {
+        if (this.isNotString(recipient_node_peer_id)) {
+            alert("error recipient_node_peer_id");
+            return;
+        }
+        if (this.isNotString(recipient_user_peer_id)) {
+            alert("error recipient_user_peer_id");
+            return;
+        }
         if (this.isNotString(info.channel_id_from)) {
             alert("empty channel_id_from");
             return;
@@ -1650,14 +1660,26 @@ class ObdApi {
         let msg = new Message();
         msg.type = this.messageType.MsgType_Atomic_SendSwap_80;
         msg.data = info;
+        msg.recipient_user_peer_id = recipient_user_peer_id;
+        msg.recipient_node_peer_id = recipient_node_peer_id;
         this.sendData(msg, callback);
     }
     /**
      * MsgType_Atomic_SendSwapAccept_81
+     * @param recipient_node_peer_id string
+     * @param recipient_user_peer_id string
      * @param info AtomicSwapAccepted
      * @param callback function
      */
-    atomicSwapAccepted(info, callback) {
+    atomicSwapAccepted(recipient_node_peer_id, recipient_user_peer_id, info, callback) {
+        if (this.isNotString(recipient_node_peer_id)) {
+            alert("error recipient_node_peer_id");
+            return;
+        }
+        if (this.isNotString(recipient_user_peer_id)) {
+            alert("error recipient_user_peer_id");
+            return;
+        }
         if (this.isNotString(info.channel_id_from)) {
             alert("empty channel_id_from");
             return;
@@ -1697,6 +1719,8 @@ class ObdApi {
         let msg = new Message();
         msg.type = this.messageType.MsgType_Atomic_SendSwapAccept_81;
         msg.data = info;
+        msg.recipient_user_peer_id = recipient_user_peer_id;
+        msg.recipient_node_peer_id = recipient_node_peer_id;
         this.sendData(msg, callback);
     }
     isNotString(str) {
