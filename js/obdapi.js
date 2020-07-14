@@ -45,17 +45,12 @@ class ObdApi {
             alert("error request content.");
             return;
         }
-        // if (msg.type < 0 && this.isLogin == false) {
-        //   alert("please login");
-        //   return;
-        // }
         console.info(new Date(), "------send json msg------");
         console.info(msg);
         if (callback != null) {
             this.callbackMap[type] = callback;
         }
         this.ws.send(msg);
-        // this.ws.send(JSON.stringify(msg));
     }
     /**
      * connectToServer
@@ -125,7 +120,7 @@ class ObdApi {
         this.ws.send(JSON.stringify(msg));
     }
     getDataFromServer(jsonData) {
-        console.info(jsonData.data);
+        console.info(jsonData);
         if (this.globalCallback) {
             this.globalCallback(jsonData);
         }
@@ -251,13 +246,14 @@ class ObdApi {
     }
     /**
      * MsgType_UserLogin_2001
-     * @param mnemonic:string
+     * @param mnemonic string
      * @param callback function
      */
     logIn(mnemonic, callback) {
         if (this.isLogin) {
             if (callback != null) {
-                callback("already login");
+                callback("already logined");
+                alert("You are already logged in!");
             }
             return;
         }

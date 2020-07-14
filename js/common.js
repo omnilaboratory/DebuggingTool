@@ -1,6 +1,8 @@
 var obdApi = new ObdApi();
 var enumMsgType = new MessageType();
 
+var wallet = new Wallet();
+
 // Save connection status.
 var isConnectToOBD = false;
 
@@ -477,34 +479,18 @@ function registerEvent() {
     });
 }
 
-// logIn API at local.
-function logIn(msgType) {
+// -102001 logIn.
+function sdkLogIn() {
 
     let mnemonic = $("#mnemonic").val();
-    // console.info('mnemonic = ' + mnemonic);
 
-    if (mnemonic === '') {
-        alert('Please input a valid mnemonic.');
-        return;
-    }
-
-    obdApi.logIn(mnemonic, function(e) {
+    wallet.logIn(mnemonic, function(e) {
+        console.info('-102001 logIn = ' + JSON.stringify(e));
 
         // Register event needed for listening.
         registerEvent();
 
-        console.info('logIn - OBD Response = ' + JSON.stringify(e));
-        // If already logined, then stop listening to OBD Response,
-        // DO NOT update the userID.
-        if (isLogined) {
-            createOBDResponseDiv(e, msgType);
-            return;
-        }
-
-        // Otherwise, a new loginning, update the userID.
         mnemonicWithLogined = mnemonic;
-        // nodeID              = e.nodePeerId;
-        // globalUserID        = e.userPeerId;
         $("#logined").text(e.userPeerId);
         isLogined = true;
 
@@ -517,6 +503,46 @@ function logIn(msgType) {
         }
         displaySentMessage(e.userPeerId, msgSend);
     });
+    
+
+    // If already logined, then stop listening to OBD Response,
+    // DO NOT update the userID.
+    // if (isLogined) {
+        // console.info('-102001 isLogined = ' + isLogined);
+        // createOBDResponseDiv(e, msgType);
+        // return;
+    // }
+
+    /*
+    obdApi.logIn(mnemonic, function(e) {
+        console.info('-102001 logIn = ' + JSON.stringify(e));
+
+        // Register event needed for listening.
+        registerEvent();
+
+        // If already logined, then stop listening to OBD Response,
+        // DO NOT update the userID.
+        if (isLogined) {
+            console.info('-102001 isLogined = ' + isLogined);
+            // createOBDResponseDiv(e, msgType);
+            return;
+        }
+
+        // Otherwise, a new loginning, update the userID.
+        mnemonicWithLogined = mnemonic;
+        $("#logined").text(e.userPeerId);
+        isLogined = true;
+
+        // Display the sent message in the message box and save it to the log file
+        let msgSend = {
+            type: -102001,
+            data: {
+                mnemonic: mnemonic
+            }
+        }
+        displaySentMessage(e.userPeerId, msgSend);
+    });
+    */
 }
 
 /**
@@ -1583,7 +1609,7 @@ function invokeAPIs(objSelf) {
 
             // APIs for debugging.
         case enumMsgType.MsgType_UserLogin_2001:
-            logIn(msgType);
+            sdkLogIn(msgType);
             break;
         case enumMsgType.MsgType_UserLogout_2002:
             obdApi.logout();
@@ -5008,7 +5034,6 @@ function genAddressFromMnemonic() {
     }
 
     let newIndex = getNewAddrIndex();
-    // console.info('mnemonicWithLogined = ' + mnemonicWithLogined);
     // console.info('addr index = ' + newIndex);
 
     // True: testnet  False: mainnet
