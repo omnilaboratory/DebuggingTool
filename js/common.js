@@ -1618,7 +1618,7 @@ function invokeAPIs(objSelf) {
             // Generate mnemonic by local js library.
             // var mnemonic = btctool.generateMnemonic(128);
             // let mnemonic = obdApi.genMnemonic();
-            let mnemonic = genMnemonic();
+            let mnemonic = sdkGenMnemonic();
             saveMnemonic(mnemonic);
             createOBDResponseDiv(mnemonic);
             break;
@@ -3487,8 +3487,8 @@ function updateOmniAssetData(response, data, msgType) {
 // mnemonic words generated with signUp api save to local storage.
 function saveMnemonic(response) {
 
-    var mnemonic = JSON.parse(sessionStorage.getItem(itemMnemonic));
-    // var mnemonic = JSON.parse(localStorage.getItem(saveMnemonic));
+    let mnemonic = JSON.parse(sessionStorage.getItem(itemMnemonic));
+    // let mnemonic = JSON.parse(localStorage.getItem(saveMnemonic));
 
     // If has data.
     if (mnemonic) {
@@ -5018,8 +5018,9 @@ function autoMode(obj) {
  * MsgType_GetMnemonic_2004
  * This is a OBD JS API. Will be moved to obdapi.js file.
  */
-function genMnemonic() {
-    return btctool.generateMnemonic(128);
+function sdkGenMnemonic() {
+    // return btctool.generateMnemonic(128);
+    return wallet.genMnemonic();
 }
 
 /**
