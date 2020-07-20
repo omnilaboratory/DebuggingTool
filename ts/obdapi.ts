@@ -258,7 +258,7 @@ class ObdApi {
         this.onRevokeAndAcknowledgeCommitmentTransaction(resultData);
         break;
       case this.messageType.MsgType_HTLC_Invoice_402:
-        this.onHtlcInvoice(resultData);
+        this.onAddInvoice(resultData);
         break;
       case this.messageType.MsgType_HTLC_FindPath_401:
         this.onHtlcFindPath(resultData);
@@ -345,7 +345,7 @@ class ObdApi {
    * @param info P2PPeer
    * @param callback function
    */
-  public connectP2PPeer(info: P2PPeer, callback: Function) {
+  public connectPeer(info: P2PPeer, callback: Function) {
 
     if (this.isNotString(info.remote_node_address)) {
       alert("empty remote_node_address");
@@ -879,7 +879,7 @@ class ObdApi {
    * @param info InvoiceInfo
    * @param callback function
    */
-  public htlcInvoice(info: InvoiceInfo, callback: Function) {
+  public addInvoice(info: InvoiceInfo, callback: Function) {
     // if (this.isNotString(info.recipient_user_peer_id)) {
     //   alert("empty recipient_user_peer_id");
     //   return;
@@ -911,7 +911,7 @@ class ObdApi {
     this.sendData(msg, callback);
   }
 
-  public onHtlcInvoice(jsonData: any) {}
+  public onAddInvoice(jsonData: any) {}
 
   /**
    * MsgType_HTLC_FindPath_401

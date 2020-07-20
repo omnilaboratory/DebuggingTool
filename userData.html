@@ -7,10 +7,14 @@
     <title>User Data</title>
     <link rel="stylesheet" href="css/main.css">
     <script src="https://lib.sinaapp.com/js/jquery/2.0.2/jquery-2.0.2.min.js"></script>
-    <script src="sdk/btctool.js"></script>
+    <!-- <script src="sdk/btctool.js"></script> -->
     <script src="js/pojo.js"></script>
     <script src="js/obdapi.js"></script>
     <script src="js/common.js"></script>
+    <script src="sdk/wallet.js"></script>
+    <script src="sdk/htlc.js"></script>
+    <script src="sdk/basic.js"></script>
+    <script src="sdk/util.js"></script>
 </head>
 
 <body>
@@ -30,9 +34,9 @@
     getUserDataList(data.goWhere);
 
     // 
-    function connectOBD() {
-        var nodeAddress = getNewestConnOBD();
-        obdApi.connectToServer(nodeAddress, function(response) {
+    function sdkConnect2OBD() {
+        let nodeAddress = getNewestConnOBD();
+        connectToServer(nodeAddress, function(response) {
             // console.info('OBD Response = ' + response);
         }, function(globalResponse) {
         });
@@ -41,7 +45,7 @@
     //
     if (data.goWhere === 'MyAddresses') {
         console.info('IS from MyAddresses');
-        connectOBD();
+        sdkConnect2OBD();
     }
 </script>
 
