@@ -46,7 +46,7 @@ class AcceptChannelInfo {
         this.approval = false;
     }
 }
-class ChannelFundingCreatedInfo {
+class AssetFundingCreatedInfo {
     constructor() {
         this.temporary_channel_id = "";
         this.funding_tx_hex = "";
@@ -55,7 +55,7 @@ class ChannelFundingCreatedInfo {
         this.channel_address_private_key = "";
     }
 }
-class ChannelFundingSignedInfo {
+class AssetFundingSignedInfo {
     constructor() {
         this.temporary_channel_id = "";
         this.fundee_channel_address_private_key = "";
@@ -83,13 +83,9 @@ class CommitmentTxSigned {
         this.approval = false;
     }
 }
-class HtlcFindPathInfo {
+class PayInvoiceInfo {
     constructor() {
         this.invoice = "";
-        // recipient_node_peer_id: string = "";
-        // recipient_user_peer_id: string = "";
-        // property_id: number = 0;
-        // amount: number = 0;
     }
 }
 class InvoiceInfo {

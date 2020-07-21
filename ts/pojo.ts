@@ -40,7 +40,7 @@ class AcceptChannelInfo {
   approval: boolean = false;
 }
 
-class ChannelFundingCreatedInfo {
+class AssetFundingCreatedInfo {
   temporary_channel_id: string = "";
   funding_tx_hex: string = "";
   temp_address_pub_key: string = "";
@@ -48,7 +48,7 @@ class ChannelFundingCreatedInfo {
   channel_address_private_key: string = "";
 }
 
-class ChannelFundingSignedInfo {
+class AssetFundingSignedInfo {
   temporary_channel_id: string = "";
   fundee_channel_address_private_key: string = "";
   // approval: boolean = false;
@@ -73,12 +73,8 @@ class CommitmentTxSigned {
   approval: boolean = false;
 }
 
-class HtlcFindPathInfo {
+class PayInvoiceInfo {
   invoice: string = "";
-  // recipient_node_peer_id: string = "";
-  // recipient_user_peer_id: string = "";
-  // property_id: number = 0;
-  // amount: number = 0;
 }
 
 class InvoiceInfo {

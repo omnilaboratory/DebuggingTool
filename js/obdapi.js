@@ -184,7 +184,7 @@ class ObdApi {
                 this.onListProperties(resultData);
                 break;
             case this.messageType.MsgType_Core_Omni_FundingAsset_2120:
-                this.onFundingAssetOfOmni(resultData);
+                this.onFundingAsset(resultData);
                 break;
             case this.messageType.MsgType_Mnemonic_CreateAddress_3000:
                 this.onGenAddressFromMnemonic(resultData);
@@ -199,10 +199,10 @@ class ObdApi {
                 this.onAcceptChannel(resultData);
                 break;
             case this.messageType.MsgType_FundingCreate_SendAssetFundingCreated_34:
-                this.onChannelFundingCreated(resultData);
+                this.onAssetFundingCreated(resultData);
                 break;
             case this.messageType.MsgType_FundingSign_SendAssetFundingSigned_35:
-                this.onChannelFundingSigned(resultData);
+                this.onAssetFundingSigned(resultData);
                 break;
             case this.messageType
                 .MsgType_CommitmentTx_SendCommitmentTransactionCreated_351:
@@ -216,7 +216,7 @@ class ObdApi {
                 this.onAddInvoice(resultData);
                 break;
             case this.messageType.MsgType_HTLC_FindPath_401:
-                this.onHtlcFindPath(resultData);
+                this.onPayInvoice(resultData);
                 break;
             case this.messageType.MsgType_HTLC_SendAddHTLC_40:
                 this.onHtlcCreated(resultData);
@@ -431,7 +431,7 @@ class ObdApi {
      * @param info OmniFundingAssetInfo
      * @param callback function
      */
-    fundingAssetOfOmni(info, callback) {
+    fundingAsset(info, callback) {
         if (this.isNotString(info.from_address)) {
             alert("empty from_address");
             return;
@@ -460,7 +460,7 @@ class ObdApi {
         msg.data = info;
         this.sendData(msg, callback);
     }
-    onFundingAssetOfOmni(jsonData) { }
+    onFundingAsset(jsonData) { }
     /**
      * MsgType_Mnemonic_CreateAddress_3000
      * @param callback function
@@ -556,10 +556,10 @@ class ObdApi {
      * MsgType_FundingCreate_SendAssetFundingCreated_34
      * @param recipient_node_peer_id string
      * @param recipient_user_peer_id string
-     * @param info ChannelFundingCreatedInfo
+     * @param info AssetFundingCreatedInfo
      * @param callback function
      */
-    channelFundingCreated(recipient_node_peer_id, recipient_user_peer_id, info, callback) {
+    assetFundingCreated(recipient_node_peer_id, recipient_user_peer_id, info, callback) {
         if (this.isNotString(recipient_node_peer_id)) {
             alert("error recipient_node_peer_id");
             return;
@@ -595,15 +595,15 @@ class ObdApi {
         msg.data = info;
         this.sendData(msg, callback);
     }
-    onChannelFundingCreated(jsonData) { }
+    onAssetFundingCreated(jsonData) { }
     /**
      * MsgType_FundingSign_SendAssetFundingSigned_35
      * @param recipient_node_peer_id string
      * @param recipient_user_peer_id string
-     * @param info ChannelFundingSignedInfo
+     * @param info AssetFundingSignedInfo
      * @param callback function
      */
-    channelFundingSigned(recipient_node_peer_id, recipient_user_peer_id, info, callback) {
+    assetFundingSigned(recipient_node_peer_id, recipient_user_peer_id, info, callback) {
         if (this.isNotString(recipient_node_peer_id)) {
             alert("error recipient_node_peer_id");
             return;
@@ -632,7 +632,7 @@ class ObdApi {
         msg.data = info;
         this.sendData(msg, callback);
     }
-    onChannelFundingSigned(jsonData) { }
+    onAssetFundingSigned(jsonData) { }
     /**
      * MsgType_CommitmentTx_SendCommitmentTransactionCreated_351
      * @param recipient_node_peer_id string
@@ -764,36 +764,20 @@ class ObdApi {
     onAddInvoice(jsonData) { }
     /**
      * MsgType_HTLC_FindPath_401
-     * @param info HtlcFindPathInfo
+     * @param info PayInvoiceInfo
      * @param callback function
      */
-    htlcFindPath(info, callback) {
+    payInvoice(info, callback) {
         if (this.isNotString(info.invoice)) {
             alert("empty invoice");
             return;
         }
-        // if (this.isNotString(info.recipient_node_peer_id)) {
-        //   alert("empty recipient_node_peer_id");
-        //   return;
-        // }
-        // if (this.isNotString(info.recipient_user_peer_id)) {
-        //   alert("empty recipient_user_peer_id");
-        //   return;
-        // }
-        // if (info.property_id == null || info.property_id <= 0) {
-        //   alert("empty property_id");
-        //   return;
-        // }
-        // if (info.amount == null || info.amount <= 0) {
-        //   alert("wrong amount");
-        //   return;
-        // }
         let msg = new Message();
         msg.type = this.messageType.MsgType_HTLC_FindPath_401;
         msg.data = info;
         this.sendData(msg, callback);
     }
-    onHtlcFindPath(jsonData) { }
+    onPayInvoice(jsonData) { }
     /**
      * MsgType_HTLC_SendAddHTLC_40
      * @param recipient_node_peer_id string

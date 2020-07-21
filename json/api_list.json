@@ -27,9 +27,9 @@
             ]
         },
         {
-            "id": "createInvoice",
+            "id": "addInvoice",
             "type_id": -100402,
-            "description": "createInvoice is used to generate an invoice for receiver.",
+            "description": "addInvoice is used to generate an invoice for receiver.",
             "parameters": [
                 {
                     "name": "property_id",
@@ -700,9 +700,9 @@
             ]
         },
         {
-            "id": "HTLCFindPath",
+            "id": "payInvoice",
             "type_id": -100401,
-            "description": "HTLCFindPath is used to find a routing between A and B node for launch a HTLC transfer.",
+            "description": "payInvoice is used to find a routing between A and B node for launch a HTLC transfer.",
             "parameters": [
                 {
                     "name": "invoice",
