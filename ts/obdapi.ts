@@ -880,10 +880,6 @@ class ObdApi {
    * @param callback function
    */
   public addInvoice(info: InvoiceInfo, callback: Function) {
-    // if (this.isNotString(info.recipient_user_peer_id)) {
-    //   alert("empty recipient_user_peer_id");
-    //   return;
-    // }
 
     if (info.property_id == null || info.property_id <= 0) {
       alert("empty property_id");

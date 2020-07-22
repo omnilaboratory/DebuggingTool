@@ -201,3 +201,31 @@ function revokeAndAcknowledgeCommitmentTransaction(myUserID, nodeID, userID, inf
             info.curr_temp_address_private_key, kTbTempPrivKey);
     });
 }
+
+/**
+ * Type -100038 Protocol is used to close a channel. 
+ * 
+ * @param nodeID peer id of the obd node where the fundee logged in.
+ * @param userID the user id of the fundee.
+ * @param channel_id 
+ */
+function closeChannel(nodeID, userID, channel_id) {
+    obdApi.closeChannel(nodeID, userID, channel_id, function(e) {
+        console.info('SDK: -100038 closeChannel = ' + JSON.stringify(e));
+        // saveChannelList(e, channel_id, msgType);
+    });
+}
+
+/**
+ * Type -100039 Protocol is used to response the close channel request.
+ * 
+ * @param nodeID peer id of the obd node where the fundee logged in.
+ * @param userID the user id of the fundee.
+ * @param info 
+ */
+function closeChannelSign(nodeID, userID, info) {
+    obdApi.closeChannelSign(nodeID, userID, info, function(e) {
+        console.info('SDK: -100039 closeChannelSign = ' + JSON.stringify(e));
+        // saveChannelList(e, info.channel_id, msgType);
+    });
+}

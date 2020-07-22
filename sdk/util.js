@@ -15,6 +15,9 @@ const kCounterparties = 'counterparties';
 const kAddress = 'address';
 
 //
+const kMnemonic = 'mnemonic';
+
+//
 const kChannelID = 'channel_id';
 
 //
@@ -515,5 +518,36 @@ function getTempPrivKey(myUserID, saveKey, channelID) {
         return '';
     } else {
         return '';
+    }
+}
+
+/**
+ * mnemonic words generated with signUp api save to local storage.
+ * @param value mnemonic words
+ */
+function saveMnemonic(value) {
+
+    let mnemonic = JSON.parse(sessionStorage.getItem(kMnemonic));
+    // let mnemonic = JSON.parse(localStorage.getItem(kMnemonic));
+
+    // If has data.
+    if (mnemonic) {
+        // console.info('HAS DATA');
+        let new_data = {
+            mnemonic: value,
+        }
+        mnemonic.result.push(new_data);
+        sessionStorage.setItem(kMnemonic, JSON.stringify(mnemonic));
+        // localStorage.setItem(kMnemonic, JSON.stringify(mnemonic));
+
+    } else {
+        // console.info('FIRST DATA');
+        let data = {
+            result: [{
+                mnemonic: value
+            }]
+        }
+        sessionStorage.setItem(kMnemonic, JSON.stringify(data));
+        // localStorage.setItem(kMnemonic, JSON.stringify(data));
     }
 }

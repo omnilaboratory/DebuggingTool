@@ -27,9 +27,6 @@ const kOBDList = 'obd_list';
 const kInvokeHistory = 'invoke_history';
 
 //
-const kMnemonic = 'mnemonic';
-
-//
 const kGoWhere = 'go_where';
 
 
@@ -66,8 +63,8 @@ function listening110040(e, msgType) {
     console.info('listening110040 = ' + JSON.stringify(e));
 
     // Generate an address by local js library.
-    let addr_1 = genAddressFromMnemonic();
-    let addr_2 = genAddressFromMnemonic();
+    let addr_1 = sdkGenAddressFromMnemonic();
+    let addr_2 = sdkGenAddressFromMnemonic();
     saveAddress($("#logined").text(), addr_1);
     saveAddress($("#logined").text(), addr_2);
 
@@ -139,7 +136,7 @@ function listening110049(e, msgType) {
     console.info('listening110049 = ' + JSON.stringify(e));
 
     // Generate an address by local js library.
-    let addr = genAddressFromMnemonic();
+    let addr = sdkGenAddressFromMnemonic();
     saveAddress($("#logined").text(), addr);
     
     // will send -100050 CloseHTLCSigned
@@ -180,7 +177,7 @@ function listening110032(e, msgType) {
     let temp_cid = e.temporary_channel_id;
 
     // Generate an address by local js library.
-    let addr = genAddressFromMnemonic();
+    let addr = sdkGenAddressFromMnemonic();
     saveAddress($("#logined").text(), addr);
 
     // will send -100033 acceptChannel
@@ -287,7 +284,7 @@ function listening110351(e, msgType) {
     console.info('listening110351 = ' + JSON.stringify(e));
 
     // Generate an address by local js library.
-    let addr = genAddressFromMnemonic();
+    let addr = sdkGenAddressFromMnemonic();
     saveAddress($("#logined").text(), addr);
 
     // will send -100352 RSMCCTxSigned
@@ -547,7 +544,7 @@ function sdkCloseHTLC(msgType) {
  * -100050 closeHTLCSigned API at local.
  * @param msgType
  */
-function closeHTLCSigned(msgType) {
+function sdkCloseHTLCSigned(msgType) {
 
     let nodeID    = $("#recipient_node_peer_id").val();
     let userID    = $("#recipient_user_peer_id").val();
@@ -561,22 +558,17 @@ function closeHTLCSigned(msgType) {
     info.curr_rsmc_temp_address_pub_key              = $("#curr_rsmc_temp_address_pub_key").val();
     info.curr_rsmc_temp_address_private_key          = $("#curr_rsmc_temp_address_private_key").val();
 
-    // OBD API
-    obdApi.closeHTLCSigned(nodeID, userID, info, function(e) {
-        console.info('-100050 closeHTLCSigned = ' + JSON.stringify(e));
-        saveChannelID(e.channel_id);
-        // saveTempPrivKey(RsmcTempPrivKey, e.channel_id, info.curr_rsmc_temp_address_private_key);
-        addDataInTable($("#logined").text(), e.channel_id, 
-            info.curr_rsmc_temp_address_private_key, kTbTempPrivKey);
-        displaySentMessage100050(nodeID, userID, info);
-    });
+    // SDK API
+    closeHTLCSigned($("#logined").text(), nodeID, userID, info);
+    displaySentMessage100050(nodeID, userID, info);
+
 }
 
 /** 
  * -100080 atomicSwap API at local.
  * @param msgType
  */
-function atomicSwap(msgType) {
+function sdkAtomicSwap(msgType) {
 
     let nodeID  = $("#recipient_node_peer_id").val();
     let userID  = $("#recipient_user_peer_id").val();
@@ -592,37 +584,16 @@ function atomicSwap(msgType) {
     info.transaction_id         = $("#transaction_id").val();
     info.time_locker            = Number($("#time_locker").val());
 
-    // OBD API
-    obdApi.atomicSwap(nodeID, userID, info, function(e) {
-        console.info('-100080 atomicSwap = ' + JSON.stringify(e));
-
-        // Display the sent message in the message box and save it to the log file
-        let msgSend = {
-            type: -100080,
-            recipient_node_peer_id: nodeID,
-            recipient_user_peer_id: userID,
-            data: {
-                channel_id_from:        info.channel_id_from,
-                channel_id_to:          info.channel_id_to,
-                recipient_user_peer_id: info.recipient_user_peer_id,
-                property_sent:          info.property_sent,
-                amount:                 info.amount,
-                exchange_rate:          info.exchange_rate,
-                property_received:      info.property_received,
-                transaction_id:         info.transaction_id,
-                time_locker:            info.time_locker,
-            }
-        }
-
-        displaySentMessage(msgSend);
-    });
+    // SDK API
+    atomicSwap(nodeID, userID, info);
+    displaySentMessage100080(nodeID, userID, info);
 }
 
 /** 
  * -100081 atomicSwapAccepted API at local.
  * @param msgType
  */
-function atomicSwapAccepted(msgType) {
+function sdkAcceptSwap(msgType) {
 
     let nodeID  = $("#recipient_node_peer_id").val();
     let userID  = $("#recipient_user_peer_id").val();
@@ -639,65 +610,31 @@ function atomicSwapAccepted(msgType) {
     info.target_transaction_id  = $("#target_transaction_id").val();
     info.time_locker            = Number($("#time_locker").val());
 
-    // OBD API
-    obdApi.atomicSwapAccepted(nodeID, userID, info, function(e) {
-        console.info('-100081 atomicSwapAccepted = ' + JSON.stringify(e));
-
-        // Display the sent message in the message box and save it to the log file
-        let msgSend = {
-            type: -100081,
-            recipient_node_peer_id: nodeID,
-            recipient_user_peer_id: userID,
-            data: {
-                channel_id_from:        info.channel_id_from,
-                channel_id_to:          info.channel_id_to,
-                recipient_user_peer_id: info.recipient_user_peer_id,
-                property_sent:          info.property_sent,
-                amount:                 info.amount,
-                exchange_rate:          info.exchange_rate,
-                property_received:      info.property_received,
-                transaction_id:         info.transaction_id,
-                target_transaction_id:  info.target_transaction_id,
-                time_locker:            info.time_locker,
-            }
-        }
-
-        displaySentMessage(msgSend);
-    });
+    // SDK API
+    acceptSwap(nodeID, userID, info);
+    displaySentMessage100081(nodeID, userID, info);
 }
 
 /** 
  * -100038 closeChannel API at local.
  * @param msgType
  */
-function closeChannel(msgType) {
+function sdkCloseChannel(msgType) {
 
     let nodeID     = $("#recipient_node_peer_id").val();
     let userID     = $("#recipient_user_peer_id").val();
     let channel_id = $("#channel_id").val();
 
     // OBD API
-    obdApi.closeChannel(nodeID, userID, channel_id, function(e) {
-        console.info('-100038 closeChannel = ' + JSON.stringify(e));
-        saveChannelList(e, channel_id, msgType);
-
-        // Display the sent message in the message box and save it to the log file
-        let msgSend = {
-            type: -100038,
-            recipient_node_peer_id: nodeID,
-            recipient_user_peer_id: userID,
-            channel_id: channel_id,
-        }
-
-        displaySentMessage(msgSend);
-    });
+    closeChannel(nodeID, userID, channel_id);
+    displaySentMessage100038(nodeID, userID, channel_id);
 }
 
 /** 
  * -100039 closeChannelSigned API at local.
  * @param msgType
  */
-function closeChannelSigned(msgType) {
+function sdkCloseChannelSigned(msgType) {
 
     let nodeID = $("#recipient_node_peer_id").val();
     let userID = $("#recipient_user_peer_id").val();
@@ -708,24 +645,8 @@ function closeChannelSigned(msgType) {
     info.approval                   = $("#checkbox_n39").prop("checked");
 
     // OBD API
-    obdApi.closeChannelSign(nodeID, userID, info, function(e) {
-        console.info('-100039 closeChannelSign = ' + JSON.stringify(e));
-        saveChannelList(e, info.channel_id, msgType);
-
-        // Display the sent message in the message box and save it to the log file
-        let msgSend = {
-            type: -100039,
-            recipient_node_peer_id: nodeID,
-            recipient_user_peer_id: userID,
-            data: {
-                channel_id:                 info.channel_id,
-                request_close_channel_hash: info.request_close_channel_hash,
-                approval:                   info.approval,
-            }
-        }
-
-        displaySentMessage(msgSend);
-    });
+    closeChannelSign(nodeID, userID, info);
+    displaySentMessage100039(nodeID, userID, info);
 }
 
 /** 
@@ -898,14 +819,10 @@ function getAllChannels(msgType) {
  * -103200 GetAllCommitmentTransactions API at local.
  * @param msgType
  */
-function getAllCommitmentTransactions(msgType) {
-
+function sdkGetAllCommitmentTransactions(msgType) {
     let channel_id = $("#channel_id").val();
-
-    // OBD API
-    obdApi.getItemsByChannelId(channel_id, function(e) {
-        console.info('-103200 GetAllCommitmentTransactions = ' + JSON.stringify(e));
-    });
+    // SDK API
+    getAllCommitmentTransactions(channel_id);
 }
 
 /** 
@@ -1207,13 +1124,13 @@ function invokeAPIs(obj) {
             getAllChannels(msgType);
             break;
         case enumMsgType.MsgType_CommitmentTx_ItemsByChanId_3200:
-            getAllCommitmentTransactions(msgType);
+            sdkGetAllCommitmentTransactions(msgType);
             break;
         case enumMsgType.MsgType_CommitmentTx_LatestCommitmentTxByChanId_3203:
             getLatestCommitmentTx(msgType);
             break;
         case enumMsgType.MsgType_Mnemonic_CreateAddress_3000:
-            result = genAddressFromMnemonic();
+            result = sdkGenAddressFromMnemonic();
             if (result === '') return;
             saveAddress($("#logined").text(), result);
             createOBDResponseDiv(result, msgType);
@@ -1297,19 +1214,19 @@ function invokeAPIs(obj) {
             sdkCloseHTLC(msgType);
             break;
         case enumMsgType.MsgType_HTLC_SendCloseSigned_50:
-            closeHTLCSigned(msgType);
+            sdkCloseHTLCSigned(msgType);
             break;
         case enumMsgType.MsgType_SendCloseChannelRequest_38:
-            closeChannel(msgType);
+            sdkCloseChannel(msgType);
             break;
         case enumMsgType.MsgType_SendCloseChannelSign_39:
-            closeChannelSigned(msgType);
+            sdkCloseChannelSigned(msgType);
             break;
         case enumMsgType.MsgType_Atomic_SendSwap_80:
-            atomicSwap(msgType);
+            sdkAtomicSwap(msgType);
             break;
         case enumMsgType.MsgType_Atomic_SendSwapAccept_81:
-            atomicSwapAccepted(msgType);
+            sdkAcceptSwap(msgType);
             break;
         case enumMsgType.MsgType_p2p_ConnectPeer_2003:
             sdkConnectP2PPeer(msgType);
@@ -1768,7 +1685,7 @@ function fillTempChannelIDAndFundingPrivKey(msgType) {
 
 //
 function fillTempAddrKey() {
-    let result = genAddressFromMnemonic();
+    let result = sdkGenAddressFromMnemonic();
     if (result === '') return;
     $("#temp_address_pub_key").val(result.result.pubkey);
     $("#temp_address_private_key").val(result.result.wif);
@@ -1779,7 +1696,7 @@ function fillTempAddrKey() {
 
 //
 function fillCurrTempAddrKey() {
-    let result = genAddressFromMnemonic();
+    let result = sdkGenAddressFromMnemonic();
     if (result === '') return;
     $("#curr_temp_address_pub_key").val(result.result.pubkey);
     $("#curr_temp_address_private_key").val(result.result.wif);
@@ -1790,7 +1707,7 @@ function fillCurrTempAddrKey() {
 
 //
 function fillCurrRsmcTempKey() {
-    let result = genAddressFromMnemonic();
+    let result = sdkGenAddressFromMnemonic();
     if (result === '') return;
     $("#curr_rsmc_temp_address_pub_key").val(result.result.pubkey);
     $("#curr_rsmc_temp_address_private_key").val(result.result.wif);
@@ -1801,7 +1718,7 @@ function fillCurrRsmcTempKey() {
 
 //
 function fillCurrHtlcTempKey() {
-    let result = genAddressFromMnemonic();
+    let result = sdkGenAddressFromMnemonic();
     if (result === '') return;
     $("#curr_htlc_temp_address_pub_key").val(result.result.pubkey);
     $("#curr_htlc_temp_address_private_key").val(result.result.wif);
@@ -1812,7 +1729,7 @@ function fillCurrHtlcTempKey() {
 
 //
 function fillCurrHtlcHe1bTempKey() {
-    let result = genAddressFromMnemonic();
+    let result = sdkGenAddressFromMnemonic();
     if (result === '') return;
     $("#curr_htlc_temp_address_for_he1b_pub_key").val(result.result.pubkey);
     $("#curr_htlc_temp_address_for_he1b_private_key").val(result.result.wif);
@@ -1823,7 +1740,7 @@ function fillCurrHtlcHe1bTempKey() {
 
 //
 function fillCurrHtlcHt1aTempKey() {
-    let result = genAddressFromMnemonic();
+    let result = sdkGenAddressFromMnemonic();
     if (result === '') return;
     $("#curr_htlc_temp_address_for_ht1a_pub_key").val(result.result.pubkey);
     $("#curr_htlc_temp_address_for_ht1a_private_key").val(result.result.wif);
@@ -1835,7 +1752,8 @@ function fillCurrHtlcHt1aTempKey() {
 //
 function fillFundingBtcData() {
     let result = getFundingBtcData($("#logined").text());
-    if (result === '') return;
+    // console.info('AUTO FILL result ==>  ' + result);
+    // if (result === '') return;
     $("#from_address").val(result.from_address);
     $("#from_address_private_key").val(result.from_address_private_key);
     $("#to_address").val(getChannelAddress());
@@ -2547,7 +2465,7 @@ function parseData3000_3001(response) {
 // get a new index of address
 function getNewAddrIndex() {
 
-    var addr = JSON.parse(localStorage.getItem(kAddress));
+    let addr = JSON.parse(localStorage.getItem(kAddress));
     // console.info('localStorage KEY  = ' + addr);
 
     // If has data.
@@ -2868,33 +2786,6 @@ function updateOmniAssetData(response, data, msgType) {
     }
 }
 
-// mnemonic words generated with signUp api save to local storage.
-function saveMnemonic(response) {
-
-    let mnemonic = JSON.parse(sessionStorage.getItem(kMnemonic));
-    // let mnemonic = JSON.parse(localStorage.getItem(saveMnemonic));
-
-    // If has data.
-    if (mnemonic) {
-        // console.info('HAS DATA');
-        let new_data = {
-            mnemonic: response,
-        }
-        mnemonic.result.push(new_data);
-        sessionStorage.setItem(kMnemonic, JSON.stringify(mnemonic));
-        // localStorage.setItem(saveMnemonic, JSON.stringify(mnemonic));
-
-    } else {
-        // console.info('FIRST DATA');
-        let data = {
-            result: [{
-                mnemonic: response
-            }]
-        }
-        sessionStorage.setItem(kMnemonic, JSON.stringify(data));
-        // localStorage.setItem(saveMnemonic, JSON.stringify(data));
-    }
-}
 
 // 
 function getNewestConnOBD() {
@@ -3043,15 +2934,18 @@ function getBalance(strAddr) {
 // Generate new mnemonic words.
 function autoCreateMnemonic() {
     // Generate mnemonic by local js library.
-    var mnemonic = btctool.generateMnemonic(128);
+    // let mnemonic = btctool.generateMnemonic(128);
+    // saveMnemonic(mnemonic);
+
+    // SDK API
+    let mnemonic = sdkGenMnemonic();
     $("#mnemonic").val(mnemonic);
-    saveMnemonic(mnemonic);
 }
 
 // Generate a new pub key of an address.
 function autoCreateFundingPubkey(param) {
     // Generate address by local js library.
-    var result = genAddressFromMnemonic();
+    let result = sdkGenAddressFromMnemonic();
     if (result === '') return;
 
     switch (param) {
@@ -4197,7 +4091,7 @@ function sdkGenMnemonic() {
  * genAddressFromMnemonic by local js library
  * This is a OBD JS API. Will be moved to obdapi.js file.
  */
-function genAddressFromMnemonic() {
+function sdkGenAddressFromMnemonic() {
     if (!isLogined) { // Not logined
         alert('Please login first.');
         return '';
@@ -4206,11 +4100,13 @@ function genAddressFromMnemonic() {
     let newIndex = getNewAddrIndex();
     // console.info('addr index = ' + newIndex);
 
-    // True: testnet  False: mainnet
-    let result = btctool.generateWalletInfo(mnemonicWithLogined, newIndex, true);
-    console.info('local addr data = ' + JSON.stringify(result));
+    // SDK API
+    return genAddressFromMnemonic(mnemonicWithLogined, newIndex, true);
 
-    return result;
+    // True: testnet  False: mainnet
+    // let result = btctool.generateWalletInfo(mnemonicWithLogined, newIndex, true);
+    // console.info('local addr data = ' + JSON.stringify(result));
+    // return result;
 }
 
 /**
@@ -4224,12 +4120,12 @@ function getAddressInfo() {
         return '';
     }
 
-    var index = $("#index").val();
+    let index = $("#index").val();
     console.info('index = ' + index);
 
     try {
         // True: testnet  False: mainnet
-        var result = btctool.generateWalletInfo(mnemonicWithLogined, index, true);
+        let result = btctool.generateWalletInfo(mnemonicWithLogined, index, true);
         console.info('local addr data = ' + JSON.stringify(result));
     } catch (error) {
         alert('Please input a valid index of address.');
@@ -4834,6 +4730,99 @@ function displaySentMessage100049(nodeID, userID, info) {
             last_htlc_temp_address_for_htnx_private_key: info.last_htlc_temp_address_for_htnx_private_key,
             curr_rsmc_temp_address_pub_key: info.curr_rsmc_temp_address_pub_key,
             curr_rsmc_temp_address_private_key: info.curr_rsmc_temp_address_private_key,
+        }
+    }
+
+    displaySentMessage(msgSend);
+}
+
+/**
+ * -100080 Display the sent message in the message box and save it to the log file
+ * @param nodeID 
+ * @param userID
+ * @param info 
+ */
+function displaySentMessage100080(nodeID, userID, info) {
+    let msgSend = {
+        type: -100080,
+        recipient_node_peer_id: nodeID,
+        recipient_user_peer_id: userID,
+        data: {
+            channel_id_from:        info.channel_id_from,
+            channel_id_to:          info.channel_id_to,
+            recipient_user_peer_id: info.recipient_user_peer_id,
+            property_sent:          info.property_sent,
+            amount:                 info.amount,
+            exchange_rate:          info.exchange_rate,
+            property_received:      info.property_received,
+            transaction_id:         info.transaction_id,
+            time_locker:            info.time_locker,
+        }
+    }
+
+    displaySentMessage(msgSend);
+}
+
+/**
+ * -100081 Display the sent message in the message box and save it to the log file
+ * @param nodeID 
+ * @param userID
+ * @param info 
+ */
+function displaySentMessage100081(nodeID, userID, info) {
+    let msgSend = {
+        type: -100081,
+        recipient_node_peer_id: nodeID,
+        recipient_user_peer_id: userID,
+        data: {
+            channel_id_from:        info.channel_id_from,
+            channel_id_to:          info.channel_id_to,
+            recipient_user_peer_id: info.recipient_user_peer_id,
+            property_sent:          info.property_sent,
+            amount:                 info.amount,
+            exchange_rate:          info.exchange_rate,
+            property_received:      info.property_received,
+            transaction_id:         info.transaction_id,
+            target_transaction_id:  info.target_transaction_id,
+            time_locker:            info.time_locker,
+        }
+    }
+
+    displaySentMessage(msgSend);
+}
+
+/**
+ * -100038 Display the sent message in the message box and save it to the log file
+ * @param nodeID 
+ * @param userID
+ * @param channel_id 
+ */
+function displaySentMessage100038(nodeID, userID, channel_id) {
+    let msgSend = {
+        type: -100038,
+        recipient_node_peer_id: nodeID,
+        recipient_user_peer_id: userID,
+        channel_id: channel_id,
+    }
+
+    displaySentMessage(msgSend);
+}
+
+/**
+ * -100039 Display the sent message in the message box and save it to the log file
+ * @param nodeID 
+ * @param userID
+ * @param info 
+ */
+function displaySentMessage100039(nodeID, userID, info) {
+    let msgSend = {
+        type: -100039,
+        recipient_node_peer_id: nodeID,
+        recipient_user_peer_id: userID,
+        data: {
+            channel_id:                 info.channel_id,
+            request_close_channel_hash: info.request_close_channel_hash,
+            approval:                   info.approval,
         }
     }
 

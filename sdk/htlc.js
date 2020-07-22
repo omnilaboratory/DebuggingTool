@@ -118,3 +118,20 @@ function closeHTLC(myUserID, nodeID, userID, info) {
             info.curr_rsmc_temp_address_private_key, kTbTempPrivKey);
     });
 }
+
+/**
+ * Type -100050 Protocol is used to response the request of close HTLC .
+ * 
+ * @param myUserID The user id of logged in
+ * @param nodeID peer id of the obd node where the fundee logged in.
+ * @param userID the user id of the fundee.
+ * @param info 
+ */
+function closeHTLCSigned(myUserID, nodeID, userID, info) {
+    obdApi.closeHTLCSigned(nodeID, userID, info, function(e) {
+        console.info('SDK: -100050 closeHTLCSigned = ' + JSON.stringify(e));
+        saveChannelID(e.channel_id);
+        addDataInTable(myUserID, e.channel_id, 
+            info.curr_rsmc_temp_address_private_key, kTbTempPrivKey);
+    });
+}

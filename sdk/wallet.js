@@ -20,14 +20,35 @@ function connectPeer(info, callback) {
 }
 
 /**
- * Type -102004 Protocol is used to sign up a new user 
- * by hirarchecal deterministic wallet system integrated in OBD.
+ * Mode 1 local OBD:
+ * 
+ * Type -102004 Protocol is used to sign up a new user by 
+ * hirarchecal deterministic wallet system integrated in OBD. 
+ * OBD returns mnemonic words to the client who signs up, 
+ * and create a new user by the hash of the mnemonic words as the UserID.
  */
 function genMnemonic() {
     let mnemonic = btctool.generateMnemonic(128);
-    console.info('SDK - genMnemonic = ' + mnemonic);
-    sdkSaveMnemonic(mnemonic);
+    console.info('SDK: - genMnemonic = ' + mnemonic);
+    saveMnemonic(mnemonic);
     return mnemonic;
+}
+
+/**
+ * Type -103000 Protocol generates a new address from mnemonic words. 
+ * This message requires to generate address on local device from 
+ * mnemonic words using BIP32. Clients interacting with obd, e.g wallets, 
+ * shall implement this HD mechanism for security guarantees. Mnemonic words 
+ * shall be kept in a safe place, and never be shared with any obd instances.
+ * 
+ * @param mnemonic 
+ * @param index
+ * @param netType true: testnet  false: mainnet
+ */
+function genAddressFromMnemonic(mnemonic, index, netType) {
+    let result = btctool.generateWalletInfo(mnemonic, index, netType);
+    console.info('SDK: - genAddressFromMnemonic = ' + JSON.stringify(result));
+    return result;
 }
 
 /**
@@ -37,33 +58,4 @@ function genMnemonic() {
  */
 function logIn(mnemonic, callback) {
     obdApi.logIn(mnemonic, callback);
-}
-
-// FOR TEST
-// mnemonic words generated with signUp api save to local storage.
-function sdkSaveMnemonic(value) {
-
-    // let mnemonic = JSON.parse(sessionStorage.getItem(itemMnemonic));
-    let mnemonic = JSON.parse(localStorage.getItem('saveMnemonic'));
-
-    // If has data.
-    if (mnemonic) {
-        // console.info('HAS DATA');
-        let new_data = {
-            mnemonic: value,
-        }
-        mnemonic.result.push(new_data);
-        // sessionStorage.setItem(itemMnemonic, JSON.stringify(mnemonic));
-        localStorage.setItem('saveMnemonic', JSON.stringify(mnemonic));
-
-    } else {
-        // console.info('FIRST DATA');
-        let data = {
-            result: [{
-                mnemonic: value
-            }]
-        }
-        // sessionStorage.setItem(itemMnemonic, JSON.stringify(data));
-        localStorage.setItem('saveMnemonic', JSON.stringify(data));
-    }
 }
