@@ -55,9 +55,9 @@ function acceptChannel(myUserID, nodeID, userID, info) {
  * @param myUserID The user id of logged in
  * @param info 
  */
-function fundingBTC(myUserID, info) {
-    obdApi.fundingBTC(info, function(e) {
-        console.info('SDK: -102109 fundingBTC = ' + JSON.stringify(e));
+function fundingBitcoin(myUserID, info) {
+    obdApi.fundingBitcoin(info, function(e) {
+        console.info('SDK: -102109 fundingBitcoin = ' + JSON.stringify(e));
         // saveChannelList(e, getChannelID(), msgType);
         saveTempHash(e.hex);
         saveFundingBtcData(myUserID, info);
@@ -72,9 +72,9 @@ function fundingBTC(myUserID, info) {
  * @param userID the user id of the fundee.
  * @param info 
  */
-function BTCFundingCreated(nodeID, userID, info) {
-    obdApi.btcFundingCreated(nodeID, userID, info, function(e) {
-        console.info('SDK: -100340 btcFundingCreated = ' + JSON.stringify(e));
+function bitcoinFundingCreated(nodeID, userID, info) {
+    obdApi.bitcoinFundingCreated(nodeID, userID, info, function(e) {
+        console.info('SDK: -100340 bitcoinFundingCreated = ' + JSON.stringify(e));
         // saveChannelList(e, info.temporary_channel_id, msgType);
     });
 }
@@ -87,9 +87,9 @@ function BTCFundingCreated(nodeID, userID, info) {
  * @param userID the user id of the fundee.
  * @param info 
  */
-function BTCFundingSigned(nodeID, userID, info) {
-    obdApi.btcFundingSigned(nodeID, userID, info, function(e) {
-        console.info('SDK: -100350 btcFundingSigned = ' + JSON.stringify(e));
+function bitcoinFundingSigned(nodeID, userID, info) {
+    obdApi.bitcoinFundingSigned(nodeID, userID, info, function(e) {
+        console.info('SDK: -100350 bitcoinFundingSigned = ' + JSON.stringify(e));
         // saveChannelList(e, info.temporary_channel_id, msgType);
     });
 }
@@ -187,9 +187,9 @@ function commitmentTransactionCreated(myUserID, nodeID, userID, info) {
  * @param userID the user id of the fundee.
  * @param info 
  */
-function revokeAndAcknowledgeCommitmentTransaction(myUserID, nodeID, userID, info) {
-    obdApi.revokeAndAcknowledgeCommitmentTransaction(nodeID, userID, info, function(e) {
-        console.info('SDK: -100352 rsmcCTxSigned = ' + JSON.stringify(e));
+function commitmentTransactionAccepted(myUserID, nodeID, userID, info) {
+    obdApi.commitmentTransactionAccepted(nodeID, userID, info, function(e) {
+        console.info('SDK: -100352 commitmentTransactionAccepted = ' + JSON.stringify(e));
         // saveChannelList(e, e.channel_id, msgType);
 
         saveChannelID(e.channel_id);
@@ -223,9 +223,9 @@ function closeChannel(nodeID, userID, channel_id) {
  * @param userID the user id of the fundee.
  * @param info 
  */
-function closeChannelSign(nodeID, userID, info) {
-    obdApi.closeChannelSign(nodeID, userID, info, function(e) {
-        console.info('SDK: -100039 closeChannelSign = ' + JSON.stringify(e));
+function closeChannelSigned(nodeID, userID, info) {
+    obdApi.closeChannelSigned(nodeID, userID, info, function(e) {
+        console.info('SDK: -100039 closeChannelSigned = ' + JSON.stringify(e));
         // saveChannelList(e, info.channel_id, msgType);
     });
 }

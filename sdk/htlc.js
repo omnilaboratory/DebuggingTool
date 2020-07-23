@@ -73,9 +73,9 @@ function HTLCSigned(myUserID, nodeID, userID, info) {
  * @param userID the user id of the fundee.
  * @param info 
  */
-function htlcSendVerifyR(myUserID, nodeID, userID, info) {
-    obdApi.htlcSendVerifyR(nodeID, userID, info, function(e) {
-        console.info('SDK: -100045 htlcSendVerifyR = ' + JSON.stringify(e));
+function forwardR(myUserID, nodeID, userID, info) {
+    obdApi.forwardR(nodeID, userID, info, function(e) {
+        console.info('SDK: -100045 forwardR = ' + JSON.stringify(e));
         // saveChannelList(e, e.channel_id, msgType);
 
         saveChannelID(e.channel_id);
@@ -92,9 +92,9 @@ function htlcSendVerifyR(myUserID, nodeID, userID, info) {
  * @param userID the user id of the fundee.
  * @param info 
  */
-function htlcSendSignVerifyR(nodeID, userID, info) {
-    obdApi.htlcSendSignVerifyR(nodeID, userID, info, function(e) {
-        console.info('SDK: -100046 htlcSendSignVerifyR = ' + JSON.stringify(e));
+function signR(nodeID, userID, info) {
+    obdApi.signR(nodeID, userID, info, function(e) {
+        console.info('SDK: -100046 signR = ' + JSON.stringify(e));
         // saveChannelList(e, e.channel_id, msgType);
         saveChannelID(e.channel_id);
     });

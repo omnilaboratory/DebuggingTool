@@ -94,29 +94,29 @@ function listening110040(e, msgType) {
     });
 }
 
-// auto response to -100045 (HTLCSendVerifyR) 
-// listening to -110045 and send -100046 HTLCSendSignVerifyR
+// auto response to -100045 (forwardR) 
+// listening to -110045 and send -100046 signR
 function listening110045(e, msgType) {
     console.info('NOW isAutoMode = ' + isAutoMode);
 
     saveTempHash(e.msg_hash);
-    saveHtlcVerifyR(e.r);
+    saveForwardR(e.r);
 
     if (!isAutoMode) return;
     
     console.info('listening110045 = ' + JSON.stringify(e));
 
-    // Alice will send -100046 HTLCSendSignVerifyR
+    // Alice will send -100046 signR
     asyncGetPrivKey(db, e.channel_id, kTbFundingPrivKey).then(function (result) {
-        let info                         = new HtlcSendSignVerifyRInfo();
+        let info                         = new SignRInfo();
         info.channel_id                  = e.channel_id;
         info.r                           = e.r;
         info.msg_hash                    = e.msg_hash;
         info.channel_address_private_key = result;
     
         // OBD API
-        obdApi.htlcSendSignVerifyR(e.payee_node_address, e.payee_peer_id, info, function(e) {
-            console.info('-100046 htlcSendSignVerifyR = ' + JSON.stringify(e));
+        obdApi.signR(e.payee_node_address, e.payee_peer_id, info, function(e) {
+            console.info('-100046 signR = ' + JSON.stringify(e));
             saveChannelID(e.channel_id);
             saveChannelList(e, e.channel_id, msgType);
             displaySentMessage100046(e.payee_node_address, e.payee_peer_id, info);
@@ -197,8 +197,8 @@ function listening110032(e, msgType) {
     });
 }
 
-// auto response to -100340 (BTCFundingCreated)
-// listening to -110340 and send -100350 BTCFundingSigned
+// auto response to -100340 (bitcoinFundingCreated)
+// listening to -110340 and send -100350 bitcoinFundingSigned
 function listening110340(e, msgType) {
     console.info('NOW isAutoMode = ' + isAutoMode);
 
@@ -208,7 +208,7 @@ function listening110340(e, msgType) {
     
     console.info('listening110340 = ' + JSON.stringify(e));
 
-    // will send -100350 BTCFundingSigned
+    // will send -100350 bitcoinFundingSigned
     asyncGetPrivKey(db, e.temporary_channel_id, kTbFundingPrivKey).then(function (result) {
         let info                          = new FundingBtcSigned();
         info.temporary_channel_id         = e.temporary_channel_id;
@@ -217,8 +217,8 @@ function listening110340(e, msgType) {
         info.approval                     = true;
     
         // OBD API
-        obdApi.btcFundingSigned(e.funder_node_address, e.funder_peer_id, info, function(e) {
-            console.info('-100350 btcFundingSigned = ' + JSON.stringify(e));
+        obdApi.bitcoinFundingSigned(e.funder_node_address, e.funder_peer_id, info, function(e) {
+            console.info('-100350 bitcoinFundingSigned = ' + JSON.stringify(e));
             saveChannelList(e, e.temporary_channel_id, msgType);
             displaySentMessage100350(e.funder_node_address, e.funder_peer_id, info);
         });
@@ -272,8 +272,8 @@ function listening110035(e, msgType) {
     saveChannelID(e.channel_id);
 }
 
-// auto response to -100351 (RSMCCTxCreated)
-// listening to -110351 and send -100352 RSMCCTxSigned
+// auto response to -100351 (commitmentTransactionCreated)
+// listening to -110351 and send -100352 commitmentTransactionAccepted
 function listening110351(e, msgType) {
     console.info('NOW isAutoMode = ' + isAutoMode);
 
@@ -287,7 +287,7 @@ function listening110351(e, msgType) {
     let addr = sdkGenAddressFromMnemonic();
     saveAddress($("#logined").text(), addr);
 
-    // will send -100352 RSMCCTxSigned
+    // will send -100352 commitmentTransactionAccepted
     let info                           = new CommitmentTxSigned();
     info.channel_id                    = e.channel_id;
     info.msg_hash                      = e.msg_hash;
@@ -302,9 +302,9 @@ function listening110351(e, msgType) {
         asyncGetPrivKey(db, e.channel_id, kTbFundingPrivKey).then(function (resp) {
             info.channel_address_private_key = resp;
             // OBD API
-            obdApi.revokeAndAcknowledgeCommitmentTransaction(
+            obdApi.commitmentTransactionAccepted(
                 e.payer_node_address, e.payer_peer_id, info, function(e) {
-                // console.info('-100352 RSMCCTxSigned = ' + JSON.stringify(e));
+                // console.info('-100352 commitmentTransactionAccepted = ' + JSON.stringify(e));
                 saveChannelID(e.channel_id);
                 saveChannelList(e, e.channel_id, msgType);
                 // saveTempPrivKey(TempPrivKey, e.channel_id, info.curr_temp_address_private_key);
@@ -477,15 +477,15 @@ function sdkAcceptChannel() {
 }
 
 /** 
- * -100045 htlcSendVerifyR API at local.
+ * -100045 forwardR API at local.
  * @param msgType
  */
-function sdkHtlcSendVerifyR(msgType) {
+function sdkForwardR(msgType) {
 
     let nodeID      = $("#recipient_node_peer_id").val();
     let userID      = $("#recipient_user_peer_id").val();
 
-    let info        = new HtlcSendVerifyRInfo();
+    let info        = new ForwardRInfo();
     info.channel_id = $("#channel_id").val();
     info.r          = $("#r").val();
     info.channel_address_private_key                 = $("#channel_address_private_key").val();
@@ -493,27 +493,27 @@ function sdkHtlcSendVerifyR(msgType) {
     info.curr_htlc_temp_address_for_he1b_private_key = $("#curr_htlc_temp_address_for_he1b_private_key").val();
 
     // SDK API
-    htlcSendVerifyR($("#logined").text(), nodeID, userID, info);
+    forwardR($("#logined").text(), nodeID, userID, info);
     displaySentMessage100045(nodeID, userID, info);
 }
 
 /** 
- * -100046 htlcSendSignVerifyR API at local.
+ * -100046 signR API at local.
  * @param msgType
  */
-function htlcSendSignVerifyR(msgType) {
+function sdkSignR(msgType) {
 
     let nodeID = $("#recipient_node_peer_id").val();
     let userID = $("#recipient_user_peer_id").val();
 
-    let info                         = new HtlcSendSignVerifyRInfo();
+    let info                         = new SignRInfo();
     info.channel_id                  = $("#channel_id").val();
     info.r                           = $("#r").val();
     info.msg_hash                    = $("#msg_hash").val();
     info.channel_address_private_key = $("#channel_address_private_key").val();
 
     // SDK API
-    htlcSendSignVerifyR(nodeID, userID, info);
+    signR(nodeID, userID, info);
     displaySentMessage100046(nodeID, userID, info);
 }
 
@@ -645,7 +645,7 @@ function sdkCloseChannelSigned(msgType) {
     info.approval                   = $("#checkbox_n39").prop("checked");
 
     // OBD API
-    closeChannelSign(nodeID, userID, info);
+    closeChannelSigned(nodeID, userID, info);
     displaySentMessage100039(nodeID, userID, info);
 }
 
@@ -840,7 +840,7 @@ function getLatestCommitmentTx(msgType) {
 }
 
 // -100340 BTC Funding Created API at local.
-function sdkBTCFundingCreated(msgType) {
+function sdkBitcoinFundingCreated(msgType) {
 
     let nodeID = $("#recipient_node_peer_id").val();
     let userID = $("#recipient_user_peer_id").val();
@@ -851,12 +851,12 @@ function sdkBTCFundingCreated(msgType) {
     info.funding_tx_hex              = $("#funding_tx_hex").val();
 
     // SDK API
-    BTCFundingCreated(nodeID, userID, info);
+    bitcoinFundingCreated(nodeID, userID, info);
     displaySentMessage100340(nodeID, userID, info);
 }
 
 // -100350 BTC Funding Signed API at local.
-function sdkBTCFundingSigned(msgType) {
+function sdkBitcoinFundingSigned(msgType) {
 
     let nodeID = $("#recipient_node_peer_id").val();
     let userID = $("#recipient_user_peer_id").val();
@@ -868,7 +868,7 @@ function sdkBTCFundingSigned(msgType) {
     info.approval                    = $("#checkbox_n3500").prop("checked");
 
     // SDK API
-    BTCFundingSigned(nodeID, userID, info);
+    bitcoinFundingSigned(nodeID, userID, info);
     displaySentMessage100350(nodeID, userID, info);
 }
 
@@ -910,7 +910,7 @@ function sdkAssetFundingSigned(msgType) {
 }
 
 // -102109 funding BTC API at local.
-function sdkFundingBTC(msgType) {
+function sdkFundingBitcoin(msgType) {
 
     let info                      = new BtcFundingInfo();
     info.from_address             = $("#from_address").val();
@@ -920,7 +920,7 @@ function sdkFundingBTC(msgType) {
     info.miner_fee                = Number($("#miner_fee").val());
 
     // SDK API
-    fundingBTC($("#logined").text(), info);
+    fundingBitcoin($("#logined").text(), info);
     displaySentMessage102109(info);
 }
 
@@ -1043,7 +1043,7 @@ function sdkPayInvoice(msgType) {
 }
 
 // -100351 Commitment Transaction Created API at local.
-function sdkRsmcCTxCreated(msgType) {
+function sdkCommitmentTransactionCreated(msgType) {
 
     let nodeID = $("#recipient_node_peer_id").val();
     let userID = $("#recipient_user_peer_id").val();
@@ -1062,7 +1062,7 @@ function sdkRsmcCTxCreated(msgType) {
 }
 
 // -100352 Revoke and Acknowledge Commitment Transaction API at local.
-function sdkRsmcCTxSigned(msgType) {
+function sdkCommitmentTransactionAccepted(msgType) {
 
     let nodeID = $("#recipient_node_peer_id").val();
     let userID = $("#recipient_user_peer_id").val();
@@ -1077,7 +1077,7 @@ function sdkRsmcCTxSigned(msgType) {
     info.approval                      = $("#checkbox_n352").prop("checked");
 
     // SDK API
-    revokeAndAcknowledgeCommitmentTransaction($("#logined").text(), nodeID, userID, info);
+    commitmentTransactionAccepted($("#logined").text(), nodeID, userID, info);
     displaySentMessage100352(nodeID, userID, info);
 }
 
@@ -1157,13 +1157,13 @@ function invokeAPIs(obj) {
             createOBDResponseDiv(mnemonic);
             break;
         case enumMsgType.MsgType_Core_FundingBTC_2109:
-            sdkFundingBTC(msgType);
+            sdkFundingBitcoin(msgType);
             break;
         case enumMsgType.MsgType_FundingCreate_SendBtcFundingCreated_340:
-            sdkBTCFundingCreated(msgType);
+            sdkBitcoinFundingCreated(msgType);
             break;
         case enumMsgType.MsgType_FundingSign_SendBtcSign_350:
-            sdkBTCFundingSigned(msgType);
+            sdkBitcoinFundingSigned(msgType);
             break;
         case enumMsgType.MsgType_Core_Omni_FundingAsset_2120:
             sdkFundingAsset(msgType);
@@ -1175,10 +1175,10 @@ function invokeAPIs(obj) {
             sdkAssetFundingSigned(msgType);
             break;
         case enumMsgType.MsgType_CommitmentTx_SendCommitmentTransactionCreated_351:
-            sdkRsmcCTxCreated(msgType);
+            sdkCommitmentTransactionCreated(msgType);
             break;
         case enumMsgType.MsgType_CommitmentTxSigned_SendRevokeAndAcknowledgeCommitmentTransaction_352:
-            sdkRsmcCTxSigned(msgType);
+            sdkCommitmentTransactionAccepted(msgType);
             break;
         case enumMsgType.MsgType_Core_Omni_GetTransaction_2118:
             txid = "c76710920860456dff2433197db79dd030f9b527e83a2e253f5bc6ab7d197e73";
@@ -1205,10 +1205,10 @@ function invokeAPIs(obj) {
             sdkHTLCSigned(msgType);
             break;
         case enumMsgType.MsgType_HTLC_SendVerifyR_45:
-            sdkHtlcSendVerifyR(msgType);
+            sdkForwardR(msgType);
             break;
         case enumMsgType.MsgType_HTLC_SendSignVerifyR_46:
-            htlcSendSignVerifyR(msgType);
+            sdkSignR(msgType);
             break;
         case enumMsgType.MsgType_HTLC_SendRequestCloseCurrTx_49:
             sdkCloseHTLC(msgType);
@@ -1890,10 +1890,8 @@ function autoFillValue(arrParams, obj) {
             if (!isLogined) return;  // Not logined
             fillCounterparty();
             fillChannelIDAndFundingPrivKey();
-            // tempHash = getTempHash();
             $("#msg_hash").val(getTempHash());
-            // let r = getHtlcVerifyR();
-            $("#r").val(getHtlcVerifyR());
+            $("#r").val(getForwardR());
             break;
 
         case enumMsgType.MsgType_HTLC_SendRequestCloseCurrTx_49:
@@ -2879,24 +2877,6 @@ function saveInvokeHistory(name, content) {
 }
 
 
-// save r from HTLCSendVerifyR type ( -100045 ) return
-function saveHtlcVerifyR(r) {
-    let data = {
-        r: r
-    }
-    localStorage.setItem(kHtlcR, JSON.stringify(data));
-}
-
-// get r from HTLCSendVerifyR type ( -100045 ) return
-function getHtlcVerifyR() {
-    let resp = JSON.parse(localStorage.getItem(kHtlcR));
-    // If has data.
-    if (resp) {
-        return resp.r;
-    } else {
-        return '';
-    }
-}
 
 //----------------------------------------------------------------
 // Functions of buttons.

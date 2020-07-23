@@ -302,10 +302,10 @@ function getChannelAddress() {
 /**
  * save temp hash from:
  * @param hex
- * 1) fundingBTC -102109 return
- * 2) BTCFundingCreated type ( -100340 ) return
+ * 1) fundingBitcoin -102109 return
+ * 2) bitcoinFundingCreated type ( -100340 ) return
  * 3) FundingAsset type ( -102120 ) return
- * 4) RSMCCTxCreated type ( -100351 ) return
+ * 4) commitmentTransactionCreated type ( -100351 ) return
  * 5) HTLCCreated type ( -100040 ) return
  */
 function saveTempHash(hex) {
@@ -314,10 +314,10 @@ function saveTempHash(hex) {
 
 /**
  * get temp hash from:
- * 1) fundingBTC -102109 return
- * 2) BTCFundingCreated type ( -100340 ) return
+ * 1) fundingBitcoin -102109 return
+ * 2) bitcoinFundingCreated type ( -100340 ) return
  * 3) FundingAsset type ( -102120 ) return
- * 4) RSMCCTxCreated type ( -100351 ) return
+ * 4) commitmentTransactionCreated type ( -100351 ) return
  * 5) HTLCCreated type ( -100040 ) return
  */
 function getTempHash() {
@@ -550,4 +550,14 @@ function saveMnemonic(value) {
         sessionStorage.setItem(kMnemonic, JSON.stringify(data));
         // localStorage.setItem(kMnemonic, JSON.stringify(data));
     }
+}
+
+// save r from forwardR type ( -100045 ) return
+function saveForwardR(r) {
+    localStorage.setItem(kHtlcR, r);
+}
+
+// get r from forwardR type ( -100045 ) return
+function getForwardR() {
+    return localStorage.getItem(kHtlcR);
 }

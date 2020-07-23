@@ -152,7 +152,7 @@ class HtlcRequestOpen {
         this.curr_htlc_temp_address_for_ht1a_private_key = "";
     }
 }
-class HtlcSendVerifyRInfo {
+class ForwardRInfo {
     constructor() {
         this.channel_id = "";
         this.r = "";
@@ -161,7 +161,7 @@ class HtlcSendVerifyRInfo {
         this.curr_htlc_temp_address_for_he1b_private_key = "";
     }
 }
-class HtlcSendSignVerifyRInfo {
+class SignRInfo {
     constructor() {
         this.channel_id = "";
         this.msg_hash = "";

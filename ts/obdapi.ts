@@ -222,7 +222,7 @@ class ObdApi {
       //   this.onGetNewAddressFromOmniCore(resultData);
       //   break;
       case this.messageType.MsgType_Core_FundingBTC_2109:
-        this.onFundingBTC(resultData);
+        this.onFundingBitcoin(resultData);
         break;
       case this.messageType.MsgType_Core_Omni_ListProperties_2117:
         this.onListProperties(resultData);
@@ -255,7 +255,7 @@ class ObdApi {
         break;
       case this.messageType
         .MsgType_CommitmentTxSigned_SendRevokeAndAcknowledgeCommitmentTransaction_352:
-        this.onRevokeAndAcknowledgeCommitmentTransaction(resultData);
+        this.onCommitmentTransactionAccepted(resultData);
         break;
       case this.messageType.MsgType_HTLC_Invoice_402:
         this.onAddInvoice(resultData);
@@ -270,10 +270,10 @@ class ObdApi {
         this.onHtlcSigned(resultData);
         break;
       case this.messageType.MsgType_HTLC_SendVerifyR_45:
-        this.onHtlcSendVerifyR(resultData);
+        this.onForwardR(resultData);
         break;
       case this.messageType.MsgType_HTLC_SendSignVerifyR_46:
-        this.onHtlcSendSignVerifyR(resultData);
+        this.onSignR(resultData);
         break;
       case this.messageType.MsgType_HTLC_SendRequestCloseCurrTx_49:
         this.onCloseHTLC(resultData);
@@ -374,7 +374,7 @@ class ObdApi {
    * @param info BtcFundingInfo
    * @param callback function
    */
-  public fundingBTC(info: BtcFundingInfo, callback: Function) {
+  public fundingBitcoin(info: BtcFundingInfo, callback: Function) {
     if (this.isNotString(info.from_address)) {
       alert("empty from_address");
       return;
@@ -400,7 +400,7 @@ class ObdApi {
     msg.data = info;
     this.sendData(msg, callback);
   }
-  public onFundingBTC(jsonData: any) {}
+  public onFundingBitcoin(jsonData: any) {}
 
   /**
    * MsgType_FundingCreate_SendBtcFundingCreated_340
@@ -409,7 +409,7 @@ class ObdApi {
    * @param info  FundingBtcCreated
    * @param callback  Function
    */
-  public btcFundingCreated(
+  public bitcoinFundingCreated(
     recipient_node_peer_id: string,
     recipient_user_peer_id: string,
     info: FundingBtcCreated,
@@ -453,7 +453,7 @@ class ObdApi {
    * @param info FundingBtcSigned
    * @param callback  Function
    */
-  public btcFundingSigned(
+  public bitcoinFundingSigned(
     recipient_node_peer_id: string,
     recipient_user_peer_id: string,
     info: FundingBtcSigned,
@@ -821,7 +821,7 @@ class ObdApi {
    * @param info CommitmentTxSigned
    * @param callback function
    */
-  public revokeAndAcknowledgeCommitmentTransaction(
+  public commitmentTransactionAccepted(
     recipient_node_peer_id: string,
     recipient_user_peer_id: string,
     info: CommitmentTxSigned,
@@ -872,7 +872,7 @@ class ObdApi {
     msg.data = info;
     this.sendData(msg, callback);
   }
-  public onRevokeAndAcknowledgeCommitmentTransaction(jsonData: any) {}
+  public onCommitmentTransactionAccepted(jsonData: any) {}
 
   /**
    * MsgType_HTLC_Invoice_402
@@ -1087,13 +1087,13 @@ class ObdApi {
    * MsgType_HTLC_SendVerifyR_45
    * @param recipient_node_peer_id string 
    * @param recipient_user_peer_id string 
-   * @param info htlcSendVerifyR
+   * @param info ForwardRInfo
    * @param callback function
    */
-  public htlcSendVerifyR(
+  public forwardR(
     recipient_node_peer_id: string,
     recipient_user_peer_id: string,
-    info: HtlcSendVerifyRInfo, 
+    info: ForwardRInfo, 
     callback: Function) {
 
     if (this.isNotString(recipient_node_peer_id)) {
@@ -1138,19 +1138,19 @@ class ObdApi {
     msg.recipient_node_peer_id = recipient_node_peer_id;
     this.sendData(msg, callback);
   }
-  public onHtlcSendVerifyR(jsonData: any) {}
+  public onForwardR(jsonData: any) {}
 
   /**
    * MsgType_HTLC_SendSignVerifyR_46
    * @param recipient_node_peer_id string 
    * @param recipient_user_peer_id string
-   * @param info HtlcSendSignVerifyRInfo
+   * @param info SignRInfo
    * @param callback function
    */
-  public htlcSendSignVerifyR(
+  public signR(
     recipient_node_peer_id: string,
     recipient_user_peer_id: string,
-    info: HtlcSendSignVerifyRInfo, 
+    info: SignRInfo, 
     callback: Function) {
 
     if (this.isNotString(recipient_node_peer_id)) {
@@ -1190,7 +1190,7 @@ class ObdApi {
     msg.recipient_node_peer_id = recipient_node_peer_id;
     this.sendData(msg, callback);
   }
-  public onHtlcSendSignVerifyR(jsonData: any) {}
+  public onSignR(jsonData: any) {}
   /* ***************** backward R end*****************/
 
   /* ***************** close htlc tx begin*****************/
@@ -1812,7 +1812,7 @@ class ObdApi {
    * @param info CloseChannelSign
    * @param callback function
    */
-  public closeChannelSign(
+  public closeChannelSigned(
     recipient_node_peer_id: string,
     recipient_user_peer_id: string,
     info: CloseChannelSign, callback: Function) {
@@ -1850,7 +1850,7 @@ class ObdApi {
       msg.recipient_node_peer_id = recipient_node_peer_id;
       this.sendData(msg, callback);
   }
-  public onCloseChannelSign(jsonData: any) {}
+  public onCloseChannelSigned(jsonData: any) {}
 
   /**
    * MsgType_Atomic_SendSwap_80

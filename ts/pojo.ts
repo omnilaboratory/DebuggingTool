@@ -136,7 +136,7 @@ class HtlcRequestOpen {
   curr_htlc_temp_address_for_ht1a_private_key: string = "";
 }
 
-class HtlcSendVerifyRInfo {
+class ForwardRInfo {
   channel_id: string = "";
   r: string = "";
   channel_address_private_key: string = "";
@@ -144,7 +144,7 @@ class HtlcSendVerifyRInfo {
   curr_htlc_temp_address_for_he1b_private_key: string = "";
 }
 
-class HtlcSendSignVerifyRInfo {
+class SignRInfo {
   channel_id: string = "";
   msg_hash: string = "";
   r: string = "";
