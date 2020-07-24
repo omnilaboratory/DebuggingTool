@@ -112,10 +112,14 @@ function closeHTLC(myUserID, nodeID, userID, info) {
     obdApi.closeHTLC(nodeID, userID, info, function(e) {
         console.info('SDK: -100049 closeHTLC = ' + JSON.stringify(e));
         // saveChannelList(e, e.channel_id, msgType);
-        // saveTempPrivKey(RsmcTempPrivKey, e.channel_id, info.curr_rsmc_temp_address_private_key);
         saveChannelID(e.channel_id);
-        addDataInTable(myUserID, e.channel_id, 
-            info.curr_rsmc_temp_address_private_key, kTbTempPrivKey);
+
+        // OLD RESOLUTION
+        saveTempPrivKey(myUserID, kTempPrivKey, e.channel_id, 
+            info.curr_rsmc_temp_address_private_key);
+
+        // addDataInTable(myUserID, e.channel_id, 
+        //     info.curr_rsmc_temp_address_private_key, kTbTempPrivKey);
     });
 }
 
@@ -131,7 +135,11 @@ function closeHTLCSigned(myUserID, nodeID, userID, info) {
     obdApi.closeHTLCSigned(nodeID, userID, info, function(e) {
         console.info('SDK: -100050 closeHTLCSigned = ' + JSON.stringify(e));
         saveChannelID(e.channel_id);
-        addDataInTable(myUserID, e.channel_id, 
-            info.curr_rsmc_temp_address_private_key, kTbTempPrivKey);
+
+        // OLD RESOLUTION
+        saveTempPrivKey(myUserID, kTempPrivKey, e.channel_id, info.curr_rsmc_temp_address_private_key);
+        
+        // addDataInTable(myUserID, e.channel_id, 
+        //     info.curr_rsmc_temp_address_private_key, kTbTempPrivKey);
     });
 }

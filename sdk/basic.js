@@ -124,11 +124,11 @@ function assetFundingCreated(myUserID, nodeID, userID, info) {
 
         // Save temporary private key to local storage
         // OLD RESOLUTION - MAYBE RECOVER LATER
-        // const TempPrivKey = 'temp_priv_key';
-        // saveTempPrivKey(TempPrivKey, temp_cid, t_ad_prk);
+        saveTempPrivKey(myUserID, kTempPrivKey, info.temporary_channel_id, 
+            info.temp_address_private_key);
 
-        addDataInTable(myUserID, info.temporary_channel_id, 
-            info.temp_address_private_key, kTbTempPrivKey);
+        // addDataInTable(myUserID, info.temporary_channel_id, 
+        //     info.temp_address_private_key, kTbTempPrivKey);
     });
 }
 
@@ -171,10 +171,11 @@ function commitmentTransactionCreated(myUserID, nodeID, userID, info) {
         saveChannelID(e.channel_id);
 
         // OLD RESOLUTION - MAYBE RECOVER LATER
-        // saveTempPrivKey(TempPrivKey, e.channel_id, info.curr_temp_address_private_key);
+        saveTempPrivKey(myUserID, kTempPrivKey, e.channel_id, 
+            info.curr_temp_address_private_key);
 
-        addDataInTable(myUserID, e.channel_id, 
-            info.curr_temp_address_private_key, kTbTempPrivKey);
+        // addDataInTable(myUserID, e.channel_id, 
+        //     info.curr_temp_address_private_key, kTbTempPrivKey);
     });
 }
 
@@ -195,10 +196,10 @@ function commitmentTransactionAccepted(myUserID, nodeID, userID, info) {
         saveChannelID(e.channel_id);
 
         // OLD RESOLUTION - MAYBE RECOVER LATER
-        // saveTempPrivKey(TempPrivKey, e.channel_id, info.curr_temp_address_private_key);
+        saveTempPrivKey(myUserID, kTempPrivKey, e.channel_id, info.curr_temp_address_private_key);
 
-        addDataInTable(myUserID, e.channel_id, 
-            info.curr_temp_address_private_key, kTbTempPrivKey);
+        // addDataInTable(myUserID, e.channel_id, 
+        //     info.curr_temp_address_private_key, kTbTempPrivKey);
     });
 }
 

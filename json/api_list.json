@@ -212,8 +212,13 @@
                 },
                 {
                     "name": "amount",
-                    "help": "Minimum sending 0.00014184 BTC.",
-                    "buttons": []
+                    "help": "It can automatically calculate how much bitcoin needs to be recharged in the channel.",
+                    "buttons": [
+                        {
+                            "innerText": "Auto Calc",
+                            "onclick": "autoCalcAmount()"
+                        }
+                    ]
                 },
                 {
                     "name": "miner_fee",

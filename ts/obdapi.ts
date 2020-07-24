@@ -1652,6 +1652,17 @@ class ObdApi {
   public onGetAllChannels(jsonData: any) {}
 
   /**
+   * MsgType_GetMiniBtcFundAmount_2006
+   * @param callback function
+   */
+  public getAmountOfRechargeBTC(callback: Function) {
+    let msg = new Message();
+    msg.type = this.messageType.MsgType_GetMiniBtcFundAmount_2006;
+    this.sendData(msg, callback);
+  }
+  public onGetAmountOfRechargeBTC(jsonData: any) {}
+
+  /**
    * MsgType_GetChannelInfoByChannelId_3154
    * @param id number
    * @param callback function

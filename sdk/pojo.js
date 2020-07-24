@@ -263,6 +263,7 @@ class MessageType {
         this.MsgType_UserLogout_2002 = -102002;
         this.MsgType_p2p_ConnectPeer_2003 = -102003;
         this.MsgType_GetMnemonic_2004 = -102004;
+        this.MsgType_GetMiniBtcFundAmount_2006 = -102006;
         this.MsgType_Core_GetNewAddress_2101 = -102101;
         this.MsgType_Core_GetMiningInfo_2102 = -102102;
         this.MsgType_Core_GetNetworkInfo_2103 = -102103;

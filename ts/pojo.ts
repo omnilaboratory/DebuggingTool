@@ -234,6 +234,8 @@ class MessageType {
   MsgType_p2p_ConnectPeer_2003    = -102003;
   MsgType_GetMnemonic_2004        = -102004;
 
+  MsgType_GetMiniBtcFundAmount_2006  = -102006;
+
   MsgType_Core_GetNewAddress_2101                    = -102101;
   MsgType_Core_GetMiningInfo_2102                    = -102102;
   MsgType_Core_GetNetworkInfo_2103                   = -102103;

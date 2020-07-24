@@ -29,22 +29,13 @@ const kInvokeHistory = 'invoke_history';
 //
 const kGoWhere = 'go_where';
 
-
 // the info save to local storage [ChannelList].
 var channelInfo;
-
 
 /**
  * open / close auto mode.
  */
 var isAutoMode = false;
-
-/**
- * Save temporary private key to local storage
- * OLD RESOLUTION - MAYBE RECOVER LATER
- */
-// const TempPrivKey = 'temp_priv_key';
-
 
 // Get name of saveGoWhere variable.
 function getSaveName() {
@@ -75,23 +66,22 @@ function listening110040(e, msgType) {
     info.curr_rsmc_temp_address_private_key = addr_1.result.wif;
     info.curr_htlc_temp_address_pub_key     = addr_2.result.pubkey;
     info.curr_htlc_temp_address_private_key = addr_2.result.wif;
-    
-    asyncGetPrivKey(db, e.channel_id, kTbTempPrivKey).then(function (result) {
-        info.last_temp_address_private_key = result;
+    info.last_temp_address_private_key      = 
+        getTempPrivKey($("#logined").text(), kTempPrivKey, e.channel_id);
 
-        asyncGetPrivKey(db, e.channel_id, kTbFundingPrivKey).then(function (result) {
-            info.channel_address_private_key = result;
-            // OBD API
-            obdApi.htlcSigned(e.payer_node_address, e.payer_peer_id, info, function(e) {
-                console.info('-100041 htlcSigned = ' + JSON.stringify(e));
-                saveChannelID(e.channel_id);
-                saveChannelList(e, e.channel_id, msgType);
-                saveTempPrivKey($("#logined").text(), kRsmcTempPrivKey, e.channel_id, addr_1.result.wif);
-                saveTempPrivKey($("#logined").text(), kHtlcTempPrivKey, e.channel_id, addr_2.result.wif);
-                displaySentMessage100041(e.payer_node_address, e.payer_peer_id, info);
-            });
-        });
+    asyncGetPrivKey(db, e.channel_id, kTbFundingPrivKey).then(function (result) {
+        info.channel_address_private_key = result;
+
+        // SDK API
+        let nodeID = e.payer_node_address;
+        let userID = e.payer_peer_id;
+        HTLCSigned($("#logined").text(), nodeID, userID, info);
+        displaySentMessage100041(nodeID, userID, info);
     });
+
+    // asyncGetPrivKey(db, e.channel_id, kTbTempPrivKey).then(function (result) {
+    //     info.last_temp_address_private_key = result;
+    // });
 }
 
 // auto response to -100045 (forwardR) 
@@ -114,13 +104,11 @@ function listening110045(e, msgType) {
         info.msg_hash                    = e.msg_hash;
         info.channel_address_private_key = result;
     
-        // OBD API
-        obdApi.signR(e.payee_node_address, e.payee_peer_id, info, function(e) {
-            console.info('-100046 signR = ' + JSON.stringify(e));
-            saveChannelID(e.channel_id);
-            saveChannelList(e, e.channel_id, msgType);
-            displaySentMessage100046(e.payee_node_address, e.payee_peer_id, info);
-        });
+        // SDK API
+        let nodeID = e.payee_node_address;
+        let userID = e.payee_peer_id;
+        signR(nodeID, userID, info);
+        displaySentMessage100046(nodeID, userID, info);
     });
 }
 
@@ -150,15 +138,11 @@ function listening110049(e, msgType) {
         info.curr_rsmc_temp_address_pub_key              = addr.result.pubkey;
         info.curr_rsmc_temp_address_private_key          = addr.result.wif;
     
-        // OBD API
-        obdApi.closeHTLCSigned(e.sender_node_address, e.sender_peer_id, info, function(e) {
-            console.info('-100050 closeHTLCSigned = ' + JSON.stringify(e));
-            saveChannelID(e.channel_id);
-            // saveTempPrivKey(RsmcTempPrivKey, e.channel_id, info.curr_rsmc_temp_address_private_key);
-            addDataInTable($("#logined").text(), e.channel_id, 
-                info.curr_rsmc_temp_address_private_key, kTbTempPrivKey);
-            displaySentMessage100050(e.sender_node_address, e.sender_peer_id, info);
-        });
+        // SDK API
+        let nodeID = e.sender_node_address;
+        let userID = e.sender_peer_id;
+        closeHTLCSigned($("#logined").text(), nodeID, userID, info);
+        displaySentMessage100050(nodeID, userID, info);
     });
 }
 
@@ -186,15 +170,9 @@ function listening110032(e, msgType) {
     info.funding_pubkey       = addr.result.pubkey;
     info.approval             = true;
 
-    // OBD API
-    obdApi.acceptChannel(nodeID, userID, info, function(e) {
-        console.info('-100033 acceptChannel = ' + JSON.stringify(e));
-        saveChannelList(e);
-        saveCounterparties($("#logined").text(), nodeID, userID);
-        saveChannelAddress(e.channel_address);
-        addDataInTable($("#logined").text(), temp_cid, addr.result.wif, kTbFundingPrivKey);
-        displaySentMessage100033(nodeID, userID, info);
-    });
+    // SDK API
+    acceptChannel($("#logined").text(), nodeID, userID, info);
+    displaySentMessage100033(nodeID, userID, info);
 }
 
 // auto response to -100340 (bitcoinFundingCreated)
@@ -216,12 +194,11 @@ function listening110340(e, msgType) {
         info.funding_txid                 = e.funding_txid;
         info.approval                     = true;
     
-        // OBD API
-        obdApi.bitcoinFundingSigned(e.funder_node_address, e.funder_peer_id, info, function(e) {
-            console.info('-100350 bitcoinFundingSigned = ' + JSON.stringify(e));
-            saveChannelList(e, e.temporary_channel_id, msgType);
-            displaySentMessage100350(e.funder_node_address, e.funder_peer_id, info);
-        });
+        // SDK API
+        let nodeID = e.funder_node_address;
+        let userID = e.funder_peer_id;
+        bitcoinFundingSigned(nodeID, userID, info);
+        displaySentMessage100350(nodeID, userID, info);
     });
 }
 
@@ -233,23 +210,17 @@ function listening110034(e, msgType) {
     console.info('listening110034 = ' + JSON.stringify(e));
 
     // will send -100035 AssetFundingSigned
+    // get fundee_channel_address_private_key - MAYBE MODIFYED LATER
     asyncGetPrivKey(db, e.temporary_channel_id, kTbFundingPrivKey).then(function (result) {
-        let info                                = new ChannelFundingSignedInfo();
+        let info                                = new AssetFundingSignedInfo();
         info.temporary_channel_id               = e.temporary_channel_id;
         info.fundee_channel_address_private_key = result;
     
-        // OBD API
-        obdApi.channelFundingSigned(e.funder_node_address, e.funder_peer_id, info, function(e) {
-            console.info('-100035 AssetFundingSigned = ' + JSON.stringify(e));
-            saveChannelList(e, e.channel_id, msgType);
-    
-            // Once sent -100035 AssetFundingSigned , the final channel_id has generated.
-            // So need update the local saved data for funding private key and channel_id.
-            addDataInTable($("#logined").text(), e.channel_id, 
-                info.fundee_channel_address_private_key, kTbFundingPrivKey);
-            saveChannelID(e.channel_id);
-            displaySentMessage100035(e.funder_node_address, e.funder_peer_id, info);
-        });
+        // SDK API
+        let nodeID = e.funder_node_address;
+        let userID = e.funder_peer_id;
+        assetFundingSigned($("#logined").text(), nodeID, userID, info);
+        displaySentMessage100035(nodeID, userID, info);
     });
 }
 
@@ -263,11 +234,12 @@ function listening110035(e, msgType) {
         addDataInTable($("#logined").text(), e.channel_id, result, kTbFundingPrivKey);
     });
 
-    // let tempPrivKey = getTempPrivKey(TempPrivKey, e.temporary_channel_id);
-    asyncGetPrivKey(db, e.temporary_channel_id, kTbTempPrivKey).then(function (result) {
-        // saveTempPrivKey(TempPrivKey, e.channel_id, tempPrivKey);
-        addDataInTable($("#logined").text(), e.channel_id, result, kTbTempPrivKey);
-    });
+    // OLD
+    let tempPrivKey = getTempPrivKey($("#logined").text(), kTempPrivKey, e.temporary_channel_id);
+    saveTempPrivKey($("#logined").text(), kTempPrivKey, e.channel_id, tempPrivKey);
+    // asyncGetPrivKey(db, e.temporary_channel_id, kTbTempPrivKey).then(function (result) {
+    //     addDataInTable($("#logined").text(), e.channel_id, result, kTbTempPrivKey);
+    // });
 
     saveChannelID(e.channel_id);
 }
@@ -294,26 +266,23 @@ function listening110351(e, msgType) {
     info.curr_temp_address_pub_key     = addr.result.pubkey;
     info.curr_temp_address_private_key = addr.result.wif;
     info.approval                      = true;
+    info.last_temp_address_private_key = 
+        getTempPrivKey($("#logined").text(), kTempPrivKey, e.channel_id);
         
-    asyncGetPrivKey(db, e.channel_id, kTbTempPrivKey).then(function (result) {
-        // info.last_temp_address_private_key = getTempPrivKey(TempPrivKey, e.channel_id);
-        info.last_temp_address_private_key = result;
+    // Get channel_address_private_key
+    asyncGetPrivKey(db, e.channel_id, kTbFundingPrivKey).then(function (resp) {
+        info.channel_address_private_key = resp;
 
-        asyncGetPrivKey(db, e.channel_id, kTbFundingPrivKey).then(function (resp) {
-            info.channel_address_private_key = resp;
-            // OBD API
-            obdApi.commitmentTransactionAccepted(
-                e.payer_node_address, e.payer_peer_id, info, function(e) {
-                // console.info('-100352 commitmentTransactionAccepted = ' + JSON.stringify(e));
-                saveChannelID(e.channel_id);
-                saveChannelList(e, e.channel_id, msgType);
-                // saveTempPrivKey(TempPrivKey, e.channel_id, info.curr_temp_address_private_key);
-                addDataInTable($("#logined").text(), e.channel_id, 
-                    info.curr_temp_address_private_key, kTbTempPrivKey);
-                displaySentMessage100352(e.payer_node_address, e.payer_peer_id, info);
-            });
-        });
+        // SDK API
+        let nodeID = e.payer_node_address;
+        let userID = e.payer_peer_id;
+        commitmentTransactionAccepted($("#logined").text(), nodeID, userID, info);
+        displaySentMessage100352(nodeID, userID, info);
     });
+
+    // asyncGetPrivKey(db, e.channel_id, kTbTempPrivKey).then(function (result) {
+    //     info.last_temp_address_private_key = result;
+    // });
 }
 
 // listening to -110038 and save request_close_channel_hash
@@ -561,7 +530,6 @@ function sdkCloseHTLCSigned(msgType) {
     // SDK API
     closeHTLCSigned($("#logined").text(), nodeID, userID, info);
     displaySentMessage100050(nodeID, userID, info);
-
 }
 
 /** 
@@ -2971,9 +2939,20 @@ function autoCreateFundingPubkey(param) {
     saveAddress($("#logined").text(), result);
 }
 
-// auto Calculation Miner Fee
+// auto calculation the miner fee
 function autoCalcMinerFee() {
     $("#miner_fee").val('0.00001');
+}
+
+// auto calculation the amount of btc that needs to be recharged in the channel
+function autoCalcAmount() {
+    // SDK API
+    getAmountOfRechargeBTC(function(e) {
+        console.info('SDK: -102006 getAmountOfRechargeBTC = ' + JSON.stringify(e));
+        let value = JSON.stringify(e);
+        value = value.replace("\"", "").replace("\"", "");
+        $("#amount").val(value);
+    });
 }
 
 //----------------------------------------------------------------
@@ -4152,11 +4131,12 @@ function openDB() {
             os2.createIndex('channel_id', 'channel_id', { unique: false });
         }
 
-        let os3;
-        if (!db.objectStoreNames.contains(kTbTempPrivKey)) {
-            os3 = db.createObjectStore(kTbTempPrivKey, { autoIncrement: true });
-            os3.createIndex('channel_id', 'channel_id', { unique: false });
-        }
+        // OLD RESOLUTION
+        // let os3;
+        // if (!db.objectStoreNames.contains(kTbTempPrivKey)) {
+        //     os3 = db.createObjectStore(kTbTempPrivKey, { autoIncrement: true });
+        //     os3.createIndex('channel_id', 'channel_id', { unique: false });
+        // }
     }
 }
 
