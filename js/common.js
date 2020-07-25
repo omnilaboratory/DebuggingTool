@@ -1628,12 +1628,12 @@ function fillChannelIDAndFundingPrivKey() {
 //
 function fillChannelFundingLastTempKeys() {
     fillChannelIDAndFundingPrivKey();
-    let channel_id = getChannelID();
-    // let tempPrivKey = getTempPrivKey(TempPrivKey, getChannelID());
-    asyncGetPrivKey(db, channel_id, kTbTempPrivKey).then(function (result) {
-        $("#last_temp_address_private_key").val(result);
-        // $("#last_temp_address_private_key").val(tempPrivKey);
-    });
+    let channel_id  = getChannelID();
+    let tempPrivKey = getTempPrivKey($("#logined").text(), kTempPrivKey, channel_id);
+    $("#last_temp_address_private_key").val(tempPrivKey);
+    // asyncGetPrivKey(db, channel_id, kTbTempPrivKey).then(function (result) {
+    //     $("#last_temp_address_private_key").val(result);
+    // });
 }
 
 //

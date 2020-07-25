@@ -75,7 +75,7 @@ const kTbFundingPrivKey = 'tb_funding_priv_key';
  * Object Store (table) name of IndexedDB.
  * temp private key
  */
-const kTbTempPrivKey = 'tb_temp_priv_key';
+// const kTbTempPrivKey = 'tb_temp_priv_key';
 
 /**
  *  List of Counterparties who have interacted
