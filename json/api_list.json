@@ -7,6 +7,12 @@
             "parameters": []
         },
         {
+            "id": "genAddressFromMnemonic",
+            "type_id": -103000,
+            "description": "NewAddressWithMnemonic is used to create a new address with mnemonic words.",
+            "parameters": []
+        },
+        {
             "id": "logIn",
             "type_id": -102001,
             "description": "LogIn is used to login to OBD.",

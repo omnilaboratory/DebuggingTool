@@ -1608,7 +1608,7 @@ class ObdApi {
    * @param channel_id string
    * @param callback function
    */
-  public getLatestCommitmentTxByChannelId(
+  public getLatestCommitmentTransaction(
     channel_id: string,
     callback: Function
   ) {
@@ -1621,7 +1621,7 @@ class ObdApi {
     msg.data["channel_id"] = channel_id;
     this.sendData(msg, callback);
   }
-  public onGetLatestCommitmentTxByChannelId(jsonData: any) {}
+  public onGetLatestCommitmentTransaction(jsonData: any) {}
 
   /**
    * MsgType_CommitmentTx_ItemsByChanId_3200
@@ -1664,27 +1664,45 @@ class ObdApi {
 
   /**
    * MsgType_GetChannelInfoByChannelId_3154
+   * @param channel_id string
+   * @param callback function
+   */
+  public getChannelDetailFromChannelID(channel_id: string, callback: Function) {
+    if (this.isNotString(channel_id)) {
+      alert("empty channel_id");
+      return;
+    }
+    let msg = new Message();
+    msg.type = this.messageType.MsgType_GetChannelInfoByChannelId_3154;
+    // msg.data = channel_id;
+    msg.data["channel_id"] = channel_id;
+    this.sendData(msg, callback);
+  }
+  public onGetChannelDetailFromChannelID(jsonData: any) {}
+
+  /**
+   * MsgType_GetChannelInfoByDbId_3155
    * @param id number
    * @param callback function
    */
-  public getChannelById(id: number, callback: Function) {
+  public getChannelDetailFromDatabaseID(id: number, callback: Function) {
     if (id == null || id <= 0) {
       alert("error id");
       return;
     }
     let msg = new Message();
-    msg.type = this.messageType.MsgType_GetChannelInfoByChannelId_3154;
+    msg.type = this.messageType.MsgType_GetChannelInfoByDbId_3155;
     msg.data = id;
     this.sendData(msg, callback);
   }
-  public onGetChannelById(jsonData: any) {}
+  public onGetChannelDetailFromDatabaseID(jsonData: any) {}
 
   /**
    * MsgType_CommitmentTx_AllBRByChanId_3208
    * @param channel_id string
    * @param callback function
    */
-  public getAllBRTx(channel_id: string, callback: Function) {
+  public getAllBreachRemedyTransactions(channel_id: string, callback: Function) {
     if (this.isNotString(channel_id)) {
       alert("empty channel_id");
       return;
@@ -1694,7 +1712,7 @@ class ObdApi {
     msg.data["channel_id"] = channel_id;
     this.sendData(msg, callback);
   }
-  public onGetAllBrTx(jsonData: any) {}
+  public onGetAllBreachRemedyTransactions(jsonData: any) {}
 
   /**
    * MsgType_CommitmentTx_ItemsByChanId_3200
@@ -1718,7 +1736,7 @@ class ObdApi {
    * @param channel_id string
    * @param callback function
    */
-  public getLatestCommitmentTx(channel_id: string, callback: Function) {
+  public getLatestRevockableDeliveryTransaction(channel_id: string, callback: Function) {
     if (this.isNotString(channel_id)) {
       alert("empty channel_id");
       return;
@@ -1728,14 +1746,14 @@ class ObdApi {
     msg.data["channel_id"] = channel_id;
     this.sendData(msg, callback);
   }
-  public onGetLatestCommitmentTx(jsonData: any) {}
+  public onGetLatestRevockableDeliveryTransaction(jsonData: any) {}
 
   /**
    * MsgType_CommitmentTx_LatestBRByChanId_3205
    * @param channel_id string
    * @param callback function
    */
-  public getLatestBRTx(channel_id: string, callback: Function) {
+  public getLatestBreachRemedyTransaction(channel_id: string, callback: Function) {
     if (this.isNotString(channel_id)) {
       alert("empty channel_id");
       return;
@@ -1745,14 +1763,14 @@ class ObdApi {
     msg.data["channel_id"] = channel_id;
     this.sendData(msg, callback);
   }
-  public onGetLatestBRTx(jsonData: any) {}
+  public onGetLatestBreachRemedyTransaction(jsonData: any) {}
 
   /**
    * MsgType_CommitmentTx_AllRDByChanId_3207
    * @param channel_id string
    * @param callback function
    */
-  public getAllRDTx(channel_id: string, callback: Function) {
+  public getAllRevockableDeliveryTransactions(channel_id: string, callback: Function) {
     if (this.isNotString(channel_id)) {
       alert("empty channel_id");
       return;
@@ -1762,7 +1780,7 @@ class ObdApi {
     msg.data["channel_id"] = channel_id;
     this.sendData(msg, callback);
   }
-  public onGetAllRDTx(jsonData: any) {}
+  public onGetAllRevockableDeliveryTransactions(jsonData: any) {}
 
   /**
    * MsgType_SendBreachRemedyTransaction_3206

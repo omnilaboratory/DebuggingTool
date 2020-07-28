@@ -1371,7 +1371,7 @@ class ObdApi {
      * @param channel_id string
      * @param callback function
      */
-    getLatestCommitmentTxByChannelId(channel_id, callback) {
+    getLatestCommitmentTransaction(channel_id, callback) {
         if (this.isNotString(channel_id)) {
             alert("empty channel_id");
             return;
@@ -1381,7 +1381,7 @@ class ObdApi {
         msg.data["channel_id"] = channel_id;
         this.sendData(msg, callback);
     }
-    onGetLatestCommitmentTxByChannelId(jsonData) { }
+    onGetLatestCommitmentTransaction(jsonData) { }
     /**
      * MsgType_CommitmentTx_ItemsByChanId_3200
      * @param channel_id string
@@ -1420,26 +1420,43 @@ class ObdApi {
     onGetAmountOfRechargeBTC(jsonData) { }
     /**
      * MsgType_GetChannelInfoByChannelId_3154
+     * @param channel_id string
+     * @param callback function
+     */
+    getChannelDetailFromChannelID(channel_id, callback) {
+        if (this.isNotString(channel_id)) {
+            alert("empty channel_id");
+            return;
+        }
+        let msg = new Message();
+        msg.type = this.messageType.MsgType_GetChannelInfoByChannelId_3154;
+        // msg.data = channel_id;
+        msg.data["channel_id"] = channel_id;
+        this.sendData(msg, callback);
+    }
+    onGetChannelDetailFromChannelID(jsonData) { }
+    /**
+     * MsgType_GetChannelInfoByDbId_3155
      * @param id number
      * @param callback function
      */
-    getChannelById(id, callback) {
+    getChannelDetailFromDatabaseID(id, callback) {
         if (id == null || id <= 0) {
             alert("error id");
             return;
         }
         let msg = new Message();
-        msg.type = this.messageType.MsgType_GetChannelInfoByChannelId_3154;
+        msg.type = this.messageType.MsgType_GetChannelInfoByDbId_3155;
         msg.data = id;
         this.sendData(msg, callback);
     }
-    onGetChannelById(jsonData) { }
+    onGetChannelDetailFromDatabaseID(jsonData) { }
     /**
      * MsgType_CommitmentTx_AllBRByChanId_3208
      * @param channel_id string
      * @param callback function
      */
-    getAllBRTx(channel_id, callback) {
+    getAllBreachRemedyTransactions(channel_id, callback) {
         if (this.isNotString(channel_id)) {
             alert("empty channel_id");
             return;
@@ -1449,7 +1466,7 @@ class ObdApi {
         msg.data["channel_id"] = channel_id;
         this.sendData(msg, callback);
     }
-    onGetAllBrTx(jsonData) { }
+    onGetAllBreachRemedyTransactions(jsonData) { }
     /**
      * MsgType_CommitmentTx_ItemsByChanId_3200
      * @param channel_id string
@@ -1471,7 +1488,7 @@ class ObdApi {
      * @param channel_id string
      * @param callback function
      */
-    getLatestCommitmentTx(channel_id, callback) {
+    getLatestRevockableDeliveryTransaction(channel_id, callback) {
         if (this.isNotString(channel_id)) {
             alert("empty channel_id");
             return;
@@ -1481,13 +1498,13 @@ class ObdApi {
         msg.data["channel_id"] = channel_id;
         this.sendData(msg, callback);
     }
-    onGetLatestCommitmentTx(jsonData) { }
+    onGetLatestRevockableDeliveryTransaction(jsonData) { }
     /**
      * MsgType_CommitmentTx_LatestBRByChanId_3205
      * @param channel_id string
      * @param callback function
      */
-    getLatestBRTx(channel_id, callback) {
+    getLatestBreachRemedyTransaction(channel_id, callback) {
         if (this.isNotString(channel_id)) {
             alert("empty channel_id");
             return;
@@ -1497,13 +1514,13 @@ class ObdApi {
         msg.data["channel_id"] = channel_id;
         this.sendData(msg, callback);
     }
-    onGetLatestBRTx(jsonData) { }
+    onGetLatestBreachRemedyTransaction(jsonData) { }
     /**
      * MsgType_CommitmentTx_AllRDByChanId_3207
      * @param channel_id string
      * @param callback function
      */
-    getAllRDTx(channel_id, callback) {
+    getAllRevockableDeliveryTransactions(channel_id, callback) {
         if (this.isNotString(channel_id)) {
             alert("empty channel_id");
             return;
@@ -1513,7 +1530,7 @@ class ObdApi {
         msg.data["channel_id"] = channel_id;
         this.sendData(msg, callback);
     }
-    onGetAllRDTx(jsonData) { }
+    onGetAllRevockableDeliveryTransactions(jsonData) { }
     /**
      * MsgType_SendBreachRemedyTransaction_3206
      * @param channel_id string

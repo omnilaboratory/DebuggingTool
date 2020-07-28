@@ -745,42 +745,29 @@ function getAssetNameByID(msgType) {
 }
 
 /** 
- * -103208 getAllBRTx API at local.
- * @param msgType
+ * -103154 GetChannelDetailFromChannelID API at local.
  */
-function getAllBRTx(msgType) {
-
+function sdkGetChannelDetailFromChannelID() {
     let channel_id = $("#channel_id").val();
-
-    // OBD API
-    obdApi.getAllBRTx(channel_id, function(e) {
-        console.info('-103208 getAllBRTx = ' + JSON.stringify(e));
-    });
+    // SDK API
+    getChannelDetailFromChannelID(channel_id);
 }
 
 /** 
- * -103154 GetChannelDetail API at local.
- * @param msgType
+ * -103155 getChannelDetailFromDatabaseID API at local.
  */
-function getChannelDetail(msgType) {
-
+function sdkGetChannelDetailFromDatabaseID() {
     let id = $("#id").val();
-
-    // OBD API
-    obdApi.getChannelById(Number(id), function(e) {
-        console.info('-103154 GetChannelDetail = ' + JSON.stringify(e));
-    });
+    // SDK API
+    getChannelDetailFromDatabaseID(id);
 }
 
 /** 
  * -103150 getAllChannels API at local.
- * @param msgType
  */
-function getAllChannels(msgType) {
-    // OBD API
-    obdApi.getAllChannels(function(e) {
-        console.info('-103150 getAllChannels = ' + JSON.stringify(e));
-    });
+function sdkGetAllChannels() {
+    // SDK API
+    getAllChannels();
 }
 
 /** 
@@ -794,17 +781,49 @@ function sdkGetAllCommitmentTransactions(msgType) {
 }
 
 /** 
- * -103203 getLatestCommitmentTx API at local.
+ * -103203 getLatestCommitmentTransaction API at local.
  * @param msgType
  */
-function getLatestCommitmentTx(msgType) {
-
+function sdkGetLatestCommitmentTransaction(msgType) {
     let channel_id = $("#channel_id").val();
+    // SDK API
+    getLatestCommitmentTransaction(channel_id);    
+}
 
-    // OBD API
-    obdApi.getLatestCommitmentTxByChannelId(channel_id, function(e) {
-        console.info('-103203 getLatestCommitmentTx = ' + JSON.stringify(e));
-    });
+/** 
+ * -103204 getLatestRevockableDeliveryTransaction API at local.
+ */
+function sdkGetLatestRevockableDeliveryTransaction() {
+    let channel_id = $("#channel_id").val();
+    // SDK API
+    getLatestRevockableDeliveryTransaction(channel_id);    
+}
+
+/** 
+ * -103205 getLatestBreachRemedyTransaction API at local.
+ */
+function sdkGetLatestBreachRemedyTransaction() {
+    let channel_id = $("#channel_id").val();
+    // SDK API
+    getLatestBreachRemedyTransaction(channel_id);    
+}
+
+/** 
+ * -103207 getAllRevockableDeliveryTransactions API at local.
+ */
+function sdkGetAllRevockableDeliveryTransactions() {
+    let channel_id = $("#channel_id").val();
+    // SDK API
+    getAllRevockableDeliveryTransactions(channel_id);    
+}
+
+/** 
+ * -103208 getAllBRTx API at local.
+ */
+function sdkGetAllBreachRemedyTransactions() {
+    let channel_id = $("#channel_id").val();
+    // SDK API
+    getAllBreachRemedyTransactions(channel_id); 
 }
 
 // -100340 BTC Funding Created API at local.
@@ -1052,7 +1071,6 @@ function sdkCommitmentTransactionAccepted(msgType) {
 // Invoke each APIs.
 function invokeAPIs(obj) {
 
-    let result;
     let msgType = Number(obj.getAttribute('type_id'));
     console.info('type_id = ' + msgType);
 
@@ -1082,34 +1100,42 @@ function invokeAPIs(obj) {
         case enumMsgType.MsgType_Core_Omni_GetProperty_2119:
             getAssetNameByID(msgType);
             break;
-        case enumMsgType.MsgType_CommitmentTx_AllBRByChanId_3208:
-            getAllBRTx(msgType);
-            break;
         case enumMsgType.MsgType_GetChannelInfoByChannelId_3154:
-            getChannelDetail(msgType);
+            sdkGetChannelDetailFromChannelID(msgType);
+            break;
+        case enumMsgType.MsgType_GetChannelInfoByDbId_3155:
+            sdkGetChannelDetailFromDatabaseID(msgType);
             break;
         case enumMsgType.MsgType_ChannelOpen_AllItem_3150:
-            getAllChannels(msgType);
+            sdkGetAllChannels();
             break;
         case enumMsgType.MsgType_CommitmentTx_ItemsByChanId_3200:
             sdkGetAllCommitmentTransactions(msgType);
             break;
         case enumMsgType.MsgType_CommitmentTx_LatestCommitmentTxByChanId_3203:
-            getLatestCommitmentTx(msgType);
+            sdkGetLatestCommitmentTransaction(msgType);
+            break;
+        case enumMsgType.MsgType_CommitmentTx_LatestRDByChanId_3204:
+            sdkGetLatestRevockableDeliveryTransaction();
+            break;
+        case enumMsgType.MsgType_CommitmentTx_LatestBRByChanId_3205:
+            sdkGetLatestBreachRemedyTransaction();
+            break;
+        case enumMsgType.MsgType_CommitmentTx_AllRDByChanId_3207:
+            sdkGetAllRevockableDeliveryTransactions();
+            break;
+        case enumMsgType.MsgType_CommitmentTx_AllBRByChanId_3208:
+            sdkGetAllBreachRemedyTransactions(msgType);
             break;
         case enumMsgType.MsgType_Mnemonic_CreateAddress_3000:
-            result = sdkGenAddressFromMnemonic();
+            let result = sdkGenAddressFromMnemonic();
             if (result === '') return;
             saveAddress($("#logined").text(), result);
             createOBDResponseDiv(result, msgType);
             break;
         case enumMsgType.MsgType_Mnemonic_GetAddressByIndex_3001:
-            result = getAddressInfo();
-            if (result === '') return;
-            createOBDResponseDiv(result, msgType);
+            sdkGetAddressInfo(msgType);
             break;
-
-            // APIs for debugging.
         case enumMsgType.MsgType_UserLogin_2001:
             sdkLogIn(msgType);
             break;
@@ -2412,7 +2438,7 @@ function parseData2001(response) {
 
 // genAddressFromMnemonic
 function parseData3000_3001(response) {
-    var arrData = [
+    let arrData = [
         'ADDRESS : ' + response.result.address,
         'INDEX : ' + response.result.index,
         'PUB_KEY : ' + response.result.pubkey,
@@ -2420,9 +2446,9 @@ function parseData3000_3001(response) {
     ];
 
     for (let i = 0; i < arrData.length; i++) {
-        var point   = arrData[i].indexOf(':') + 1;
-        var title   = arrData[i].substring(0, point);
-        var content = arrData[i].substring(point);
+        let point   = arrData[i].indexOf(':') + 1;
+        let title   = arrData[i].substring(0, point);
+        let content = arrData[i].substring(point);
         createElement(obd_response_div, 'text', title);
         createElement(obd_response_div, 'p', content, 'responseText');
     }
@@ -4053,7 +4079,7 @@ function sdkGenMnemonic() {
 function sdkGenAddressFromMnemonic() {
     if (!isLogined) { // Not logined
         alert('Please login first.');
-        return '';
+        return;
     }
 
     let newIndex = getNewAddrIndex();
@@ -4061,42 +4087,26 @@ function sdkGenAddressFromMnemonic() {
 
     // SDK API
     return genAddressFromMnemonic(mnemonicWithLogined, newIndex, true);
-
-    // True: testnet  False: mainnet
-    // let result = btctool.generateWalletInfo(mnemonicWithLogined, newIndex, true);
-    // console.info('local addr data = ' + JSON.stringify(result));
-    // return result;
 }
 
 /**
  * MsgType_Mnemonic_GetAddressByIndex_3001
  * get Address Info by local js library
- * This is a OBD JS API. Will be moved to obdapi.js file.
+ * @param msgType
  */
-function getAddressInfo() {
+function sdkGetAddressInfo(msgType) {
     if (!isLogined) { // Not logined
         alert('Please login first.');
-        return '';
+        return;
     }
 
     let index = $("#index").val();
-    console.info('index = ' + index);
+    // console.info('index = ' + index);
 
-    try {
-        // True: testnet  False: mainnet
-        let result = btctool.generateWalletInfo(mnemonicWithLogined, index, true);
-        console.info('local addr data = ' + JSON.stringify(result));
-    } catch (error) {
-        alert('Please input a valid index of address.');
-        return '';
-    }
-
-    if (!result.status) { // status = false
-        alert('Please input a valid index of address.');
-        return '';
-    }
-
-    return result;
+    // SDK API
+    let result = getAddressInfo(mnemonicWithLogined, index, true);
+    if (result === '') return;
+    createOBDResponseDiv(result, msgType);
 }
 
 /**
