@@ -283,10 +283,10 @@ class ObdApi {
         break;
 
       case this.messageType.MsgType_Core_Omni_GetTransaction_2118:
-        this.onGetOmniTxByTxid(resultData);
+        this.onGetTransaction(resultData);
         break;
       case this.messageType.MsgType_Core_Omni_CreateNewTokenFixed_2113:
-        this.onCreateNewTokenFixed(resultData);
+        this.onIssueFixedAmount(resultData);
         break;
     }
   }
@@ -1325,7 +1325,7 @@ class ObdApi {
    * @param txid string
    * @param callback function
    */
-  public getOmniTxByTxid(txid: string, callback: Function) {
+  public getTransaction(txid: string, callback: Function) {
     if (this.isNotString(txid)) {
       alert("empty txid");
     }
@@ -1334,14 +1334,14 @@ class ObdApi {
     msg.data["txid"] = txid;
     this.sendData(msg, callback);
   }
-  public onGetOmniTxByTxid(jsonData: any) {}
+  public onGetTransaction(jsonData: any) {}
 
   /**
    * MsgType_Core_Omni_CreateNewTokenFixed_2113
-   * @param info OmniSendIssuanceFixed
+   * @param info IssueFixedAmountInfo
    * @param callback function
    */
-  public createNewTokenFixed(info: OmniSendIssuanceFixed, callback: Function) {
+  public issueFixedAmount(info: IssueFixedAmountInfo, callback: Function) {
     if (this.isNotString(info.from_address)) {
       alert("empty from_address");
       return;
@@ -1371,15 +1371,15 @@ class ObdApi {
     msg.data = info;
     this.sendData(msg, callback);
   }
-  public onCreateNewTokenFixed(jsonData: any) {}
+  public onIssueFixedAmount(jsonData: any) {}
 
   /**
    * MsgType_Core_Omni_CreateNewTokenManaged_2114
-   * @param info OmniSendIssuanceManaged
+   * @param info IssueManagedAmoutInfo
    * @param callback function
    */
-  public createNewTokenManaged(
-    info: OmniSendIssuanceManaged,
+  public issueManagedAmout(
+    info: IssueManagedAmoutInfo,
     callback: Function
   ) {
     if (this.isNotString(info.from_address)) {
@@ -1406,13 +1406,14 @@ class ObdApi {
     msg.data = info;
     this.sendData(msg, callback);
   }
-  public onCreateNewTokenManaged(jsonData: any) {}
+  public onIssueManagedAmout(jsonData: any) {}
+
   /**
    * MsgType_Core_Omni_GrantNewUnitsOfManagedToken_2115
    * @param info OmniSendGrant
    * @param callback function
    */
-  public omniSendGrant(info: OmniSendGrant, callback: Function) {
+  public sendGrant(info: OmniSendGrant, callback: Function) {
     if (this.isNotString(info.from_address)) {
       alert("empty from_address");
       return;
@@ -1434,13 +1435,14 @@ class ObdApi {
     msg.data = info;
     this.sendData(msg, callback);
   }
-  public onOmniSendGrant(jsonData: any) {}
+  public onSendGrant(jsonData: any) {}
+
   /**
    * MsgType_Core_Omni_RevokeUnitsOfManagedToken_2116
    * @param info OmniSendRevoke
    * @param callback function
    */
-  public omniSendRevoke(info: OmniSendRevoke, callback: Function) {
+  public sendRevoke(info: OmniSendRevoke, callback: Function) {
     if (this.isNotString(info.from_address)) {
       alert("empty from_address");
       return;
@@ -1461,14 +1463,14 @@ class ObdApi {
     msg.data = info;
     this.sendData(msg, callback);
   }
-  public onOmniSendRevoke(jsonData: any) {}
+  public onSendRevoke(jsonData: any) {}
 
   /**
    * MsgType_Core_Omni_Getbalance_2112
    * @param address string
    * @param callback function
    */
-  public omniGetAllBalancesForAddress(address: string, callback: Function) {
+  public getAllBalancesForAddress(address: string, callback: Function) {
     if (this.isNotString(address)) {
       alert("empty address");
       return;
@@ -1478,14 +1480,14 @@ class ObdApi {
     msg.data["address"] = address;
     this.sendData(msg, callback);
   }
-  public onOmniGetAllBalancesForAddress(jsonData: any) {}
+  public onGetAllBalancesForAddress(jsonData: any) {}
 
   /**
    * MsgType_Core_Omni_GetProperty_2119
    * @param propertyId string
    * @param callback function
    */
-  public omniGetAssetNameByID(propertyId: string, callback: Function) {
+  public getProperty(propertyId: string, callback: Function) {
     if (this.isNotString(propertyId)) {
       alert("empty propertyId");
       return;
@@ -1495,7 +1497,7 @@ class ObdApi {
     msg.data["propertyId"] = propertyId;
     this.sendData(msg, callback);
   }
-  public onOmniGetAssetNameByID(jsonData: any) {}
+  public onGetProperty(jsonData: any) {}
 
   /**
    * MsgType_Core_BalanceByAddress_2108
@@ -1781,23 +1783,6 @@ class ObdApi {
     this.sendData(msg, callback);
   }
   public onGetAllRevockableDeliveryTransactions(jsonData: any) {}
-
-  /**
-   * MsgType_SendBreachRemedyTransaction_3206
-   * @param channel_id string
-   * @param callback function
-   */
-  public sendBreachRemedyTransaction(channel_id: string, callback: Function) {
-    if (this.isNotString(channel_id)) {
-      alert("empty channel_id");
-      return;
-    }
-    let msg = new Message();
-    msg.type = this.messageType.MsgType_SendBreachRemedyTransaction_3206;
-    msg.data["channel_id"] = channel_id;
-    this.sendData(msg, callback);
-  }
-  public onSendBreachRemedyTransaction(jsonData: any) {}
 
   /**
    * MsgType_SendCloseChannelRequest_38

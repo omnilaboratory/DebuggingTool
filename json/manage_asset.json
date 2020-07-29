@@ -1,9 +1,9 @@
 ﻿{
     "data": [
         {
-            "id": "issuanceFixed",
+            "id": "issueFixedAmount",
             "type_id": -102113,
-            "description": "issuanceFixed is used to create new tokens with fixed supply.",
+            "description": "issueFixedAmount is used to create new tokens with fixed amount supply.",
             "parameters": [
                 {
                     "name": "from_address",
@@ -43,9 +43,9 @@
             ]
         },
         {
-            "id": "issuanceManaged",
+            "id": "issueManagedAmout",
             "type_id": -102114,
-            "description": "issuanceManaged is used to create new tokens with manageable supply. NOTE: Record the txid returned by OBD and get the property id you have issued manageable asset with GetTransaction (type 1206) API.",
+            "description": "issueManagedAmout is used to create new tokens with manageable supply. NOTE: Record the txid returned by the OBD, and then you can use the GetTransaction (type-102118) API to get the property ID of the manageable asset you issued.",
             "parameters": [
                 {
                     "name": "from_address",

@@ -138,9 +138,9 @@
             ]
         },
         {
-            "id": "getBalanceForOmni",
+            "id": "getAllBalancesForAddress",
             "type_id": -102112,
-            "description": "getBalanceForOmni is used to get balance of omni asset.",
+            "description": "getAllBalancesForAddress is used to get all omni assets details of an address.",
             "parameters": [
                 {
                     "name": "address",
@@ -173,7 +173,7 @@
         {
             "id": "getProperty",
             "type_id": -102119,
-            "description": "getProperty is used to get omni asset name by asset id (Property Id) .",
+            "description": "getProperty is used to get omni asset details by asset id (Property Id) .",
             "parameters": [
                 {
                     "name": "PropertyID",

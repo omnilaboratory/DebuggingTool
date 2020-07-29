@@ -191,7 +191,7 @@ class CloseHtlcTxInfoSigned {
         this.curr_rsmc_temp_address_private_key = "";
     }
 }
-class OmniSendIssuanceManaged {
+class IssueManagedAmoutInfo {
     constructor() {
         this.from_address = "";
         this.name = "";
@@ -200,7 +200,7 @@ class OmniSendIssuanceManaged {
         this.data = "";
     }
 }
-class OmniSendIssuanceFixed extends OmniSendIssuanceManaged {
+class IssueFixedAmountInfo extends IssueManagedAmoutInfo {
     constructor() {
         super(...arguments);
         this.amount = 0;
@@ -318,7 +318,6 @@ class MessageType {
         this.MsgType_CommitmentTx_LatestCommitmentTxByChanId_3203 = -103203;
         this.MsgType_CommitmentTx_LatestRDByChanId_3204 = -103204;
         this.MsgType_CommitmentTx_LatestBRByChanId_3205 = -103205;
-        this.MsgType_SendBreachRemedyTransaction_3206 = -103206;
         this.MsgType_CommitmentTx_AllRDByChanId_3207 = -103207;
         this.MsgType_CommitmentTx_AllBRByChanId_3208 = -103208;
         this.MsgType_SendCloseChannelRequest_38 = -100038;

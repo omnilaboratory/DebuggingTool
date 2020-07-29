@@ -124,3 +124,44 @@ function getAddressInfo(mnemonic, index, netType) {
 
     return result;
 }
+
+/**
+ * Type -102112 Protocol is used to get all omni assets details of an address.
+ * @param address 
+ */
+function getAllBalancesForAddress(address) {
+    obdApi.getAllBalancesForAddress(address, function(e) {
+        console.info('SDK: -102112 getAllBalancesForAddress = ' + JSON.stringify(e));
+    });
+}
+
+/**
+ * Type -102117 Protocol is used to list all tokens or smart properties.
+ * This call may take a long time, it may return a large amount of data, 
+ * please use it with caution.
+ */
+function listProperties() {
+    obdApi.listProperties(function(e) {
+        console.info('SDK: -102117 listProperties = ' + JSON.stringify(e));
+    });
+}
+
+/**
+ * Type -102118 Protocol is used to get detailed information about an Omni transaction.
+ * @param txid 
+ */
+function getTransaction(txid) {
+    obdApi.getTransaction(txid, function(e) {
+        console.info('SDK: -102118 getTransaction = ' + JSON.stringify(e));
+    });
+}
+
+/**
+ * Type -102119 Protocol is used to get omni asset details by asset id (Property Id) .
+ * @param propertyId 
+ */
+function getProperty(propertyId) {
+    obdApi.getProperty(propertyId, function(e) {
+        console.info('SDK: -102119 getProperty = ' + JSON.stringify(e));
+    });
+}

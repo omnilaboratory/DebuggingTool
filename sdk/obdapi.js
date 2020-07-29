@@ -237,10 +237,10 @@ class ObdApi {
                 this.onCloseHTLCSigned(resultData);
                 break;
             case this.messageType.MsgType_Core_Omni_GetTransaction_2118:
-                this.onGetOmniTxByTxid(resultData);
+                this.onGetTransaction(resultData);
                 break;
             case this.messageType.MsgType_Core_Omni_CreateNewTokenFixed_2113:
-                this.onCreateNewTokenFixed(resultData);
+                this.onIssueFixedAmount(resultData);
                 break;
         }
     }
@@ -1104,7 +1104,7 @@ class ObdApi {
      * @param txid string
      * @param callback function
      */
-    getOmniTxByTxid(txid, callback) {
+    getTransaction(txid, callback) {
         if (this.isNotString(txid)) {
             alert("empty txid");
         }
@@ -1113,13 +1113,13 @@ class ObdApi {
         msg.data["txid"] = txid;
         this.sendData(msg, callback);
     }
-    onGetOmniTxByTxid(jsonData) { }
+    onGetTransaction(jsonData) { }
     /**
      * MsgType_Core_Omni_CreateNewTokenFixed_2113
-     * @param info OmniSendIssuanceFixed
+     * @param info IssueFixedAmountInfo
      * @param callback function
      */
-    createNewTokenFixed(info, callback) {
+    issueFixedAmount(info, callback) {
         if (this.isNotString(info.from_address)) {
             alert("empty from_address");
             return;
@@ -1148,13 +1148,13 @@ class ObdApi {
         msg.data = info;
         this.sendData(msg, callback);
     }
-    onCreateNewTokenFixed(jsonData) { }
+    onIssueFixedAmount(jsonData) { }
     /**
      * MsgType_Core_Omni_CreateNewTokenManaged_2114
-     * @param info OmniSendIssuanceManaged
+     * @param info IssueManagedAmoutInfo
      * @param callback function
      */
-    createNewTokenManaged(info, callback) {
+    issueManagedAmout(info, callback) {
         if (this.isNotString(info.from_address)) {
             alert("empty from_address");
             return;
@@ -1179,13 +1179,13 @@ class ObdApi {
         msg.data = info;
         this.sendData(msg, callback);
     }
-    onCreateNewTokenManaged(jsonData) { }
+    onIssueManagedAmout(jsonData) { }
     /**
      * MsgType_Core_Omni_GrantNewUnitsOfManagedToken_2115
      * @param info OmniSendGrant
      * @param callback function
      */
-    omniSendGrant(info, callback) {
+    sendGrant(info, callback) {
         if (this.isNotString(info.from_address)) {
             alert("empty from_address");
             return;
@@ -1206,13 +1206,13 @@ class ObdApi {
         msg.data = info;
         this.sendData(msg, callback);
     }
-    onOmniSendGrant(jsonData) { }
+    onSendGrant(jsonData) { }
     /**
      * MsgType_Core_Omni_RevokeUnitsOfManagedToken_2116
      * @param info OmniSendRevoke
      * @param callback function
      */
-    omniSendRevoke(info, callback) {
+    sendRevoke(info, callback) {
         if (this.isNotString(info.from_address)) {
             alert("empty from_address");
             return;
@@ -1233,13 +1233,13 @@ class ObdApi {
         msg.data = info;
         this.sendData(msg, callback);
     }
-    onOmniSendRevoke(jsonData) { }
+    onSendRevoke(jsonData) { }
     /**
      * MsgType_Core_Omni_Getbalance_2112
      * @param address string
      * @param callback function
      */
-    omniGetAllBalancesForAddress(address, callback) {
+    getAllBalancesForAddress(address, callback) {
         if (this.isNotString(address)) {
             alert("empty address");
             return;
@@ -1249,13 +1249,13 @@ class ObdApi {
         msg.data["address"] = address;
         this.sendData(msg, callback);
     }
-    onOmniGetAllBalancesForAddress(jsonData) { }
+    onGetAllBalancesForAddress(jsonData) { }
     /**
      * MsgType_Core_Omni_GetProperty_2119
      * @param propertyId string
      * @param callback function
      */
-    omniGetAssetNameByID(propertyId, callback) {
+    getProperty(propertyId, callback) {
         if (this.isNotString(propertyId)) {
             alert("empty propertyId");
             return;
@@ -1265,7 +1265,7 @@ class ObdApi {
         msg.data["propertyId"] = propertyId;
         this.sendData(msg, callback);
     }
-    onOmniGetAssetNameByID(jsonData) { }
+    onGetProperty(jsonData) { }
     /**
      * MsgType_Core_BalanceByAddress_2108
      * @param address string
@@ -1531,22 +1531,6 @@ class ObdApi {
         this.sendData(msg, callback);
     }
     onGetAllRevockableDeliveryTransactions(jsonData) { }
-    /**
-     * MsgType_SendBreachRemedyTransaction_3206
-     * @param channel_id string
-     * @param callback function
-     */
-    sendBreachRemedyTransaction(channel_id, callback) {
-        if (this.isNotString(channel_id)) {
-            alert("empty channel_id");
-            return;
-        }
-        let msg = new Message();
-        msg.type = this.messageType.MsgType_SendBreachRemedyTransaction_3206;
-        msg.data["channel_id"] = channel_id;
-        this.sendData(msg, callback);
-    }
-    onSendBreachRemedyTransaction(jsonData) { }
     /**
      * MsgType_SendCloseChannelRequest_38
      * @param recipient_node_peer_id string

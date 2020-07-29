@@ -171,7 +171,7 @@ class CloseHtlcTxInfoSigned {
   curr_rsmc_temp_address_private_key: string = "";
 }
 
-class OmniSendIssuanceManaged {
+class IssueManagedAmoutInfo {
   from_address: string = "";
   name: string = "";
   ecosystem: number = 0;
@@ -179,7 +179,7 @@ class OmniSendIssuanceManaged {
   data: string = "";
 }
 
-class OmniSendIssuanceFixed extends OmniSendIssuanceManaged {
+class IssueFixedAmountInfo extends IssueManagedAmoutInfo {
   amount: number = 0;
 }
 
@@ -296,7 +296,6 @@ class MessageType {
   MsgType_CommitmentTx_LatestCommitmentTxByChanId_3203  = -103203;
   MsgType_CommitmentTx_LatestRDByChanId_3204            = -103204;
   MsgType_CommitmentTx_LatestBRByChanId_3205            = -103205;
-  MsgType_SendBreachRemedyTransaction_3206              = -103206;
   MsgType_CommitmentTx_AllRDByChanId_3207               = -103207;
   MsgType_CommitmentTx_AllBRByChanId_3208               = -103208;
   

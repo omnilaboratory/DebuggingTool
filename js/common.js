@@ -447,9 +447,8 @@ function sdkAcceptChannel() {
 
 /** 
  * -100045 forwardR API at local.
- * @param msgType
  */
-function sdkForwardR(msgType) {
+function sdkForwardR() {
 
     let nodeID      = $("#recipient_node_peer_id").val();
     let userID      = $("#recipient_user_peer_id").val();
@@ -468,9 +467,8 @@ function sdkForwardR(msgType) {
 
 /** 
  * -100046 signR API at local.
- * @param msgType
  */
-function sdkSignR(msgType) {
+function sdkSignR() {
 
     let nodeID = $("#recipient_node_peer_id").val();
     let userID = $("#recipient_user_peer_id").val();
@@ -488,9 +486,8 @@ function sdkSignR(msgType) {
 
 /** 
  * -100049 closeHTLC API at local.
- * @param msgType
  */
-function sdkCloseHTLC(msgType) {
+function sdkCloseHTLC() {
 
     let nodeID    = $("#recipient_node_peer_id").val();
     let userID    = $("#recipient_user_peer_id").val();
@@ -511,9 +508,8 @@ function sdkCloseHTLC(msgType) {
 
 /** 
  * -100050 closeHTLCSigned API at local.
- * @param msgType
  */
-function sdkCloseHTLCSigned(msgType) {
+function sdkCloseHTLCSigned() {
 
     let nodeID    = $("#recipient_node_peer_id").val();
     let userID    = $("#recipient_user_peer_id").val();
@@ -534,9 +530,8 @@ function sdkCloseHTLCSigned(msgType) {
 
 /** 
  * -100080 atomicSwap API at local.
- * @param msgType
  */
-function sdkAtomicSwap(msgType) {
+function sdkAtomicSwap() {
 
     let nodeID  = $("#recipient_node_peer_id").val();
     let userID  = $("#recipient_user_peer_id").val();
@@ -559,9 +554,8 @@ function sdkAtomicSwap(msgType) {
 
 /** 
  * -100081 atomicSwapAccepted API at local.
- * @param msgType
  */
-function sdkAcceptSwap(msgType) {
+function sdkAcceptSwap() {
 
     let nodeID  = $("#recipient_node_peer_id").val();
     let userID  = $("#recipient_user_peer_id").val();
@@ -585,9 +579,8 @@ function sdkAcceptSwap(msgType) {
 
 /** 
  * -100038 closeChannel API at local.
- * @param msgType
  */
-function sdkCloseChannel(msgType) {
+function sdkCloseChannel() {
 
     let nodeID     = $("#recipient_node_peer_id").val();
     let userID     = $("#recipient_user_peer_id").val();
@@ -600,9 +593,8 @@ function sdkCloseChannel(msgType) {
 
 /** 
  * -100039 closeChannelSigned API at local.
- * @param msgType
  */
-function sdkCloseChannelSigned(msgType) {
+function sdkCloseChannelSigned() {
 
     let nodeID = $("#recipient_node_peer_id").val();
     let userID = $("#recipient_user_peer_id").val();
@@ -618,25 +610,21 @@ function sdkCloseChannelSigned(msgType) {
 }
 
 /** 
- * 1200 getBalanceForOmni API at local.
+ * MsgType_Core_Omni_Getbalance_2112
+ * getAllBalancesForAddress API at local.
  */
-function getBalanceForOmni() {
-
+function sdkGetAllBalancesForAddress() {
     let address = $("#address").val();
-
-    // OBD API
-    obdApi.omniGetAllBalancesForAddress(address, function(e) {
-        console.info('1200 getBalanceForOmni = ' + JSON.stringify(e));
-    });
+    // SDK API
+    getAllBalancesForAddress(address);
 }
 
 /** 
- * -102113 issuanceFixed API at local.
- * @param msgType
+ * -102113 issueFixedAmount API at local.
  */
-function issuanceFixed(msgType) {
+function sdkIssueFixedAmount() {
 
-    let info            = new OmniSendIssuanceFixed();
+    let info            = new IssueFixedAmountInfo();
     info.from_address   = $("#from_address").val();
     info.name           = $("#name").val();
     info.ecosystem      = Number($("#ecosystem").val());
@@ -644,36 +632,30 @@ function issuanceFixed(msgType) {
     info.data           = $("#data").val();
     info.amount         = Number($("#amount").val());
 
-    // OBD API
-    obdApi.createNewTokenFixed(info, function(e) {
-        console.info('-102113 createNewTokenFixed = ' + JSON.stringify(e));
-    });
+    // SDK API
+    issueFixedAmount(info);
 }
 
 /** 
- * -102114 issuanceManaged API at local.
- * @param msgType
+ * -102114 issueManagedAmout API at local.
  */
-function issuanceManaged(msgType) {
+function sdkIssueManagedAmout() {
 
-    let info            = new OmniSendIssuanceManaged();
+    let info            = new IssueManagedAmoutInfo();
     info.from_address   = $("#from_address").val();
     info.name           = $("#name").val();
     info.ecosystem      = Number($("#ecosystem").val());
     info.divisible_type = Number($("#divisible_type").val());
     info.data           = $("#data").val();
 
-    // OBD API
-    obdApi.createNewTokenManaged(info, function(e) {
-        console.info('-102114 issuanceManaged = ' + JSON.stringify(e));
-    });
+    // SDK API
+    issueManagedAmout(info);
 }
 
 /** 
  * -102115 sendGrant API at local.
- * @param msgType
  */
-function sendGrant(msgType) {
+function sdkSendGrant() {
 
     let info          = new OmniSendGrant();
     info.from_address = $("#from_address").val();
@@ -681,17 +663,14 @@ function sendGrant(msgType) {
     info.amount       = Number($("#amount").val());
     info.memo         = $("#memo").val();
 
-    // OBD API
-    obdApi.omniSendGrant(info, function(e) {
-        console.info('-102115 sendGrant = ' + JSON.stringify(e));
-    });
+    // SDK API
+    sendGrant(info);
 }
 
 /** 
  * -102116 sendRevoke API at local.
- * @param msgType
  */
-function sendRevoke(msgType) {
+function sdkSendRevoke() {
 
     let info          = new OmniSendRevoke();
     info.from_address = $("#from_address").val();
@@ -699,49 +678,34 @@ function sendRevoke(msgType) {
     info.amount       = Number($("#amount").val());
     info.memo         = $("#memo").val();
 
-    // OBD API
-    obdApi.omniSendRevoke(info, function(e) {
-        console.info('-102116 sendRevoke = ' + JSON.stringify(e));
-    });
+    // SDK API
+    sendRevoke(info);
 }
 
 /** 
  * -102117 listProperties API at local.
- * @param msgType
  */
-function listProperties(msgType) {
-    // OBD API
-    obdApi.listProperties(function(e) {
-        console.info('-102117 listProperties = ' + JSON.stringify(e));
-    });
+function sdkListProperties() {
+    // SDK API
+    listProperties();
 }
 
 /** 
  * -102118 getTransaction API at local.
- * @param msgType
  */
-function getTransaction(msgType) {
-
+function sdkGetTransaction() {
     let txid = $("#txid").val();
-
-    // OBD API
-    obdApi.getOmniTxByTxid(txid, function(e) {
-        console.info('-102118 getTransaction = ' + JSON.stringify(e));
-    });
+    // SDK API
+    getTransaction(txid);
 }
 
 /** 
- * -102119 getAssetNameByID API at local.
- * @param msgType
+ * -102119 getProperty API at local.
  */
-function getAssetNameByID(msgType) {
-
+function sdkGetProperty() {
     let propertyId = $("#PropertyID").val();
-
-    // OBD API
-    obdApi.omniGetAssetNameByID(propertyId, function(e) {
-        console.info('-102119 getAssetNameByID = ' + JSON.stringify(e));
-    });
+    // SDK API
+    getProperty(propertyId);
 }
 
 /** 
@@ -772,9 +736,8 @@ function sdkGetAllChannels() {
 
 /** 
  * -103200 GetAllCommitmentTransactions API at local.
- * @param msgType
  */
-function sdkGetAllCommitmentTransactions(msgType) {
+function sdkGetAllCommitmentTransactions() {
     let channel_id = $("#channel_id").val();
     // SDK API
     getAllCommitmentTransactions(channel_id);
@@ -782,9 +745,8 @@ function sdkGetAllCommitmentTransactions(msgType) {
 
 /** 
  * -103203 getLatestCommitmentTransaction API at local.
- * @param msgType
  */
-function sdkGetLatestCommitmentTransaction(msgType) {
+function sdkGetLatestCommitmentTransaction() {
     let channel_id = $("#channel_id").val();
     // SDK API
     getLatestCommitmentTransaction(channel_id);    
@@ -827,7 +789,7 @@ function sdkGetAllBreachRemedyTransactions() {
 }
 
 // -100340 BTC Funding Created API at local.
-function sdkBitcoinFundingCreated(msgType) {
+function sdkBitcoinFundingCreated() {
 
     let nodeID = $("#recipient_node_peer_id").val();
     let userID = $("#recipient_user_peer_id").val();
@@ -843,7 +805,7 @@ function sdkBitcoinFundingCreated(msgType) {
 }
 
 // -100350 BTC Funding Signed API at local.
-function sdkBitcoinFundingSigned(msgType) {
+function sdkBitcoinFundingSigned() {
 
     let nodeID = $("#recipient_node_peer_id").val();
     let userID = $("#recipient_user_peer_id").val();
@@ -860,7 +822,7 @@ function sdkBitcoinFundingSigned(msgType) {
 }
 
 // -100034 Omni Asset Funding Created API at local.
-function sdkAssetFundingCreated(msgType) {
+function sdkAssetFundingCreated() {
 
     let nodeID   = $("#recipient_node_peer_id").val();
     let userID   = $("#recipient_user_peer_id").val();
@@ -878,7 +840,7 @@ function sdkAssetFundingCreated(msgType) {
 }
 
 // -100035 Omni Asset Funding Signed API at local.
-function sdkAssetFundingSigned(msgType) {
+function sdkAssetFundingSigned() {
 
     let nodeID    = $("#recipient_node_peer_id").val();
     let userID    = $("#recipient_user_peer_id").val();
@@ -897,7 +859,7 @@ function sdkAssetFundingSigned(msgType) {
 }
 
 // -102109 funding BTC API at local.
-function sdkFundingBitcoin(msgType) {
+function sdkFundingBitcoin() {
 
     let info                      = new BtcFundingInfo();
     info.from_address             = $("#from_address").val();
@@ -912,7 +874,7 @@ function sdkFundingBitcoin(msgType) {
 }
 
 //  -102120 funding Omni Asset API at local.
-function sdkFundingAsset(msgType) {
+function sdkFundingAsset() {
 
     let info                      = new OmniFundingAssetInfo();
     info.from_address             = $("#from_address").val();
@@ -921,16 +883,13 @@ function sdkFundingAsset(msgType) {
     info.amount                   = Number($("#amount").val());
     info.property_id              = Number($("#property_id").val());
 
-    // Get temporary_channel_id
-    // let tempChID = getChannelID();
-
     // SDK API
     fundingAsset(info);
     displaySentMessage102120(info);
 }
 
 // -100402 create Invoice API at local.
-function sdkAddInvoice(msgType) {
+function sdkAddInvoice() {
 
     let info         = new InvoiceInfo();
     info.property_id = Number($("#property_id").val());
@@ -942,8 +901,8 @@ function sdkAddInvoice(msgType) {
     // SDK API
     addInvoice(info, function(e) {
         console.info('-100402 sdkAddInvoice = ' + JSON.stringify(e));
-        makeQRCode(e);
         displaySentMessage100402(info);
+        makeQRCode(e);
     });
 }
 
@@ -999,7 +958,7 @@ function sdkAddHTLC() {
 }
 
 // -100041 htlcSigned API at local.
-function sdkHTLCSigned(msgType) {
+function sdkHTLCSigned() {
 
     let nodeID  = $("#recipient_node_peer_id").val();
     let userID  = $("#recipient_user_peer_id").val();
@@ -1019,7 +978,7 @@ function sdkHTLCSigned(msgType) {
 }
 
 // -100401 Old name is HtlcFindPath API at local.
-function sdkPayInvoice(msgType) {
+function sdkPayInvoice() {
 
     let info     = new PayInvoiceInfo();
     info.invoice = $("#invoice").val();
@@ -1030,7 +989,7 @@ function sdkPayInvoice(msgType) {
 }
 
 // -100351 Commitment Transaction Created API at local.
-function sdkCommitmentTransactionCreated(msgType) {
+function sdkCommitmentTransactionCreated() {
 
     let nodeID = $("#recipient_node_peer_id").val();
     let userID = $("#recipient_user_peer_id").val();
@@ -1049,7 +1008,7 @@ function sdkCommitmentTransactionCreated(msgType) {
 }
 
 // -100352 Revoke and Acknowledge Commitment Transaction API at local.
-function sdkCommitmentTransactionAccepted(msgType) {
+function sdkCommitmentTransactionAccepted() {
 
     let nodeID = $("#recipient_node_peer_id").val();
     let userID = $("#recipient_user_peer_id").val();
@@ -1075,45 +1034,44 @@ function invokeAPIs(obj) {
     console.info('type_id = ' + msgType);
 
     switch (msgType) {
-        // Util APIs.
         case enumMsgType.MsgType_Core_Omni_Getbalance_2112:
-            getBalanceForOmni();
+            sdkGetAllBalancesForAddress();
             break;
         case enumMsgType.MsgType_Core_Omni_CreateNewTokenFixed_2113:
-            issuanceFixed(msgType);
+            sdkIssueFixedAmount();
             break;
         case enumMsgType.MsgType_Core_Omni_CreateNewTokenManaged_2114:
-            issuanceManaged(msgType);
+            sdkIssueManagedAmout();
             break;
         case enumMsgType.MsgType_Core_Omni_GrantNewUnitsOfManagedToken_2115:
-            sendGrant(msgType);
+            sdkSendGrant();
             break;
         case enumMsgType.MsgType_Core_Omni_RevokeUnitsOfManagedToken_2116:
-            sendRevoke(msgType);
+            sdkSendRevoke();
             break;
         case enumMsgType.MsgType_Core_Omni_ListProperties_2117:
-            listProperties(msgType);
+            sdkListProperties();
             break;
         case enumMsgType.MsgType_Core_Omni_GetTransaction_2118:
-            getTransaction(msgType);
+            sdkGetTransaction();
             break;
         case enumMsgType.MsgType_Core_Omni_GetProperty_2119:
-            getAssetNameByID(msgType);
+            sdkGetProperty();
             break;
         case enumMsgType.MsgType_GetChannelInfoByChannelId_3154:
-            sdkGetChannelDetailFromChannelID(msgType);
+            sdkGetChannelDetailFromChannelID();
             break;
         case enumMsgType.MsgType_GetChannelInfoByDbId_3155:
-            sdkGetChannelDetailFromDatabaseID(msgType);
+            sdkGetChannelDetailFromDatabaseID();
             break;
         case enumMsgType.MsgType_ChannelOpen_AllItem_3150:
             sdkGetAllChannels();
             break;
         case enumMsgType.MsgType_CommitmentTx_ItemsByChanId_3200:
-            sdkGetAllCommitmentTransactions(msgType);
+            sdkGetAllCommitmentTransactions();
             break;
         case enumMsgType.MsgType_CommitmentTx_LatestCommitmentTxByChanId_3203:
-            sdkGetLatestCommitmentTransaction(msgType);
+            sdkGetLatestCommitmentTransaction();
             break;
         case enumMsgType.MsgType_CommitmentTx_LatestRDByChanId_3204:
             sdkGetLatestRevockableDeliveryTransaction();
@@ -1125,7 +1083,7 @@ function invokeAPIs(obj) {
             sdkGetAllRevockableDeliveryTransactions();
             break;
         case enumMsgType.MsgType_CommitmentTx_AllBRByChanId_3208:
-            sdkGetAllBreachRemedyTransactions(msgType);
+            sdkGetAllBreachRemedyTransactions();
             break;
         case enumMsgType.MsgType_Mnemonic_CreateAddress_3000:
             let result = sdkGenAddressFromMnemonic();
@@ -1137,90 +1095,84 @@ function invokeAPIs(obj) {
             sdkGetAddressInfo(msgType);
             break;
         case enumMsgType.MsgType_UserLogin_2001:
-            sdkLogIn(msgType);
+            sdkLogIn();
             break;
         case enumMsgType.MsgType_UserLogout_2002:
             obdApi.logout();
             break;
         case enumMsgType.MsgType_GetMnemonic_2004:
-            // Generate mnemonic by local js library.
-            // var mnemonic = btctool.generateMnemonic(128);
-            // let mnemonic = obdApi.genMnemonic();
             let mnemonic = sdkGenMnemonic();
             saveMnemonic(mnemonic);
             createOBDResponseDiv(mnemonic);
             break;
         case enumMsgType.MsgType_Core_FundingBTC_2109:
-            sdkFundingBitcoin(msgType);
+            sdkFundingBitcoin();
             break;
         case enumMsgType.MsgType_FundingCreate_SendBtcFundingCreated_340:
-            sdkBitcoinFundingCreated(msgType);
+            sdkBitcoinFundingCreated();
             break;
         case enumMsgType.MsgType_FundingSign_SendBtcSign_350:
-            sdkBitcoinFundingSigned(msgType);
+            sdkBitcoinFundingSigned();
             break;
         case enumMsgType.MsgType_Core_Omni_FundingAsset_2120:
-            sdkFundingAsset(msgType);
+            sdkFundingAsset();
             break;
         case enumMsgType.MsgType_FundingCreate_SendAssetFundingCreated_34:
-            sdkAssetFundingCreated(msgType);
+            sdkAssetFundingCreated();
             break;
         case enumMsgType.MsgType_FundingSign_SendAssetFundingSigned_35:
-            sdkAssetFundingSigned(msgType);
+            sdkAssetFundingSigned();
             break;
         case enumMsgType.MsgType_CommitmentTx_SendCommitmentTransactionCreated_351:
-            sdkCommitmentTransactionCreated(msgType);
+            sdkCommitmentTransactionCreated();
             break;
         case enumMsgType.MsgType_CommitmentTxSigned_SendRevokeAndAcknowledgeCommitmentTransaction_352:
-            sdkCommitmentTransactionAccepted(msgType);
+            sdkCommitmentTransactionAccepted();
             break;
         case enumMsgType.MsgType_Core_Omni_GetTransaction_2118:
-            txid = "c76710920860456dff2433197db79dd030f9b527e83a2e253f5bc6ab7d197e73";
-            obdApi.getOmniTxByTxid(txid);
+            sdkGetTransaction();
             break;
-            // Open Channel request.
         case enumMsgType.MsgType_SendChannelOpen_32:
             sdkOpenChannel();
             break;
-            // Accept Channel request.
         case enumMsgType.MsgType_SendChannelAccept_33:
             sdkAcceptChannel();
             break;
         case enumMsgType.MsgType_HTLC_Invoice_402:
-            sdkAddInvoice(msgType);
+            sdkAddInvoice();
             break;
         case enumMsgType.MsgType_HTLC_FindPath_401:
-            sdkPayInvoice(msgType);
+            sdkPayInvoice();
             break;
         case enumMsgType.MsgType_HTLC_SendAddHTLC_40:
             sdkAddHTLC();
             break;
         case enumMsgType.MsgType_HTLC_SendAddHTLCSigned_41:
-            sdkHTLCSigned(msgType);
+            sdkHTLCSigned();
             break;
         case enumMsgType.MsgType_HTLC_SendVerifyR_45:
-            sdkForwardR(msgType);
+            sdkForwardR();
             break;
         case enumMsgType.MsgType_HTLC_SendSignVerifyR_46:
-            sdkSignR(msgType);
+            sdkSignR();
             break;
         case enumMsgType.MsgType_HTLC_SendRequestCloseCurrTx_49:
-            sdkCloseHTLC(msgType);
+            sdkCloseHTLC();
             break;
         case enumMsgType.MsgType_HTLC_SendCloseSigned_50:
-            sdkCloseHTLCSigned(msgType);
+            sdkCloseHTLCSigned();
             break;
         case enumMsgType.MsgType_SendCloseChannelRequest_38:
-            sdkCloseChannel(msgType);
+            sdkCloseChannel();
             break;
         case enumMsgType.MsgType_SendCloseChannelSign_39:
-            sdkCloseChannelSigned(msgType);
+            sdkCloseChannelSigned();
             break;
         case enumMsgType.MsgType_Atomic_SendSwap_80:
-            sdkAtomicSwap(msgType);
+            sdkAtomicSwap();
             break;
         case enumMsgType.MsgType_Atomic_SendSwapAccept_81:
-            sdkAcceptSwap(msgType);
+            sdkAcceptSwap();
             break;
         case enumMsgType.MsgType_p2p_ConnectPeer_2003:
             sdkConnectP2PPeer(msgType);
@@ -4074,7 +4026,6 @@ function sdkGenMnemonic() {
 /**
  * MsgType_Mnemonic_CreateAddress_3000
  * genAddressFromMnemonic by local js library
- * This is a OBD JS API. Will be moved to obdapi.js file.
  */
 function sdkGenAddressFromMnemonic() {
     if (!isLogined) { // Not logined
