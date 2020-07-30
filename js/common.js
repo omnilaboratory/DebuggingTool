@@ -35,7 +35,7 @@ var channelInfo;
 /**
  * open / close auto mode.
  */
-var isAutoMode = false;
+// var isAutoMode = false;
 
 // Get name of saveGoWhere variable.
 function getSaveName() {
@@ -44,7 +44,7 @@ function getSaveName() {
 
 // auto response to -100040 (HTLCCreated) 
 // listening to -110040 and send -100041 HTLCSigned
-function listening110040(e, msgType) {
+function listening110040(e) {
     console.info('NOW isAutoMode = ' + isAutoMode);
 
     saveTempHash(e.payer_commitment_tx_hash);
@@ -86,7 +86,7 @@ function listening110040(e, msgType) {
 
 // auto response to -100045 (forwardR) 
 // listening to -110045 and send -100046 signR
-function listening110045(e, msgType) {
+function listening110045(e) {
     console.info('NOW isAutoMode = ' + isAutoMode);
 
     saveTempHash(e.msg_hash);
@@ -114,7 +114,7 @@ function listening110045(e, msgType) {
 
 // auto response to -100049 (CloseHTLC) 
 // listening to -110049 and send -100050 CloseHTLCSigned
-function listening110049(e, msgType) {
+function listening110049(e) {
     console.info('NOW isAutoMode = ' + isAutoMode);
 
     saveTempHash(e.msg_hash);
@@ -148,7 +148,7 @@ function listening110049(e, msgType) {
 
 // auto response to -100032 (openChannel) 
 // listening to -110032 and send -100033 acceptChannel
-function listening110032(e, msgType) {
+function templistening110032(e) {
     console.info('NOW isAutoMode = ' + isAutoMode);
     saveChannelID(e.temporary_channel_id);
 
@@ -177,7 +177,7 @@ function listening110032(e, msgType) {
 
 // auto response to -100340 (bitcoinFundingCreated)
 // listening to -110340 and send -100350 bitcoinFundingSigned
-function listening110340(e, msgType) {
+function listening110340(e) {
     console.info('NOW isAutoMode = ' + isAutoMode);
 
     saveTempHash(e.funding_txid);
@@ -204,7 +204,7 @@ function listening110340(e, msgType) {
 
 // auto response to -100034 (AssetFundingCreated)
 // listening to -110034 and send -100035 AssetFundingSigned
-function listening110034(e, msgType) {
+function listening110034(e) {
     console.info('NOW isAutoMode = ' + isAutoMode);
     if (!isAutoMode) return;
     console.info('listening110034 = ' + JSON.stringify(e));
@@ -227,7 +227,7 @@ function listening110034(e, msgType) {
 // save funding private key of Alice side
 // Once sent -100035 AssetFundingSigned , the final channel_id has generated.
 // So need update the local saved data for funding private key and channel_id.
-function listening110035(e, msgType) {
+function listening110035(e) {
     console.info('listening110035 = ' + JSON.stringify(e));
 
     asyncGetPrivKey(db, e.temporary_channel_id, kTbFundingPrivKey).then(function (result) {
@@ -246,7 +246,7 @@ function listening110035(e, msgType) {
 
 // auto response to -100351 (commitmentTransactionCreated)
 // listening to -110351 and send -100352 commitmentTransactionAccepted
-function listening110351(e, msgType) {
+function listening110351(e) {
     console.info('NOW isAutoMode = ' + isAutoMode);
 
     saveTempHash(e.msg_hash);
@@ -290,63 +290,6 @@ function listening110038(e) {
     saveTempHash(e.request_close_channel_hash);
 }
 
-// 
-function registerEvent() {
-    // auto response mode
-    let msg_110032 = enumMsgType.MsgType_RecvChannelOpen_32;
-    obdApi.registerEvent(msg_110032, function(e) {
-        listening110032(e, msg_110032);
-    });
-
-    // auto response mode
-    let msg_110340 = enumMsgType.MsgType_FundingCreate_RecvBtcFundingCreated_340;
-    obdApi.registerEvent(msg_110340, function(e) {
-        listening110340(e, msg_110340);
-    });
-
-    // auto response mode
-    let msg_110034 = enumMsgType.MsgType_FundingCreate_RecvAssetFundingCreated_34;
-    obdApi.registerEvent(msg_110034, function(e) {
-        listening110034(e, msg_110034);
-    });
-
-    // auto response mode
-    let msg_110035 = enumMsgType.MsgType_FundingSign_RecvAssetFundingSigned_35;
-    obdApi.registerEvent(msg_110035, function(e) {
-        listening110035(e, msg_110035);
-    });
-
-    // auto response mode
-    let msg_110351 = enumMsgType.MsgType_CommitmentTx_RecvCommitmentTransactionCreated_351;
-    obdApi.registerEvent(msg_110351, function(e) {
-        listening110351(e, msg_110351);
-    });
-    
-    // auto response mode
-    let msg_110040 = enumMsgType.MsgType_HTLC_RecvAddHTLC_40;
-    obdApi.registerEvent(msg_110040, function(e) {
-        listening110040(e, msg_110040);
-    });
-
-    // auto response mode
-    let msg_110045 = enumMsgType.MsgType_HTLC_RecvVerifyR_45;
-    obdApi.registerEvent(msg_110045, function(e) {
-        listening110045(e, msg_110045);
-    });
-
-    // auto response mode
-    let msg_110049 = enumMsgType.MsgType_HTLC_RecvRequestCloseCurrTx_49;
-    obdApi.registerEvent(msg_110049, function(e) {
-        listening110049(e, msg_110049);
-    });
-
-    // save request_close_channel_hash
-    let msg_110038 = enumMsgType.MsgType_RecvCloseChannelRequest_38;
-    obdApi.registerEvent(msg_110038, function(e) {
-        listening110038(e);
-    });
-}
-
 // -102001 logIn.
 function sdkLogIn() {
 
@@ -356,21 +299,22 @@ function sdkLogIn() {
     logIn(mnemonic, function(e) {
         console.info('SDK: -102001 logIn = ' + JSON.stringify(e));
 
-        // Register event needed for listening.
-        registerEvent();
+        // SDK API: Register event needed for listening.
+        registerEvent(true);
 
-        // If already logined, then stop listening to OBD Response,
-        // DO NOT update the userID.
+        // If already logined, then return.
         if (isLogined) {
             console.info('-102001 isLogined = ' + isLogined);
-            // createOBDResponseDiv(e, msgType);
             return;
         }
 
-        // Otherwise, a new loginning, update the userID.
+        // a new loginning.
         mnemonicWithLogined = mnemonic;
         $("#logined").text(e.userPeerId);
         isLogined = true;
+
+        // SDK API: Save mnemonic
+        saveMnemonic(e.userPeerId, mnemonic);
 
         displaySentMessage102001(mnemonic);
     });
@@ -1102,7 +1046,6 @@ function invokeAPIs(obj) {
             break;
         case enumMsgType.MsgType_GetMnemonic_2004:
             let mnemonic = sdkGenMnemonic();
-            saveMnemonic(mnemonic);
             createOBDResponseDiv(mnemonic);
             break;
         case enumMsgType.MsgType_Core_FundingBTC_2109:
@@ -2320,15 +2263,15 @@ function createOBDResponseDiv(response, msgType) {
     $("#newDiv").remove();
     $("#obd_response_div").remove();
 
-    var newDiv = document.createElement('div');
+    let newDiv = document.createElement('div');
     newDiv.id = "newDiv";
     newDiv.setAttribute('class', 'panelItem');
 
-    var obd_response_div = document.createElement('div');
+    let obd_response_div = document.createElement('div');
     obd_response_div.id = "obd_response_div";
 
     // create [title] element
-    var title = document.createElement('div');
+    let title = document.createElement('div');
     title.setAttribute('class', 'panelTitle');
     createElement(title, 'h2', 'Messages');
     newDiv.append(title);
@@ -2338,7 +2281,7 @@ function createOBDResponseDiv(response, msgType) {
 
     switch (msgType) {
         case 'connect_node_resp':
-            var msg = response + '. Please refresh the page if you want to connect again.';
+            let msg = response + '. Please refresh the page if you want to connect again.';
             createElement(obd_response_div, 'p', msg);
             break;
         case enumMsgType.MsgType_Mnemonic_CreateAddress_3000:
@@ -2362,7 +2305,7 @@ function createOBDResponseDiv(response, msgType) {
 
 // 
 function parseData2003(response) {
-    var arrData = [
+    let arrData = [
         'Connect success.',
     ];
 
@@ -2373,16 +2316,17 @@ function parseData2003(response) {
 
 // 
 function parseData2001(response) {
+    let arrData;
     if (isLogined) {
-        var arrData = [
+        arrData = [
             'Status : ' + response,
         ];
     }
 
     for (let i = 0; i < arrData.length; i++) {
-        var point   = arrData[i].indexOf(':') + 1;
-        var title   = arrData[i].substring(0, point);
-        var content = arrData[i].substring(point);
+        let point   = arrData[i].indexOf(':') + 1;
+        let title   = arrData[i].substring(0, point);
+        let content = arrData[i].substring(point);
         createElement(obd_response_div, 'text', title);
         createElement(obd_response_div, 'p', content, 'responseText');
     }
@@ -2392,9 +2336,9 @@ function parseData2001(response) {
 function parseData3000_3001(response) {
     let arrData = [
         'ADDRESS : ' + response.result.address,
-        'INDEX : ' + response.result.index,
+        'INDEX : '   + response.result.index,
         'PUB_KEY : ' + response.result.pubkey,
-        'WIF : ' + response.result.wif
+        'WIF : '     + response.result.wif
     ];
 
     for (let i = 0; i < arrData.length; i++) {
@@ -2406,36 +2350,9 @@ function parseData3000_3001(response) {
     }
 }
 
-// get a new index of address
-function getNewAddrIndex() {
-
-    let addr = JSON.parse(localStorage.getItem(kAddress));
-    // console.info('localStorage KEY  = ' + addr);
-
-    // If has data.
-    if (addr) {
-        // console.info('HAS DATA');
-        for (let i = 0; i < addr.result.length; i++) {
-            if ($("#logined").text() === addr.result[i].userID) {
-                maxIndex = addr.result[i].data.length - 1;
-                newIndex = addr.result[i].data[maxIndex].index + 1;
-                return newIndex;
-            }
-        }
-
-        // A new User ID.
-        return 1;
-
-    } else {
-        // console.info('FIRST DATA');
-        return 1;
-    }
-}
-
 // Record full flow channel data.
 function channelData(response) {
-
-    var data = {
+    let data = {
         channelInfo: channelInfo,
         create_at: response.create_at,
         create_by: response.create_by,
@@ -2454,7 +2371,7 @@ function channelData(response) {
 
 // Depositing btc record.
 function btcData(response, msgType) {
-    var btc = {
+    let btc = {
         from_address: $("#from_address").val(),
         amount: $("#amount").val(),
         hex: response.hex,
@@ -2467,7 +2384,7 @@ function btcData(response, msgType) {
 
 // transfer (HTLC) record.
 function htlcData(response, msgType) {
-    var data = {
+    let data = {
         channelId: response.channelId,
         amount: response.amount,
         htlcChannelPath: response.htlcChannelPath,
@@ -2493,7 +2410,7 @@ function updateHtlcData(response, data, msgType) {
 
 // transfer (RSMC) record.
 function rsmcData(response, msgType) {
-    var data = {
+    let data = {
         channelId: response.channelId,
         amount: response.amount,
         msgHash: response.msgHash,
@@ -2523,7 +2440,7 @@ function updateRsmcData(response, data, msgType) {
 
 // Depositing omni assets record.
 function omniAssetData(response, msgType) {
-    var omniAsset = {
+    let omniAsset = {
         from_address: $("#from_address").val(),
         amount: $("#amount").val(),
         property_id: $("#property_id").val(),
@@ -2843,8 +2760,8 @@ function getBalance(strAddr) {
     });
 
     // for omni assets
-    obdApi.omniGetAllBalancesForAddress(strAddr, function(e) {
-        console.info('-102112 omniGetAllBalancesForAddress = ' + JSON.stringify(e));
+    obdApi.getAllBalancesForAddress(strAddr, function(e) {
+        console.info('-102112 getAllBalancesForAddress = ' + JSON.stringify(e));
 
         if (e != "") {
             for (let i = 0; i < e.length; i++) {
@@ -2859,10 +2776,6 @@ function getBalance(strAddr) {
 
 // Generate new mnemonic words.
 function autoCreateMnemonic() {
-    // Generate mnemonic by local js library.
-    // let mnemonic = btctool.generateMnemonic(128);
-    // saveMnemonic(mnemonic);
-
     // SDK API
     let mnemonic = sdkGenMnemonic();
     $("#mnemonic").val(mnemonic);
@@ -2960,7 +2873,7 @@ function displayMnemonic() {
     // get [name_req_div] div
     var parent = $("#name_req_div");
     var mnemonic = JSON.parse(sessionStorage.getItem(kMnemonic));
-    // var mnemonic = JSON.parse(localStorage.getItem(saveMnemonic));
+    // var mnemonic = JSON.parse(localStorage.getItem(kMnemonic));
 
     var newDiv = document.createElement('div');
     newDiv.setAttribute('class', 'panelItem');
@@ -3057,15 +2970,15 @@ function displayAddresses(param) {
 //
 function createBalanceElement(parent, strAddr) {
     // create [text] element
-    var title = document.createElement('text');
+    let title = document.createElement('text');
     title.id = strAddr;
     title.innerText = 'Balance : ';
     parent.append(title);
 
     // create [button] element
-    var button = document.createElement('button');
+    let button = document.createElement('button');
     button.innerText = 'Get Balance';
-    var clickFunc = "getBalance('" + strAddr + "')";
+    let clickFunc = "getBalance('" + strAddr + "')";
     button.setAttribute('class', 'button button_small');
     button.setAttribute('onclick', clickFunc);
     parent.append(button);
@@ -4006,10 +3919,14 @@ function formatTime(time) {
 //
 function autoMode(obj) {
     if (obj.checked) {
-        isAutoMode = true;
+        // isAutoMode = true;
+        saveAutoPilot('Yes');
     } else {
-        isAutoMode = false;
+        // isAutoMode = false;
+        saveAutoPilot('No');
     }
+
+    let isAutoMode = getAutoPilot();
     console.info('CLICK - isAutoMode = ' + isAutoMode);
 }
 
@@ -4033,11 +3950,10 @@ function sdkGenAddressFromMnemonic() {
         return;
     }
 
-    let newIndex = getNewAddrIndex();
-    // console.info('addr index = ' + newIndex);
-
     // SDK API
-    return genAddressFromMnemonic(mnemonicWithLogined, newIndex, true);
+    let index = getNewAddrIndex($("#logined").text());
+    // console.info('addr index = ' + newIndex);
+    return genAddressFromMnemonic(mnemonicWithLogined, index, true);
 }
 
 /**

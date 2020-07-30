@@ -55,6 +55,11 @@ const kHtlcTempPrivKey = 'htlc_temp_priv_key';
 const kHtlcHtnxTempPrivKey = 'htlc_htnx_temp_priv_key';
 
 /**
+ * Save auto pilot status
+ */
+const kAutoPilot = 'auto_pilot';
+
+/**
  * Object of IndexedDB.
  */
 var db;
@@ -523,33 +528,67 @@ function getTempPrivKey(myUserID, saveKey, channelID) {
 }
 
 /**
- * mnemonic words generated with signUp api save to local storage.
+ * Save mnemonic words used by a user to log in
+ * @param myUserID user id of currently logged in
  * @param value mnemonic words
  */
-function saveMnemonic(value) {
+function saveMnemonic(myUserID, value) {
 
-    let mnemonic = JSON.parse(sessionStorage.getItem(kMnemonic));
-    // let mnemonic = JSON.parse(localStorage.getItem(kMnemonic));
+    let resp = JSON.parse(localStorage.getItem(kMnemonic));
 
     // If has data.
-    if (mnemonic) {
+    if (resp) {
         // console.info('HAS DATA');
+        for (let i = 0; i < resp.result.length; i++) {
+            if (myUserID === resp.result[i].userID) {
+                return;
+            }
+        }
+        
+        // A new user.
         let new_data = {
+            userID:   myUserID,
             mnemonic: value,
         }
-        mnemonic.result.push(new_data);
-        sessionStorage.setItem(kMnemonic, JSON.stringify(mnemonic));
-        // localStorage.setItem(kMnemonic, JSON.stringify(mnemonic));
+        resp.result.push(new_data);
+        localStorage.setItem(kMnemonic, JSON.stringify(resp));
 
     } else {
         // console.info('FIRST DATA');
         let data = {
             result: [{
-                mnemonic: value
+                userID:   myUserID,
+                mnemonic: value,
             }]
         }
-        sessionStorage.setItem(kMnemonic, JSON.stringify(data));
-        // localStorage.setItem(kMnemonic, JSON.stringify(data));
+        localStorage.setItem(kMnemonic, JSON.stringify(data));
+    }
+}
+
+/**
+ * Get mnemonic words used by a user to log in
+ * @param myUserID user id of currently logged in
+ * @param param    0: Return all data   1: Return data that lastest key value is Yes
+ */
+function getMnemonic(myUserID, param) {
+
+    let resp = JSON.parse(localStorage.getItem(kMnemonic));
+
+    // If has data.
+    if (resp) {
+        // console.info('HAS DATA');
+        if (param === 0) {
+            return resp.result;
+        } else {
+            for (let i = 0; i < resp.result.length; i++) {
+                if (myUserID === resp.result[i].userID) {
+                    return resp.result[i].mnemonic;
+                }
+            }
+            return '';
+        }
+    } else {
+        return '';
     }
 }
 
@@ -561,4 +600,47 @@ function saveForwardR(r) {
 // get r from forwardR type ( -100045 ) return
 function getForwardR() {
     return localStorage.getItem(kHtlcR);
+}
+
+/**
+ * Save auto pilot status
+ * @param value Yes or No
+ */
+function saveAutoPilot(value) {
+    localStorage.setItem(kAutoPilot, value);
+}
+
+/**
+ * Get auto pilot status
+ */
+function getAutoPilot() {
+    return localStorage.getItem(kAutoPilot);
+}
+
+/**
+ * get a new index of an address
+ * @param myUserID 
+ */
+function getNewAddrIndex(myUserID) {
+
+    let addr = JSON.parse(localStorage.getItem(kAddress));
+
+    // If has data.
+    if (addr) {
+        // console.info('HAS DATA');
+        for (let i = 0; i < addr.result.length; i++) {
+            if (myUserID === addr.result[i].userID) {
+                maxIndex = addr.result[i].data.length - 1;
+                newIndex = addr.result[i].data[maxIndex].index + 1;
+                return newIndex;
+            }
+        }
+
+        // A new User ID.
+        return 1;
+
+    } else {
+        // console.info('FIRST DATA');
+        return 1;
+    }
 }

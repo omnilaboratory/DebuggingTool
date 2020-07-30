@@ -30,7 +30,6 @@ function connectPeer(info, callback) {
 function genMnemonic() {
     let mnemonic = btctool.generateMnemonic(128);
     console.info('SDK: - genMnemonic = ' + mnemonic);
-    saveMnemonic(mnemonic);
     return mnemonic;
 }
 

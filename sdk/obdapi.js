@@ -158,6 +158,7 @@ class ObdApi {
         //如果是广播信息，或者是被推送的信息（比如alice推送给Bob的351）
         if (fromId != toId) {
             if (callback != null) {
+                resultData["to_peer_id"] = toId;
                 callback(resultData);
             }
             return;
