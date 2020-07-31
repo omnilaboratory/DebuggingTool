@@ -554,6 +554,45 @@ class ObdApi {
     }
     onAcceptChannel(jsonData) { }
     /**
+     * MsgType_CheckChannelAddessExist_3156
+     * Parameters same to type 33
+     *
+     * @param recipient_node_peer_id string
+     * @param recipient_user_peer_id string
+     * @param info AcceptChannelInfo
+     * @param callback function
+     */
+    checkChannelAddessExist(recipient_node_peer_id, recipient_user_peer_id, info, callback) {
+        if (this.isNotString(recipient_node_peer_id)) {
+            alert("error recipient_node_peer_id");
+            return;
+        }
+        if (this.isNotString(recipient_user_peer_id)) {
+            alert("error recipient_user_peer_id");
+            return;
+        }
+        if (this.isNotString(info.temporary_channel_id)) {
+            alert("empty temporary_channel_id");
+            return;
+        }
+        if (info.approval == null) {
+            info.approval = false;
+        }
+        if (info.approval == true) {
+            if (this.isNotString(info.funding_pubkey)) {
+                alert("empty funding_pubkey");
+                return;
+            }
+        }
+        let msg = new Message();
+        msg.type = this.messageType.MsgType_CheckChannelAddessExist_3156;
+        msg.recipient_node_peer_id = recipient_node_peer_id;
+        msg.recipient_user_peer_id = recipient_user_peer_id;
+        msg.data = info;
+        this.sendData(msg, callback);
+    }
+    onCheckChannelAddessExist(jsonData) { }
+    /**
      * MsgType_FundingCreate_SendAssetFundingCreated_34
      * @param recipient_node_peer_id string
      * @param recipient_user_peer_id string

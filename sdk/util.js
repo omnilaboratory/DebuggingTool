@@ -544,7 +544,7 @@ function saveMnemonic(myUserID, value) {
                 return;
             }
         }
-        
+
         // A new user.
         let new_data = {
             userID:   myUserID,
@@ -643,4 +643,17 @@ function getNewAddrIndex(myUserID) {
         // console.info('FIRST DATA');
         return 1;
     }
+}
+
+/**
+ * Type -103156 is used to check channel address if has already created.
+ * Return - True: created False: not created
+ * 
+ * @param nodeID peer id of the obd node where the fundee logged in.
+ * @param userID the user id of the fundee.
+ * @param info 
+ * @param callback 
+ */
+function checkChannelAddessExist(nodeID, userID, info, callback) {
+    obdApi.checkChannelAddessExist(nodeID, userID, info, callback);
 }

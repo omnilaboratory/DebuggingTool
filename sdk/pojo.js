@@ -312,6 +312,7 @@ class MessageType {
         this.MsgType_ChannelOpen_DelItemByTempId_3153 = -103153;
         this.MsgType_GetChannelInfoByChannelId_3154 = -103154;
         this.MsgType_GetChannelInfoByDbId_3155 = -103155;
+        this.MsgType_CheckChannelAddessExist_3156 = -103156;
         this.MsgType_CommitmentTx_ItemsByChanId_3200 = -103200;
         this.MsgType_CommitmentTx_ItemById_3201 = -103201;
         this.MsgType_CommitmentTx_Count_3202 = -103202;

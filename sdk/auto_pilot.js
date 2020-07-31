@@ -71,7 +71,7 @@ function registerEvent(netType) {
  * @param e 
  * @param netType true: testnet  false: mainnet
  */
-function listening110032(e, netType) {
+async function listening110032(e, netType) {
 
     let isAutoMode = getAutoPilot();
     console.info('SDK: NOW isAutoMode = ' + isAutoMode);
@@ -81,28 +81,57 @@ function listening110032(e, netType) {
     if (isAutoMode === 'No' || isAutoMode === null) return;
     
     console.info('SDK: listening110032 = ' + JSON.stringify(e));
-
+    
     let nodeID   = e.funder_node_address;
     let userID   = e.funder_peer_id;
     let myUserID = e.to_peer_id;
-    let temp_cid = e.temporary_channel_id;
 
-    // Generate an address from mnemonic words.
-    let index    = getNewAddrIndex(myUserID);
-    // console.info('SDK: addr index = ' + index);
-    let mnemonic = getMnemonic(myUserID, 1);
-    let addr     = genAddressFromMnemonic(mnemonic, index, netType);
-    saveAddress(myUserID, addr);
-
-    // will send -100033 acceptChannel
+    let index, mnemonic, addr;
     let info                  = new AcceptChannelInfo();
-    info.temporary_channel_id = temp_cid;
-    info.funding_pubkey       = addr.result.pubkey;
+    info.temporary_channel_id = e.temporary_channel_id;
     info.approval             = true;
 
-    // SDK API
+    let isExist = 0;
+    while (isExist === 0) {
+        // Generate an address from mnemonic words.
+        // console.info('SDK: addr index = ' + index);
+        index    = getNewAddrIndex(myUserID);
+        mnemonic = getMnemonic(myUserID, 1);
+        addr     = genAddressFromMnemonic(mnemonic, index, netType);
+        saveAddress(myUserID, addr);
+        
+        info.funding_pubkey = addr.result.pubkey;
+
+        // Check
+        isExist = await asyncCheckChannelAddessExist(nodeID, userID, info);
+    }
+
+    // SDK API send -100033 acceptChannel
     acceptChannel(myUserID, nodeID, userID, info);
 
     // NOT SDK API. This a client function, just for Debugging Tool.
     displaySentMessage100033(nodeID, userID, info);
+}
+
+/**
+ * Read data from IndexedDB
+ * @param nodeID peer id of the obd node where the fundee logged in.
+ * @param userID the user id of the fundee.
+ * @param info 
+ */
+function asyncCheckChannelAddessExist(nodeID, userID, info) {
+
+    return new Promise((resolve, reject) => {
+        checkChannelAddessExist(nodeID, userID, info, function(e) {
+            console.info('SDK: -103156 checkChannelAddessExist = ' + JSON.stringify(e));
+            let value = JSON.stringify(e);
+            value = value.replace("\"", "").replace("\"", "");
+            // console.info('SDK: value = ' + value);
+            if (value === 'true') {
+                resolve(0);
+            } else {
+                resolve(1);
+            }
+        });
+    })
 }

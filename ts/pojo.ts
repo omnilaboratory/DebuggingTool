@@ -289,6 +289,7 @@ class MessageType {
   MsgType_ChannelOpen_DelItemByTempId_3153  = -103153;
   MsgType_GetChannelInfoByChannelId_3154    = -103154;
   MsgType_GetChannelInfoByDbId_3155         = -103155;
+  MsgType_CheckChannelAddessExist_3156      = -103156;
 
   MsgType_CommitmentTx_ItemsByChanId_3200               = -103200;
   MsgType_CommitmentTx_ItemById_3201                    = -103201;
