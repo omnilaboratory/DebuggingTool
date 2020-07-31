@@ -657,3 +657,87 @@ function getNewAddrIndex(myUserID) {
 function checkChannelAddessExist(nodeID, userID, info, callback) {
     obdApi.checkChannelAddessExist(nodeID, userID, info, callback);
 }
+
+/**
+ * Read data from IndexedDB
+ * @param nodeID peer id of the obd node where the fundee logged in.
+ * @param userID the user id of the fundee.
+ * @param info 
+ */
+function asyncCheckChannelAddessExist(nodeID, userID, info) {
+
+    return new Promise((resolve, reject) => {
+        checkChannelAddessExist(nodeID, userID, info, function(e) {
+            console.info('SDK: -103156 checkChannelAddessExist = ' + JSON.stringify(e));
+            let value = JSON.stringify(e);
+            value = value.replace("\"", "").replace("\"", "");
+            // console.info('SDK: value = ' + value);
+            if (value === 'true') {
+                resolve(0);
+            } else {
+                resolve(1);
+            }
+        });
+    })
+}
+
+/**
+ * Read data from IndexedDB
+ * @param myUserID 
+ * @param dataDB
+ * @param channel_id
+ * @param tbName: Funding private key or Last temp private key
+ */
+function asyncGetFundingPrivKey(myUserID, dataDB, channel_id, tbName) {
+
+    return new Promise((resolve, reject) => {
+
+        let data        = [];
+        let transaction = dataDB.transaction([tbName], 'readonly');
+        let store       = transaction.objectStore(tbName);
+        let index       = store.index('channel_id');
+        let request     = index.get(channel_id);
+            request     = index.openCursor(channel_id);
+
+        request.onerror = function(e) {
+            console.log('Read data false.');
+            reject('Read data false.');
+        }
+
+        request.onsuccess = function (e) {
+            let result = e.target.result;
+            if (result) {
+                let value = {
+                    user_id: result.value.user_id,
+                    privkey: result.value.privkey
+                };
+
+                data.push(value);
+                result.continue();
+            } else {
+                console.log('No More Data.');
+                for (let i = data.length - 1; i >= 0; i--) {
+                    if (myUserID === data[i].user_id) {
+                        console.log('FINAL privkey: ' + data[i].privkey);
+                        resolve(data[i].privkey);
+                    }
+                }
+
+                // Not found private key
+                resolve('');
+            }
+        }
+    })
+}
+
+/**
+ * Generate an address from mnemonic words.
+ * @param myUserID
+ * @param netType true: testnet  false: mainnet
+ */
+function genNewAddress(myUserID, netType) {
+    let index    = getNewAddrIndex(myUserID);
+    let mnemonic = getMnemonic(myUserID, 1);
+    let address  = genAddressFromMnemonic(mnemonic, index, netType);
+    return address;
+}

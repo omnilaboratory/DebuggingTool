@@ -42,254 +42,6 @@ function getSaveName() {
     return kGoWhere;
 }
 
-// auto response to -100040 (HTLCCreated) 
-// listening to -110040 and send -100041 HTLCSigned
-function listening110040(e) {
-    console.info('NOW isAutoMode = ' + isAutoMode);
-
-    saveTempHash(e.payer_commitment_tx_hash);
-
-    if (!isAutoMode) return;
-    
-    console.info('listening110040 = ' + JSON.stringify(e));
-
-    // Generate an address by local js library.
-    let addr_1 = sdkGenAddressFromMnemonic();
-    let addr_2 = sdkGenAddressFromMnemonic();
-    saveAddress($("#logined").text(), addr_1);
-    saveAddress($("#logined").text(), addr_2);
-
-    // will send -100041 HTLCSigned
-    let info                                = new HtlcSignedInfo();
-    info.payer_commitment_tx_hash           = e.payer_commitment_tx_hash;
-    info.curr_rsmc_temp_address_pub_key     = addr_1.result.pubkey;
-    info.curr_rsmc_temp_address_private_key = addr_1.result.wif;
-    info.curr_htlc_temp_address_pub_key     = addr_2.result.pubkey;
-    info.curr_htlc_temp_address_private_key = addr_2.result.wif;
-    info.last_temp_address_private_key      = 
-        getTempPrivKey($("#logined").text(), kTempPrivKey, e.channel_id);
-
-    asyncGetPrivKey(db, e.channel_id, kTbFundingPrivKey).then(function (result) {
-        info.channel_address_private_key = result;
-
-        // SDK API
-        let nodeID = e.payer_node_address;
-        let userID = e.payer_peer_id;
-        HTLCSigned($("#logined").text(), nodeID, userID, info);
-        displaySentMessage100041(nodeID, userID, info);
-    });
-
-    // asyncGetPrivKey(db, e.channel_id, kTbTempPrivKey).then(function (result) {
-    //     info.last_temp_address_private_key = result;
-    // });
-}
-
-// auto response to -100045 (forwardR) 
-// listening to -110045 and send -100046 signR
-function listening110045(e) {
-    console.info('NOW isAutoMode = ' + isAutoMode);
-
-    saveTempHash(e.msg_hash);
-    saveForwardR(e.r);
-
-    if (!isAutoMode) return;
-    
-    console.info('listening110045 = ' + JSON.stringify(e));
-
-    // Alice will send -100046 signR
-    asyncGetPrivKey(db, e.channel_id, kTbFundingPrivKey).then(function (result) {
-        let info                         = new SignRInfo();
-        info.channel_id                  = e.channel_id;
-        info.r                           = e.r;
-        info.msg_hash                    = e.msg_hash;
-        info.channel_address_private_key = result;
-    
-        // SDK API
-        let nodeID = e.payee_node_address;
-        let userID = e.payee_peer_id;
-        signR(nodeID, userID, info);
-        displaySentMessage100046(nodeID, userID, info);
-    });
-}
-
-// auto response to -100049 (CloseHTLC) 
-// listening to -110049 and send -100050 CloseHTLCSigned
-function listening110049(e) {
-    console.info('NOW isAutoMode = ' + isAutoMode);
-
-    saveTempHash(e.msg_hash);
-
-    if (!isAutoMode) return;
-    
-    console.info('listening110049 = ' + JSON.stringify(e));
-
-    // Generate an address by local js library.
-    let addr = sdkGenAddressFromMnemonic();
-    saveAddress($("#logined").text(), addr);
-    
-    // will send -100050 CloseHTLCSigned
-    asyncGetPrivKey(db, e.channel_id, kTbFundingPrivKey).then(function (result) {
-        let info                                         = new CloseHtlcTxInfoSigned();
-        info.msg_hash                                    = e.msg_hash;
-        info.channel_address_private_key                 = result;
-        info.last_rsmc_temp_address_private_key          = getTempPrivKey($("#logined").text(), kRsmcTempPrivKey, e.channel_id);
-        info.last_htlc_temp_address_private_key          = getTempPrivKey($("#logined").text(), kHtlcTempPrivKey, e.channel_id);
-        info.last_htlc_temp_address_for_htnx_private_key = getTempPrivKey($("#logined").text(), kHtlcHtnxTempPrivKey, e.channel_id);
-        info.curr_rsmc_temp_address_pub_key              = addr.result.pubkey;
-        info.curr_rsmc_temp_address_private_key          = addr.result.wif;
-    
-        // SDK API
-        let nodeID = e.sender_node_address;
-        let userID = e.sender_peer_id;
-        closeHTLCSigned($("#logined").text(), nodeID, userID, info);
-        displaySentMessage100050(nodeID, userID, info);
-    });
-}
-
-// auto response to -100032 (openChannel) 
-// listening to -110032 and send -100033 acceptChannel
-function templistening110032(e) {
-    console.info('NOW isAutoMode = ' + isAutoMode);
-    saveChannelID(e.temporary_channel_id);
-
-    if (!isAutoMode) return;
-    
-    console.info('listening110032 = ' + JSON.stringify(e));
-
-    let nodeID   = e.funder_node_address;
-    let userID   = e.funder_peer_id;
-    let temp_cid = e.temporary_channel_id;
-
-    // Generate an address by local js library.
-    let addr = sdkGenAddressFromMnemonic();
-    saveAddress($("#logined").text(), addr);
-
-    // will send -100033 acceptChannel
-    let info                  = new AcceptChannelInfo();
-    info.temporary_channel_id = temp_cid;
-    info.funding_pubkey       = addr.result.pubkey;
-    info.approval             = true;
-
-    // SDK API
-    acceptChannel($("#logined").text(), nodeID, userID, info);
-    displaySentMessage100033(nodeID, userID, info);
-}
-
-// auto response to -100340 (bitcoinFundingCreated)
-// listening to -110340 and send -100350 bitcoinFundingSigned
-function listening110340(e) {
-    console.info('NOW isAutoMode = ' + isAutoMode);
-
-    saveTempHash(e.funding_txid);
-
-    if (!isAutoMode) return;
-    
-    console.info('listening110340 = ' + JSON.stringify(e));
-
-    // will send -100350 bitcoinFundingSigned
-    asyncGetPrivKey(db, e.temporary_channel_id, kTbFundingPrivKey).then(function (result) {
-        let info                          = new FundingBtcSigned();
-        info.temporary_channel_id         = e.temporary_channel_id;
-        info.channel_address_private_key  = result;
-        info.funding_txid                 = e.funding_txid;
-        info.approval                     = true;
-    
-        // SDK API
-        let nodeID = e.funder_node_address;
-        let userID = e.funder_peer_id;
-        bitcoinFundingSigned(nodeID, userID, info);
-        displaySentMessage100350(nodeID, userID, info);
-    });
-}
-
-// auto response to -100034 (AssetFundingCreated)
-// listening to -110034 and send -100035 AssetFundingSigned
-function listening110034(e) {
-    console.info('NOW isAutoMode = ' + isAutoMode);
-    if (!isAutoMode) return;
-    console.info('listening110034 = ' + JSON.stringify(e));
-
-    // will send -100035 AssetFundingSigned
-    // get fundee_channel_address_private_key - MAYBE MODIFYED LATER
-    asyncGetPrivKey(db, e.temporary_channel_id, kTbFundingPrivKey).then(function (result) {
-        let info                                = new AssetFundingSignedInfo();
-        info.temporary_channel_id               = e.temporary_channel_id;
-        info.fundee_channel_address_private_key = result;
-    
-        // SDK API
-        let nodeID = e.funder_node_address;
-        let userID = e.funder_peer_id;
-        assetFundingSigned($("#logined").text(), nodeID, userID, info);
-        displaySentMessage100035(nodeID, userID, info);
-    });
-}
-
-// save funding private key of Alice side
-// Once sent -100035 AssetFundingSigned , the final channel_id has generated.
-// So need update the local saved data for funding private key and channel_id.
-function listening110035(e) {
-    console.info('listening110035 = ' + JSON.stringify(e));
-
-    asyncGetPrivKey(db, e.temporary_channel_id, kTbFundingPrivKey).then(function (result) {
-        addDataInTable($("#logined").text(), e.channel_id, result, kTbFundingPrivKey);
-    });
-
-    // OLD
-    let tempPrivKey = getTempPrivKey($("#logined").text(), kTempPrivKey, e.temporary_channel_id);
-    saveTempPrivKey($("#logined").text(), kTempPrivKey, e.channel_id, tempPrivKey);
-    // asyncGetPrivKey(db, e.temporary_channel_id, kTbTempPrivKey).then(function (result) {
-    //     addDataInTable($("#logined").text(), e.channel_id, result, kTbTempPrivKey);
-    // });
-
-    saveChannelID(e.channel_id);
-}
-
-// auto response to -100351 (commitmentTransactionCreated)
-// listening to -110351 and send -100352 commitmentTransactionAccepted
-function listening110351(e) {
-    console.info('NOW isAutoMode = ' + isAutoMode);
-
-    saveTempHash(e.msg_hash);
-
-    if (!isAutoMode) return;
-
-    console.info('listening110351 = ' + JSON.stringify(e));
-
-    // Generate an address by local js library.
-    let addr = sdkGenAddressFromMnemonic();
-    saveAddress($("#logined").text(), addr);
-
-    // will send -100352 commitmentTransactionAccepted
-    let info                           = new CommitmentTxSigned();
-    info.channel_id                    = e.channel_id;
-    info.msg_hash                      = e.msg_hash;
-    info.curr_temp_address_pub_key     = addr.result.pubkey;
-    info.curr_temp_address_private_key = addr.result.wif;
-    info.approval                      = true;
-    info.last_temp_address_private_key = 
-        getTempPrivKey($("#logined").text(), kTempPrivKey, e.channel_id);
-        
-    // Get channel_address_private_key
-    asyncGetPrivKey(db, e.channel_id, kTbFundingPrivKey).then(function (resp) {
-        info.channel_address_private_key = resp;
-
-        // SDK API
-        let nodeID = e.payer_node_address;
-        let userID = e.payer_peer_id;
-        commitmentTransactionAccepted($("#logined").text(), nodeID, userID, info);
-        displaySentMessage100352(nodeID, userID, info);
-    });
-
-    // asyncGetPrivKey(db, e.channel_id, kTbTempPrivKey).then(function (result) {
-    //     info.last_temp_address_private_key = result;
-    // });
-}
-
-// listening to -110038 and save request_close_channel_hash
-function listening110038(e) {
-    saveTempHash(e.request_close_channel_hash);
-}
-
 // -102001 logIn.
 function sdkLogIn() {
 
@@ -1538,12 +1290,13 @@ function fillH_RP_CE() {
 }
 
 //
-function fillChannelIDAndFundingPrivKey() {
+async function fillChannelIDAndFundingPrivKey() {
     let channelID = getChannelID();
     $("#channel_id").val(channelID);
-    asyncGetPrivKey(db, channelID, kTbFundingPrivKey).then(function (result) {
-        $("#channel_address_private_key").val(result);
-    });
+
+    let fundingPrivKey = await asyncGetFundingPrivKey(
+        $("#logined").text(), db, channelID, kTbFundingPrivKey);
+    $("#channel_address_private_key").val(fundingPrivKey);
 }
 
 //
@@ -1552,24 +1305,21 @@ function fillChannelFundingLastTempKeys() {
     let channel_id  = getChannelID();
     let tempPrivKey = getTempPrivKey($("#logined").text(), kTempPrivKey, channel_id);
     $("#last_temp_address_private_key").val(tempPrivKey);
-    // asyncGetPrivKey(db, channel_id, kTbTempPrivKey).then(function (result) {
-    //     $("#last_temp_address_private_key").val(result);
-    // });
 }
 
 //
-function fillTempChannelIDAndFundingPrivKey(msgType) {
+async function fillTempChannelIDAndFundingPrivKey(msgType) {
     let channelID = getChannelID();
     $("#temporary_channel_id").val(channelID);
 
-    asyncGetPrivKey(db, channelID, kTbFundingPrivKey).then(function (result) {
-        // console.log('FINAL RESULT = ' + result);
-        if (msgType === 35) {
-            $("#fundee_channel_address_private_key").val(result);
-        } else {
-            $("#channel_address_private_key").val(result);
-        }
-    });
+    let fundingPrivKey = await asyncGetFundingPrivKey(
+        $("#logined").text(), db, channelID, kTbFundingPrivKey);
+
+    if (msgType === 35) {
+        $("#fundee_channel_address_private_key").val(fundingPrivKey);
+    } else {
+        $("#channel_address_private_key").val(fundingPrivKey);
+    }
 }
 
 //
@@ -1660,10 +1410,9 @@ function fillFundingAssetData() {
 }
 
 //
-function autoFillValue(arrParams, obj) {
+async function autoFillValue(arrParams, obj) {
 
     // Auto fill some values
-    let channelID, fundingPrivKey;
     let msgType = Number(obj.getAttribute("type_id"));
     switch (msgType) {
         case enumMsgType.MsgType_HTLC_Invoice_402:
@@ -1680,7 +1429,6 @@ function autoFillValue(arrParams, obj) {
         case enumMsgType.MsgType_SendChannelAccept_33:
             if (!isLogined) return;  // Not logined
             fillCounterparty();
-            // channelID = getChannelID();
             $("#temporary_channel_id").val(getChannelID());
             break;
 
@@ -1700,7 +1448,6 @@ function autoFillValue(arrParams, obj) {
             fillCounterparty();
             fillTempChannelIDAndFundingPrivKey();
 
-            // tempHash = getTempHash();
             if (msgType === enumMsgType.MsgType_FundingSign_SendBtcSign_350) {
                 $("#funding_txid").val(getTempHash());
             } else {
@@ -1712,7 +1459,6 @@ function autoFillValue(arrParams, obj) {
             if (!isLogined) return;  // Not logined
             fillCounterparty();
             fillTempChannelIDAndFundingPrivKey();
-            // tempHash = getTempHash();
             $("#funding_tx_hex").val(getTempHash());
             fillTempAddrKey();
             break;
@@ -1792,12 +1538,12 @@ function autoFillValue(arrParams, obj) {
                 $("#msg_hash").val(getTempHash());
             }
 
-            channelID = getChannelID();
-            console.info('-100049 Get Channel ID = ' + channelID);
+            let channelID = getChannelID();
             $("#channel_id").val(channelID);
-            asyncGetPrivKey(db, channelID, kTbFundingPrivKey).then(function (result) {
-                $("#channel_address_private_key").val(result);
-            });
+
+            let fundingPrivKey = await asyncGetFundingPrivKey(
+                $("#logined").text(), db, channelID, kTbFundingPrivKey);
+            $("#channel_address_private_key").val(fundingPrivKey);
 
             let privkey_1 = getTempPrivKey($("#logined").text(), kRsmcTempPrivKey, channelID);
             $("#last_rsmc_temp_address_private_key").val(privkey_1);
@@ -3926,6 +3672,7 @@ function autoMode(obj) {
         saveAutoPilot('No');
     }
 
+    // TEMP TEST CODE
     let isAutoMode = getAutoPilot();
     console.info('CLICK - isAutoMode = ' + isAutoMode);
 }
@@ -4101,65 +3848,6 @@ function readData(dataDB, user_id) {
             $("#log").html(showMsg);
         }
     }
-}
-
-/**
- * Read data from IndexedDB
- * @param dataDB
- * @param channel_id
- * @param tbName: Funding private key or Last temp private key
- */
-function readDataFromTable(dataDB, channel_id, tbName) {
-
-    return new Promise((resolve, reject) => {
-
-        let data        = [];
-        let transaction = dataDB.transaction([tbName], 'readonly');
-        let store       = transaction.objectStore(tbName);
-        let index       = store.index('channel_id');
-        let request     = index.get(channel_id);
-            request     = index.openCursor(channel_id);
-
-        request.onerror = function(e) {
-            console.log('Read data false.');
-            reject('Read data false.');
-        }
-
-        request.onsuccess = function (e) {
-            let result = e.target.result;
-            if (result) {
-                let value = {
-                    user_id: result.value.user_id,
-                    privkey: result.value.privkey
-                };
-
-                data.push(value);
-                result.continue();
-            } else {
-                console.log('No More Data.');
-                for (let i = data.length - 1; i >= 0; i--) {
-                    if ($("#logined").text() === data[i].user_id) {
-                        console.log('FINAL privkey: ' + data[i].privkey);
-                        resolve(data[i].privkey);
-                    }
-                }
-
-                // Not found private key
-                resolve('');
-            }
-        }
-    })
-}
-
-/**
- * Async read data from IndexedDB
- * @param dataDB
- * @param channel_id
- * @param tbName Funding private key or Last temp private key
- */
-async function asyncGetPrivKey(dataDB, channel_id, tbName){
-    let privkey = await readDataFromTable(dataDB, channel_id, tbName);
-    return privkey;
 }
 
 /**
