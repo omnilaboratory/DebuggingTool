@@ -39,6 +39,12 @@ class OmniFundingAssetInfo {
         this.miner_fee = 0.0;
     }
 }
+class OpenChannelInfo {
+    constructor() {
+        this.funding_pubkey = "";
+        this.is_private = false;
+    }
+}
 class AcceptChannelInfo {
     constructor() {
         this.temporary_channel_id = "";

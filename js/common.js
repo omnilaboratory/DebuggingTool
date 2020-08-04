@@ -118,11 +118,14 @@ function sdkOpenChannel() {
 
     let nodeID  = $("#recipient_node_peer_id").val();
     let userID  = $("#recipient_user_peer_id").val();
-    let pubkey  = $("#funding_pubkey").val();
+
+    let info            = new OpenChannelInfo();
+    info.funding_pubkey = $("#funding_pubkey").val();
+    info.is_private     = $("#checkbox_n32").prop("checked");
 
     // SDK API
-    openChannel($("#logined").text(), nodeID, userID, pubkey);
-    displaySentMessage100032(nodeID, userID, pubkey);
+    openChannel($("#logined").text(), nodeID, userID, info);
+    displaySentMessage100032(nodeID, userID, info);
 }
 
 // -100033 accept Channel API at local.
@@ -1221,17 +1224,19 @@ function createRequestDiv(obj) {
 // dynamic create input parameters div area.
 function createInputParamDiv(obj, jsonFile) {
 
+    let arrParams, newDiv, title;
+
     $.getJSON(jsonFile, function(result) {
         // get [content] div
-        var content_div = $("#name_req_div");
+        let content_div = $("#name_req_div");
 
         // get JS function name.
-        var js_func = obj.getAttribute("id");
+        let js_func = obj.getAttribute("id");
 
         for (let i = 0; i < result.data.length; i++) {
             // id = js_func, is JS function name.
             if (js_func === result.data[i].id) {
-                var arrParams = result.data[i].parameters;
+                arrParams = result.data[i].parameters;
                 // console.info('arrParams = ' + arrParams.length);
 
                 // No parameter.
@@ -1239,10 +1244,10 @@ function createInputParamDiv(obj, jsonFile) {
                     break;
                 }
 
-                var newDiv = document.createElement('div');
+                newDiv = document.createElement('div');
                 newDiv.setAttribute('class', 'panelItem');
 
-                var title = document.createElement('div');
+                title = document.createElement('div');
                 title.setAttribute('class', 'panelTitle');
                 createElement(title, 'h2', 'Input Parameters');
                 newDiv.append(title);
@@ -1256,15 +1261,16 @@ function createInputParamDiv(obj, jsonFile) {
 
         // display Approval Checkbox
         if (jsonFile === 'json/api_list.json') {
-            var msgType = Number(obj.getAttribute("type_id"));
+            let msgType = Number(obj.getAttribute("type_id"));
             switch (msgType) {
+                case enumMsgType.MsgType_SendChannelOpen_32:
                 case enumMsgType.MsgType_SendChannelAccept_33:
                 case enumMsgType.MsgType_FundingSign_SendBtcSign_350:
                 // case enumMsgType.MsgType_FundingSign_SendAssetFundingSigned_35:
                 case enumMsgType.MsgType_CommitmentTxSigned_SendRevokeAndAcknowledgeCommitmentTransaction_352:
                 case enumMsgType.MsgType_SendCloseChannelSign_39:
                 // case enumMsgType.MsgType_HTLC_SendAddHTLCSigned_41:
-                    displayApprovalCheckbox(newDiv, obj, msgType);
+                    displayApprovalCheckbox(newDiv, msgType);
                     content_div.append(newDiv);
                     break;
             }
@@ -1560,11 +1566,20 @@ async function autoFillValue(arrParams, obj) {
 }
 
 // display Approval Checkbox
-function displayApprovalCheckbox(content_div, obj, msgType) {
+function displayApprovalCheckbox(content_div, msgType) {
 
-    createElement(content_div, 'text', 'Approval ');
-    var element = document.createElement('input');
+    if (msgType === enumMsgType.MsgType_SendChannelOpen_32) {
+        createElement(content_div, 'text', 'is_private ');
+    } else {
+        createElement(content_div, 'text', 'Approval ');
+    }
+
+    let element = document.createElement('input');
+
     switch (msgType) {
+        case enumMsgType.MsgType_SendChannelOpen_32:
+            element.id = 'checkbox_n32';
+            break;
         case enumMsgType.MsgType_SendChannelAccept_33:
             element.id = 'checkbox_n33';
             break;
@@ -1586,7 +1601,13 @@ function displayApprovalCheckbox(content_div, obj, msgType) {
     }
 
     element.type = 'checkbox';
-    element.defaultChecked = true;
+
+    if (msgType === enumMsgType.MsgType_SendChannelOpen_32) {
+        element.defaultChecked = false;
+    } else {
+        element.defaultChecked = true;
+    }
+
     element.setAttribute('onclick', 'clickApproval(this)');
     content_div.append(element);
 }
@@ -3854,15 +3875,16 @@ function readData(dataDB, user_id) {
  * -100032 Display the sent message in the message box and save it to the log file
  * @param nodeID 
  * @param userID 
- * @param pubkey 
+ * @param info 
  */
-function displaySentMessage100032(nodeID, userID, pubkey) {
+function displaySentMessage100032(nodeID, userID, info) {
     let msgSend = {
         type: -100032,
         recipient_node_peer_id: nodeID,
         recipient_user_peer_id: userID,
         data: {
-            funding_pubkey: pubkey
+            funding_pubkey: info.funding_pubkey,
+            is_private:     info.is_private
         }
     }
 

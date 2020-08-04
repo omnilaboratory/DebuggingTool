@@ -492,10 +492,10 @@ class ObdApi {
      * MsgType_SendChannelOpen_32
      * @param recipient_node_peer_id string
      * @param recipient_user_peer_id string
-     * @param funding_pubkey string
+     * @param info OpenChannelInfo
      * @param callback function
      */
-    openChannel(recipient_node_peer_id, recipient_user_peer_id, funding_pubkey, callback) {
+    openChannel(recipient_node_peer_id, recipient_user_peer_id, info, callback) {
         if (this.isNotString(recipient_node_peer_id)) {
             alert("error recipient_node_peer_id");
             return;
@@ -504,15 +504,18 @@ class ObdApi {
             alert("error recipient_user_peer_id");
             return;
         }
-        if (this.isNotString(funding_pubkey)) {
+        if (this.isNotString(info.funding_pubkey)) {
             alert("error funding_pubkey");
             return;
+        }
+        if (info.is_private == null) {
+            info.is_private = false;
         }
         let msg = new Message();
         msg.type = this.messageType.MsgType_SendChannelOpen_32;
         msg.recipient_node_peer_id = recipient_node_peer_id;
         msg.recipient_user_peer_id = recipient_user_peer_id;
-        msg.data["funding_pubkey"] = funding_pubkey;
+        msg.data = info;
         this.sendData(msg, callback);
     }
     onOpenChannel(jsonData) { }

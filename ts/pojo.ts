@@ -34,6 +34,11 @@ class OmniFundingAssetInfo {
   miner_fee: number = 0.0;
 }
 
+class OpenChannelInfo {
+  funding_pubkey: string = "";
+  is_private: boolean = false;
+}
+
 class AcceptChannelInfo {
   temporary_channel_id: string = "";
   funding_pubkey: string = "";

@@ -7,10 +7,10 @@
  *  @param myUserID The user id of logged in
  *  @param nodeID peer id of the obd node where the fundee logged in.
  *  @param userID the user id of the fundee.
- *  @param pubkey public key of funder, who wish to deposite BTC and other tokens to the channel
+ *  @param info 
  */
-function openChannel(myUserID, nodeID, userID, pubkey) {
-    obdApi.openChannel(nodeID, userID, pubkey, function(e) {
+function openChannel(myUserID, nodeID, userID, info) {
+    obdApi.openChannel(nodeID, userID, info, function(e) {
         console.info('SDK: -100032 openChannel = ' + JSON.stringify(e));
 
         // WILL BE UPDATED
@@ -19,7 +19,7 @@ function openChannel(myUserID, nodeID, userID, pubkey) {
         // Functions related to save and get data have be moved to SDK.
         saveCounterparties(myUserID, nodeID, userID);
         saveChannelID(e.temporary_channel_id);
-        let privkey = getFundingPrivKeyFromPubKey(myUserID, pubkey);
+        let privkey = getFundingPrivKeyFromPubKey(myUserID, info.funding_pubkey);
         addDataInTable(myUserID, e.temporary_channel_id, privkey, kTbFundingPrivKey);
     });
 }
