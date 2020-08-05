@@ -687,8 +687,8 @@ function sdkPayInvoice() {
         info.invoice = $("#invoice").val();
     } else {
         info.recipient_user_peer_id = $("#recipient_user_peer_id").val();
-        info.property_id            = $("#property_id").val();
-        info.amount                 = $("#amount").val();
+        info.property_id            = Number($("#property_id").val());
+        info.amount                 = Number($("#amount").val());
         info.h                      = $("#h").val();
         info.expiry_time            = $("#expiry_time").val();
         info.description            = $("#description").val();
@@ -1448,6 +1448,7 @@ async function autoFillValue(arrParams, obj) {
     // Auto fill some values
     let msgType = Number(obj.getAttribute("type_id"));
     switch (msgType) {
+        case enumMsgType.MsgType_HTLC_FindPath_401:
         case enumMsgType.MsgType_HTLC_Invoice_402:
             let date = new Date().toJSON().substr(0, 10).replace('T', ' ');
             $("#expiry_time").val(date);

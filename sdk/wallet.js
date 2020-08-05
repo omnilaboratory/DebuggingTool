@@ -23,9 +23,9 @@ function connectPeer(info, callback) {
  * Mode 1 local OBD:
  * 
  * Type -102004 Protocol is used to sign up a new user by 
- * hirarchecal deterministic wallet system integrated in OBD. 
- * OBD returns mnemonic words to the client who signs up, 
- * and create a new user by the hash of the mnemonic words as the UserID.
+ * hirarchecal deterministic wallet system integrated in 
+ * the local client. Client generates mnemonic words and 
+ * the hash of the mnemonic words as the UserID.
  */
 function genMnemonic() {
     let mnemonic = btctool.generateMnemonic(128);
