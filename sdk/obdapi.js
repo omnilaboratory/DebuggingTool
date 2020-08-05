@@ -1559,6 +1559,22 @@ class ObdApi {
     }
     onGetLatestBreachRemedyTransaction(jsonData) { }
     /**
+     * MsgType_CommitmentTx_SendSomeCommitmentById_3206
+     * @param id number
+     * @param callback function
+     */
+    sendSomeCommitmentById(id, callback) {
+        if (id == null || id < 0) {
+            alert("error id");
+            return;
+        }
+        let msg = new Message();
+        msg.type = this.messageType.MsgType_CommitmentTx_SendSomeCommitmentById_3206;
+        msg.data = id;
+        this.sendData(msg, callback);
+    }
+    onSendSomeCommitmentById(jsonData) { }
+    /**
      * MsgType_CommitmentTx_AllRDByChanId_3207
      * @param channel_id string
      * @param callback function

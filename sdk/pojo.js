@@ -328,6 +328,7 @@ class MessageType {
         this.MsgType_CommitmentTx_LatestCommitmentTxByChanId_3203 = -103203;
         this.MsgType_CommitmentTx_LatestRDByChanId_3204 = -103204;
         this.MsgType_CommitmentTx_LatestBRByChanId_3205 = -103205;
+        this.MsgType_CommitmentTx_SendSomeCommitmentById_3206 = -103206;
         this.MsgType_CommitmentTx_AllRDByChanId_3207 = -103207;
         this.MsgType_CommitmentTx_AllBRByChanId_3208 = -103208;
         this.MsgType_SendCloseChannelRequest_38 = -100038;
