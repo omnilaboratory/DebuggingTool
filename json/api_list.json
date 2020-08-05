@@ -718,6 +718,48 @@
                 {
                     "name": "invoice",
                     "buttons": []
+                },
+                {
+                    "name": "recipient_user_peer_id",
+                    "buttons": [
+                        {
+                            "innerText": "Counterparties",
+                            "onclick": "displayUserDataInNewHtml('Counterparties')"
+                        }
+                    ]
+                },
+                {
+                    "name": "property_id",
+                    "buttons": [
+                        {
+                            "innerText": "Display",
+                            "onclick": "displayUserDataInNewHtml('MyAddresses')"
+                        }
+                    ]
+                },
+                {
+                    "name": "amount",
+                    "buttons": []
+                },
+                {
+                    "name": "h",
+                    "help": "The H (Hash of a Preimage R) currently is Public Key of a wallet address, and the R (Preimage R) is Private Key of a wallet address. This is a temporary solution.",
+                    "buttons": [
+                        {
+                            "innerText": "Display",
+                            "onclick": "displayUserDataInNewHtml('MyAddresses')"
+                        }
+                    ]
+                },
+                {
+                    "name": "expiry_time",
+                    "help": "Example: 2020-7-16",
+                    "buttons": []
+                },
+                {
+                    "name": "description",
+                    "help": "A memo",
+                    "buttons": []
                 }
             ]
         },

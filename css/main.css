@@ -334,3 +334,10 @@ pre {
     margin-left:200px;
     margin-top:50px;
 }
+
+.invoice_payment {
+    color: #26272e;
+    font-size: 18px;
+    font-weight: 600;
+    padding-right: 25px;
+}

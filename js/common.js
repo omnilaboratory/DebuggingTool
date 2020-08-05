@@ -680,11 +680,24 @@ function sdkHTLCSigned() {
 function sdkPayInvoice() {
 
     let info     = new PayInvoiceInfo();
-    info.invoice = $("#invoice").val();
+    let isInvPay = Boolean($("#n401_InvPay").prop("checked"));
+
+    // Invoice Payment is true
+    if (isInvPay === true) {
+        info.invoice = $("#invoice").val();
+    } else {
+        info.recipient_user_peer_id = $("#recipient_user_peer_id").val();
+        info.property_id            = $("#property_id").val();
+        info.amount                 = $("#amount").val();
+        info.h                      = $("#h").val();
+        info.expiry_time            = $("#expiry_time").val();
+        info.description            = $("#description").val();
+        info.is_private             = $("#checkbox_n401").prop("checked");
+    }
 
     // SDK API
     payInvoice(info);
-    displaySentMessage100401(info);
+    displaySentMessage100401(info, isInvPay);
 }
 
 // -100351 Commitment Transaction Created API at local.
@@ -1224,7 +1237,7 @@ function createRequestDiv(obj) {
 // dynamic create input parameters div area.
 function createInputParamDiv(obj, jsonFile) {
 
-    let arrParams, newDiv, title;
+    let arrParams, newDiv, title, msgType;
 
     $.getJSON(jsonFile, function(result) {
         // get [content] div
@@ -1252,6 +1265,15 @@ function createInputParamDiv(obj, jsonFile) {
                 createElement(title, 'h2', 'Input Parameters');
                 newDiv.append(title);
 
+                // display checkbox of invoice payment
+                if (jsonFile === 'json/api_list.json') {
+                    msgType = Number(obj.getAttribute("type_id"));
+                    if (msgType === enumMsgType.MsgType_HTLC_FindPath_401) {
+                        checkboxInvoicePayment(newDiv);
+                        content_div.append(newDiv);
+                    }
+                }
+
                 // Parameters
                 createParamOfAPI(arrParams, newDiv);
                 content_div.append(newDiv);
@@ -1261,8 +1283,13 @@ function createInputParamDiv(obj, jsonFile) {
 
         // display Approval Checkbox
         if (jsonFile === 'json/api_list.json') {
-            let msgType = Number(obj.getAttribute("type_id"));
+            msgType = Number(obj.getAttribute("type_id"));
             switch (msgType) {
+                case enumMsgType.MsgType_HTLC_FindPath_401:
+                    displayApprovalCheckbox(newDiv, msgType);
+                    content_div.append(newDiv);
+                    hide401Elements();
+                    break;
                 case enumMsgType.MsgType_SendChannelOpen_32:
                 case enumMsgType.MsgType_SendChannelAccept_33:
                 case enumMsgType.MsgType_FundingSign_SendBtcSign_350:
@@ -1568,7 +1595,8 @@ async function autoFillValue(arrParams, obj) {
 // display Approval Checkbox
 function displayApprovalCheckbox(content_div, msgType) {
 
-    if (msgType === enumMsgType.MsgType_SendChannelOpen_32) {
+    if (msgType === enumMsgType.MsgType_SendChannelOpen_32 || 
+        msgType === enumMsgType.MsgType_HTLC_FindPath_401) {
         createElement(content_div, 'text', 'is_private ');
     } else {
         createElement(content_div, 'text', 'Approval ');
@@ -1598,11 +1626,15 @@ function displayApprovalCheckbox(content_div, msgType) {
         case enumMsgType.MsgType_SendCloseChannelSign_39:
             element.id = 'checkbox_n39';
             break;
+        case enumMsgType.MsgType_HTLC_FindPath_401:
+            element.id = 'checkbox_n401';
+            break;
     }
 
     element.type = 'checkbox';
 
-    if (msgType === enumMsgType.MsgType_SendChannelOpen_32) {
+    if (msgType === enumMsgType.MsgType_SendChannelOpen_32 || 
+        msgType === enumMsgType.MsgType_HTLC_FindPath_401) {
         element.defaultChecked = false;
     } else {
         element.defaultChecked = true;
@@ -1610,6 +1642,55 @@ function displayApprovalCheckbox(content_div, msgType) {
 
     element.setAttribute('onclick', 'clickApproval(this)');
     content_div.append(element);
+}
+
+// 
+function checkboxInvoicePayment(content_div) {
+
+    createElement(content_div, 'text', 'Invoice Payment', 'invoice_payment');
+
+    let element  = document.createElement('input');
+    element.id   = 'n401_InvPay';
+    element.type = 'checkbox';
+    element.defaultChecked = true;
+    element.setAttribute('onclick', 'clickInvoicePayment(this)');
+    content_div.append(element);
+
+    createElement(content_div, 'p');
+}
+
+//
+function hide401Elements() {
+    $("#invoice").show();
+    $("#recipient_user_peer_id").hide();
+    $("#recipient_user_peer_idCou").hide();
+    $("#property_id").hide();
+    $("#property_idDis").hide();
+    $("#amount").hide();
+    $("#h").hide();
+    $("#hDis").hide();
+    $("#expiry_time").hide();
+    $("#description").hide();
+    $("#checkbox_n401").hide();
+}
+
+// 
+function clickInvoicePayment(obj) {
+    if (obj.checked) {
+        hide401Elements();
+    } else {
+        $("#invoice").hide();
+        $("#recipient_user_peer_id").show();
+        $("#recipient_user_peer_idCou").show();
+        $("#property_id").show();
+        $("#property_idDis").show();
+        $("#amount").show();
+        $("#h").show();
+        $("#hDis").show();
+        $("#expiry_time").show();
+        $("#description").show();
+        $("#checkbox_n401").show();
+    }
 }
 
 // 
@@ -4191,12 +4272,31 @@ function displaySentMessage100402(info) {
 /**
  * -100401 Display the sent message in the message box and save it to the log file
  * @param info 
+ * @param isInvPay 
  */
-function displaySentMessage100401(info) {
-    let msgSend = {
-        type: -100401,
-        data: {
-            invoice: info.invoice
+function displaySentMessage100401(info, isInvPay) {
+    let msgSend;
+
+    // Invoice Payment is true
+    if (Boolean(isInvPay) === true) {
+        msgSend = {
+            type: -100401,
+            data: {
+                invoice: info.invoice
+            }
+        }
+    } else {
+        msgSend = {
+            type: -100401,
+            data: {
+                recipient_user_peer_id: info.recipient_user_peer_id,
+                property_id:            info.property_id,
+                amount:                 info.amount,
+                h:                      info.h,
+                expiry_time:            info.expiry_time,
+                description:            info.description,
+                is_private:             info.is_private,
+            }
         }
     }
 

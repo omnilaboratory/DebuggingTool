@@ -78,16 +78,18 @@ class CommitmentTxSigned {
   approval: boolean = false;
 }
 
-class PayInvoiceInfo {
-  invoice: string = "";
-}
-
 class InvoiceInfo {
   property_id: number = 0;
   amount: number = 0;
   h: string = "";
   expiry_time: string = "";
   description: string = "";
+}
+
+class PayInvoiceInfo extends InvoiceInfo {
+  invoice: string = "";
+  recipient_user_peer_id: string = "";
+  is_private: boolean = false;
 }
 
 class HtlcCreatedInfo {
@@ -302,6 +304,7 @@ class MessageType {
   MsgType_CommitmentTx_LatestCommitmentTxByChanId_3203  = -103203;
   MsgType_CommitmentTx_LatestRDByChanId_3204            = -103204;
   MsgType_CommitmentTx_LatestBRByChanId_3205            = -103205;
+  MsgType_CommitmentTx_SendSomeCommitmentById_3206      = -103206;
   MsgType_CommitmentTx_AllRDByChanId_3207               = -103207;
   MsgType_CommitmentTx_AllBRByChanId_3208               = -103208;
   

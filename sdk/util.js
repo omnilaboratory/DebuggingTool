@@ -741,3 +741,14 @@ function genNewAddress(myUserID, netType) {
     let address  = genAddressFromMnemonic(mnemonic, index, netType);
     return address;
 }
+
+/**
+ * Type -103206 Protocol is used to broadcast the commitment transaction 
+ * from it's id of database.
+ * @param id Number
+ */
+function sendSomeCommitmentById(id) {
+    obdApi.sendSomeCommitmentById(id, function(e) {
+        console.info('SDK: -103206 sendSomeCommitmentById = ' + JSON.stringify(e));
+    });
+}

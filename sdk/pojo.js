@@ -89,11 +89,6 @@ class CommitmentTxSigned {
         this.approval = false;
     }
 }
-class PayInvoiceInfo {
-    constructor() {
-        this.invoice = "";
-    }
-}
 class InvoiceInfo {
     constructor() {
         this.property_id = 0;
@@ -101,6 +96,14 @@ class InvoiceInfo {
         this.h = "";
         this.expiry_time = "";
         this.description = "";
+    }
+}
+class PayInvoiceInfo extends InvoiceInfo {
+    constructor() {
+        super(...arguments);
+        this.invoice = "";
+        this.recipient_user_peer_id = "";
+        this.is_private = false;
     }
 }
 class HtlcCreatedInfo {

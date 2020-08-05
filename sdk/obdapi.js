@@ -807,10 +807,10 @@ class ObdApi {
      * @param callback function
      */
     payInvoice(info, callback) {
-        if (this.isNotString(info.invoice)) {
-            alert("empty invoice");
-            return;
-        }
+        // if (this.isNotString(info.invoice)) {
+        //   alert("empty invoice");
+        //   return;
+        // }
         let msg = new Message();
         msg.type = this.messageType.MsgType_HTLC_FindPath_401;
         msg.data = info;

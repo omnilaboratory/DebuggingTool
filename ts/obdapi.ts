@@ -970,12 +970,12 @@ class ObdApi {
    * @param callback function
    */
   public payInvoice(info: PayInvoiceInfo, callback: Function) {
-    if (this.isNotString(info.invoice)) {
-      alert("empty invoice");
-      return;
-    }
+    // if (this.isNotString(info.invoice)) {
+    //   alert("empty invoice");
+    //   return;
+    // }
 
-    let msg = new Message();
+    let msg  = new Message();
     msg.type = this.messageType.MsgType_HTLC_FindPath_401;
     msg.data = info;
     this.sendData(msg, callback);
@@ -1821,6 +1821,23 @@ class ObdApi {
     this.sendData(msg, callback);
   }
   public onGetLatestBreachRemedyTransaction(jsonData: any) {}
+
+  /**
+   * MsgType_CommitmentTx_SendSomeCommitmentById_3206
+   * @param id number
+   * @param callback function
+   */
+  public sendSomeCommitmentById(id: number, callback: Function) {
+    if (id == null || id < 0) {
+      alert("error id");
+      return;
+    }
+    let msg  = new Message();
+    msg.type = this.messageType.MsgType_CommitmentTx_SendSomeCommitmentById_3206;
+    msg.data = id;
+    this.sendData(msg, callback);
+  }
+  public onSendSomeCommitmentById(jsonData: any) {}
 
   /**
    * MsgType_CommitmentTx_AllRDByChanId_3207
