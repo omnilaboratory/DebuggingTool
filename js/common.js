@@ -2719,18 +2719,19 @@ function displayUserData(obj, param) {
 
 //
 function displayMnemonic() {
-    // get [name_req_div] div
-    var parent = $("#name_req_div");
-    var mnemonic = JSON.parse(sessionStorage.getItem(kMnemonic));
-    // var mnemonic = JSON.parse(localStorage.getItem(kMnemonic));
-
-    var newDiv = document.createElement('div');
+    let parent   = $("#name_req_div");
+    let mnemonic = JSON.parse(localStorage.getItem(kMnemonic));
+    let newDiv   = document.createElement('div');
     newDiv.setAttribute('class', 'panelItem');
 
     // If has data
     if (mnemonic) {
         for (let i = 0; i < mnemonic.result.length; i++) {
             createElement(newDiv, 'h4', 'NO. ' + (i + 1));
+            createElement(newDiv, 'text', 'User ID:');
+            createElement(newDiv, 'text', mnemonic.result[i].userID, 'responseText');
+            createElement(newDiv, 'p');
+            createElement(newDiv, 'text', 'Mnemonic:');
             createElement(newDiv, 'text', mnemonic.result[i].mnemonic, 'responseText');
         }
     } else { // NO LOCAL STORAGE DATA YET.
