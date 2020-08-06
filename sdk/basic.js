@@ -20,7 +20,7 @@ function openChannel(myUserID, nodeID, userID, info) {
         saveCounterparties(myUserID, nodeID, userID);
         saveChannelID(e.temporary_channel_id);
         let privkey = getFundingPrivKeyFromPubKey(myUserID, info.funding_pubkey);
-        addDataInTable(myUserID, e.temporary_channel_id, privkey, kTbFundingPrivKey);
+        saveFundingPrivKey(myUserID, e.temporary_channel_id, privkey, kTbFundingPrivKey);
     });
 }
 
@@ -42,7 +42,7 @@ function acceptChannel(myUserID, nodeID, userID, info) {
         saveCounterparties(myUserID, nodeID, userID);
         saveChannelAddress(e.channel_address);
         let privkey = getFundingPrivKeyFromPubKey(myUserID, info.funding_pubkey);
-        addDataInTable(myUserID, info.temporary_channel_id, privkey, kTbFundingPrivKey);
+        saveFundingPrivKey(myUserID, info.temporary_channel_id, privkey, kTbFundingPrivKey);
     });
 }
 
@@ -123,12 +123,8 @@ function assetFundingCreated(myUserID, nodeID, userID, info) {
         // saveChannelList(e, info.temporary_channel_id, msgType);
 
         // Save temporary private key to local storage
-        // OLD RESOLUTION - MAYBE RECOVER LATER
         saveTempPrivKey(myUserID, kTempPrivKey, info.temporary_channel_id, 
             info.temp_address_private_key);
-
-        // addDataInTable(myUserID, info.temporary_channel_id, 
-        //     info.temp_address_private_key, kTbTempPrivKey);
     });
 }
 
@@ -149,7 +145,7 @@ function assetFundingSigned(myUserID, nodeID, userID, info) {
         
         // Once sent -100035 AssetFundingSigned , the final channel_id has generated.
         // So need update the local saved data for funding private key and channel_id.
-        addDataInTable(myUserID, e.channel_id, 
+        saveFundingPrivKey(myUserID, e.channel_id, 
             info.fundee_channel_address_private_key, kTbFundingPrivKey);
         saveChannelID(e.channel_id);
     });
@@ -167,15 +163,9 @@ function assetFundingSigned(myUserID, nodeID, userID, info) {
 function commitmentTransactionCreated(myUserID, nodeID, userID, info) {
     obdApi.commitmentTransactionCreated(nodeID, userID, info, function(e) {
         console.info('SDK: -100351 commitmentTransactionCreated = ' + JSON.stringify(e));
-
         saveChannelID(e.channel_id);
-
-        // OLD RESOLUTION - MAYBE RECOVER LATER
         saveTempPrivKey(myUserID, kTempPrivKey, e.channel_id, 
             info.curr_temp_address_private_key);
-
-        // addDataInTable(myUserID, e.channel_id, 
-        //     info.curr_temp_address_private_key, kTbTempPrivKey);
     });
 }
 
@@ -192,14 +182,8 @@ function commitmentTransactionAccepted(myUserID, nodeID, userID, info) {
     obdApi.commitmentTransactionAccepted(nodeID, userID, info, function(e) {
         console.info('SDK: -100352 commitmentTransactionAccepted = ' + JSON.stringify(e));
         // saveChannelList(e, e.channel_id, msgType);
-
         saveChannelID(e.channel_id);
-
-        // OLD RESOLUTION - MAYBE RECOVER LATER
         saveTempPrivKey(myUserID, kTempPrivKey, e.channel_id, info.curr_temp_address_private_key);
-
-        // addDataInTable(myUserID, e.channel_id, 
-        //     info.curr_temp_address_private_key, kTbTempPrivKey);
     });
 }
 

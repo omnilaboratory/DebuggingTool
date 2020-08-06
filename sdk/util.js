@@ -197,7 +197,7 @@ function getFundingPrivKeyFromPubKey(myUserID, pubkey) {
  * @param privkey
  * @param tbName: Funding private key or Last temp private key
  */
-function addDataInTable(user_id, channel_id, privkey, tbName) {
+function saveFundingPrivKey(user_id, channel_id, privkey, tbName) {
 
     let request = db.transaction([tbName], 'readwrite')
         .objectStore(tbName)

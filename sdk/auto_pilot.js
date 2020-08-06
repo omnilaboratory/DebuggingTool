@@ -150,9 +150,9 @@ async function listening110035(e) {
     let fundingPrivKey = await asyncGetFundingPrivKey(myUserID, db, 
         e.temporary_channel_id, kTbFundingPrivKey);
 
-    addDataInTable(myUserID, e.channel_id, fundingPrivKey, kTbFundingPrivKey);
+    saveFundingPrivKey(myUserID, e.channel_id, fundingPrivKey, kTbFundingPrivKey);
 
-    // OLD
+    //
     let tempPrivKey = getTempPrivKey(myUserID, kTempPrivKey, e.temporary_channel_id);
     saveTempPrivKey(myUserID, kTempPrivKey, e.channel_id, tempPrivKey);
 
