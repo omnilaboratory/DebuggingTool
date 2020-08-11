@@ -1798,23 +1798,23 @@ function clickApproval(obj) {
 
 //
 function showTooltip(content, parent, imgPath) {
-    var div_help = document.createElement('div');
+    let div_help = document.createElement('div');
     div_help.setAttribute('class', 'wrapper');
 
-    var help = document.createElement('i');
-    help.setAttribute('class', 'btn_help fa fa-info-circle');
-    div_help.append(help);
-
-    // var help = document.createElement('img');
-    // help.setAttribute('class', 'btn_help');
-    // help.setAttribute('src', 'doc/tooltip/help.png');
-    // help.setAttribute('alt', 'help');
+    // let help = document.createElement('i');
+    // help.setAttribute('class', 'btn_help fa fa-info-circle');
     // div_help.append(help);
 
-    var div_tooltip = document.createElement('div');
+    let help = document.createElement('img');
+    help.setAttribute('class', 'btn_help');
+    help.setAttribute('src', 'doc/tooltip/help.png');
+    help.setAttribute('alt', 'help');
+    div_help.append(help);
+
+    let div_tooltip = document.createElement('div');
     div_tooltip.setAttribute('class', 'tooltip_help');
 
-    var tooltip = document.createElement('label');
+    let tooltip = document.createElement('label');
     tooltip.innerText = content;
     div_tooltip.append(tooltip);
 

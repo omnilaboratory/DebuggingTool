@@ -129,19 +129,20 @@
 
 /* ==================== */
 /* for .fa.fa-info-circle */
+/* for Auto Pilot tooltip */
 .wrapper .info_icon {
     background: #093c49;
     top: 100%;
     color: rgb(102, 221, 55);
     display: block;
     left: -30px;
-    margin-top: 15px;
+    margin-top: 10px;
     opacity: 0;
     padding: 20px;
     pointer-events: none;
     position: absolute;
     z-index: 1;
-    width: 180px;
+    width: 220px;
     word-break: normal;
     transform: translateY(10px);
     transition: all .25s ease-out;
@@ -186,14 +187,20 @@
 }
 
 .btn_help {
-    margin-top: 5px;
+    margin-top: 2px;
     margin-right: 10px;
-    margin-left: -8px;
+    margin-left: -13px;
 
     /* width: 30px;
     height: 30px;
     vertical-align: bottom;
     padding-right: 10px; */
+}
+
+.auto_pilot_help {
+    margin-top: 15px;
+    margin-right: 10px;
+    margin-left: -33px;
 }
 
 
