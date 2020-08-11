@@ -34,6 +34,13 @@ class OmniFundingAssetInfo {
   miner_fee: number = 0.0;
 }
 
+class OmniSendAssetInfo {
+  from_address: string = "";
+  to_address: string = "";
+  property_id: number = 0;
+  amount: number = 0;
+}
+
 class OpenChannelInfo {
   funding_pubkey: string = "";
   is_private: boolean = false;
@@ -263,6 +270,7 @@ class MessageType {
   MsgType_Core_Omni_GetTransaction_2118              = -102118;
   MsgType_Core_Omni_GetProperty_2119                 = -102119;
   MsgType_Core_Omni_FundingAsset_2120                = -102120;
+  MsgType_Core_Omni_Send_2121                        = -102121;
   
   MsgType_Mnemonic_CreateAddress_3000              = -103000;
   MsgType_Mnemonic_GetAddressByIndex_3001          = -103001;

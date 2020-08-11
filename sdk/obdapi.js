@@ -463,6 +463,34 @@ class ObdApi {
     }
     onFundingAsset(jsonData) { }
     /**
+     * MsgType_Core_Omni_Send_2121
+     * @param info OmniSendAssetInfo
+     * @param callback function
+     */
+    sendAsset(info, callback) {
+        if (this.isNotString(info.from_address)) {
+            alert("empty from_address");
+            return;
+        }
+        if (this.isNotString(info.to_address)) {
+            alert("empty to_address");
+            return;
+        }
+        if (info.property_id == null || info.property_id <= 0) {
+            alert("error property_id");
+            return;
+        }
+        if (info.amount == null || info.amount <= 0) {
+            alert("wrong amount");
+            return;
+        }
+        let msg = new Message();
+        msg.type = this.messageType.MsgType_Core_Omni_Send_2121;
+        msg.data = info;
+        this.sendData(msg, callback);
+    }
+    onSendAsset(jsonData) { }
+    /**
      * MsgType_Mnemonic_CreateAddress_3000
      * @param callback function
      */

@@ -28,25 +28,30 @@
 </body>
 
 <script>
-    var name = getSaveName();
-    var data = JSON.parse(localStorage.getItem(name));
+    // var name = getSaveName();
+    var data = JSON.parse(localStorage.getItem(kGoWhere));
     console.info('goWhere= '+ data.goWhere);
-    getUserDataList(data.goWhere);
+    // getUserDataList(data.goWhere);
 
     // 
     function sdkConnect2OBD() {
         let nodeAddress = getNewestConnOBD();
         connectToServer(nodeAddress, function(response) {
             // console.info('OBD Response = ' + response);
+            getUserDataList(data.goWhere);
         }, function(globalResponse) {
         });
     }
 
     //
-    if (data.goWhere === 'MyAddresses') {
-        console.info('IS from MyAddresses');
-        sdkConnect2OBD();
-    }
+    sdkConnect2OBD();
+
+    // if (data.goWhere === 'MyAddresses' ||
+    //     data.goWhere === 'OmniFaucet') {
+            
+    //     console.info('IS from -->  ' + data.goWhere);
+    //     sdkConnect2OBD();
+    // }
 </script>
 
 </html>

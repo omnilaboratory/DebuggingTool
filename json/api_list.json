@@ -363,6 +363,10 @@
                         {
                             "innerText": "Create",
                             "onclick": "autoCreateFundingPubkey(-102120)"
+                        },
+                        {
+                            "innerText": "Omni Faucet",
+                            "onclick": "displayUserDataInNewHtml('OmniFaucet')"
                         }
                     ]
                 },

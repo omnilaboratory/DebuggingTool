@@ -15,6 +15,10 @@
         {
             "id": "ChannelList",
             "description": "List of channel creation process records."
+        },
+        {
+            "id": "OmniFaucet",
+            "description": "Omni Faucet provide omni test assets to use."
         }
     ]
 }

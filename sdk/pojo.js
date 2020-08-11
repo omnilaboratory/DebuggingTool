@@ -39,6 +39,14 @@ class OmniFundingAssetInfo {
         this.miner_fee = 0.0;
     }
 }
+class OmniSendAssetInfo {
+    constructor() {
+        this.from_address = "";
+        this.to_address = "";
+        this.property_id = 0;
+        this.amount = 0;
+    }
+}
 class OpenChannelInfo {
     constructor() {
         this.funding_pubkey = "";
@@ -293,6 +301,7 @@ class MessageType {
         this.MsgType_Core_Omni_GetTransaction_2118 = -102118;
         this.MsgType_Core_Omni_GetProperty_2119 = -102119;
         this.MsgType_Core_Omni_FundingAsset_2120 = -102120;
+        this.MsgType_Core_Omni_Send_2121 = -102121;
         this.MsgType_Mnemonic_CreateAddress_3000 = -103000;
         this.MsgType_Mnemonic_GetAddressByIndex_3001 = -103001;
         this.MsgType_FundingCreate_Asset_AllItem_3100 = -103100;

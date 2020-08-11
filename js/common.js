@@ -38,9 +38,9 @@ var channelInfo;
 // var isAutoMode = false;
 
 // Get name of saveGoWhere variable.
-function getSaveName() {
-    return kGoWhere;
-}
+// function getSaveName() {
+//     return kGoWhere;
+// }
 
 // -102001 logIn.
 function sdkLogIn() {
@@ -1061,20 +1061,16 @@ function displayOBDMessages(msg) {
 // 
 function getUserDataList(goWhere) {
 
-    var api_id, description, apiItem, menuDiv;
-    var jsonFile = "json/user_data_list.json";
+    let api_id, description, apiItem;
+    let jsonFile = "json/user_data_list.json";
 
     // dynamic create api_list div.
     $.getJSON(jsonFile, function(result) {
-        // get [user_data_list] div
-        var apiList = $("#user_data_list");
+        let apiList = $("#user_data_list");
 
         for (let i = 0; i < result.data.length; i++) {
             api_id = result.data[i].id;
             description = result.data[i].description;
-
-            // menuDiv = document.createElement('div');
-            // menuDiv.setAttribute('class', 'menuItem');
 
             apiItem = document.createElement('a');
             apiItem.id = api_id;
@@ -1084,7 +1080,6 @@ function getUserDataList(goWhere) {
             apiItem.setAttribute('onclick', 'displayUserData(this)');
             apiItem.innerText = api_id;
 
-            // menuDiv.append(apiItem);
             apiList.append(apiItem);
 
             createElement(apiList, 'p');
@@ -1105,6 +1100,9 @@ function getUserDataList(goWhere) {
                 break;
             case 'ChannelList':
                 displayUserData(ChannelList, kNewHtml);
+                break;
+            case 'OmniFaucet':
+                displayUserData(OmniFaucet, kNewHtml);
                 break;
         }
     });
@@ -1182,13 +1180,13 @@ function displayAPIContent(obj) {
 
 // create 
 function createApiNameDiv(obj) {
-    var content_div = $("#name_req_div");
+    let content_div = $("#name_req_div");
 
-    var newDiv = document.createElement('div');
+    let newDiv = document.createElement('div');
     newDiv.setAttribute('class', 'panelItem');
 
     // create [api_name] element
-    var title = document.createElement('div');
+    let title = document.createElement('div');
     title.setAttribute('class', 'panelTitle');
     createElement(title, 'h2', obj.innerHTML);
     newDiv.append(title);
@@ -1201,13 +1199,13 @@ function createApiNameDiv(obj) {
 
 // create 
 function createRequestDiv(obj) {
-    var content_div = $("#name_req_div");
+    let content_div = $("#name_req_div");
 
-    var newDiv = document.createElement('div');
+    let newDiv = document.createElement('div');
     newDiv.setAttribute('class', 'panelItem');
 
     // create [title] element
-    var title = document.createElement('div');
+    let title = document.createElement('div');
     title.setAttribute('class', 'panelTitle');
     createElement(title, 'h2', 'Request');
     newDiv.append(title);
@@ -1220,11 +1218,11 @@ function createRequestDiv(obj) {
     createElement(newDiv, 'text', obj.getAttribute("id"), 'funcText');
 
     // create [type_id] element
-    var value = " type ( " + obj.getAttribute("type_id") + " )";
+    let value = " type ( " + obj.getAttribute("type_id") + " )";
     createElement(newDiv, 'text', value);
 
     // create [Invoke API] element
-    var button = document.createElement('button');
+    let button = document.createElement('button');
     button.setAttribute('type_id', obj.getAttribute("type_id"));
     button.setAttribute('class', 'button button_big');
     button.setAttribute('onclick', 'invokeAPIs(this)');
@@ -2187,7 +2185,7 @@ function parseData3000_3001(response) {
         'ADDRESS : ' + response.result.address,
         'INDEX : '   + response.result.index,
         'PUB_KEY : ' + response.result.pubkey,
-        'WIF : '     + response.result.wif
+        'PRIV_KEY : '     + response.result.wif
     ];
 
     for (let i = 0; i < arrData.length; i++) {
@@ -2714,6 +2712,9 @@ function displayUserData(obj, param) {
         case 'ChannelList':
             displayChannelCreation(param);
             break;
+        case 'OmniFaucet':
+            displayOmniFaucet(param);
+            break;
     }
 }
 
@@ -2789,7 +2790,7 @@ function displayAddresses(param) {
                         'Address : ' + addr.result[i].data[i2].address,
                         'Index : '   + addr.result[i].data[i2].index,
                         'PubKey : '  + addr.result[i].data[i2].pubkey,
-                        'WIF : '     + addr.result[i].data[i2].wif
+                        'PrivKey : ' + addr.result[i].data[i2].wif
                     ];
 
                     for (let i3 = 0; i3 < arrData.length; i3++) {
@@ -2815,6 +2816,64 @@ function displayAddresses(param) {
         createElement(newDiv, 'h3', 'NO DATA YET.');
         parent.append(newDiv);
     }
+}
+
+//
+function displayOmniFaucet(param) {
+    let userID = $("#logined").text();
+    let parent = $("#name_req_div");
+    let newDiv = document.createElement('div');
+    newDiv.setAttribute('class', 'panelItem');
+
+    //
+    let strAddr = 'n4j37pAMNsjkTs6roKof3TGNvmPh16fvpS';
+    obdApi.getAllBalancesForAddress(strAddr, function(e) {
+        console.info('-102112 displayOmniFaucet = ' + JSON.stringify(e));
+
+        if (e != "") {
+
+            createElement(newDiv, 'h3', 'Omni Faucet Asset:');
+
+            for (let i = 0; i < e.length; i++) {
+                createElement(newDiv, 'text', 'Asset Name:');
+                createElement(newDiv, 'text', e[i].name, 'responseText');
+                createElement(newDiv, 'p');
+
+                createElement(newDiv, 'text', 'Property ID:');
+                createElement(newDiv, 'text', e[i].propertyid, 'responseText');
+                createElement(newDiv, 'p');
+
+                createElement(newDiv, 'text', 'Balance:');
+                createElement(newDiv, 'text', parseFloat(e[i].balance), 'responseText');
+                createElement(newDiv, 'p');
+            }
+
+            createElement(newDiv, 'p', '------------');
+            createElement(newDiv, 'h3', 'Send Asset:');
+
+            createElement(newDiv, 'text',  'To Address: ', 'param');
+            createElement(newDiv, 'input', '', 'input', 'to_address');
+
+            createElement(newDiv, 'p');
+
+            createElement(newDiv, 'text',  'Amout: ', 'param');
+            createElement(newDiv, 'input', '', 'input', 'amount');
+
+            createElement(newDiv, 'p');
+
+            let button = document.createElement('button');
+            button.innerText = 'Send';
+            // let clickFunc = "getBalance('" + strAddr + "')";
+            let clickFunc = 'sendAsset()';
+            button.setAttribute('class', 'button button_small');
+            button.setAttribute('onclick', clickFunc);
+            newDiv.append(button);
+            parent.append(newDiv);
+
+            createElement(newDiv, 'p', '------------');
+            createElement(newDiv, 'h3', 'Send Result:', '', 'send_result');
+        }
+    });
 }
 
 //
@@ -4476,4 +4535,22 @@ function displaySentMessage100039(nodeID, userID, info) {
     }
 
     displaySentMessage(msgSend);
+}
+
+//  -102121 Invoke omni_send rpc command of omni core
+function sendAsset() {
+
+    let info           = new OmniSendAssetInfo();
+    info.from_address  = 'n4j37pAMNsjkTs6roKof3TGNvmPh16fvpS';
+    info.to_address    = $("#to_address").val();
+    info.amount        = Number($("#amount").val());
+    info.property_id   = Number('137');
+
+    console.info('-102121 to_address = ' + info.to_address);
+    console.info('-102121 amount = ' + info.amount);
+
+    obdApi.sendAsset(info, function(e) {
+        console.info('-102121 sendAsset = ' + JSON.stringify(e));
+        $("#send_result").text('Send Result: Success!');
+    });
 }
