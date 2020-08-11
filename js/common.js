@@ -2820,7 +2820,7 @@ function displayAddresses(param) {
 
 //
 function displayOmniFaucet(param) {
-    let userID = $("#logined").text();
+    // let userID = $("#logined").text();
     let parent = $("#name_req_div");
     let newDiv = document.createElement('div');
     newDiv.setAttribute('class', 'panelItem');
@@ -2863,7 +2863,6 @@ function displayOmniFaucet(param) {
 
             let button = document.createElement('button');
             button.innerText = 'Send';
-            // let clickFunc = "getBalance('" + strAddr + "')";
             let clickFunc = 'sendAsset()';
             button.setAttribute('class', 'button button_small');
             button.setAttribute('onclick', clickFunc);
@@ -4546,11 +4545,11 @@ function sendAsset() {
     info.amount        = Number($("#amount").val());
     info.property_id   = Number('137');
 
-    console.info('-102121 to_address = ' + info.to_address);
-    console.info('-102121 amount = ' + info.amount);
+    // console.info('-102121 to_address = ' + info.to_address);
+    // console.info('-102121 amount = ' + info.amount);
 
     obdApi.sendAsset(info, function(e) {
         console.info('-102121 sendAsset = ' + JSON.stringify(e));
-        $("#send_result").text('Send Result: Success!');
+        $("#send_result").text('Send Result: Success! Txid is: ' + JSON.stringify(e));
     });
 }
