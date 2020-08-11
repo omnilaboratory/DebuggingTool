@@ -333,6 +333,7 @@ function sdkIssueFixedAmount() {
 
     // SDK API
     issueFixedAmount(info);
+    displaySentMessage102113(info);
 }
 
 /** 
@@ -349,6 +350,7 @@ function sdkIssueManagedAmout() {
 
     // SDK API
     issueManagedAmout(info);
+    displaySentMessage102114(info);
 }
 
 /** 
@@ -364,6 +366,7 @@ function sdkSendGrant() {
 
     // SDK API
     sendGrant(info);
+    displaySentMessage102115(info);
 }
 
 /** 
@@ -379,6 +382,7 @@ function sdkSendRevoke() {
 
     // SDK API
     sendRevoke(info);
+    displaySentMessage102116(info);
 }
 
 /** 
@@ -4536,6 +4540,81 @@ function displaySentMessage100039(nodeID, userID, info) {
     displaySentMessage(msgSend);
 }
 
+/**
+ * -102113 Display the sent message in the message box and save it to the log file
+ * @param info 
+ */
+function displaySentMessage102113(info) {
+    let msgSend = {
+        type: -102113,
+        data: {
+            from_address:   info.from_address,
+            name:           info.name,
+            ecosystem:      info.ecosystem,
+            divisible_type: info.divisible_type,
+            data:           info.data,
+            amount:         info.amount
+        }
+    }
+
+    displaySentMessage(msgSend);
+}
+
+/**
+ * -102114 Display the sent message in the message box and save it to the log file
+ * @param info 
+ */
+function displaySentMessage102114(info) {
+    let msgSend = {
+        type: -102114,
+        data: {
+            from_address:   info.from_address,
+            name:           info.name,
+            ecosystem:      info.ecosystem,
+            divisible_type: info.divisible_type,
+            data:           info.data,
+        }
+    }
+
+    displaySentMessage(msgSend);
+}
+
+/**
+ * -102115 Display the sent message in the message box and save it to the log file
+ * @param info 
+ */
+function displaySentMessage102115(info) {
+    let msgSend = {
+        type: -102115,
+        data: {
+            from_address: info.from_address,
+            property_id:  info.property_id,
+            amount:       info.amount,
+            memo:         info.memo,
+        }
+    }
+
+    displaySentMessage(msgSend);
+}
+
+/**
+ * -102116 Display the sent message in the message box and save it to the log file
+ * @param info 
+ */
+function displaySentMessage102116(info) {
+    let msgSend = {
+        type: -102116,
+        data: {
+            from_address: info.from_address,
+            property_id:  info.property_id,
+            amount:       info.amount,
+            memo:         info.memo,
+        }
+    }
+
+    displaySentMessage(msgSend);
+}
+
 //  -102121 Invoke omni_send rpc command of omni core
 function sendAsset() {
 
@@ -4545,11 +4624,19 @@ function sendAsset() {
     info.amount        = Number($("#amount").val());
     info.property_id   = Number('137');
 
-    // console.info('-102121 to_address = ' + info.to_address);
-    // console.info('-102121 amount = ' + info.amount);
-
     obdApi.sendAsset(info, function(e) {
         console.info('-102121 sendAsset = ' + JSON.stringify(e));
         $("#send_result").text('Send Result: Success! Txid is: ' + JSON.stringify(e));
+    });
+}
+
+//  -102111 import an address to omni core
+function importToOmniCore() {
+
+    let address = $("#from_address").val();
+    let privkey = getPrivKeyFromAddress(address);
+
+    obdApi.importPrivKey(privkey, function(e) {
+        console.info('-102111 importPrivKey = ' + JSON.stringify(e));
     });
 }

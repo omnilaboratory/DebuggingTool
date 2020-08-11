@@ -190,6 +190,26 @@ function getFundingPrivKeyFromPubKey(myUserID, pubkey) {
     }
 }
 
+//
+function getPrivKeyFromAddress(address) {
+
+    let resp = JSON.parse(localStorage.getItem(kAddress));
+
+    // If has data.
+    if (resp) {
+        for (let i = 0; i < resp.result.length; i++) {
+            for (let j = 0; j < resp.result[i].data.length; j++) {
+                if (address === resp.result[i].data[j].address) {
+                    return resp.result[i].data[j].wif;
+                }
+            }
+        }
+        return '';
+    } else {
+        return '';
+    }
+}
+
 /**
  * Add a record to table Funding private key or Last temp private key
  * @param user_id

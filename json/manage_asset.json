@@ -7,11 +7,15 @@
             "parameters": [
                 {
                     "name": "from_address",
-                    "help": "The address to send from. This address must be belong to wallet (ismine = true) and has enough bitcoin to pay miner fee.",
+                    "help": "The address to send from. This address must be belong to wallet (ismine = true) and has enough bitcoin to pay miner fee. You could be import the address to omni core (will be ismine = true).",
                     "buttons": [
                         {
                             "innerText": "Select",
                             "onclick": "displayUserDataInNewHtml('MyAddresses')"
+                        },
+                        {
+                            "innerText": "Import to Omni Core",
+                            "onclick": "importToOmniCore()"
                         }
                     ]
                 },
@@ -49,11 +53,15 @@
             "parameters": [
                 {
                     "name": "from_address",
-                    "help": "the address to send from",
+                    "help": "the address to send from. This address must be belong to wallet (ismine = true) and has enough bitcoin to pay miner fee. You could be import the address to omni core (will be ismine = true).",
                     "buttons": [
                         {
                             "innerText": "Select",
                             "onclick": "displayUserDataInNewHtml('MyAddresses')"
+                        },
+                        {
+                            "innerText": "Import to Omni Core",
+                            "onclick": "importToOmniCore()"
                         }
                     ]
                 },
