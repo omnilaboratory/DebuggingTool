@@ -1733,12 +1733,12 @@ class ObdApi {
    * MsgType_ChannelOpen_AllItem_3150
    * @param callback function
    */
-  public getAllChannels(callback: Function) {
+  public getMyChannels(callback: Function) {
     let msg = new Message();
     msg.type = this.messageType.MsgType_ChannelOpen_AllItem_3150;
     this.sendData(msg, callback);
   }
-  public onGetAllChannels(jsonData: any) {}
+  public onGetMyChannels(jsonData: any) {}
 
   /**
    * MsgType_GetMiniBtcFundAmount_2006

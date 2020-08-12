@@ -430,11 +430,11 @@ function sdkGetChannelDetailFromDatabaseID() {
 }
 
 /** 
- * -103150 getAllChannels API at local.
+ * -103150 getMyChannels API at local.
  */
-function sdkGetAllChannels() {
+function sdkGetMyChannels() {
     // SDK API
-    getAllChannels();
+    getMyChannels();
 }
 
 /** 
@@ -781,7 +781,7 @@ function invokeAPIs(obj) {
             sdkGetChannelDetailFromDatabaseID();
             break;
         case enumMsgType.MsgType_ChannelOpen_AllItem_3150:
-            sdkGetAllChannels();
+            sdkGetMyChannels();
             break;
         case enumMsgType.MsgType_CommitmentTx_ItemsByChanId_3200:
             sdkGetAllCommitmentTransactions();
@@ -1836,11 +1836,11 @@ function showTooltip(content, parent, imgPath) {
 // create parameter of each API.
 function createParamOfAPI(arrParams, content_div) {
 
-    let input_box;
+    let input_box, parent, div_other;
     
     for (let i = 0; i < arrParams.length; i++) {
         
-        let parent = document.createElement('div');
+        parent = document.createElement('div');
         parent.setAttribute('class', 'parent_div');
 
         // Show tooltip.
@@ -1848,7 +1848,7 @@ function createParamOfAPI(arrParams, content_div) {
             showTooltip(arrParams[i].help, parent, arrParams[i].imgPath);
         }
 
-        let div_other = document.createElement('div');
+        div_other = document.createElement('div');
 
         // create [param_title] element
         createElement(div_other, 'text', arrParams[i].name + ' : ', 'param');
@@ -1868,6 +1868,13 @@ function createParamOfAPI(arrParams, content_div) {
         createElement(div_other, 'p');
         parent.append(div_other);
         content_div.append(parent);
+    }
+
+    //
+    if (arrParams[0].name === 'remote_node_address') {
+        createElement(div_other, 'h4', 'Example:');
+        createElement(div_other, 'text', '/ip4/62.234.216.108/tcp/4001/' + 
+            'p2p/QmVEoTmyofsbEnsoFwQXHngafECHJuVfEgGyb2bZtyiont', 'responseText');
     }
 }
 
@@ -2900,7 +2907,7 @@ function createBalanceElement(parent, strAddr) {
 
 // List of Counterparties who have interacted
 function displayCounterparties(param) {
-    
+
     let arrData, point, title, content;;
     let userID = $("#logined").text();
     let parent = $("#name_req_div");

@@ -14,9 +14,9 @@ function getAmountOfRechargeBTC(callback) {
 /**
  * Type -103150 Protocol is used to get get all of channels.
  */
-function getAllChannels() {
-    obdApi.getAllChannels(function(e) {
-        console.info('SDK: -103150 getAllChannels = ' + JSON.stringify(e));
+function getMyChannels() {
+    obdApi.getMyChannels(function(e) {
+        console.info('SDK: -103150 getMyChannels = ' + JSON.stringify(e));
     });
 }
 

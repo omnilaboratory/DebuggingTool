@@ -10,7 +10,7 @@
     top: 100%;
     color: rgb(102, 221, 55);
     display: block;
-    left: -70px;
+    left: -100px;
     /* margin-bottom: 15px; */
     margin-top: 15px;
     opacity: 0;
@@ -18,7 +18,7 @@
     pointer-events: none;
     position: absolute;
     /* width: 100%; */
-    width: 200px;
+    width: 260px;
     /* height: 100%; */
     -webkit-transform: translateY(10px);
     -moz-transform: translateY(10px);

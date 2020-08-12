@@ -12,9 +12,9 @@
             ]
         },
         {
-            "id": "getAllChannels",
+            "id": "getMyChannels",
             "type_id": -103150,
-            "description": "getAllChannels is used to get all of channels.",
+            "description": "getMyChannels is used to get the channels of currently user.",
             "parameters": []
         },
         {
