@@ -2900,15 +2900,16 @@ function createBalanceElement(parent, strAddr) {
 
 // List of Counterparties who have interacted
 function displayCounterparties(param) {
+    
+    let arrData, point, title, content;;
     let userID = $("#logined").text();
-    let arrData;
     let parent = $("#name_req_div");
     let list   = JSON.parse(localStorage.getItem(kCounterparties));
     let newDiv = document.createElement('div');
     newDiv.setAttribute('class', 'panelItem');
 
     if (param === kNewHtml) { // New page
-        var status = JSON.parse(localStorage.getItem(kGoWhere));
+        let status = JSON.parse(localStorage.getItem(kGoWhere));
         if (!status.isLogined) { // Not login.
             createElement(newDiv, 'h3', 'NOT LOGINED.');
             parent.append(newDiv);
@@ -2932,14 +2933,14 @@ function displayCounterparties(param) {
                 for (let i2 = 0; i2 < list.result[i].data.length; i2++) {
                     createElement(newDiv, 'h3', 'NO. ' + (i2 + 1), 'responseText');
                     arrData = [
-                        'NodePeerID : ' + list.result[i].data[i2].p2pID,
-                        'UserPeerID : ' + list.result[i].data[i2].name,
+                        'NodePeerID : ' + list.result[i].data[i2].nodeID,
+                        'UserPeerID : ' + list.result[i].data[i2].userID,
                     ];
 
                     for (let i3 = 0; i3 < arrData.length; i3++) {
-                        var point   = arrData[i3].indexOf(':') + 1;
-                        var title   = arrData[i3].substring(0, point);
-                        var content = arrData[i3].substring(point);
+                        point   = arrData[i3].indexOf(':') + 1;
+                        title   = arrData[i3].substring(0, point);
+                        content = arrData[i3].substring(point);
                         createElement(newDiv, 'text', title);
                         createElement(newDiv, 'text', content, 'responseText');
                         createElement(newDiv, 'p');
