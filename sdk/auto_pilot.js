@@ -106,6 +106,17 @@ async function listening110032(e, netType) {
 }
 
 /**
+ * auto response to -100032 (openChannel) 
+ * listening to -110032 and send -100033 acceptChannel
+ * 
+ * @param e 
+ * @param netType true: testnet  false: mainnet
+ */
+function listening110033(e) {
+    saveChannelAddress(e.channel_address);
+}
+
+/**
  * auto response to -100034 (AssetFundingCreated)
  * listening to -110034 and send -100035 AssetFundingSigned
  * @param e 
