@@ -54,6 +54,9 @@ function sdkLogIn() {
         // SDK API: Register event needed for listening.
         registerEvent(true);
 
+        // Just for GUI Tool
+        registerEventForGUITool();
+
         // If already logined, then return.
         if (isLogined) {
             console.info('-102001 isLogined = ' + isLogined);
@@ -4647,4 +4650,30 @@ function importToOmniCore() {
     obdApi.importPrivKey(privkey, function(e) {
         console.info('-102111 importPrivKey = ' + JSON.stringify(e));
     });
+}
+
+
+/**
+ * For GUI Tool
+ * Register event needed for listening.
+ */
+function registerEventForGUITool() {
+    let msg_110340 = enumMsgType.MsgType_FundingCreate_RecvBtcFundingCreated_340;
+    obdApi.registerEvent(msg_110340, function(e) {
+        listening110340ForGUITool(e);
+    });
+}
+
+
+/**
+ * For GUI Tool
+ * auto response to -100340 (bitcoinFundingCreated)
+ * listening to -110340 and send -100350 bitcoinFundingSigned
+ * @param e 
+ */
+function listening110340ForGUITool(e) {
+
+    // console.info('listening110340 = ' + JSON.stringify(e));
+    saveTempHash(e.funding_txid);
+    $("#funding_txid").val(getTempHash());
 }
