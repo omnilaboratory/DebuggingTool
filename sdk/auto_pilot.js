@@ -16,6 +16,11 @@ function registerEvent(netType) {
         listening110032(e, netType);
     });
 
+    let msg_110033 = enumMsgType.MsgType_RecvChannelAccept_33;
+    obdApi.registerEvent(msg_110033, function(e) {
+        listening110033(e);
+    });
+
     // auto response mode
     let msg_110340 = enumMsgType.MsgType_FundingCreate_RecvBtcFundingCreated_340;
     obdApi.registerEvent(msg_110340, function(e) {
