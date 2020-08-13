@@ -44,6 +44,10 @@
     width: 68px;
 }
 
+.col_5_width{
+    width: 110px;
+}
+
 .bottom_div {
     margin-top: 30px;
     font-size: 18px;

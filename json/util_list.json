@@ -25,6 +25,10 @@
                 {
                     "name": "channel_id",
                     "buttons": [
+                        {
+                            "innerText": "Display",
+                            "onclick": "displayMyChannelList(5, 1)"
+                        }
                     ]
                 }
             ]
@@ -51,7 +55,7 @@
                     "buttons": [
                         {
                             "innerText": "Select",
-                            "onclick": "displayUserDataInNewHtml('ChannelList')"
+                            "onclick": "displayMyChannelList(5, 1)"
                         }
                     ]
                 }
@@ -67,7 +71,7 @@
                     "buttons": [
                         {
                             "innerText": "Select",
-                            "onclick": "displayUserDataInNewHtml('ChannelList')"
+                            "onclick": "displayMyChannelList(5, 1)"
                         }
                     ]
                 }
@@ -83,7 +87,7 @@
                     "buttons": [
                         {
                             "innerText": "Select",
-                            "onclick": "displayUserDataInNewHtml('ChannelList')"
+                            "onclick": "displayMyChannelList(5, 1)"
                         }
                     ]
                 }
@@ -99,7 +103,7 @@
                     "buttons": [
                         {
                             "innerText": "Select",
-                            "onclick": "displayUserDataInNewHtml('ChannelList')"
+                            "onclick": "displayMyChannelList(5, 1)"
                         }
                     ]
                 }
@@ -115,7 +119,7 @@
                     "buttons": [
                         {
                             "innerText": "Select",
-                            "onclick": "displayUserDataInNewHtml('ChannelList')"
+                            "onclick": "displayMyChannelList(5, 1)"
                         }
                     ]
                 }
@@ -131,7 +135,7 @@
                     "buttons": [
                         {
                             "innerText": "Select",
-                            "onclick": "displayUserDataInNewHtml('ChannelList')"
+                            "onclick": "displayMyChannelList(5, 1)"
                         }
                     ]
                 }

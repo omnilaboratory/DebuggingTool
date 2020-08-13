@@ -1536,6 +1536,9 @@ async function autoFillValue(arrParams, obj) {
 
         case enumMsgType.MsgType_HTLC_SendAddHTLC_40:
             if (!isLogined) return;  // Not logined
+            $("#channel_id").val(getChannelID());
+            $("#channel_id").attr("class", "input input_color");
+            
             fillCounterparty();
             fillH_RP_CE();
             fillChannelFundingLastTempKeys();
@@ -1546,6 +1549,9 @@ async function autoFillValue(arrParams, obj) {
 
         case enumMsgType.MsgType_HTLC_SendAddHTLCSigned_41:
             if (!isLogined) return;  // Not logined
+            $("#channel_id").val(getChannelID());
+            $("#channel_id").attr("class", "input input_color");
+
             fillCounterparty();
             $("#payer_commitment_tx_hash").val(getTempHash());
             fillChannelFundingLastTempKeys();
@@ -2724,7 +2730,8 @@ function displayUserData(obj, param) {
             displayCounterparties(param);
             break;
         case 'ChannelList':
-            displayChannelCreation(param);
+            displayMyChannelList(5, 1);
+            // displayChannelCreation(param);
             break;
         case 'OmniFaucet':
             displayOmniFaucet(param);
@@ -3830,6 +3837,18 @@ function nextPage(obj) {
 }
 
 //
+function previousPageForChannelList(obj) {
+    let previousPage = Number(obj.getAttribute("pageNum")) - 1;
+    displayMyChannelList(5, previousPage);
+}
+
+//
+function nextPageForChannelList(obj) {
+    let nextPage = Number(obj.getAttribute("pageNum")) + 1;
+    displayMyChannelList(5, nextPage);
+}
+
+//
 function formatTime(time) {
     // console.info(time);
     if (time === '0001-01-01T00:00:00Z') {  // Null time
@@ -4652,7 +4671,6 @@ function importToOmniCore() {
     });
 }
 
-
 /**
  * For GUI Tool
  * Register event needed for listening.
@@ -4664,16 +4682,144 @@ function registerEventForGUITool() {
     });
 }
 
-
 /**
  * For GUI Tool
  * auto response to -100340 (bitcoinFundingCreated)
- * listening to -110340 and send -100350 bitcoinFundingSigned
+ * listening to -110340 and 
  * @param e 
  */
 function listening110340ForGUITool(e) {
-
     // console.info('listening110340 = ' + JSON.stringify(e));
     saveTempHash(e.funding_txid);
     $("#funding_txid").val(getTempHash());
+}
+
+//
+function displayMyChannelList(page_size, page_index) {
+    obdApi.getMyChannels(Number(page_size), Number(page_index), function(e) {
+        // console.info('-103150 tableMyChannelList = ' + JSON.stringify(e));
+        tableMyChannelList(e);
+    });
+}
+
+function rowMyChannelList(e, i, tr) {
+
+    if (e.data[i].channel_id === '') {
+        createElement(tr, 'td', e.data[i].temporary_channel_id);
+        createElement(tr, 'td', 'temp channel');
+    } else {
+        createElement(tr, 'td', e.data[i].channel_id);
+        createElement(tr, 'td', 'normal channel');
+    }
+
+    createElement(tr, 'td', e.data[i].channel_address);
+    createElement(tr, 'td', e.data[i].property_id);
+    // createElement(tr, 'td', e.data[i].asset_amount);
+    createElement(tr, 'td', e.data[i].balance_a);
+    createElement(tr, 'td', e.data[i].balance_b);
+    // createElement(tr, 'td', e.data[i].balance_htlc);
+    // createElement(tr, 'td', e.data[i].btc_amount);
+
+    if (e.data[i].channel_id === '') {  // is a temporary channel
+        if (e.data[i].btc_funding_times === 0) {
+            createElement(tr, 'td', '0');
+        } else {
+            createElement(tr, 'td', e.data[i].btc_funding_times);
+        }
+    } else {
+        createElement(tr, 'td', '3');
+    }
+
+    // createElement(tr, 'td', e.data[i].is_private);
+
+    if ( $("#logined").text() === e.data[i].peer_ida ) {
+        createElement(tr, 'td', e.data[i].peer_idb);
+    } else {
+        createElement(tr, 'td', e.data[i].peer_ida);
+    }
+
+    // createElement(tr, 'td', e.data[i].create_at);
+}
+
+function tableMyChannelList(e) {
+    
+    console.info('total count = ' + e.totalCount);
+
+    removeTrackerDiv();
+
+    // table
+    let tracker_div = $("#tracker_div");
+    let table = document.createElement('table');
+    table.id = 'tracker';
+    tracker_div.append(table);
+
+    // head
+    createElement(table, 'tr');
+    createElement(table, 'th', 'NO', 'col_1_width');
+    createElement(table, 'th', 'channel_id');
+    createElement(table, 'th', 'status', 'col_3_width');
+    createElement(table, 'th', 'channel_address');
+    createElement(table, 'th', 'property_id', 'col_2_width');
+    // createElement(table, 'th', 'asset_amount', 'col_4_width');
+    createElement(table, 'th', 'balance_a', 'col_3_width');
+    createElement(table, 'th', 'balance_b', 'col_3_width');
+    // createElement(table, 'th', 'balance_htlc', 'col_4_width');
+    // createElement(table, 'th', 'btc_amount', 'col_4_width');
+    createElement(table, 'th', 'btc_funding_times', 'col_3_width');
+    // createElement(table, 'th', 'is_private', 'col_4_width');
+    // createElement(table, 'th', 'user_a', 'col_5_width');
+    createElement(table, 'th', 'counterparty', 'col_5_width');
+    // createElement(table, 'th', 'create_at', 'col_4_width');
+    
+    // row
+    let iNum = (e.pageNum - 1) * 5;
+
+    for (let i = 0; i < e.data.length; i++) {
+        if (i % 2 != 0) {
+            let tr = document.createElement('tr');
+            tr.setAttribute('class', 'alt');
+            table.append(tr);
+
+            createElement(tr, 'td', i + 1 + iNum);
+            rowMyChannelList(e, i, tr);
+        } else {
+            createElement(table, 'tr');
+            createElement(table, 'td', i + 1 + iNum);
+            rowMyChannelList(e, i, table);
+        }
+    }
+
+    // total count
+    let bottom_div = document.createElement('div');
+    bottom_div.setAttribute('class', 'bottom_div');
+    tracker_div.append(bottom_div);
+
+    createElement(bottom_div, 'label', 'Total Count : ' + e.totalCount, 'left_margin');
+    createElement(bottom_div, 'label', 'Page ' + e.pageNum + ' / ' + e.totalPage, 'left_margin');
+
+    // previous page
+    let butPrevious = document.createElement('button');
+    butPrevious.setAttribute('pageNum', e.pageNum);
+    butPrevious.setAttribute('class', 'button button_small');
+    butPrevious.setAttribute('onclick', 'previousPageForChannelList(this)');
+    butPrevious.innerText = 'Prev Page';
+    bottom_div.append(butPrevious);
+
+    if (e.pageNum === 1) {
+        butPrevious.setAttribute('class', 'button_small disabled');
+        butPrevious.setAttribute("disabled", "disabled");
+    }
+
+    // next page
+    let butNext = document.createElement('button');
+    butNext.setAttribute('pageNum', e.pageNum);
+    butNext.setAttribute('class', 'button button_small');
+    butNext.setAttribute('onclick', 'nextPageForChannelList(this)');
+    butNext.innerText = 'Next Page';
+    bottom_div.append(butNext);
+
+    if (e.pageNum === e.totalPage) {
+        butNext.setAttribute('class', 'button_small disabled');
+        butNext.setAttribute("disabled", "disabled");
+    }
 }

@@ -1731,11 +1731,24 @@ class ObdApi {
 
   /**
    * MsgType_ChannelOpen_AllItem_3150
+   * @param page_size Number
+   * @param page_index Number
    * @param callback function
    */
-  public getMyChannels(callback: Function) {
-    let msg = new Message();
+  public getMyChannels(page_size: Number, page_index: Number, callback: Function) {
+
+    if (page_size == null || page_size <= 0) {
+      page_size = 10;
+    }
+
+    if (page_index == null || page_index <= 0) {
+      page_index = 1;
+    }
+
+    let msg  = new Message();
     msg.type = this.messageType.MsgType_ChannelOpen_AllItem_3150;
+    msg.data["page_size"]  = page_size;
+    msg.data["page_index"] = page_index;
     this.sendData(msg, callback);
   }
   public onGetMyChannels(jsonData: any) {}
@@ -1763,8 +1776,8 @@ class ObdApi {
     }
     let msg = new Message();
     msg.type = this.messageType.MsgType_GetChannelInfoByChannelId_3154;
-    // msg.data = channel_id;
-    msg.data["channel_id"] = channel_id;
+    msg.data = channel_id;
+    // msg.data["channel_id"] = channel_id;
     this.sendData(msg, callback);
   }
   public onGetChannelDetailFromChannelID(jsonData: any) {}

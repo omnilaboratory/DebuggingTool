@@ -12,11 +12,8 @@
 function openChannel(myUserID, nodeID, userID, info) {
     obdApi.openChannel(nodeID, userID, info, function(e) {
         console.info('SDK: -100032 openChannel = ' + JSON.stringify(e));
-
-        // WILL BE UPDATED
-        // saveChannelList(e);
-
         // Functions related to save and get data have be moved to SDK.
+        // saveMyChannelList(e);
         saveCounterparties(myUserID, nodeID, userID);
         saveChannelID(e.temporary_channel_id);
         let privkey = getFundingPrivKeyFromPubKey(myUserID, info.funding_pubkey);

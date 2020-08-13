@@ -152,7 +152,7 @@
                     "buttons": [
                         {
                             "innerText": "Display",
-                            "onclick": "displayUserDataInNewHtml('ChannelList')"
+                            "onclick": "displayMyChannelList(5, 1)"
                         }
                     ]
                 },
@@ -212,7 +212,7 @@
                     "buttons": [
                         {
                             "innerText": "Display (Channel Address)",
-                            "onclick": "displayUserDataInNewHtml('ChannelList')"
+                            "onclick": "displayMyChannelList(5, 1)"
                         }
                     ]
                 },
@@ -265,7 +265,7 @@
                     "buttons": [
                         {
                             "innerText": "Display",
-                            "onclick": "displayUserDataInNewHtml('ChannelList')"
+                            "onclick": "displayMyChannelList(5, 1)"
                         }
                     ]
                 },
@@ -284,10 +284,6 @@
                     "help": "The commitment transaction hex created in fundingBitcoin api (type 1009).",
                     "imgPath": "doc/tooltip/3400-3500.png",
                     "buttons": [
-                        {
-                            "innerText": "Display",
-                            "onclick": "displayUserDataInNewHtml('ChannelList')"
-                        }
                     ]
                 }
             ]
@@ -320,7 +316,7 @@
                     "buttons": [
                         {
                             "innerText": "Display",
-                            "onclick": "displayUserDataInNewHtml('ChannelList')"
+                            "onclick": "displayMyChannelList(5, 1)"
                         }
                     ]
                 },
@@ -339,10 +335,6 @@
                     "help": "The commitment transaction txid created in fundingBitcoin api (type 1009).",
                     "imgPath": "doc/tooltip/3400-3500.png",
                     "buttons": [
-                        {
-                            "innerText": "Display",
-                            "onclick": "displayUserDataInNewHtml('ChannelList')"
-                        }
                     ]
                 }
             ]
@@ -386,8 +378,8 @@
                     "help": "This is channel 2-2 multi-sig address generated after AcceptChannel API invoked with counterparty.",
                     "buttons": [
                         {
-                            "innerText": "Display (Channel Addr)",
-                            "onclick": "displayUserDataInNewHtml('ChannelList')"
+                            "innerText": "Display (Channel Address)",
+                            "onclick": "displayMyChannelList(5, 1)"
                         }
                     ]
                 },
@@ -435,7 +427,7 @@
                     "buttons": [
                         {
                             "innerText": "Display",
-                            "onclick": "displayUserDataInNewHtml('ChannelList')"
+                            "onclick": "displayMyChannelList(5, 1)"
                         }
                     ]
                 },
@@ -481,10 +473,6 @@
                     "help": "The commitment transaction hex created in FundingAsset api (type 2001).",
                     "imgPath": "doc/tooltip/FundingAsset.png",
                     "buttons": [
-                        {
-                            "innerText": "Display",
-                            "onclick": "displayUserDataInNewHtml('ChannelList')"
-                        }
                     ]
                 }
             ]
@@ -518,7 +506,7 @@
                     "buttons": [
                         {
                             "innerText": "Display",
-                            "onclick": "displayUserDataInNewHtml('ChannelList')"
+                            "onclick": "displayMyChannelList(5, 1)"
                         }
                     ]
                 },
@@ -563,7 +551,7 @@
                     "buttons": [
                         {
                             "innerText": "Display",
-                            "onclick": "displayUserDataInNewHtml('ChannelList')"
+                            "onclick": "displayMyChannelList(5, 1)"
                         }
                     ]
                 },
@@ -649,7 +637,7 @@
                     "buttons": [
                         {
                             "innerText": "Display",
-                            "onclick": "displayUserDataInNewHtml('ChannelList')"
+                            "onclick": "displayMyChannelList(5, 1)"
                         }
                     ]
                 },
@@ -658,10 +646,6 @@
                     "help": "Commitment hash of C2a transaction created by Alice.",
                     "imgPath": "doc/tooltip/C2a.png",
                     "buttons": [
-                        {
-                            "innerText": "Display",
-                            "onclick": "displayUserDataInNewHtml('ChannelList')"
-                        }
                     ]
                 },
                 {
@@ -773,6 +757,11 @@
             "description": "addHTLC is used for looking for a path to transfer to target and Send H to middleman.",
             "parameters": [
                 {
+                    "name": "channel_id",
+                    "buttons": [
+                    ]
+                },
+                {
                     "name": "recipient_node_peer_id",
                     "buttons": [
                         {
@@ -822,10 +811,6 @@
                     "name": "routing_packet",
                     "help": "The path from sender to final receiver.",
                     "buttons": [
-                        {
-                            "innerText": "Display",
-                            "onclick": "displayUserDataInNewHtml('ChannelList')"
-                        }
                     ]
                 },
                 {
@@ -941,6 +926,11 @@
             "description": "HTLCSigned is used to response a routing request by middleman.",
             "parameters": [
                 {
+                    "name": "channel_id",
+                    "buttons": [
+                    ]
+                },
+                {
                     "name": "recipient_node_peer_id",
                     "buttons": [
                         {
@@ -962,10 +952,6 @@
                     "name": "payer_commitment_tx_hash",
                     "help": "The hash of commitment transaction created in HTLCCreated (type -40).",
                     "buttons": [
-                        {
-                            "innerText": "Display",
-                            "onclick": "displayUserDataInNewHtml('ChannelList')"
-                        }
                     ]
                 },
                 {
@@ -1072,7 +1058,7 @@
                     "buttons": [
                         {
                             "innerText": "Display",
-                            "onclick": "displayUserDataInNewHtml('ChannelList')"
+                            "onclick": "displayMyChannelList(5, 1)"
                         }
                     ]
                 },
@@ -1153,7 +1139,7 @@
                     "buttons": [
                         {
                             "innerText": "Display",
-                            "onclick": "displayUserDataInNewHtml('ChannelList')"
+                            "onclick": "displayMyChannelList(5, 1)"
                         }
                     ]
                 },
@@ -1161,10 +1147,6 @@
                     "name": "msg_hash",
                     "help": "The hash of commitment transaction created in HTLCSendR (type -45).",
                     "buttons": [
-                        {
-                            "innerText": "Display",
-                            "onclick": "displayUserDataInNewHtml('ChannelList')"
-                        }
                     ]
                 },
                 {
@@ -1218,7 +1200,7 @@
                     "buttons": [
                         {
                             "innerText": "Display",
-                            "onclick": "displayUserDataInNewHtml('ChannelList')"
+                            "onclick": "displayMyChannelList(5, 1)"
                         }
                     ]
                 },
@@ -1316,10 +1298,6 @@
                     "name": "msg_hash",
                     "help": "The hash of commitment transaction created in CloseHTLC (type -49).",
                     "buttons": [
-                        {
-                            "innerText": "Display",
-                            "onclick": "displayUserDataInNewHtml('ChannelList')"
-                        }
                     ]
                 },
                 {
@@ -1417,7 +1395,7 @@
                     "buttons": [
                         {
                             "innerText": "Display",
-                            "onclick": "displayUserDataInNewHtml('ChannelList')"
+                            "onclick": "displayMyChannelList(5, 1)"
                         }
                     ]
                 }
@@ -1451,7 +1429,7 @@
                     "buttons": [
                         {
                             "innerText": "Display",
-                            "onclick": "displayUserDataInNewHtml('ChannelList')"
+                            "onclick": "displayMyChannelList(5, 1)"
                         }
                     ]
                 },
@@ -1459,10 +1437,6 @@
                     "name": "request_close_channel_hash",
                     "help": "The hash of request created in CloseChannel (type -38).",
                     "buttons": [
-                        {
-                            "innerText": "Display",
-                            "onclick": "displayUserDataInNewHtml('ChannelList')"
-                        }
                     ]
                 }
             ]
@@ -1495,7 +1469,7 @@
                     "buttons": [
                         {
                             "innerText": "Select",
-                            "onclick": "displayUserDataInNewHtml('ChannelList')"
+                            "onclick": "displayMyChannelList(5, 1)"
                         }
                     ]
                 },
@@ -1504,7 +1478,7 @@
                     "buttons": [
                         {
                             "innerText": "Select",
-                            "onclick": "displayUserDataInNewHtml('ChannelList')"
+                            "onclick": "displayMyChannelList(5, 1)"
                         }
                     ]
                 },
@@ -1577,7 +1551,7 @@
                     "buttons": [
                         {
                             "innerText": "Select",
-                            "onclick": "displayUserDataInNewHtml('ChannelList')"
+                            "onclick": "displayMyChannelList(5, 1)"
                         }
                     ]
                 },
@@ -1586,7 +1560,7 @@
                     "buttons": [
                         {
                             "innerText": "Select",
-                            "onclick": "displayUserDataInNewHtml('ChannelList')"
+                            "onclick": "displayMyChannelList(5, 1)"
                         }
                     ]
                 },
