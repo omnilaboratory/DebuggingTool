@@ -82,6 +82,7 @@ async function listening110032(e, netType) {
     let isAutoMode = getAutoPilot();
     console.info('SDK: NOW isAutoMode = ' + isAutoMode);
     saveChannelID(e.temporary_channel_id);
+    saveCounterparties(e.to_peer_id, e.funder_node_address, e.funder_peer_id);
 
     if (isAutoMode === 'No' || isAutoMode === null) return;
     
