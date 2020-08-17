@@ -32,17 +32,9 @@ const kGoWhere = 'go_where';
 // the info save to local storage [ChannelList].
 var channelInfo;
 
-/**
- * open / close auto mode.
- */
-// var isAutoMode = false;
-
-// Get name of saveGoWhere variable.
-// function getSaveName() {
-//     return kGoWhere;
-// }
 
 // -102001 logIn.
+/*
 function sdkLogIn() {
 
     let mnemonic = $("#mnemonic").val();
@@ -70,9 +62,43 @@ function sdkLogIn() {
 
         // SDK API: Save mnemonic
         saveMnemonic(e.userPeerId, mnemonic);
-
         displaySentMessage102001(mnemonic);
     });
+}
+*/
+
+async function sdkLogIn() {
+
+    let mnemonic = $("#mnemonic").val();
+    let e = await logIn(mnemonic);
+
+    // Just for GUI Tool
+    registerEventForGUITool();
+
+    // If already logined, then return.
+    if (isLogined) {
+        console.info('-102001 isLogined = ' + isLogined);
+        return;
+    }
+
+    // a new loginning.
+    mnemonicWithLogined = mnemonic;
+    $("#logined").text(e.userPeerId);
+    isLogined = true;
+
+    displaySentMessage102001(mnemonic);
+
+    await displayMyChannelListAtTopRight(5, 1);
+}
+
+/**
+ * // Get channel list
+    //    asyncDisplayMyChannelListAtTopRight();
+ * Display the sent message in the message box and save it to the log file
+ * @param msgSend Sent message
+ */
+async function asyncDisplayMyChannelListAtTopRight() {
+    await displayMyChannelListAtTopRight(5, 1);
 }
 
 /**
@@ -1890,15 +1916,15 @@ function createParamOfAPI(arrParams, content_div) {
 // create button of parameter
 function createButtonOfParam(arrParams, index, content_div) {
 
-    var innerText, invokeFunc;
-    var arrButtons = arrParams[index].buttons;
+    let innerText, invokeFunc;
+    let arrButtons = arrParams[index].buttons;
 
     for (let i = 0; i < arrButtons.length; i++) {
         innerText = arrButtons[i].innerText;
         invokeFunc = arrButtons[i].onclick;
 
         // create [button] element
-        var button = document.createElement('button');
+        let button = document.createElement('button');
         button.id = arrParams[index].name + innerText.substring(0, 3);
         button.innerText = innerText;
         button.setAttribute('class', 'button button_small');
@@ -1910,15 +1936,15 @@ function createButtonOfParam(arrParams, index, content_div) {
 // 
 function createInvokeAPIButton(obj) {
     // get [content] div
-    var content_div = $("#name_req_div");
+    let content_div = $("#name_req_div");
 
-    var newDiv = document.createElement('div');
+    let newDiv = document.createElement('div');
     newDiv.setAttribute('class', 'panelItem');
 
     createElement(newDiv, 'p');
 
     // create [Send button] element
-    var button = document.createElement('button');
+    let button = document.createElement('button');
     // button.id = 'send_button';
     button.setAttribute('type_id', obj.getAttribute("type_id"));
     button.setAttribute('class', 'button');
@@ -3849,6 +3875,18 @@ function nextPageForChannelList(obj) {
 }
 
 //
+function previousPageForChannelListAtTopRight(obj) {
+    let previousPage = Number(obj.getAttribute("pageNum")) - 1;
+    displayMyChannelListAtTopRight(5, previousPage);
+}
+
+//
+function nextPageForChannelListAtTopRight(obj) {
+    let nextPage = Number(obj.getAttribute("pageNum")) + 1;
+    displayMyChannelListAtTopRight(5, nextPage);
+}
+
+//
 function formatTime(time) {
     // console.info(time);
     if (time === '0001-01-01T00:00:00Z') {  // Null time
@@ -4706,10 +4744,10 @@ function rowMyChannelList(e, i, tr) {
 
     if (e.data[i].channel_id === '') {
         createElement(tr, 'td', e.data[i].temporary_channel_id);
-        createElement(tr, 'td', 'temp channel');
+        createElement(tr, 'td', 'temp');
     } else {
         createElement(tr, 'td', e.data[i].channel_id);
-        createElement(tr, 'td', 'normal channel');
+        createElement(tr, 'td', 'normal');
     }
 
     createElement(tr, 'td', e.data[i].channel_address);
@@ -4822,4 +4860,173 @@ function tableMyChannelList(e) {
         butNext.setAttribute('class', 'button_small disabled');
         butNext.setAttribute("disabled", "disabled");
     }
+}
+
+/**
+ * Open 
+ */
+function openSQLite() {
+    let dbSqlite = openDatabase("myDB","1.0","test db",1024*100);
+}
+
+/**
+ *  Fix Show Top Div
+ */
+function fixShowTopDiv() {
+    window.addEventListener('scroll', function() {
+        let t = $('body, html').scrollTop();
+        if (t > 0) {
+            $('.top').addClass('top-active')
+        } else {
+            $('.top').removeClass('top-active')
+        }
+    })
+}
+
+//
+function displayMyChannelListAtTopRight(page_size, page_index) {
+    return new Promise((resolve, reject) => {
+        obdApi.getMyChannels(Number(page_size), Number(page_index), function(e) {
+            // console.info('-103150 tableMyChannelList = ' + JSON.stringify(e));
+    
+            tableMyChannelListAtTopRight(e);
+
+            // Running success and return
+            resolve();
+        });
+    })
+}
+
+
+function tableMyChannelListAtTopRight(e) {
+
+    let div_channels = $("#div_channels");
+    div_channels.html("");
+
+    // table
+    let table = document.createElement('table');
+    table.id = 'tracker';
+    div_channels.append(table);
+
+    // head
+    createElement(table, 'tr');
+    createElement(table, 'th', 'NO', 'col_1_width');
+    createElement(table, 'th', 'channel_id', 'col_6_width');
+    createElement(table, 'th', 'status');
+    // createElement(table, 'th', 'channel_address');
+    // createElement(table, 'th', 'property_id', 'col_2_width');
+    // createElement(table, 'th', 'asset_amount', 'col_4_width');
+    createElement(table, 'th', 'balance');
+    createElement(table, 'th', 'p_msg');
+    // createElement(table, 'th', 'balance_b', 'col_3_width');
+    // createElement(table, 'th', 'balance_htlc', 'col_4_width');
+    // createElement(table, 'th', 'btc_amount', 'col_4_width');
+    // createElement(table, 'th', 'btc_funding_times', 'col_3_width');
+    // createElement(table, 'th', 'is_private', 'col_4_width');
+    // createElement(table, 'th', 'user_a', 'col_5_width');
+    // createElement(table, 'th', 'counterparty');
+    // createElement(table, 'th', 'create_at', 'col_4_width');
+    
+    // row
+    let iNum = (e.pageNum - 1) * 5;
+    for (let i = 0; i < e.data.length; i++) {
+        createElement(table, 'tr');
+        createElement(table, 'td', i + 1 + iNum);
+        rowMyChannelListAtTopRight(e, i, table);
+
+        // if (i % 2 != 0) {
+        //     let tr = document.createElement('tr');
+        //     tr.setAttribute('class', 'altTopRight');
+        //     table.append(tr);
+
+        //     createElement(tr, 'td', i + 1 + iNum);
+        //     rowMyChannelListAtTopRight(e, i, tr);
+        // } else {
+        //     createElement(table, 'tr');
+        //     createElement(table, 'td', i + 1 + iNum);
+        //     rowMyChannelListAtTopRight(e, i, table);
+        // }
+    }
+
+    // total count
+    let bottom_div = document.createElement('div');
+    bottom_div.setAttribute('class', 'bottom_div');
+    div_channels.append(bottom_div);
+
+    createElement(bottom_div, 'label', 'Total Count : ' + e.totalCount, 'left_margin');
+    createElement(bottom_div, 'label', 'Page ' + e.pageNum + ' / ' + e.totalPage, 'left_margin');
+
+    // previous page
+    let butPrevious = document.createElement('button');
+    butPrevious.setAttribute('pageNum', e.pageNum);
+    butPrevious.setAttribute('class', 'button button_small');
+    butPrevious.setAttribute('onclick', 'previousPageForChannelListAtTopRight(this)');
+    butPrevious.innerText = 'Prev Page';
+    bottom_div.append(butPrevious);
+
+    if (e.pageNum === 1) {
+        butPrevious.setAttribute('class', 'button_small disabled');
+        butPrevious.setAttribute("disabled", "disabled");
+    }
+
+    // next page
+    let butNext = document.createElement('button');
+    butNext.setAttribute('pageNum', e.pageNum);
+    butNext.setAttribute('class', 'button button_small');
+    butNext.setAttribute('onclick', 'nextPageForChannelListAtTopRight(this)');
+    butNext.innerText = 'Next Page';
+    bottom_div.append(butNext);
+
+    if (e.pageNum === e.totalPage) {
+        butNext.setAttribute('class', 'button_small disabled');
+        butNext.setAttribute("disabled", "disabled");
+    }
+
+    // refresh button
+    let butRefresh = document.createElement('button');
+    // butRefresh.setAttribute('pageNum', e.pageNum);
+    butRefresh.setAttribute('class', 'button button_small');
+    butRefresh.setAttribute('onclick', 'displayMyChannelListAtTopRight(5, 1)');
+    butRefresh.innerText = 'Refresh';
+    bottom_div.append(butRefresh);
+}
+
+function rowMyChannelListAtTopRight(e, i, tr) {
+
+    if (e.data[i].channel_id === '') {
+        createElement(tr, 'td', e.data[i].temporary_channel_id);
+        createElement(tr, 'td', 'temp');
+    } else {
+        createElement(tr, 'td', e.data[i].channel_id);
+        createElement(tr, 'td', 'normal');
+    }
+
+    // createElement(tr, 'td', e.data[i].channel_address);
+    // createElement(tr, 'td', e.data[i].property_id);
+    // createElement(tr, 'td', e.data[i].asset_amount);
+    createElement(tr, 'td', e.data[i].balance_a);
+    createElement(tr, 'td', '0');
+    // createElement(tr, 'td', e.data[i].balance_b);
+    // createElement(tr, 'td', e.data[i].balance_htlc);
+    // createElement(tr, 'td', e.data[i].btc_amount);
+
+    // if (e.data[i].channel_id === '') {  // is a temporary channel
+    //     if (e.data[i].btc_funding_times === 0) {
+    //         createElement(tr, 'td', '0');
+    //     } else {
+    //         createElement(tr, 'td', e.data[i].btc_funding_times);
+    //     }
+    // } else {
+    //     createElement(tr, 'td', '3');
+    // }
+
+    // createElement(tr, 'td', e.data[i].is_private);
+
+    // if ( $("#logined").text() === e.data[i].peer_ida ) {
+    //     createElement(tr, 'td', e.data[i].peer_idb);
+    // } else {
+    //     createElement(tr, 'td', e.data[i].peer_ida);
+    // }
+
+    // createElement(tr, 'td', e.data[i].create_at);
 }

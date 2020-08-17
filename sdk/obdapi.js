@@ -155,7 +155,7 @@ class ObdApi {
         let toId = jsonData.to;
         fromId = fromId.split("@")[0];
         toId = toId.split("@")[0];
-        //如果是广播信息，或者是被推送的信息（比如alice推送给Bob的351）
+        // This message is Alice send to Bob
         if (fromId != toId) {
             if (callback != null) {
                 resultData["to_peer_id"] = toId;
@@ -163,7 +163,7 @@ class ObdApi {
             }
             return;
         }
-        //是自己的调用api的数据反馈
+        // This message is send to myself
         if (callback != null) {
             callback(resultData);
         }

@@ -55,6 +55,21 @@ function genAddressFromMnemonic(mnemonic, index, netType) {
  * @param mnemonic 
  * @param callback 
  */
-function logIn(mnemonic, callback) {
-    obdApi.logIn(mnemonic, callback);
+// function logIn(mnemonic, callback) {
+//     obdApi.logIn(mnemonic, callback);
+// }
+
+function logIn(mnemonic) {
+    return new Promise((resolve, reject) => {
+        obdApi.logIn(mnemonic, function(e) {
+            console.info('SDK: -102001 logIn = ' + JSON.stringify(e));
+            // SDK API: Register event needed for listening.
+            registerEvent(true);
+    
+            // SDK API: Save mnemonic
+            saveMnemonic(e.userPeerId, mnemonic);
+    
+            resolve(e);
+        });
+    })
 }

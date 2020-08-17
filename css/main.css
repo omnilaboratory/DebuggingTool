@@ -190,6 +190,13 @@ pre {
     background: #1E222A;
     width: 100%;
     display: flex;
+    position: relative;
+    z-index: 999;
+}
+
+.top-active{
+    position: fixed;
+    top: 0;
 }
 
 .topLeft{

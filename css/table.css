@@ -12,6 +12,7 @@
     vertical-align: middle;
     word-wrap:break-word; 
     word-break:break-all;
+    text-align: center;
 }
 #tracker th 
 {
@@ -20,7 +21,8 @@
 	padding-top:8px;
 	padding-bottom:8px;
 	background-color:rgb(78, 81, 87);
-	color:#ffffff;
+    color:#ffffff;
+    text-align: center;
 }
 #tracker tr.alt td
 {
@@ -46,6 +48,10 @@
 
 .col_5_width{
     width: 110px;
+}
+
+.col_6_width{
+    width: 220px;
 }
 
 .bottom_div {
