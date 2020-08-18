@@ -232,15 +232,15 @@
     top: 100%;
     color: rgb(102, 221, 55);
     display: block;
-    left: -480px;
+    left: -530px;
     margin-top: 15px;
     opacity: 0;
     padding: 20px;
     pointer-events: none;
     position: absolute;
     z-index: 1;
-    width:  550px;
-    height: 450px;
+    width:  600px;
+    height: 500px;
     word-break: normal;
     transform: translateY(10px);
     transition: all .25s ease-out;
@@ -266,7 +266,7 @@
     top: -10px;
     content: " ";
     height: 0;
-    left: 530px;
+    left: 580px;
     margin-left: -13px;
     position: absolute;
     width: 0;
