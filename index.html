@@ -29,7 +29,6 @@
 <script>
     // invoked when page refresh.
     openDB();
-    // openSQLite();
     getUtilList();
     getAPIList();
     getUserDataList();
@@ -41,7 +40,8 @@
 <body>
     <div id="container">
         <!-- Header -->
-        <div>
+        <div class="header">
+            <!-- Top area -->
             <div class="top">
                 <div class="topLeft">OBD Debug Tool</div>
                 <div class="topRight">
@@ -53,7 +53,6 @@
                         <div class="topDataKey">Logged In:</div>
                         <div class="topDataVal" id="logined">No One</div>
                     </div>
-                    
                     <div class="topData">
                         <div class="wrapper" onmouseover="showWrapper()"><label>Channel List</label>
                             <div id="div_top" class="channel_list">
@@ -62,6 +61,14 @@
                         </div>
                     </div>
                 </div>
+            </div>
+
+            <!-- Operation tooltip area -->
+            <div class="tooltip_area">
+                <div class="topDataKey">Channel:</div>
+                <div class="topDataVal" id="curr_channel_id">Not Logged in</div>
+                <div class="topDataKey">Next Step:</div>
+                <div class="topDataVal" id="next_step">You should connect to an OBD node first.</div>
             </div>
         </div>
 

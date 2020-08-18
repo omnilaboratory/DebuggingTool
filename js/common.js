@@ -4863,22 +4863,15 @@ function tableMyChannelList(e) {
 }
 
 /**
- * Open 
- */
-function openSQLite() {
-    let dbSqlite = openDatabase("myDB","1.0","test db",1024*100);
-}
-
-/**
  *  Fix Show Top Div
  */
 function fixShowTopDiv() {
     window.addEventListener('scroll', function() {
         let t = $('body, html').scrollTop();
         if (t > 0) {
-            $('.top').addClass('top-active')
+            $('.header').addClass('header-active');
         } else {
-            $('.top').removeClass('top-active')
+            $('.header').removeClass('header-active');
         }
     })
 }
@@ -5050,9 +5043,13 @@ function rowMyChannelListAtTopRight(e, i, tr) {
  * @param obj 
  */
 function getChannelIDFromTopRight(obj) {
-    console.info('the channel_id is --> ' + obj.getAttribute('channel_id'));
+
+    let sel_channel_id = obj.getAttribute('channel_id');
+
+    console.info('the channel_id is --> ' + sel_channel_id);
 
     $("#div_top").hide();
+    $("#curr_channel_id").text(sel_channel_id);
 }
 
 /**

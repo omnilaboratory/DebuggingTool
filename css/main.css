@@ -190,13 +190,6 @@ pre {
     background: #1E222A;
     width: 100%;
     display: flex;
-    position: relative;
-    z-index: 999;
-}
-
-.top-active{
-    position: fixed;
-    top: 0;
 }
 
 .topLeft{
@@ -350,4 +343,23 @@ pre {
     font-size: 18px;
     font-weight: 600;
     padding-right: 25px;
+}
+
+.tooltip_area {
+    height: 50px;
+    background: #dae0a3;
+    width: 100%;
+    display: flex;
+    align-items: center;
+}
+
+.header {
+    width: 100%;
+    position: relative;
+    z-index: 999;
+}
+
+.header-active{
+    position: fixed;
+    top: 0;
 }
