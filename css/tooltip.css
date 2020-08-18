@@ -240,7 +240,7 @@
     position: absolute;
     z-index: 1;
     width:  500px;
-    height: 500px;
+    height: 410px;
     word-break: normal;
     transform: translateY(10px);
     transition: all .25s ease-out;

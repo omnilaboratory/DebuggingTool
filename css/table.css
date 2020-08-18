@@ -4,6 +4,7 @@
 	width:100%;
 	border-collapse:collapse;
 }
+
 #tracker td, #tracker th 
 {
 	font-size:13px;
@@ -14,20 +15,26 @@
     word-break:break-all;
     text-align: center;
 }
+
 #tracker th 
 {
-	font-size:13px;
-	text-align:left;
+	/* font-size:13px; */
 	padding-top:8px;
 	padding-bottom:8px;
 	background-color:rgb(78, 81, 87);
     color:#ffffff;
     text-align: center;
 }
+
 #tracker tr.alt td
 {
 	color:#000000;
 	background-color:rgb(214, 236, 223);
+}
+
+tr.change_color:hover {
+    background-color:rgb(13, 126, 60);
+    cursor: pointer;
 }
 
 .col_1_width{
@@ -56,10 +63,12 @@
 
 .bottom_div {
     margin-top: 30px;
-    font-size: 18px;
+    font-size: 15px;
+    position: fixed;
+    bottom: 30px;
 }
 
-.left_margin {
+.margin_right {
     margin-right: 50px;
 }
 

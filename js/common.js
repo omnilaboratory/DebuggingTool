@@ -3812,8 +3812,8 @@ function tableData(getWhat, result) {
     bottom_div.setAttribute('class', 'bottom_div');
     tracker_div.append(bottom_div);
 
-    createElement(bottom_div, 'label', 'Total Count : ' + result.totalCount, 'left_margin');
-    createElement(bottom_div, 'label', 'Page ' + result.pageNum + ' / ' + result.totalPage, 'left_margin');
+    createElement(bottom_div, 'label', 'Total Count : ' + result.totalCount, 'margin_right');
+    createElement(bottom_div, 'label', 'Page ' + result.pageNum + ' / ' + result.totalPage, 'margin_right');
 
     // previous page
     let butPrevious = document.createElement('button');
@@ -4832,8 +4832,8 @@ function tableMyChannelList(e) {
     bottom_div.setAttribute('class', 'bottom_div');
     tracker_div.append(bottom_div);
 
-    createElement(bottom_div, 'label', 'Total Count : ' + e.totalCount, 'left_margin');
-    createElement(bottom_div, 'label', 'Page ' + e.pageNum + ' / ' + e.totalPage, 'left_margin');
+    createElement(bottom_div, 'label', 'Total Count : ' + e.totalCount, 'margin_right');
+    createElement(bottom_div, 'label', 'Page ' + e.pageNum + ' / ' + e.totalPage, 'margin_right');
 
     // previous page
     let butPrevious = document.createElement('button');
@@ -4930,10 +4930,22 @@ function tableMyChannelListAtTopRight(e) {
     // row
     let iNum = (e.pageNum - 1) * 5;
     for (let i = 0; i < e.data.length; i++) {
-        createElement(table, 'tr');
-        createElement(table, 'td', i + 1 + iNum);
-        rowMyChannelListAtTopRight(e, i, table);
+        let tr = document.createElement('tr');
+        tr.setAttribute('class', 'change_color');
+        tr.setAttribute('onclick', 'getChannelIDFromTopRight(this)');
 
+        if (e.data[i].channel_id === '') {
+            tr.setAttribute('channel_id', e.data[i].temporary_channel_id);
+        } else {
+            tr.setAttribute('channel_id', e.data[i].channel_id);
+        }
+
+        table.append(tr);
+
+        createElement(tr, 'td', i + 1 + iNum);
+        rowMyChannelListAtTopRight(e, i, tr);
+        
+        // createElement(table, 'tr');
         // if (i % 2 != 0) {
         //     let tr = document.createElement('tr');
         //     tr.setAttribute('class', 'altTopRight');
@@ -4953,8 +4965,11 @@ function tableMyChannelListAtTopRight(e) {
     bottom_div.setAttribute('class', 'bottom_div');
     div_channels.append(bottom_div);
 
-    createElement(bottom_div, 'label', 'Total Count : ' + e.totalCount, 'left_margin');
-    createElement(bottom_div, 'label', 'Page ' + e.pageNum + ' / ' + e.totalPage, 'left_margin');
+    createElement(bottom_div, 'label', 'Total Count : ' + e.totalCount, 'margin_right');
+    createElement(bottom_div, 'label', 'Page ' + e.pageNum + ' / ' + e.totalPage, 'margin_right');
+
+    createElement(bottom_div, 'br');
+    createElement(bottom_div, 'br');
 
     // previous page
     let butPrevious = document.createElement('button');
@@ -4972,22 +4987,21 @@ function tableMyChannelListAtTopRight(e) {
     // next page
     let butNext = document.createElement('button');
     butNext.setAttribute('pageNum', e.pageNum);
-    butNext.setAttribute('class', 'button button_small');
+    butNext.setAttribute('class', 'button button_small margin_right');
     butNext.setAttribute('onclick', 'nextPageForChannelListAtTopRight(this)');
     butNext.innerText = 'Next Page';
     bottom_div.append(butNext);
 
     if (e.pageNum === e.totalPage) {
-        butNext.setAttribute('class', 'button_small disabled');
+        butNext.setAttribute('class', 'button_small disabled margin_right');
         butNext.setAttribute("disabled", "disabled");
     }
 
     // refresh button
     let butRefresh = document.createElement('button');
-    // butRefresh.setAttribute('pageNum', e.pageNum);
     butRefresh.setAttribute('class', 'button button_small');
     butRefresh.setAttribute('onclick', 'displayMyChannelListAtTopRight(5, 1)');
-    butRefresh.innerText = 'Refresh';
+    butRefresh.innerText = 'Refresh Data';
     bottom_div.append(butRefresh);
 }
 
@@ -5029,4 +5043,21 @@ function rowMyChannelListAtTopRight(e, i, tr) {
     // }
 
     // createElement(tr, 'td', e.data[i].create_at);
+}
+
+/**
+ * getChannelIDFromTopRight
+ * @param obj 
+ */
+function getChannelIDFromTopRight(obj) {
+    console.info('the channel_id is --> ' + obj.getAttribute('channel_id'));
+
+    $("#div_top").hide();
+}
+
+/**
+ * 
+ */
+function showWrapper() {
+    $("#div_top").show();
 }
