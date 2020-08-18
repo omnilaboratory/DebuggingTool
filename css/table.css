@@ -64,6 +64,7 @@ tr.change_color:hover {
 .bottom_div {
     margin-top: 30px;
     font-size: 15px;
+    /* position: absolute; */
     position: fixed;
     bottom: 30px;
 }
