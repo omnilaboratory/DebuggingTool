@@ -155,6 +155,7 @@ pre {
     padding-bottom: 5px;
     padding-left: 10px;
     padding-right: 10px;
+    cursor: pointer;
 }
 
 .url:hover {
@@ -362,4 +363,16 @@ pre {
 .header-active{
     position: fixed;
     top: 0;
+}
+
+.resp_area {
+    background: #dae0a3;
+    padding: 20px;
+    /* display: flex; */
+    /* align-items: center; */
+
+    box-shadow: 0 2px 20px 0 rgba(0, 0, 0, 0.05);
+    border-radius: 6px;
+    word-wrap:break-word; 
+    word-break:break-all;
 }

@@ -32,41 +32,18 @@ const kGoWhere = 'go_where';
 // the info save to local storage [ChannelList].
 var channelInfo;
 
+/**
+ * The lastest channel
+ */
+var lastestChannel = '';
 
-// -102001 logIn.
-/*
-function sdkLogIn() {
 
-    let mnemonic = $("#mnemonic").val();
+////////////////////////////////
+// Functions are here
 
-    // SDK API
-    logIn(mnemonic, function(e) {
-        console.info('SDK: -102001 logIn = ' + JSON.stringify(e));
-
-        // SDK API: Register event needed for listening.
-        registerEvent(true);
-
-        // Just for GUI Tool
-        registerEventForGUITool();
-
-        // If already logined, then return.
-        if (isLogined) {
-            console.info('-102001 isLogined = ' + isLogined);
-            return;
-        }
-
-        // a new loginning.
-        mnemonicWithLogined = mnemonic;
-        $("#logined").text(e.userPeerId);
-        isLogined = true;
-
-        // SDK API: Save mnemonic
-        saveMnemonic(e.userPeerId, mnemonic);
-        displaySentMessage102001(mnemonic);
-    });
-}
-*/
-
+/**
+ * 
+ */
 async function sdkLogIn() {
 
     let mnemonic = $("#mnemonic").val();
@@ -87,18 +64,8 @@ async function sdkLogIn() {
     isLogined = true;
 
     displaySentMessage102001(mnemonic);
-
     await displayMyChannelListAtTopRight(5, 1);
-}
-
-/**
- * // Get channel list
-    //    asyncDisplayMyChannelListAtTopRight();
- * Display the sent message in the message box and save it to the log file
- * @param msgSend Sent message
- */
-async function asyncDisplayMyChannelListAtTopRight() {
-    await displayMyChannelListAtTopRight(5, 1);
+    afterLogin();
 }
 
 /**
@@ -1143,59 +1110,57 @@ function getUserDataList(goWhere) {
 
 // getUtilList
 function getUtilList() {
-    var jsonFile = "json/util_list.json";
-    var divName = "#util_list";
+    let jsonFile = "json/util_list.json";
+    let divName  = "#util_list";
 
     createLeftSideMenu(jsonFile, divName);
 }
 
 // getAPIList
 function getAPIList() {
-    var jsonFile = "json/api_list.json";
-    var divName = "#api_list";
+    let jsonFile = "json/api_list.json";
+    let divName  = "#api_list";
 
     createLeftSideMenu(jsonFile, divName);
 }
 
 // 
 function getManageAssetList() {
-    var jsonFile = "json/manage_asset.json";
-    var divName = "#manage_assets_list";
+    let jsonFile = "json/manage_asset.json";
+    let divName  = "#manage_assets_list";
 
     createLeftSideMenu(jsonFile, divName);
 }
 
-// createLeftSideMenu
+/**
+ * 
+ * @param jsonFile 
+ * @param divName 
+ */
 function createLeftSideMenu(jsonFile, divName) {
 
-    var api_id, type_id, description, apiItem, menuDiv;
+    let apiItem, menuDiv;
 
     // dynamic create api_list div.
     $.getJSON(jsonFile, function(result) {
         // get [api_list] div
-        var apiList = $(divName);
+        let apiList = $(divName);
 
         for (let i = 0; i < result.data.length; i++) {
-            api_id = result.data[i].id;
-            type_id = result.data[i].type_id;
-            description = result.data[i].description;
-
             menuDiv = document.createElement('div');
-            // menuDiv.setAttribute('class', 'menuItem');
-
             apiItem = document.createElement('a');
-            apiItem.id = api_id;
+
+            apiItem.id   = result.data[i].id;
             apiItem.href = '#';
             // apiItem.href = 'javascript:void(0);';
             apiItem.setAttribute('class', 'url');
-            apiItem.setAttribute('type_id', type_id);
-            apiItem.setAttribute('description', description);
+            apiItem.setAttribute('type_id', result.data[i].type_id);
+            apiItem.setAttribute('description', result.data[i].description);
             apiItem.setAttribute('onclick', 'displayAPIContent(this)');
-            apiItem.innerText = api_id;
+            apiItem.innerText = result.data[i].id;
 
             menuDiv.append(apiItem);
             apiList.append(menuDiv);
-
             createElement(apiList, 'p');
         }
     });
@@ -1209,6 +1174,13 @@ function displayAPIContent(obj) {
     createInputParamDiv(obj, 'json/util_list.json');
     createInputParamDiv(obj, 'json/api_list.json');
     createInputParamDiv(obj, 'json/manage_asset.json');
+
+    // Temp code, will be update
+    if (obj.getAttribute("id") === 'logIn') {
+        if (isLogined) {
+            alreadyLogin();
+        }
+    }
 }
 
 // create 
@@ -1256,6 +1228,7 @@ function createRequestDiv(obj) {
 
     // create [Invoke API] element
     let button = document.createElement('button');
+    button.id  = 'invoke_api';
     button.setAttribute('type_id', obj.getAttribute("type_id"));
     button.setAttribute('class', 'button button_big');
     button.setAttribute('onclick', 'invokeAPIs(this)');
@@ -1933,27 +1906,6 @@ function createButtonOfParam(arrParams, index, content_div) {
     }
 }
 
-// 
-function createInvokeAPIButton(obj) {
-    // get [content] div
-    let content_div = $("#name_req_div");
-
-    let newDiv = document.createElement('div');
-    newDiv.setAttribute('class', 'panelItem');
-
-    createElement(newDiv, 'p');
-
-    // create [Send button] element
-    let button = document.createElement('button');
-    // button.id = 'send_button';
-    button.setAttribute('type_id', obj.getAttribute("type_id"));
-    button.setAttribute('class', 'button');
-    button.setAttribute('onclick', 'invokeAPIs(this)');
-    button.innerText = 'Invoke API';
-    newDiv.append(button);
-    content_div.append(newDiv);
-}
-
 //----------------------------------------------------------------
 // 
 function displayCustomMode() {
@@ -1966,15 +1918,18 @@ function displayConnectOBD() {
     removeNameReqDiv();
     createConnectNodeDiv();
     afterConnectOBD();
+    scrollTo(0,0); // back to top
 }
 
 // remove name and request Div
 function removeNameReqDiv() {
-    $("#name_req_div").remove();
-    $("#tracker_div").remove();
-    var name_req_div = document.createElement('div');
-    name_req_div.id = "name_req_div";
-    $("#content").append(name_req_div);
+    $("#name_req_div").empty();
+    // $("#tracker_div").empty();
+    // $("#name_req_div").remove();
+    // $("#tracker_div").remove();
+    // var name_req_div = document.createElement('div');
+    // name_req_div.id = "name_req_div";
+    // $("#content").append(name_req_div);
 }
 
 // 
@@ -1986,13 +1941,15 @@ function removeInvokeHistoryDiv() {
 }
 
 // 
-function removeTrackerDiv() {
-    $("#name_req_div").remove();
-    $("#tracker_div").remove();
-    var div = document.createElement('div');
-    div.id = "tracker_div";
-    $("#content").append(div);
-}
+// function removeTrackerDiv() {
+//     $("#name_req_div").empty();
+    // $("#tracker_div").empty();
+    // $("#name_req_div").remove();
+    // $("#tracker_div").remove();
+    // var div = document.createElement('div');
+    // div.id = "tracker_div";
+    // $("#content").append(div);
+// }
 
 // 
 function createConnectNodeDiv(isCustom) {
@@ -2114,6 +2071,10 @@ function sdkConnect2OBD() {
         saveOBDConnectHistory(nodeAddress);
         $("#history_div").remove();
 
+        // $("#next_step").text(kTipsAfterConnectOBD);
+        // buttonNextStep($("#tooltip_area"), 'Log In', "goNextStep('json/api_list.json', 2)");
+        tipsOnTop('', kTipsAfterConnectOBD, 'Log In', 2);
+
     }, function(globalResponse) {
         displayOBDMessages(globalResponse);
     });
@@ -2142,7 +2103,7 @@ function sdkConnect2OBDInCustomMode() {
 
 //
 function changeConnectButtonStatus() {
-    var button = $("#button_connect");
+    let button = $("#button_connect");
     button.text("Disconnect");
     button.attr('class', 'button_small disabled');
     button.attr("disabled", "disabled");
@@ -3686,10 +3647,12 @@ function tableData(getWhat, result) {
     console.info('getWhat = ' + getWhat);
     console.info('total count = ' + result.totalCount);
 
-    removeTrackerDiv();
+    // removeTrackerDiv();
+    removeNameReqDiv();
 
     // table
-    let tracker_div = $("#tracker_div");
+    let tracker_div = $("#name_req_div");
+    // let tracker_div = $("#tracker_div");
     let table = document.createElement('table');
     table.id = 'tracker';
     tracker_div.append(table);
@@ -4783,10 +4746,12 @@ function tableMyChannelList(e) {
     
     console.info('total count = ' + e.totalCount);
 
-    removeTrackerDiv();
+    // removeTrackerDiv();
+    removeNameReqDiv();
 
     // table
-    let tracker_div = $("#tracker_div");
+    let tracker_div = $("#name_req_div");
+    // let tracker_div = $("#tracker_div");
     let table = document.createElement('table');
     table.id = 'tracker';
     tracker_div.append(table);
@@ -4882,7 +4847,19 @@ function displayMyChannelListAtTopRight(page_size, page_index) {
         obdApi.getMyChannels(Number(page_size), Number(page_index), function(e) {
             // console.info('-103150 tableMyChannelList = ' + JSON.stringify(e));
     
-            tableMyChannelListAtTopRight(e);
+            if (e.totalCount === 0) {
+                $("#div_channels").html("No Channel");
+                lastestChannel = '';
+            } else {
+                tableMyChannelListAtTopRight(e);
+
+                // Get the lastest channel
+                if (e.data[0].channel_id === '') {
+                    lastestChannel = e.data[0].temporary_channel_id;
+                } else {
+                    lastestChannel = e.data[0].channel_id;
+                }
+            }
 
             // Running success and return
             resolve();
@@ -5057,4 +5034,146 @@ function getChannelIDFromTopRight(obj) {
  */
 function showWrapper() {
     $("#div_top").show();
+}
+
+/**
+ * Show home page.
+ */
+function showHome() {
+    
+    $("#next_step").text(kTipsInit);
+    buttonNextStep($("#button_next"), 'Connect OBD', 'displayConnectOBD()');
+
+    let div_resp = document.createElement('div');
+    div_resp.setAttribute('class', 'resp_area');
+
+    createElement(div_resp, 'h2', 'This is home.');
+
+    $("#name_req_div").append(div_resp);
+
+    // back to top
+    $('html,body').animate({ scrollTop:0 });
+}
+
+/**
+ * 
+ * @param butText 
+ * @param funcClick
+ */
+function buttonNextStep(div, butText, funcClick) {
+
+    // $("#but_tooltip").remove();
+
+    let butNext = document.createElement('button');
+    // butNext.id  = 'but_tooltip';
+    butNext.setAttribute('class', 'button button_small');
+    butNext.setAttribute('onclick', funcClick);
+    butNext.innerText = butText;
+    div.append(butNext);
+}
+
+/**
+ * 
+ * @param jsonFile 
+ * @param apiIndex 
+ */
+function goNextStep(jsonFile, apiIndex) {
+
+    $.getJSON(jsonFile, function(result) {
+        for (let i = 0; i < result.data.length; i++) {
+            // console.info('apiIndex = ' + i);
+            if (i === Number(apiIndex)) {
+                let apiItem = document.createElement('a');
+                apiItem.id  = result.data[i].id;
+                apiItem.setAttribute('type_id', result.data[i].type_id);
+                apiItem.setAttribute('description', result.data[i].description);
+                apiItem.setAttribute('onclick', 'displayAPIContent(this)');
+                apiItem.innerText = result.data[i].id;
+                displayAPIContent(apiItem);
+                scrollTo(0,0); // back to top
+                return;
+            }
+        }
+    });
+}
+
+/**
+ * 
+ */
+function alreadyLogin() {
+
+    disableInvokeAPI();
+
+    let div_resp = document.createElement('div');
+    div_resp.setAttribute('class', 'resp_area');
+    createElement(div_resp, 'text', 'You have logged in.');
+    $("#name_req_div").append(div_resp);
+}
+
+/**
+ * 
+ */
+function disableInvokeAPI() {
+    let butInvokeAPI = $("#invoke_api");
+    butInvokeAPI.attr('class', 'button_big disabled');
+    butInvokeAPI.attr("disabled", "disabled");
+}
+
+/**
+ * 
+ * @param jsonFile 
+ * @param apiIndex 
+ */
+function afterLogin() {
+
+    disableInvokeAPI();
+
+    // $("#next_step").text(kTipsAfterLogin);
+    // buttonNextStep($("#tooltip_area"), 'Open Channel', "goNextStep('json/api_list.json', 5)");
+    tipsOnTop('No Channel', kTipsAfterLogin, 'Open Channel', 5);
+
+    let div_resp = document.createElement('div');
+    div_resp.setAttribute('class', 'resp_area');
+
+    createElement(div_resp, 'text', kTipsAfterLogin);
+    buttonNextStep(div_resp, 'Open Channel', "goNextStep('json/api_list.json', 5)");
+
+    // If has existing channel then display the lastest one.
+    if (lastestChannel != '') {
+        createElement(div_resp, 'p', 'OR You can choose an existing channel');
+
+        let item  = document.createElement('a');
+        item.href = 'javascript:void(0);';
+        item.setAttribute('onclick', 'clickLastestChannel()');
+        item.innerText = lastestChannel;
+        div_resp.append(item);
+    }
+
+    $("#name_req_div").append(div_resp);
+}
+
+/**
+ * 
+ */
+function clickLastestChannel() {
+    $("#curr_channel_id").text(lastestChannel);
+}
+
+/**
+ * Display tips on top
+ * @param channelID 
+ * @param tipsNextStep 
+ * @param butText 
+ * @param apiIndex 
+ */
+function tipsOnTop(channelID, tipsNextStep, butText, apiIndex) {
+
+    if (channelID != '') {
+        $("#curr_channel_id").text(channelID);
+    }
+
+    $("#next_step").text(tipsNextStep);
+
+    $("#button_next").empty();
+    buttonNextStep($("#button_next"), butText, "goNextStep('json/api_list.json', " + apiIndex + ")");
 }

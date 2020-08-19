@@ -13,6 +13,7 @@
     <script src="https://lib.sinaapp.com/js/jquery/2.0.2/jquery-2.0.2.min.js"></script>
     <script src="sdk/pojo.js"></script>
     <script src="sdk/obdapi.js"></script>
+    <script src="js/content_tips.js"></script>
     <script src="js/common.js"></script>
     <script src="js/qrcode.min.js"></script>
     <script src="sdk/btctool.js"></script>
@@ -25,17 +26,6 @@
     <script src="sdk/manage_asset.js"></script>
     <script src="sdk/auto_pilot.js"></script>
 </head>
-
-<script>
-    // invoked when page refresh.
-    openDB();
-    getUtilList();
-    getAPIList();
-    getUserDataList();
-    getManageAssetList();
-    saveAutoPilot('No');
-    fixShowTopDiv();
-</script>
 
 <body>
     <div id="container">
@@ -64,11 +54,12 @@
             </div>
 
             <!-- Operation tooltip area -->
-            <div class="tooltip_area">
-                <div class="topDataKey">Channel:</div>
+            <div id= "tooltip_area" class="tooltip_area">
+                <div class="topDataKey">In Channel:</div>
                 <div class="topDataVal" id="curr_channel_id">Not Logged in</div>
                 <div class="topDataKey">Next Step:</div>
-                <div class="topDataVal" id="next_step">You should connect to an OBD node first.</div>
+                <div class="topDataVal" id="next_step"></div>
+                <div class="" id="button_next"></div>
             </div>
         </div>
 
@@ -124,6 +115,7 @@
             <!-- API invoked area, click left side menu to display. -->
             <div id="content" class="request_div">
                 <!-- Dynamic create in 'common.js' -->
+                <div id="name_req_div"></div>
             </div>
 
             <!-- OBD messages display area -->
@@ -138,4 +130,17 @@
         <div class="copyright">Copyright © OmniLab</div>
     </div>
 </body>
+
+<script>
+    // invoked when page refresh.
+    openDB();
+    getUtilList();
+    getAPIList();
+    getUserDataList();
+    getManageAssetList();
+    saveAutoPilot('No');
+    fixShowTopDiv();
+    showHome();
+</script>
+
 </html>
