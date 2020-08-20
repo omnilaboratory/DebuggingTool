@@ -10,15 +10,17 @@
  *  @param info 
  */
 function openChannel(myUserID, nodeID, userID, info) {
-    obdApi.openChannel(nodeID, userID, info, function(e) {
-        console.info('SDK: -100032 openChannel = ' + JSON.stringify(e));
-        // Functions related to save and get data have be moved to SDK.
-        // saveMyChannelList(e);
-        saveCounterparties(myUserID, nodeID, userID);
-        saveChannelID(e.temporary_channel_id);
-        let privkey = getFundingPrivKeyFromPubKey(myUserID, info.funding_pubkey);
-        saveFundingPrivKey(myUserID, e.temporary_channel_id, privkey, kTbFundingPrivKey);
-    });
+    return new Promise((resolve, reject) => {
+        obdApi.openChannel(nodeID, userID, info, function(e) {
+            console.info('SDK: -100032 openChannel = ' + JSON.stringify(e));
+            // Functions related to save and get data have be moved to SDK.
+            saveCounterparties(myUserID, nodeID, userID);
+            saveChannelID(e.temporary_channel_id);
+            let privkey = getFundingPrivKeyFromPubKey(myUserID, info.funding_pubkey);
+            saveFundingPrivKey(myUserID, e.temporary_channel_id, privkey, kTbFundingPrivKey);
+            resolve(e);
+        });
+    })
 }
 
 /**
@@ -31,16 +33,17 @@ function openChannel(myUserID, nodeID, userID, info) {
  * @param info 
  */
 function acceptChannel(myUserID, nodeID, userID, info) {
-    obdApi.acceptChannel(nodeID, userID, info, function(e) {
-        console.info('SDK: -100033 acceptChannel = ' + JSON.stringify(e));
-        // saveChannelList(e);
-
-        // Functions related to save and get data have be moved to SDK.
-        saveCounterparties(myUserID, nodeID, userID);
-        saveChannelAddress(e.channel_address);
-        let privkey = getFundingPrivKeyFromPubKey(myUserID, info.funding_pubkey);
-        saveFundingPrivKey(myUserID, info.temporary_channel_id, privkey, kTbFundingPrivKey);
-    });
+    return new Promise((resolve, reject) => {
+        obdApi.acceptChannel(nodeID, userID, info, function(e) {
+            console.info('SDK: -100033 acceptChannel = ' + JSON.stringify(e));
+            // Functions related to save and get data have be moved to SDK.
+            saveCounterparties(myUserID, nodeID, userID);
+            saveChannelAddress(e.channel_address);
+            let privkey = getFundingPrivKeyFromPubKey(myUserID, info.funding_pubkey);
+            saveFundingPrivKey(myUserID, info.temporary_channel_id, privkey, kTbFundingPrivKey);
+            resolve(e);
+        });
+    })
 }
 
 /**
@@ -53,12 +56,14 @@ function acceptChannel(myUserID, nodeID, userID, info) {
  * @param info 
  */
 function fundingBitcoin(myUserID, info) {
-    obdApi.fundingBitcoin(info, function(e) {
-        console.info('SDK: -102109 fundingBitcoin = ' + JSON.stringify(e));
-        // saveChannelList(e, getChannelID(), msgType);
-        saveTempHash(e.hex);
-        saveFundingBtcData(myUserID, info);
-    });
+    return new Promise((resolve, reject) => {
+        obdApi.fundingBitcoin(info, function(e) {
+            console.info('SDK: -102109 fundingBitcoin = ' + JSON.stringify(e));
+            saveTempHash(e.hex);
+            saveFundingBtcData(myUserID, info);
+            resolve(e);
+        });
+    })
 }
 
 /**
@@ -70,10 +75,12 @@ function fundingBitcoin(myUserID, info) {
  * @param info 
  */
 function bitcoinFundingCreated(nodeID, userID, info) {
-    obdApi.bitcoinFundingCreated(nodeID, userID, info, function(e) {
-        console.info('SDK: -100340 bitcoinFundingCreated = ' + JSON.stringify(e));
-        // saveChannelList(e, info.temporary_channel_id, msgType);
-    });
+    return new Promise((resolve, reject) => {
+        obdApi.bitcoinFundingCreated(nodeID, userID, info, function(e) {
+            console.info('SDK: -100340 bitcoinFundingCreated = ' + JSON.stringify(e));
+            resolve(e);
+        });
+    })
 }
 
 /**
@@ -85,10 +92,12 @@ function bitcoinFundingCreated(nodeID, userID, info) {
  * @param info 
  */
 function bitcoinFundingSigned(nodeID, userID, info) {
-    obdApi.bitcoinFundingSigned(nodeID, userID, info, function(e) {
-        console.info('SDK: -100350 bitcoinFundingSigned = ' + JSON.stringify(e));
-        // saveChannelList(e, info.temporary_channel_id, msgType);
-    });
+    return new Promise((resolve, reject) => {
+        obdApi.bitcoinFundingSigned(nodeID, userID, info, function(e) {
+            console.info('SDK: -100350 bitcoinFundingSigned = ' + JSON.stringify(e));
+            resolve(e);
+        });
+    })
 }
 
 /**
@@ -100,7 +109,6 @@ function bitcoinFundingSigned(nodeID, userID, info) {
 function fundingAsset(info) {
     obdApi.fundingAsset(info, function(e) {
         console.info('SDK: -102120 fundingAssetOfOmni = ' + JSON.stringify(e));
-        // saveChannelList(e, tempChID, msgType);
         saveTempHash(e.hex);
     });
 }
@@ -117,8 +125,6 @@ function fundingAsset(info) {
 function assetFundingCreated(myUserID, nodeID, userID, info) {
     obdApi.assetFundingCreated(nodeID, userID, info, function(e) {
         console.info('SDK: -100034 - assetFundingCreated = ' + JSON.stringify(e));
-        // saveChannelList(e, info.temporary_channel_id, msgType);
-
         // Save temporary private key to local storage
         saveTempPrivKey(myUserID, kTempPrivKey, info.temporary_channel_id, 
             info.temp_address_private_key);
@@ -138,7 +144,6 @@ function assetFundingCreated(myUserID, nodeID, userID, info) {
 function assetFundingSigned(myUserID, nodeID, userID, info) {
     obdApi.assetFundingSigned(nodeID, userID, info, function(e) {
         console.info('SDK: -100035 - assetFundingSigned = ' + JSON.stringify(e));
-        // saveChannelList(e, e.channel_id, msgType);
         
         // Once sent -100035 AssetFundingSigned , the final channel_id has generated.
         // So need update the local saved data for funding private key and channel_id.
@@ -178,7 +183,6 @@ function commitmentTransactionCreated(myUserID, nodeID, userID, info) {
 function commitmentTransactionAccepted(myUserID, nodeID, userID, info) {
     obdApi.commitmentTransactionAccepted(nodeID, userID, info, function(e) {
         console.info('SDK: -100352 commitmentTransactionAccepted = ' + JSON.stringify(e));
-        // saveChannelList(e, e.channel_id, msgType);
         saveChannelID(e.channel_id);
         saveTempPrivKey(myUserID, kTempPrivKey, e.channel_id, info.curr_temp_address_private_key);
     });
@@ -194,7 +198,6 @@ function commitmentTransactionAccepted(myUserID, nodeID, userID, info) {
 function closeChannel(nodeID, userID, channel_id) {
     obdApi.closeChannel(nodeID, userID, channel_id, function(e) {
         console.info('SDK: -100038 closeChannel = ' + JSON.stringify(e));
-        // saveChannelList(e, channel_id, msgType);
     });
 }
 
@@ -208,6 +211,5 @@ function closeChannel(nodeID, userID, channel_id) {
 function closeChannelSigned(nodeID, userID, info) {
     obdApi.closeChannelSigned(nodeID, userID, info, function(e) {
         console.info('SDK: -100039 closeChannelSigned = ' + JSON.stringify(e));
-        // saveChannelList(e, info.channel_id, msgType);
     });
 }

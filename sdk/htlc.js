@@ -58,7 +58,6 @@ function addHTLC(myUserID, nodeID, userID, info) {
 function HTLCSigned(myUserID, nodeID, userID, info) {
     obdApi.htlcSigned(nodeID, userID, info, function(e) {
         console.info('SDK: -100041 htlcSigned = ' + JSON.stringify(e));
-        // saveChannelList(e, e.channel_id, msgType);
 
         saveChannelID(e.channel_id);
         saveTempPrivKey(myUserID, kRsmcTempPrivKey, e.channel_id, info.curr_rsmc_temp_address_private_key);
@@ -76,7 +75,6 @@ function HTLCSigned(myUserID, nodeID, userID, info) {
 function forwardR(myUserID, nodeID, userID, info) {
     obdApi.forwardR(nodeID, userID, info, function(e) {
         console.info('SDK: -100045 forwardR = ' + JSON.stringify(e));
-        // saveChannelList(e, e.channel_id, msgType);
 
         saveChannelID(e.channel_id);
         saveTempPrivKey(myUserID, kHtlcHtnxTempPrivKey, e.channel_id, 
@@ -95,7 +93,6 @@ function forwardR(myUserID, nodeID, userID, info) {
 function signR(nodeID, userID, info) {
     obdApi.signR(nodeID, userID, info, function(e) {
         console.info('SDK: -100046 signR = ' + JSON.stringify(e));
-        // saveChannelList(e, e.channel_id, msgType);
         saveChannelID(e.channel_id);
     });
 }
@@ -111,7 +108,6 @@ function signR(nodeID, userID, info) {
 function closeHTLC(myUserID, nodeID, userID, info) {
     obdApi.closeHTLC(nodeID, userID, info, function(e) {
         console.info('SDK: -100049 closeHTLC = ' + JSON.stringify(e));
-        // saveChannelList(e, e.channel_id, msgType);
         saveChannelID(e.channel_id);
         saveTempPrivKey(myUserID, kTempPrivKey, e.channel_id, 
             info.curr_rsmc_temp_address_private_key);

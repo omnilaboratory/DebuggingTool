@@ -33,46 +33,6 @@
             ]
         },
         {
-            "id": "addInvoice",
-            "type_id": -100402,
-            "description": "addInvoice is used to generate an invoice for receiver.",
-            "parameters": [
-                {
-                    "name": "property_id",
-                    "buttons": [
-                        {
-                            "innerText": "Display",
-                            "onclick": "displayUserDataInNewHtml('MyAddresses')"
-                        }
-                    ]
-                },
-                {
-                    "name": "amount",
-                    "buttons": []
-                },
-                {
-                    "name": "h",
-                    "help": "The H (Hash of a Preimage R) currently is Public Key of a wallet address, and the R (Preimage R) is Private Key of a wallet address. This is a temporary solution.",
-                    "buttons": [
-                        {
-                            "innerText": "Display",
-                            "onclick": "displayUserDataInNewHtml('MyAddresses')"
-                        }
-                    ]
-                },
-                {
-                    "name": "expiry_time",
-                    "help": "Example: 2020-7-16",
-                    "buttons": []
-                },
-                {
-                    "name": "description",
-                    "help": "A memo",
-                    "buttons": []
-                }
-            ]
-        },
-        {
             "id": "connectP2PPeer",
             "type_id": -102003,
             "description": "connectP2PPeer is a temp func in debugging mode. It connects to a p2p node.",
@@ -695,6 +655,46 @@
                             "onclick": "displayUserDataInNewHtml('MyAddresses')"
                         }
                     ]
+                }
+            ]
+        },
+        {
+            "id": "addInvoice",
+            "type_id": -100402,
+            "description": "addInvoice is used to generate an invoice for receiver.",
+            "parameters": [
+                {
+                    "name": "property_id",
+                    "buttons": [
+                        {
+                            "innerText": "Display",
+                            "onclick": "displayUserDataInNewHtml('MyAddresses')"
+                        }
+                    ]
+                },
+                {
+                    "name": "amount",
+                    "buttons": []
+                },
+                {
+                    "name": "h",
+                    "help": "The H (Hash of a Preimage R) currently is Public Key of a wallet address, and the R (Preimage R) is Private Key of a wallet address. This is a temporary solution.",
+                    "buttons": [
+                        {
+                            "innerText": "Display",
+                            "onclick": "displayUserDataInNewHtml('MyAddresses')"
+                        }
+                    ]
+                },
+                {
+                    "name": "expiry_time",
+                    "help": "Example: 2020-7-16",
+                    "buttons": []
+                },
+                {
+                    "name": "description",
+                    "help": "A memo",
+                    "buttons": []
                 }
             ]
         },
