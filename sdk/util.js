@@ -11,7 +11,7 @@ const kAddress = 'address';
 const kMnemonic = 'mnemonic';
 
 //
-const kChannelID = 'channel_id';
+const kChannelData = 'channel_data';
 
 //
 const kChannelAddress = 'channel_address';
@@ -233,18 +233,165 @@ function saveFundingPrivKey(user_id, channel_id, privkey, tbName) {
 }
 
 /**
- * Save channelID to local storage
- * @param channelID
+ * Save channel data to local storage
+ * @param myUserID
+ * @param channel_id
+ * @param channel_addr
+ * @param funder  true: myUserID is funder  false: myUserID is NOT funder
+ * @param status  1: openChannel done  2: acceptChannel done
+ * 3: first fundingBitcoin done   4: bitcoinFundingCreated done   5: bitcoinFundingSigned done
+ * 6: second fundingBitcoin done  7: bitcoinFundingCreated done   8: bitcoinFundingSigned done
+ * 9: third fundingBitcoin done  10: bitcoinFundingCreated done  11: bitcoinFundingSigned done
+ * 12: fundingAsset done  13: assetFundingCreated done  14: assetFundingSigned done
+ * 15: commitmentTransactionCreated done  16: commitmentTransactionAccepted done
+ * 17: payInvoice done  18: commitmentTransactionAccepted done
  */
-function saveChannelID(channelID) {
-    localStorage.setItem(kChannelID, channelID);
+function saveChannelData(myUserID, channel_id, channel_addr, funder, status) {
+    // OLD
+    // localStorage.setItem(kChannelData, channelID);
+
+    // NEW
+    let resp = JSON.parse(localStorage.getItem(kChannelData));
+
+    // If has data.
+    if (resp) {
+        // console.info('HAS DATA');
+        for (let i = 0; i < resp.result.length; i++) {
+            if (myUserID === resp.result[i].userID) {
+                for (let j = 0; j < resp.result[i].data.length; j++) {
+                    if (channel_id === resp.result[i].data[j].channel_id) {
+                        if (channel_addr != '') {
+                            resp.result[i].data[j].channel_addr = channel_addr;
+                        }
+                        resp.result[i].data[j].status       = status;
+                        localStorage.setItem(kChannelData, JSON.stringify(resp));
+                        return;
+                    }
+                }
+
+                // Add new dato to 
+                let new_data = {
+                    channel_id:   channel_id,
+                    channel_addr: channel_addr,
+                    status:       status,
+                    funder:       funder,
+                }
+                resp.result[i].data.push(new_data);
+                localStorage.setItem(kChannelData, JSON.stringify(resp));
+                return;
+            }
+        }
+
+        // A new User ID.
+        let new_data = {
+            userID: myUserID,
+            data: [{
+                channel_id:   channel_id,
+                channel_addr: channel_addr,
+                status:       status,
+                funder:       funder,
+            }]
+        }
+        resp.result.push(new_data);
+        localStorage.setItem(kChannelData, JSON.stringify(resp));
+
+    } else {
+        // console.info('FIRST DATA');
+        let data = {
+            result: [{
+                userID: myUserID,
+                data: [{
+                    channel_id:   channel_id,
+                    channel_addr: channel_addr,
+                    status:       status,
+                    funder:       funder,
+                }]
+            }]
+        }
+        localStorage.setItem(kChannelData, JSON.stringify(data));
+    }
 }
 
 /**
  * Get channelID from local storage
  */
 function getChannelID() {
-    return localStorage.getItem(kChannelID);
+    // OLD
+    // return localStorage.getItem(kChannelData);
+
+    // BACKUP CODE
+    /*
+    let data = {
+        result: [{
+            userID: myUserID,
+            data: [{
+                channel_id:    value.channel_id,
+                channel_addr:  value.channel_addr,
+                status:        value.status,
+                is_accepted:   value.is_accepted,
+                btc_times:     value.btc_times,
+                funding_asset: value.funding_asset,
+            }]
+        }]
+    }
+    */
+
+    // Temp code, maybe will be updated.
+    return $("#curr_channel_id").text();
+}
+
+/**
+ * Get temp channelID from channel address
+ * @param myUserID
+ * @param addr Channel address
+ */
+function getTempCIDFromAddr(myUserID, addr) {
+
+    let resp = JSON.parse(localStorage.getItem(kChannelData));
+
+    // If has data.
+    if (resp) {
+        // console.info('HAS DATA');
+        for (let i = 0; i < resp.result.length; i++) {
+            if (myUserID === resp.result[i].userID) {
+                for (let j = 0; j < resp.result[i].data.length; j++) {
+                    if (addr === resp.result[i].data[j].channel_addr) {
+                        return resp.result[i].data[j].channel_id;
+                    }
+                }
+            }
+        }
+        return '';
+    } else {
+        return '';
+    }
+}
+
+/**
+ * Get channel status from channelID
+ * @param myUserID
+ * @param channel_id
+ */
+function getChannelStatus(myUserID, channel_id) {
+
+    let resp = JSON.parse(localStorage.getItem(kChannelData));
+
+    // If has data.
+    if (resp) {
+        // console.info('HAS DATA');
+        for (let i = 0; i < resp.result.length; i++) {
+            if (myUserID === resp.result[i].userID) {
+                for (let j = 0; j < resp.result[i].data.length; j++) {
+                    if (channel_id === resp.result[i].data[j].channel_id) {
+                        return resp.result[i].data[j].status;
+                    }
+                }
+            }
+        }
+        return '';
+    } else {
+        return '';
+    }
 }
 
 /**
@@ -321,9 +468,31 @@ function saveChannelAddress(address) {
 
 /**
  * get Channel ddress from localStorage
+ * @param myUserID
+ * @param channel_id
  */
-function getChannelAddress() {
-    return localStorage.getItem(kChannelAddress);
+function getChannelAddress(myUserID, channel_id) {
+    // OLD
+    // return localStorage.getItem(kChannelAddress);
+
+    let resp = JSON.parse(localStorage.getItem(kChannelData));
+
+    // If has data.
+    if (resp) {
+        // console.info('HAS DATA');
+        for (let i = 0; i < resp.result.length; i++) {
+            if (myUserID === resp.result[i].userID) {
+                for (let j = 0; j < resp.result[i].data.length; j++) {
+                    if (channel_id === resp.result[i].data[j].channel_id) {
+                        return resp.result[i].data[j].channel_addr;
+                    }
+                }
+            }
+        }
+        return '';
+    } else {
+        return '';
+    }
 }
 
 /**

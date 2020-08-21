@@ -65,12 +65,32 @@ const kTips110033 = 'Counterparty accepted to open channel, you should be start 
 /**
  * Tips for 
  */
-const kTips110340 = 'You received a notify to confirm funding bitcoin.';
+const kTipsFirst110340 = 'You received a notify to confirm first funding bitcoin.';
 
 /**
  * Tips for 
  */
-const kTips110350 = 'Counterparty confirm funding bitcoin, you can start to funding bitcoin again.';
+const kTipsSecond110340 = 'You received a notify to confirm second funding bitcoin.';
+
+/**
+ * Tips for 
+ */
+const kTipsThird110340 = 'You received a notify to confirm third funding bitcoin.';
+
+/**
+ * Tips for 
+ */
+const kTipsFirst110350 = 'Counterparty confirm funding bitcoin, you can start second funding bitcoin.';
+
+/**
+ * Tips for 
+ */
+const kTipsSecond110350 = 'Counterparty confirm funding bitcoin, you can start third funding bitcoin.';
+
+/**
+ * Tips for 
+ */
+const kTipsThird110350 = 'Counterparty confirm funding bitcoin. Now, you should be funding omni asset.';
 
 /**
  * Tips for 

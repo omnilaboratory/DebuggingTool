@@ -6,71 +6,6 @@
 
 
 /**
- * Register event needed for listening.
- * @param netType true: testnet  false: mainnet
- */
-function registerEvent(netType) {
-    // auto response mode
-    let msg_110032 = enumMsgType.MsgType_RecvChannelOpen_32;
-    obdApi.registerEvent(msg_110032, function(e) {
-        listening110032(e, netType);
-    });
-
-    let msg_110033 = enumMsgType.MsgType_RecvChannelAccept_33;
-    obdApi.registerEvent(msg_110033, function(e) {
-        listening110033(e);
-    });
-
-    // auto response mode
-    let msg_110340 = enumMsgType.MsgType_FundingCreate_RecvBtcFundingCreated_340;
-    obdApi.registerEvent(msg_110340, function(e) {
-        listening110340(e);
-    });
-
-    // auto response mode
-    let msg_110034 = enumMsgType.MsgType_FundingCreate_RecvAssetFundingCreated_34;
-    obdApi.registerEvent(msg_110034, function(e) {
-        listening110034(e);
-    });
-
-    // auto response mode
-    let msg_110035 = enumMsgType.MsgType_FundingSign_RecvAssetFundingSigned_35;
-    obdApi.registerEvent(msg_110035, function(e) {
-        listening110035(e);
-    });
-
-    // auto response mode
-    let msg_110351 = enumMsgType.MsgType_CommitmentTx_RecvCommitmentTransactionCreated_351;
-    obdApi.registerEvent(msg_110351, function(e) {
-        listening110351(e, netType);
-    });
-    
-    // auto response mode
-    let msg_110040 = enumMsgType.MsgType_HTLC_RecvAddHTLC_40;
-    obdApi.registerEvent(msg_110040, function(e) {
-        listening110040(e, netType);
-    });
-
-    // auto response mode
-    let msg_110045 = enumMsgType.MsgType_HTLC_RecvVerifyR_45;
-    obdApi.registerEvent(msg_110045, function(e) {
-        listening110045(e);
-    });
-
-    // auto response mode
-    let msg_110049 = enumMsgType.MsgType_HTLC_RecvRequestCloseCurrTx_49;
-    obdApi.registerEvent(msg_110049, function(e) {
-        listening110049(e, netType);
-    });
-
-    // save request_close_channel_hash
-    let msg_110038 = enumMsgType.MsgType_RecvCloseChannelRequest_38;
-    obdApi.registerEvent(msg_110038, function(e) {
-        listening110038(e);
-    });
-}
-
-/**
  * auto response to -100032 (openChannel) 
  * listening to -110032 and send -100033 acceptChannel
  * 
@@ -81,7 +16,7 @@ async function listening110032(e, netType) {
 
     let isAutoMode = getAutoPilot();
     console.info('SDK: NOW isAutoMode = ' + isAutoMode);
-    saveChannelID(e.temporary_channel_id);
+    saveChannelData(e.to_peer_id, e.temporary_channel_id, '', false, 1);
     saveCounterparties(e.to_peer_id, e.funder_node_address, e.funder_peer_id);
 
     if (isAutoMode === 'No' || isAutoMode === null) return;
@@ -119,7 +54,9 @@ async function listening110032(e, netType) {
  * @param netType true: testnet  false: mainnet
  */
 function listening110033(e) {
-    saveChannelAddress(e.channel_address);
+    console.info('listening110033');
+    // saveChannelAddress(e.channel_address);
+    saveChannelData(e.to_peer_id, e.temporary_channel_id, e.channel_address, true, 2);
 }
 
 /**
@@ -173,7 +110,7 @@ async function listening110035(e) {
     let tempPrivKey = getTempPrivKey(myUserID, kTempPrivKey, e.temporary_channel_id);
     saveTempPrivKey(myUserID, kTempPrivKey, e.channel_id, tempPrivKey);
 
-    saveChannelID(e.channel_id);
+    saveChannelData(e.channel_id);
 }
 
 /**
@@ -313,6 +250,21 @@ async function listening110340(e) {
     let isAutoMode = getAutoPilot();
     console.info('SDK: NOW isAutoMode = ' + isAutoMode);
     saveTempHash(e.funding_txid);
+
+    let status = getChannelStatus(e.to_peer_id, e.temporary_channel_id);
+    console.info('listening110340 status = ' + status);
+    switch (Number(status)) {
+        case 2:
+            saveChannelData(e.to_peer_id, e.temporary_channel_id, '', false, 4);
+            break;
+        case 5:
+            saveChannelData(e.to_peer_id, e.temporary_channel_id, '', false, 7);
+            break;
+        case 8:
+            saveChannelData(e.to_peer_id, e.temporary_channel_id, '', false, 10);
+            break;
+    }
+            
 
     if (isAutoMode === 'No' || isAutoMode === null) return;
     

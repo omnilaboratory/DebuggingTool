@@ -46,8 +46,8 @@ async function sdkLogIn() {
     let mnemonic = $("#mnemonic").val();
     let e = await logIn(mnemonic);
 
-    // Just for GUI Tool
-    registerEventForGUITool();
+    // Register event needed for listening.
+    registerEvent(true);
 
     // If already logined, then return.
     if (isLogined) {
@@ -117,8 +117,8 @@ async function sdkOpenChannel() {
     info.is_private     = $("#checkbox_n32").prop("checked");
 
     displaySentMessage100032(nodeID, userID, info);
-    await openChannel($("#logined").text(), nodeID, userID, info);
-    afterOpenChannel();
+    let tempCID = await openChannel($("#logined").text(), nodeID, userID, info);
+    afterOpenChannel(tempCID);
 }
 
 // -100033 accept Channel API at local.
@@ -471,7 +471,7 @@ async function sdkBitcoinFundingCreated() {
     info.funding_tx_hex              = $("#funding_tx_hex").val();
 
     displaySentMessage100340(nodeID, userID, info);
-    await bitcoinFundingCreated(nodeID, userID, info);
+    await bitcoinFundingCreated($("#logined").text(), nodeID, userID, info);
     afterBitcoinFundingCreated();
 }
 
@@ -488,8 +488,8 @@ async function sdkBitcoinFundingSigned() {
     info.approval                    = $("#checkbox_n3500").prop("checked");
 
     displaySentMessage100350(nodeID, userID, info);
-    await bitcoinFundingSigned(nodeID, userID, info);
-    afterBitcoinFundingSigned();
+    await bitcoinFundingSigned($("#logined").text(), nodeID, userID, info);
+    afterBitcoinFundingSigned(info.temporary_channel_id);
 }
 
 // -100034 Omni Asset Funding Created API at local.
@@ -1396,7 +1396,11 @@ function fillFundingBtcData() {
     // if (result === '') return;
     $("#from_address").val(result.from_address);
     $("#from_address_private_key").val(result.from_address_private_key);
-    $("#to_address").val(getChannelAddress());
+
+    let myUserID   = $("#logined").text();
+    let channel_id = $("#curr_channel_id").text();
+    $("#to_address").val(getChannelAddress(myUserID, channel_id));
+
     $("#amount").val(result.amount);
     $("#miner_fee").val(result.miner_fee);
 }
@@ -1407,7 +1411,10 @@ function fillFundingAssetData() {
     if (result === '') return;
     $("#from_address").val(result.from_address);
     $("#from_address_private_key").val(result.from_address_private_key);
-    $("#to_address").val(getChannelAddress());
+
+    let myUserID   = $("#logined").text();
+    let channel_id = $("#curr_channel_id").text();
+    $("#to_address").val(getChannelAddress(myUserID, channel_id));
 }
 
 //
@@ -3985,29 +3992,75 @@ function importToOmniCore() {
 }
 
 /**
- * For GUI Tool
  * Register event needed for listening.
+ * @param netType true: testnet  false: mainnet
  */
-function registerEventForGUITool() {
-
+function registerEvent(netType) {
+    // auto response mode
     let msg_110032 = enumMsgType.MsgType_RecvChannelOpen_32;
     obdApi.registerEvent(msg_110032, function(e) {
+        listening110032(e, netType);
         listening110032ForGUITool(e);
     });
 
     let msg_110033 = enumMsgType.MsgType_RecvChannelAccept_33;
     obdApi.registerEvent(msg_110033, function(e) {
+        listening110033(e);
         listening110033ForGUITool();
     });
 
+    // auto response mode
     let msg_110340 = enumMsgType.MsgType_FundingCreate_RecvBtcFundingCreated_340;
     obdApi.registerEvent(msg_110340, function(e) {
+        listening110340(e);
         listening110340ForGUITool(e);
     });
 
     let msg_110350 = enumMsgType.MsgType_FundingSign_RecvBtcSign_350;
     obdApi.registerEvent(msg_110350, function(e) {
         listening110350ForGUITool(e);
+    });
+
+    // auto response mode
+    let msg_110034 = enumMsgType.MsgType_FundingCreate_RecvAssetFundingCreated_34;
+    obdApi.registerEvent(msg_110034, function(e) {
+        listening110034(e);
+    });
+
+    // auto response mode
+    let msg_110035 = enumMsgType.MsgType_FundingSign_RecvAssetFundingSigned_35;
+    obdApi.registerEvent(msg_110035, function(e) {
+        listening110035(e);
+    });
+
+    // auto response mode
+    let msg_110351 = enumMsgType.MsgType_CommitmentTx_RecvCommitmentTransactionCreated_351;
+    obdApi.registerEvent(msg_110351, function(e) {
+        listening110351(e, netType);
+    });
+    
+    // auto response mode
+    let msg_110040 = enumMsgType.MsgType_HTLC_RecvAddHTLC_40;
+    obdApi.registerEvent(msg_110040, function(e) {
+        listening110040(e, netType);
+    });
+
+    // auto response mode
+    let msg_110045 = enumMsgType.MsgType_HTLC_RecvVerifyR_45;
+    obdApi.registerEvent(msg_110045, function(e) {
+        listening110045(e);
+    });
+
+    // auto response mode
+    let msg_110049 = enumMsgType.MsgType_HTLC_RecvRequestCloseCurrTx_49;
+    obdApi.registerEvent(msg_110049, function(e) {
+        listening110049(e, netType);
+    });
+
+    // save request_close_channel_hash
+    let msg_110038 = enumMsgType.MsgType_RecvCloseChannelRequest_38;
+    obdApi.registerEvent(msg_110038, function(e) {
+        listening110038(e);
     });
 }
 
@@ -4016,6 +4069,8 @@ function registerEventForGUITool() {
  * @param e 
  */
 function listening110032ForGUITool(e) {
+    $("#recipient_node_peer_id").val(e.funder_node_address);
+    $("#recipient_user_peer_id").val(e.funder_peer_id);
     tipsOnTop(e.temporary_channel_id, kTips110032, 'Accept', 'acceptChannel');
 }
 
@@ -4023,7 +4078,6 @@ function listening110032ForGUITool(e) {
  * For GUI Tool. Display tips
  */
 function listening110033ForGUITool() {
-    console.info('listening110033ForGUITool');
     tipsOnTop('', kTips110033, 'Funding Bitcoin', 'fundingBitcoin');
 }
 
@@ -4033,16 +4087,57 @@ function listening110033ForGUITool() {
  */
 function listening110340ForGUITool(e) {
     // console.info('listening110340 = ' + JSON.stringify(e));
-    saveTempHash(e.funding_txid);
-    $("#funding_txid").val(getTempHash());
-    tipsOnTop('', kTips110340, 'Confirm', 'bitcoinFundingSigned');
+    $("#funding_txid").val(e.funding_txid);
+    $("#recipient_node_peer_id").val(e.funder_node_address);
+    $("#recipient_user_peer_id").val(e.funder_peer_id);
+
+    let status = getChannelStatus($("#logined").text(), e.temporary_channel_id);
+    console.info('listening110340ForGUITool status = ' + status);
+    switch (Number(status)) {
+        case 4:
+            tipsOnTop('', kTipsFirst110340, 'Confirm', 'bitcoinFundingSigned');
+            break;
+        case 7:
+            tipsOnTop('', kTipsSecond110340, 'Confirm', 'bitcoinFundingSigned');
+            break;
+        case 10:
+            tipsOnTop('', kTipsThird110340, 'Confirm', 'bitcoinFundingSigned');
+            break;
+    }
 }
 
 /**
  * For GUI Tool
  */
-function listening110350ForGUITool() {
-    tipsOnTop('', kTips110350, 'Funding Bitcoin', 'fundingBitcoin');
+function listening110350ForGUITool(e) {
+
+    let status = getChannelStatus($("#logined").text(), e.temporary_channel_id);
+    console.info('listening110350ForGUITool 1 status = ' + status);
+    switch (Number(status)) {
+        case 4:
+            saveChannelData($("#logined").text(), e.temporary_channel_id, '', true, 5);
+            break;
+        case 7:
+            saveChannelData($("#logined").text(), e.temporary_channel_id, '', true, 8);
+            break;
+        case 10:
+            saveChannelData($("#logined").text(), e.temporary_channel_id, '', true, 11);
+            break;
+    }
+
+    status = getChannelStatus($("#logined").text(), e.temporary_channel_id);
+    console.info('listening110350ForGUITool 2 status = ' + status);
+    switch (Number(status)) {
+        case 5:
+            tipsOnTop('', kTipsFirst110350, 'Funding Bitcoin', 'fundingBitcoin');
+            break;
+        case 8:
+            tipsOnTop('', kTipsSecond110350, 'Funding Bitcoin', 'fundingBitcoin');
+            break;
+        case 11:
+            tipsOnTop('', kTipsThird110350, 'Funding Asset', 'fundingAsset');
+            break;
+    }
 }
 
 //
@@ -4496,12 +4591,12 @@ function afterLogin() {
 /**
  * 
  */
-function afterOpenChannel() {
+function afterOpenChannel(tempCID) {
 
     disableInvokeAPI();
 
-    let channelID = getChannelID();
-    tipsOnTop(channelID, kTipsAfterOpenChannel);
+    // let channelID = getChannelID();
+    tipsOnTop(tempCID, kTipsAfterOpenChannel);
 }
 
 /**
@@ -4540,12 +4635,23 @@ function afterBitcoinFundingCreated() {
 /**
  * 
  */
-function afterBitcoinFundingSigned() {
+function afterBitcoinFundingSigned(tempCID) {
 
     disableInvokeAPI();
 
-    // let channelID = getChannelID();
-    tipsOnTop('', kTipsFirstAfterBitcoinFundingSigned);
+    let status = getChannelStatus($("#logined").text(), tempCID);
+    console.info('afterBitcoinFundingSigned status = ' + status);
+    switch (Number(status)) {
+        case 5:
+            tipsOnTop('', kTipsFirstAfterBitcoinFundingSigned);
+            break;
+        case 8:
+            tipsOnTop('', kTipsSecondAfterBitcoinFundingSigned);
+            break;
+        case 11:
+            tipsOnTop('', kTipsThirdAfterBitcoinFundingSigned);
+            break;
+    }
 }
 
 /**
