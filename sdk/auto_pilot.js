@@ -16,19 +16,20 @@ async function listening110032(e, netType) {
 
     let isAutoMode = getAutoPilot();
     console.info('SDK: NOW isAutoMode = ' + isAutoMode);
-    saveChannelData(e.to_peer_id, e.temporary_channel_id, '', false, 1);
-    saveCounterparties(e.to_peer_id, e.funder_node_address, e.funder_peer_id);
+
+    let myUserID     = e.to_peer_id;
+    let nodeID       = e.funder_node_address;
+    let userID       = e.funder_peer_id;
+    let channel_id   = e.temporary_channel_id;
+    await saveChannelData(myUserID, channel_id, '', false, 1);
+    saveCounterparties(myUserID, nodeID, userID);
 
     if (isAutoMode === 'No' || isAutoMode === null) return;
     
     console.info('SDK: listening110032 = ' + JSON.stringify(e));
     
-    let nodeID   = e.funder_node_address;
-    let userID   = e.funder_peer_id;
-    let myUserID = e.to_peer_id;
-
     let info                  = new AcceptChannelInfo();
-    info.temporary_channel_id = e.temporary_channel_id;
+    info.temporary_channel_id = channel_id;
     info.approval             = true;
 
     let isExist = 0;
@@ -51,12 +52,10 @@ async function listening110032(e, netType) {
  * listening to -110032 and send -100033 acceptChannel
  * 
  * @param e 
- * @param netType true: testnet  false: mainnet
  */
-function listening110033(e) {
+async function listening110033(e) {
     console.info('listening110033');
-    // saveChannelAddress(e.channel_address);
-    saveChannelData(e.to_peer_id, e.temporary_channel_id, e.channel_address, true, 2);
+    await saveChannelData(e.to_peer_id, e.temporary_channel_id, e.channel_address, true, 2);
 }
 
 /**
@@ -110,7 +109,7 @@ async function listening110035(e) {
     let tempPrivKey = getTempPrivKey(myUserID, kTempPrivKey, e.temporary_channel_id);
     saveTempPrivKey(myUserID, kTempPrivKey, e.channel_id, tempPrivKey);
 
-    saveChannelData(e.channel_id);
+    await saveChannelData(e.channel_id);
 }
 
 /**
@@ -251,19 +250,23 @@ async function listening110340(e) {
     console.info('SDK: NOW isAutoMode = ' + isAutoMode);
     saveTempHash(e.funding_txid);
 
-    let status = getChannelStatus(e.to_peer_id, e.temporary_channel_id);
-    console.info('listening110340 status = ' + status);
-    switch (Number(status)) {
-        case 2:
-            saveChannelData(e.to_peer_id, e.temporary_channel_id, '', false, 4);
-            break;
-        case 5:
-            saveChannelData(e.to_peer_id, e.temporary_channel_id, '', false, 7);
-            break;
-        case 8:
-            saveChannelData(e.to_peer_id, e.temporary_channel_id, '', false, 10);
-            break;
-    }
+    let myUserID     = e.to_peer_id;
+    let channel_id   = e.temporary_channel_id;
+
+    // let channel_addr = await getChannelAddress(channel_id);
+    // let status       = await getChannelStatus(channel_id, false);
+    // console.info('listening110340 status = ' + status);
+    // switch (Number(status)) {
+    //     case 2:
+    //         await saveChannelData(myUserID, channel_id, channel_addr, false, 4);
+    //         break;
+    //     case 5:
+    //         await saveChannelData(myUserID, channel_id, channel_addr, false, 7);
+    //         break;
+    //     case 8:
+    //         await saveChannelData(myUserID, channel_id, channel_addr, false, 10);
+    //         break;
+    // }
             
 
     if (isAutoMode === 'No' || isAutoMode === null) return;
@@ -272,13 +275,12 @@ async function listening110340(e) {
 
     let nodeID   = e.funder_node_address;
     let userID   = e.funder_peer_id;
-    let myUserID = e.to_peer_id;
 
     // will send -100350 bitcoinFundingSigned
     let info                          = new FundingBtcSigned();
-    info.temporary_channel_id         = e.temporary_channel_id;
+    info.temporary_channel_id         = channel_id;
     info.channel_address_private_key  = await asyncGetFundingPrivKey(
-        myUserID, db, e.temporary_channel_id, kTbFundingPrivKey);
+        myUserID, db, channel_id, kTbFundingPrivKey);
     info.funding_txid                 = e.funding_txid;
     info.approval                     = true;
 

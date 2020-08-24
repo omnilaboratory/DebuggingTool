@@ -78,6 +78,12 @@ const kTbFundingPrivKey = 'tb_funding_priv_key';
 
 /**
  * Object Store (table) name of IndexedDB.
+ * Funding private key
+ */
+const kTbChannelData= 'tb_channel_data';
+
+/**
+ * Object Store (table) name of IndexedDB.
  * temp private key
  */
 // const kTbTempPrivKey = 'tb_temp_priv_key';
@@ -246,59 +252,47 @@ function saveFundingPrivKey(user_id, channel_id, privkey, tbName) {
  * 15: commitmentTransactionCreated done  16: commitmentTransactionAccepted done
  * 17: payInvoice done  18: commitmentTransactionAccepted done
  */
-function saveChannelData(myUserID, channel_id, channel_addr, funder, status) {
-    // OLD
-    // localStorage.setItem(kChannelData, channelID);
 
-    // NEW
-    let resp = JSON.parse(localStorage.getItem(kChannelData));
-
-    // If has data.
-    if (resp) {
-        // console.info('HAS DATA');
-        for (let i = 0; i < resp.result.length; i++) {
-            if (myUserID === resp.result[i].userID) {
-                for (let j = 0; j < resp.result[i].data.length; j++) {
-                    if (channel_id === resp.result[i].data[j].channel_id) {
-                        if (channel_addr != '') {
-                            resp.result[i].data[j].channel_addr = channel_addr;
+ /*
+function await saveChannelData(myUserID, channel_id, channel_addr, funder, status) {
+    
+    return new Promise((resolve, reject) => {
+    
+        let resp = JSON.parse(localStorage.getItem(kChannelData));
+    
+        // If has data.
+        if (resp) {
+            // console.info('HAS DATA');
+            for (let i = 0; i < resp.result.length; i++) {
+                if (myUserID === resp.result[i].userID) {
+                    for (let j = 0; j < resp.result[i].data.length; j++) {
+                        if (channel_id === resp.result[i].data[j].channel_id) {
+                            if (channel_addr != '') {
+                                resp.result[i].data[j].channel_addr = channel_addr;
+                            }
+                            resp.result[i].data[j].status = status;
+                            localStorage.setItem(kChannelData, JSON.stringify(resp));
+                            resolve();
+                            return;
                         }
-                        resp.result[i].data[j].status       = status;
-                        localStorage.setItem(kChannelData, JSON.stringify(resp));
-                        return;
                     }
+    
+                    // Add new dato to 
+                    let new_data = {
+                        channel_id:   channel_id,
+                        channel_addr: channel_addr,
+                        status:       status,
+                        funder:       funder,
+                    }
+                    resp.result[i].data.push(new_data);
+                    localStorage.setItem(kChannelData, JSON.stringify(resp));
+                    resolve();
+                    return;
                 }
-
-                // Add new dato to 
-                let new_data = {
-                    channel_id:   channel_id,
-                    channel_addr: channel_addr,
-                    status:       status,
-                    funder:       funder,
-                }
-                resp.result[i].data.push(new_data);
-                localStorage.setItem(kChannelData, JSON.stringify(resp));
-                return;
             }
-        }
-
-        // A new User ID.
-        let new_data = {
-            userID: myUserID,
-            data: [{
-                channel_id:   channel_id,
-                channel_addr: channel_addr,
-                status:       status,
-                funder:       funder,
-            }]
-        }
-        resp.result.push(new_data);
-        localStorage.setItem(kChannelData, JSON.stringify(resp));
-
-    } else {
-        // console.info('FIRST DATA');
-        let data = {
-            result: [{
+    
+            // A new User ID.
+            let new_data = {
                 userID: myUserID,
                 data: [{
                     channel_id:   channel_id,
@@ -306,11 +300,31 @@ function saveChannelData(myUserID, channel_id, channel_addr, funder, status) {
                     status:       status,
                     funder:       funder,
                 }]
-            }]
+            }
+            resp.result.push(new_data);
+            localStorage.setItem(kChannelData, JSON.stringify(resp));
+            resolve();
+
+        } else {
+            // console.info('FIRST DATA');
+            let data = {
+                result: [{
+                    userID: myUserID,
+                    data: [{
+                        channel_id:   channel_id,
+                        channel_addr: channel_addr,
+                        status:       status,
+                        funder:       funder,
+                    }]
+                }]
+            }
+            localStorage.setItem(kChannelData, JSON.stringify(data));
+            resolve();
         }
-        localStorage.setItem(kChannelData, JSON.stringify(data));
-    }
+    })
 }
+*/
+
 
 /**
  * Get channelID from local storage
@@ -342,56 +356,62 @@ function getChannelID() {
 
 /**
  * Get temp channelID from channel address
- * @param myUserID
- * @param addr Channel address
+ * @param channel_addr
  */
-function getTempCIDFromAddr(myUserID, addr) {
+function getChannelIDFromAddr(channel_addr) {
 
-    let resp = JSON.parse(localStorage.getItem(kChannelData));
-
-    // If has data.
-    if (resp) {
-        // console.info('HAS DATA');
-        for (let i = 0; i < resp.result.length; i++) {
-            if (myUserID === resp.result[i].userID) {
-                for (let j = 0; j < resp.result[i].data.length; j++) {
-                    if (addr === resp.result[i].data[j].channel_addr) {
-                        return resp.result[i].data[j].channel_id;
-                    }
-                }
+    return new Promise((resolve, reject) => {
+        let transaction = db.transaction([kTbChannelData], 'readonly');
+        let store       = transaction.objectStore(kTbChannelData);
+        let index       = store.index('channel_addr');
+        let request     = index.get(channel_addr);
+    
+        request.onerror = function(e) {
+            console.log('Read data false.');
+            reject('Read data false.');
+        };
+    
+        request.onsuccess = function (e) {
+            let result = e.target.result;
+            if (result) {
+                console.log('result.channel_id = ' + result.channel_id);
+                resolve(result.channel_id);
+            } else {
+                console.log('No Data.');
+                resolve('');
             }
         }
-        return '';
-    } else {
-        return '';
-    }
+    })
 }
 
 /**
  * Get channel status from channelID
- * @param myUserID
  * @param channel_id
+ * @param funder true: is funder  false: is NOT funder
  */
-function getChannelStatus(myUserID, channel_id) {
+function getChannelStatus(channel_id, funder) {
 
-    let resp = JSON.parse(localStorage.getItem(kChannelData));
-
-    // If has data.
-    if (resp) {
-        // console.info('HAS DATA');
-        for (let i = 0; i < resp.result.length; i++) {
-            if (myUserID === resp.result[i].userID) {
-                for (let j = 0; j < resp.result[i].data.length; j++) {
-                    if (channel_id === resp.result[i].data[j].channel_id) {
-                        return resp.result[i].data[j].status;
-                    }
-                }
+    return new Promise((resolve, reject) => {
+        let key         = channel_id + funder;
+        let transaction = db.transaction([kTbChannelData], 'readonly');
+        let store       = transaction.objectStore(kTbChannelData);
+        let request     = store.get(key);
+    
+        request.onerror = function(e) {
+            console.log('Read data false.');
+            reject('Read data false.');
+        };
+    
+        request.onsuccess = function (e) {
+            if (request.result) {
+                console.log('request.result.status = ' + request.result.status);
+                resolve(request.result.status);
+            } else {
+                console.log('No Data.');
+                resolve('');
             }
         }
-        return '';
-    } else {
-        return '';
-    }
+    })
 }
 
 /**
@@ -468,31 +488,31 @@ function saveChannelAddress(address) {
 
 /**
  * get Channel ddress from localStorage
- * @param myUserID
  * @param channel_id
  */
-function getChannelAddress(myUserID, channel_id) {
-    // OLD
-    // return localStorage.getItem(kChannelAddress);
-
-    let resp = JSON.parse(localStorage.getItem(kChannelData));
-
-    // If has data.
-    if (resp) {
-        // console.info('HAS DATA');
-        for (let i = 0; i < resp.result.length; i++) {
-            if (myUserID === resp.result[i].userID) {
-                for (let j = 0; j < resp.result[i].data.length; j++) {
-                    if (channel_id === resp.result[i].data[j].channel_id) {
-                        return resp.result[i].data[j].channel_addr;
-                    }
-                }
+function getChannelAddress(channel_id) {
+    
+    return new Promise((resolve, reject) => {
+        let key         = channel_id + 'true';
+        let transaction = db.transaction([kTbChannelData], 'readonly');
+        let store       = transaction.objectStore(kTbChannelData);
+        let request     = store.get(key);
+    
+        request.onerror = function(e) {
+            console.log('Read data false.');
+            reject('Read data false.');
+        };
+    
+        request.onsuccess = function (e) {
+            if (request.result) {
+                console.log('request.result.channel_addr = ' + request.result.channel_addr);
+                resolve(request.result.channel_addr);
+            } else {
+                console.log('No Data.');
+                resolve('');
             }
         }
-        return '';
-    } else {
-        return '';
-    }
+    })
 }
 
 /**
@@ -940,4 +960,92 @@ function sendSomeCommitmentById(id) {
     obdApi.sendSomeCommitmentById(id, function(e) {
         console.info('SDK: -103206 sendSomeCommitmentById = ' + JSON.stringify(e));
     });
+}
+
+/**
+ * Open IndexedDB
+ */
+function openDB() {
+
+    let request = window.indexedDB.open('data');
+    
+    request.onerror = function (e) {
+        console.log('DB open error!');
+    };
+
+    request.onsuccess = function (e) {
+        db = request.result;
+        console.log('DB open success!');
+    };
+
+    // Create table and index
+    request.onupgradeneeded = function (e) {
+        db = e.target.result;
+
+        let os1;
+        if (!db.objectStoreNames.contains(kTbGlobalMsg)) {
+            os1 = db.createObjectStore(kTbGlobalMsg, { autoIncrement: true });
+            os1.createIndex('user_id', 'user_id', { unique: false });
+        }
+
+        let os2;
+        if (!db.objectStoreNames.contains(kTbFundingPrivKey)) {
+            os2 = db.createObjectStore(kTbFundingPrivKey, { autoIncrement: true });
+            os2.createIndex('channel_id', 'channel_id', { unique: false });
+        }
+
+        let os3;
+        if (!db.objectStoreNames.contains(kTbChannelData)) {
+            os3 = db.createObjectStore(kTbChannelData, { keyPath: 'key' });
+            os3.createIndex('channel_id',   'channel_id',   { unique: false });
+            os3.createIndex('channel_addr', 'channel_addr', { unique: false });
+            os3.createIndex('user_id', 'user_id', { unique: false });
+            os3.createIndex('funder',  'funder',  { unique: false });
+            os3.createIndex('status',  'status',  { unique: false });
+        }
+    }
+}
+
+
+/**
+ * Add a record to table Funding private key or Last temp private key
+ * @param myUserID
+ * @param channel_id
+ * @param privkey
+ * @param tbName: Funding private key or Last temp private key
+ */
+
+/**
+ * Save channel data to local storage
+ * @param myUserID  user id of currently loged in.
+ * @param channel_id
+ * @param channel_addr
+ * @param funder  true: myUserID is funder  false: myUserID is NOT funder
+ * @param status  1: openChannel done  2: acceptChannel done
+ * 3: first fundingBitcoin done   4: bitcoinFundingCreated done   5: bitcoinFundingSigned done
+ * 6: second fundingBitcoin done  7: bitcoinFundingCreated done   8: bitcoinFundingSigned done
+ * 9: third fundingBitcoin done  10: bitcoinFundingCreated done  11: bitcoinFundingSigned done
+ * 12: fundingAsset done  13: assetFundingCreated done  14: assetFundingSigned done
+ * 15: commitmentTransactionCreated done  16: commitmentTransactionAccepted done
+ * 17: payInvoice done  18: commitmentTransactionAccepted done
+ */
+function saveChannelData(myUserID, channel_id, channel_addr, funder, status) {
+    
+    return new Promise((resolve, reject) => {
+        let key     = channel_id + funder;
+        let request = db.transaction([kTbChannelData], 'readwrite')
+            .objectStore(kTbChannelData)
+            .put({ key: key, user_id: myUserID, channel_id: channel_id, 
+                channel_addr: channel_addr, funder: funder, status: status,});
+      
+        request.onsuccess = function (e) {
+            console.log('await saveChannelData Data write success.');
+            resolve();
+        };
+      
+        request.onerror = function (e) {
+            console.log('await saveChannelData Data write false.');
+            reject();
+        }
+    })
 }

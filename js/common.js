@@ -117,8 +117,8 @@ async function sdkOpenChannel() {
     info.is_private     = $("#checkbox_n32").prop("checked");
 
     displaySentMessage100032(nodeID, userID, info);
-    let tempCID = await openChannel($("#logined").text(), nodeID, userID, info);
-    afterOpenChannel(tempCID);
+    let resp = await openChannel($("#logined").text(), nodeID, userID, info);
+    if (resp) afterOpenChannel();
 }
 
 // -100033 accept Channel API at local.
@@ -133,8 +133,8 @@ async function sdkAcceptChannel() {
     info.approval             = $("#checkbox_n33").prop("checked");
 
     displaySentMessage100033(nodeID, userID, info);
-    await acceptChannel($("#logined").text(), nodeID, userID, info);
-    afterAcceptChannel();
+    let resp = await acceptChannel($("#logined").text(), nodeID, userID, info);
+    if (resp) afterAcceptChannel();
 }
 
 /** 
@@ -460,7 +460,7 @@ function sdkGetAllBreachRemedyTransactions() {
 }
 
 // -100340 BTC Funding Created API at local.
-async function sdkBitcoinFundingCreated() {
+function sdkBitcoinFundingCreated() {
 
     let nodeID = $("#recipient_node_peer_id").val();
     let userID = $("#recipient_user_peer_id").val();
@@ -471,12 +471,12 @@ async function sdkBitcoinFundingCreated() {
     info.funding_tx_hex              = $("#funding_tx_hex").val();
 
     displaySentMessage100340(nodeID, userID, info);
-    await bitcoinFundingCreated($("#logined").text(), nodeID, userID, info);
+    bitcoinFundingCreated($("#logined").text(), nodeID, userID, info);
     afterBitcoinFundingCreated();
 }
 
 // -100350 BTC Funding Signed API at local.
-async function sdkBitcoinFundingSigned() {
+function sdkBitcoinFundingSigned() {
 
     let nodeID = $("#recipient_node_peer_id").val();
     let userID = $("#recipient_user_peer_id").val();
@@ -488,7 +488,7 @@ async function sdkBitcoinFundingSigned() {
     info.approval                    = $("#checkbox_n3500").prop("checked");
 
     displaySentMessage100350(nodeID, userID, info);
-    await bitcoinFundingSigned($("#logined").text(), nodeID, userID, info);
+    bitcoinFundingSigned($("#logined").text(), nodeID, userID, info);
     afterBitcoinFundingSigned(info.temporary_channel_id);
 }
 
@@ -528,7 +528,7 @@ function sdkAssetFundingSigned() {
 }
 
 // -102109 funding BTC API at local.
-async function sdkFundingBitcoin() {
+function sdkFundingBitcoin() {
 
     let info                      = new BtcFundingInfo();
     info.from_address             = $("#from_address").val();
@@ -538,7 +538,7 @@ async function sdkFundingBitcoin() {
     info.miner_fee                = Number($("#miner_fee").val());
 
     displaySentMessage102109(info);
-    await fundingBitcoin($("#logined").text(), info);
+    fundingBitcoin($("#logined").text(), info);
     afterFundingBitcoin();
 }
 
@@ -1390,31 +1390,31 @@ function fillCurrHtlcHt1aTempKey() {
 }
 
 //
-function fillFundingBtcData() {
+async function fillFundingBtcData() {
     let result = getFundingBtcData($("#logined").text());
     // console.info('AUTO FILL result ==>  ' + result);
     // if (result === '') return;
     $("#from_address").val(result.from_address);
     $("#from_address_private_key").val(result.from_address_private_key);
 
-    let myUserID   = $("#logined").text();
+    // let myUserID   = $("#logined").text();
     let channel_id = $("#curr_channel_id").text();
-    $("#to_address").val(getChannelAddress(myUserID, channel_id));
+    $("#to_address").val(await getChannelAddress(channel_id));
 
     $("#amount").val(result.amount);
     $("#miner_fee").val(result.miner_fee);
 }
 
 //
-function fillFundingAssetData() {
+async function fillFundingAssetData() {
     let result = getFundingBtcData($("#logined").text());
     if (result === '') return;
     $("#from_address").val(result.from_address);
     $("#from_address_private_key").val(result.from_address_private_key);
 
-    let myUserID   = $("#logined").text();
+    // let myUserID   = $("#logined").text();
     let channel_id = $("#curr_channel_id").text();
-    $("#to_address").val(getChannelAddress(myUserID, channel_id));
+    $("#to_address").val(await getChannelAddress(channel_id));
 }
 
 //
@@ -3240,47 +3240,6 @@ function sdkGetAddressInfo(msgType) {
 }
 
 /**
- * Open IndexedDB
- */
-function openDB() {
-
-    let request = window.indexedDB.open('data');
-    
-    request.onerror = function (e) {
-        console.log('DB open error!');
-    };
-
-    request.onsuccess = function (e) {
-        db = request.result;
-        console.log('DB open success!');
-    };
-
-    // Create table and index
-    request.onupgradeneeded = function (e) {
-        db = e.target.result;
-
-        let os1;
-        if (!db.objectStoreNames.contains(kTbGlobalMsg)) {
-            os1 = db.createObjectStore(kTbGlobalMsg, { autoIncrement: true });
-            os1.createIndex('user_id', 'user_id', { unique: false });
-        }
-
-        let os2;
-        if (!db.objectStoreNames.contains(kTbFundingPrivKey)) {
-            os2 = db.createObjectStore(kTbFundingPrivKey, { autoIncrement: true });
-            os2.createIndex('channel_id', 'channel_id', { unique: false });
-        }
-
-        // OLD RESOLUTION
-        // let os3;
-        // if (!db.objectStoreNames.contains(kTbTempPrivKey)) {
-        //     os3 = db.createObjectStore(kTbTempPrivKey, { autoIncrement: true });
-        //     os3.createIndex('channel_id', 'channel_id', { unique: false });
-        // }
-    }
-}
-
-/**
  * Open a new IndexedDB instance for log page.
  * And read data belong one user.
  */
@@ -4006,7 +3965,7 @@ function registerEvent(netType) {
     let msg_110033 = enumMsgType.MsgType_RecvChannelAccept_33;
     obdApi.registerEvent(msg_110033, function(e) {
         listening110033(e);
-        listening110033ForGUITool();
+        listening110033ForGUITool(e);
     });
 
     // auto response mode
@@ -4077,67 +4036,92 @@ function listening110032ForGUITool(e) {
 /**
  * For GUI Tool. Display tips
  */
-function listening110033ForGUITool() {
-    tipsOnTop('', kTips110033, 'Funding Bitcoin', 'fundingBitcoin');
+function listening110033ForGUITool(e) {
+    console.info('listening110033ForGUITool');
+    tipsOnTop(e.temporary_channel_id, kTips110033, 'Funding Bitcoin', 'fundingBitcoin');
 }
 
 /**
  * For GUI Tool
  * @param e 
  */
-function listening110340ForGUITool(e) {
+async function listening110340ForGUITool(e) {
     // console.info('listening110340 = ' + JSON.stringify(e));
     $("#funding_txid").val(e.funding_txid);
     $("#recipient_node_peer_id").val(e.funder_node_address);
     $("#recipient_user_peer_id").val(e.funder_peer_id);
 
-    let status = getChannelStatus($("#logined").text(), e.temporary_channel_id);
+    let myUserID     = $("#logined").text();
+    let channel_id   = e.temporary_channel_id;
+    let channel_addr = await getChannelAddress(channel_id);
+    let status       = await getChannelStatus(channel_id, false);
     console.info('listening110340ForGUITool status = ' + status);
     switch (Number(status)) {
-        case 4:
+        case 2:
+            await saveChannelData(myUserID, channel_id, channel_addr, false, 4);
             tipsOnTop('', kTipsFirst110340, 'Confirm', 'bitcoinFundingSigned');
             break;
-        case 7:
+        case 5:
+            await saveChannelData(myUserID, channel_id, channel_addr, false, 7);
             tipsOnTop('', kTipsSecond110340, 'Confirm', 'bitcoinFundingSigned');
             break;
-        case 10:
+        case 8:
+            await saveChannelData(myUserID, channel_id, channel_addr, false, 10);
             tipsOnTop('', kTipsThird110340, 'Confirm', 'bitcoinFundingSigned');
             break;
     }
+
+    // switch (Number(status)) {
+    //     case 4:
+    //         tipsOnTop('', kTipsFirst110340, 'Confirm', 'bitcoinFundingSigned');
+    //         break;
+    //     case 7:
+    //         tipsOnTop('', kTipsSecond110340, 'Confirm', 'bitcoinFundingSigned');
+    //         break;
+    //     case 10:
+    //         tipsOnTop('', kTipsThird110340, 'Confirm', 'bitcoinFundingSigned');
+    //         break;
+    // }
 }
 
 /**
  * For GUI Tool
  */
-function listening110350ForGUITool(e) {
+async function listening110350ForGUITool(e) {
 
-    let status = getChannelStatus($("#logined").text(), e.temporary_channel_id);
-    console.info('listening110350ForGUITool 1 status = ' + status);
+    let myUserID     = $("#logined").text();
+    let channel_id   = e.temporary_channel_id;
+    let channel_addr = await getChannelAddress(channel_id);
+    let status       = await getChannelStatus(channel_id, true);
+    console.info('listening110350ForGUITool status = ' + status);
     switch (Number(status)) {
         case 4:
-            saveChannelData($("#logined").text(), e.temporary_channel_id, '', true, 5);
-            break;
-        case 7:
-            saveChannelData($("#logined").text(), e.temporary_channel_id, '', true, 8);
-            break;
-        case 10:
-            saveChannelData($("#logined").text(), e.temporary_channel_id, '', true, 11);
-            break;
-    }
-
-    status = getChannelStatus($("#logined").text(), e.temporary_channel_id);
-    console.info('listening110350ForGUITool 2 status = ' + status);
-    switch (Number(status)) {
-        case 5:
+            await saveChannelData(myUserID, channel_id, channel_addr, true, 5);
             tipsOnTop('', kTipsFirst110350, 'Funding Bitcoin', 'fundingBitcoin');
             break;
-        case 8:
+        case 7:
+            await saveChannelData(myUserID, channel_id, channel_addr, true, 8);
             tipsOnTop('', kTipsSecond110350, 'Funding Bitcoin', 'fundingBitcoin');
             break;
-        case 11:
+        case 10:
+            await saveChannelData(myUserID, channel_id, channel_addr, true, 11);
             tipsOnTop('', kTipsThird110350, 'Funding Asset', 'fundingAsset');
             break;
     }
+
+    // status = await getChannelStatus(e.temporary_channel_id);
+    // console.info('listening110350ForGUITool 2 status = ' + status);
+    // switch (Number(status)) {
+    //     case 5:
+    //         tipsOnTop('', kTipsFirst110350, 'Funding Bitcoin', 'fundingBitcoin');
+    //         break;
+    //     case 8:
+    //         tipsOnTop('', kTipsSecond110350, 'Funding Bitcoin', 'fundingBitcoin');
+    //         break;
+    //     case 11:
+    //         tipsOnTop('', kTipsThird110350, 'Funding Asset', 'fundingAsset');
+    //         break;
+    // }
 }
 
 //
@@ -4591,22 +4575,16 @@ function afterLogin() {
 /**
  * 
  */
-function afterOpenChannel(tempCID) {
-
+function afterOpenChannel() {
     disableInvokeAPI();
-
-    // let channelID = getChannelID();
-    tipsOnTop(tempCID, kTipsAfterOpenChannel);
+    tipsOnTop(getChannelID(), kTipsAfterOpenChannel);
 }
 
 /**
  * 
  */
 function afterAcceptChannel() {
-
     disableInvokeAPI();
-
-    // let channelID = getChannelID();
     tipsOnTop('', kTipsAfterAcceptChannel);
 }
 
@@ -4614,10 +4592,7 @@ function afterAcceptChannel() {
  * 
  */
 function afterFundingBitcoin() {
-
     disableInvokeAPI();
-
-    // let channelID = getChannelID();
     tipsOnTop('', kTipsAfterFundingBitcoin, 'Notify Counterparty', 'bitcoinFundingCreated');
 }
 
@@ -4635,11 +4610,11 @@ function afterBitcoinFundingCreated() {
 /**
  * 
  */
-function afterBitcoinFundingSigned(tempCID) {
+async function afterBitcoinFundingSigned(tempCID) {
 
     disableInvokeAPI();
 
-    let status = getChannelStatus($("#logined").text(), tempCID);
+    let status = await getChannelStatus(tempCID, false);
     console.info('afterBitcoinFundingSigned status = ' + status);
     switch (Number(status)) {
         case 5:
