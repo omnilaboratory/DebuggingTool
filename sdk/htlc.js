@@ -19,12 +19,15 @@ function addInvoice(info, callback) {
  *  @param info 
  */
 function payInvoice(info) {
-    obdApi.payInvoice(info, function(e) {
-        console.info('SDK: -100401 - payInvoice = ' + JSON.stringify(e));
-        saveHtlcH(e.h);
-        saveRoutingPacket(e.routing_packet);
-        saveCltvExpiry(e.min_cltv_expiry);
-    });
+    return new Promise((resolve, reject) => {
+        obdApi.payInvoice(info, function(e) {
+            console.info('SDK: -100401 - payInvoice = ' + JSON.stringify(e));
+            saveHtlcH(e.h);
+            saveRoutingPacket(e.routing_packet);
+            saveCltvExpiry(e.min_cltv_expiry);
+            resolve(true);
+        });
+    })
 }
 
 /**
@@ -34,18 +37,21 @@ function payInvoice(info) {
  * @param userID the user id of the fundee.
  * @param info 
  */
-async function addHTLC(myUserID, nodeID, userID, info) {
-    obdApi.htlcCreated(nodeID, userID, info, function(e) {
-        console.info('SDK: -100040 htlcCreated = ' + JSON.stringify(e));
-        // await saveChannelData(e.channel_id);
-        // save 3 privkeys
-        saveTempPrivKey(myUserID, kRsmcTempPrivKey, e.channel_id, 
-            info.curr_rsmc_temp_address_private_key);
-        saveTempPrivKey(myUserID, kHtlcTempPrivKey, e.channel_id, 
-            info.curr_htlc_temp_address_private_key);
-        saveTempPrivKey(myUserID, kHtlcHtnxTempPrivKey, e.channel_id, 
-            info.curr_htlc_temp_address_for_ht1a_private_key);
-    });
+function addHTLC(myUserID, nodeID, userID, info) {
+    return new Promise((resolve, reject) => {
+        obdApi.htlcCreated(nodeID, userID, info, function(e) {
+            console.info('SDK: -100040 htlcCreated = ' + JSON.stringify(e));
+            // await saveChannelStatus(e.channel_id);
+            // save 3 privkeys
+            saveTempPrivKey(myUserID, kRsmcTempPrivKey, e.channel_id, 
+                info.curr_rsmc_temp_address_private_key);
+            saveTempPrivKey(myUserID, kHtlcTempPrivKey, e.channel_id, 
+                info.curr_htlc_temp_address_private_key);
+            saveTempPrivKey(myUserID, kHtlcHtnxTempPrivKey, e.channel_id, 
+                info.curr_htlc_temp_address_for_ht1a_private_key);
+            resolve(true);
+        });
+    })
 }
 
 /**
@@ -55,14 +61,17 @@ async function addHTLC(myUserID, nodeID, userID, info) {
  * @param userID the user id of the fundee.
  * @param info 
  */
-async function HTLCSigned(myUserID, nodeID, userID, info) {
-    obdApi.htlcSigned(nodeID, userID, info, function(e) {
-        console.info('SDK: -100041 htlcSigned = ' + JSON.stringify(e));
-
-        // await saveChannelData(e.channel_id);
-        saveTempPrivKey(myUserID, kRsmcTempPrivKey, e.channel_id, info.curr_rsmc_temp_address_private_key);
-        saveTempPrivKey(myUserID, kHtlcTempPrivKey, e.channel_id, info.curr_htlc_temp_address_private_key);
-    });
+function HTLCSigned(myUserID, nodeID, userID, info) {
+    return new Promise((resolve, reject) => {
+        obdApi.htlcSigned(nodeID, userID, info, function(e) {
+            console.info('SDK: -100041 htlcSigned = ' + JSON.stringify(e));
+    
+            // await saveChannelStatus(e.channel_id);
+            saveTempPrivKey(myUserID, kRsmcTempPrivKey, e.channel_id, info.curr_rsmc_temp_address_private_key);
+            saveTempPrivKey(myUserID, kHtlcTempPrivKey, e.channel_id, info.curr_htlc_temp_address_private_key);
+            resolve(true);
+        });
+    })
 }
 
 /**
@@ -73,13 +82,16 @@ async function HTLCSigned(myUserID, nodeID, userID, info) {
  * @param info 
  */
 async function forwardR(myUserID, nodeID, userID, info) {
-    obdApi.forwardR(nodeID, userID, info, function(e) {
-        console.info('SDK: -100045 forwardR = ' + JSON.stringify(e));
-
-        // await saveChannelData(e.channel_id);
-        saveTempPrivKey(myUserID, kHtlcHtnxTempPrivKey, e.channel_id, 
-            info.curr_htlc_temp_address_for_he1b_private_key);
-    });
+    return new Promise((resolve, reject) => {
+        obdApi.forwardR(nodeID, userID, info, function(e) {
+            console.info('SDK: -100045 forwardR = ' + JSON.stringify(e));
+    
+            // await saveChannelStatus(e.channel_id);
+            saveTempPrivKey(myUserID, kHtlcHtnxTempPrivKey, e.channel_id, 
+                info.curr_htlc_temp_address_for_he1b_private_key);
+            resolve(true);
+        });
+    })
 }
 
 /**
@@ -91,10 +103,13 @@ async function forwardR(myUserID, nodeID, userID, info) {
  * @param info 
  */
 async function signR(nodeID, userID, info) {
-    obdApi.signR(nodeID, userID, info, function(e) {
-        console.info('SDK: -100046 signR = ' + JSON.stringify(e));
-        // await saveChannelData(e.channel_id);
-    });
+    return new Promise((resolve, reject) => {
+        obdApi.signR(nodeID, userID, info, function(e) {
+            console.info('SDK: -100046 signR = ' + JSON.stringify(e));
+            // await saveChannelStatus(e.channel_id);
+            resolve(true);
+        });
+    })
 }
 
 /**
@@ -106,12 +121,15 @@ async function signR(nodeID, userID, info) {
  * @param info 
  */
 async function closeHTLC(myUserID, nodeID, userID, info) {
-    obdApi.closeHTLC(nodeID, userID, info, function(e) {
-        console.info('SDK: -100049 closeHTLC = ' + JSON.stringify(e));
-        // await saveChannelData(e.channel_id);
-        saveTempPrivKey(myUserID, kTempPrivKey, e.channel_id, 
-            info.curr_rsmc_temp_address_private_key);
-    });
+    return new Promise((resolve, reject) => {
+        obdApi.closeHTLC(nodeID, userID, info, function(e) {
+            console.info('SDK: -100049 closeHTLC = ' + JSON.stringify(e));
+            // await saveChannelStatus(e.channel_id);
+            saveTempPrivKey(myUserID, kTempPrivKey, e.channel_id, 
+                info.curr_rsmc_temp_address_private_key);
+            resolve(true);
+        });
+    })
 }
 
 /**
@@ -123,9 +141,12 @@ async function closeHTLC(myUserID, nodeID, userID, info) {
  * @param info 
  */
 async function closeHTLCSigned(myUserID, nodeID, userID, info) {
-    obdApi.closeHTLCSigned(nodeID, userID, info, function(e) {
-        console.info('SDK: -100050 closeHTLCSigned = ' + JSON.stringify(e));
-        // await saveChannelData(e.channel_id);
-        saveTempPrivKey(myUserID, kTempPrivKey, e.channel_id, info.curr_rsmc_temp_address_private_key);
-    });
+    return new Promise((resolve, reject) => {
+        obdApi.closeHTLCSigned(nodeID, userID, info, function(e) {
+            console.info('SDK: -100050 closeHTLCSigned = ' + JSON.stringify(e));
+            // await saveChannelStatus(e.channel_id);
+            saveTempPrivKey(myUserID, kTempPrivKey, e.channel_id, info.curr_rsmc_temp_address_private_key);
+            resolve(true);
+        });
+    })
 }

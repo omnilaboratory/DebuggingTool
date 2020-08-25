@@ -11,9 +11,12 @@
  * @param info 
  */
 function atomicSwap(nodeID, userID, info) {
-    obdApi.atomicSwap(nodeID, userID, info, function(e) {
-        console.info('SDK: -100080 atomicSwap = ' + JSON.stringify(e));
-    });
+    return new Promise((resolve, reject) => {
+        obdApi.atomicSwap(nodeID, userID, info, function(e) {
+            console.info('SDK: -100080 atomicSwap = ' + JSON.stringify(e));
+            resolve(true);
+        });
+    })
 }
 
 /**
@@ -24,7 +27,10 @@ function atomicSwap(nodeID, userID, info) {
  * @param info 
  */
 function acceptSwap(nodeID, userID, info) {
-    obdApi.atomicSwapAccepted(nodeID, userID, info, function(e) {
-        console.info('SDK: -100081 atomicSwapAccepted = ' + JSON.stringify(e));
-    });
+    return new Promise((resolve, reject) => {
+        obdApi.atomicSwapAccepted(nodeID, userID, info, function(e) {
+            console.info('SDK: -100081 atomicSwapAccepted = ' + JSON.stringify(e));
+            resolve(true);
+        });
+    })
 }

@@ -21,7 +21,7 @@ async function listening110032(e, netType) {
     let nodeID       = e.funder_node_address;
     let userID       = e.funder_peer_id;
     let channel_id   = e.temporary_channel_id;
-    await saveChannelData(myUserID, channel_id, '', false, 1);
+    saveChannelStatus(myUserID, channel_id, false, 1);
     saveCounterparties(myUserID, nodeID, userID);
 
     if (isAutoMode === 'No' || isAutoMode === null) return;
@@ -53,9 +53,9 @@ async function listening110032(e, netType) {
  * 
  * @param e 
  */
-async function listening110033(e) {
+function listening110033(e) {
     console.info('listening110033');
-    await saveChannelData(e.to_peer_id, e.temporary_channel_id, e.channel_address, true, 2);
+    saveChannelStatus(e.to_peer_id, e.temporary_channel_id, true, 2);
 }
 
 /**
@@ -68,19 +68,22 @@ async function listening110034(e) {
     let isAutoMode = getAutoPilot();
     console.info('SDK: NOW isAutoMode = ' + isAutoMode);
 
+    let myUserID   = e.to_peer_id;
+    let channel_id = e.temporary_channel_id;
+    saveChannelStatus(myUserID, channel_id, false, 13);
+
     if (isAutoMode === 'No' || isAutoMode === null) return;
     
     console.info('listening110034 = ' + JSON.stringify(e));
 
     let nodeID   = e.funder_node_address;
     let userID   = e.funder_peer_id;
-    let myUserID = e.to_peer_id;
 
     // will send -100035 AssetFundingSigned
     let info                                = new AssetFundingSignedInfo();
-    info.temporary_channel_id               = e.temporary_channel_id;
+    info.temporary_channel_id               = channel_id;
     info.fundee_channel_address_private_key = await asyncGetFundingPrivKey(
-        myUserID, db, e.temporary_channel_id, kTbFundingPrivKey);
+        myUserID, db, channel_id, kTbFundingPrivKey);
 
     // SDK API
     assetFundingSigned(myUserID, nodeID, userID, info);
@@ -98,18 +101,25 @@ async function listening110034(e) {
 async function listening110035(e) {
     console.info('listening110035 = ' + JSON.stringify(e));
 
-    let myUserID = e.to_peer_id;
+    let myUserID     = e.to_peer_id;
+    let tempCID      = e.temporary_channel_id;
+    let channel_id   = e.channel_id;
+    let channel_addr = await getChannelAddr(tempCID);
 
-    let fundingPrivKey = await asyncGetFundingPrivKey(myUserID, db, 
-        e.temporary_channel_id, kTbFundingPrivKey);
-
-    saveFundingPrivKey(myUserID, e.channel_id, fundingPrivKey, kTbFundingPrivKey);
+    let fundingPrivKey = await asyncGetFundingPrivKey(myUserID, db, tempCID, kTbFundingPrivKey);
+    saveFundingPrivKey(myUserID, channel_id, fundingPrivKey, kTbFundingPrivKey);
 
     //
-    let tempPrivKey = getTempPrivKey(myUserID, kTempPrivKey, e.temporary_channel_id);
-    saveTempPrivKey(myUserID, kTempPrivKey, e.channel_id, tempPrivKey);
+    let tempPrivKey = getTempPrivKey(myUserID, kTempPrivKey, tempCID);
+    saveTempPrivKey(myUserID, kTempPrivKey, channel_id, tempPrivKey);
 
-    await saveChannelData(e.channel_id);
+    //
+    delChannelAddr(tempCID);
+    saveChannelAddr(channel_id, channel_addr);
+
+    //
+    delChannelStatus(tempCID, true);
+    saveChannelStatus(myUserID, channel_id, true, 14);
 }
 
 /**
@@ -252,21 +262,19 @@ async function listening110340(e) {
 
     let myUserID     = e.to_peer_id;
     let channel_id   = e.temporary_channel_id;
-
-    // let channel_addr = await getChannelAddress(channel_id);
-    // let status       = await getChannelStatus(channel_id, false);
-    // console.info('listening110340 status = ' + status);
-    // switch (Number(status)) {
-    //     case 2:
-    //         await saveChannelData(myUserID, channel_id, channel_addr, false, 4);
-    //         break;
-    //     case 5:
-    //         await saveChannelData(myUserID, channel_id, channel_addr, false, 7);
-    //         break;
-    //     case 8:
-    //         await saveChannelData(myUserID, channel_id, channel_addr, false, 10);
-    //         break;
-    // }
+    let status       = await getChannelStatus(channel_id, false);
+    console.info('listening110340 status = ' + status);
+    switch (Number(status)) {
+        case 2:
+            saveChannelStatus(myUserID, channel_id, false, 4);
+            break;
+        case 5:
+            saveChannelStatus(myUserID, channel_id, false, 7);
+            break;
+        case 8:
+            saveChannelStatus(myUserID, channel_id, false, 10);
+            break;
+    }
             
 
     if (isAutoMode === 'No' || isAutoMode === null) return;
@@ -289,6 +297,30 @@ async function listening110340(e) {
 
     // NOT SDK API. This a client function, just for Debugging Tool.
     displaySentMessage100350(nodeID, userID, info);
+}
+
+/**
+ * listening to -110350
+ * @param e 
+ */
+async function listening110350(e) {
+    console.info('listening110350');
+
+    let myUserID     = e.to_peer_id;
+    let channel_id   = e.temporary_channel_id;
+    let status       = await getChannelStatus(channel_id, true);
+    console.info('listening110350 status = ' + status);
+    switch (Number(status)) {
+        case 4:
+            saveChannelStatus(myUserID, channel_id, true, 5);
+            break;
+        case 7:
+            saveChannelStatus(myUserID, channel_id, true, 8);
+            break;
+        case 10:
+            saveChannelStatus(myUserID, channel_id, true, 11);
+            break;
+    }
 }
 
 /**

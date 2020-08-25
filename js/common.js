@@ -117,8 +117,8 @@ async function sdkOpenChannel() {
     info.is_private     = $("#checkbox_n32").prop("checked");
 
     displaySentMessage100032(nodeID, userID, info);
-    let resp = await openChannel($("#logined").text(), nodeID, userID, info);
-    if (resp) afterOpenChannel();
+    let e = await openChannel($("#logined").text(), nodeID, userID, info);
+    afterOpenChannel(e);
 }
 
 // -100033 accept Channel API at local.
@@ -133,14 +133,14 @@ async function sdkAcceptChannel() {
     info.approval             = $("#checkbox_n33").prop("checked");
 
     displaySentMessage100033(nodeID, userID, info);
-    let resp = await acceptChannel($("#logined").text(), nodeID, userID, info);
-    if (resp) afterAcceptChannel();
+    await acceptChannel($("#logined").text(), nodeID, userID, info);
+    afterAcceptChannel();
 }
 
 /** 
  * -100045 forwardR API at local.
  */
-function sdkForwardR() {
+async function sdkForwardR() {
 
     let nodeID      = $("#recipient_node_peer_id").val();
     let userID      = $("#recipient_user_peer_id").val();
@@ -152,14 +152,14 @@ function sdkForwardR() {
     info.curr_htlc_temp_address_for_he1b_pub_key     = $("#curr_htlc_temp_address_for_he1b_pub_key").val();
     info.curr_htlc_temp_address_for_he1b_private_key = $("#curr_htlc_temp_address_for_he1b_private_key").val();
 
-    forwardR($("#logined").text(), nodeID, userID, info);
     displaySentMessage100045(nodeID, userID, info);
+    await forwardR($("#logined").text(), nodeID, userID, info);
 }
 
 /** 
  * -100046 signR API at local.
  */
-function sdkSignR() {
+async function sdkSignR() {
 
     let nodeID = $("#recipient_node_peer_id").val();
     let userID = $("#recipient_user_peer_id").val();
@@ -170,14 +170,14 @@ function sdkSignR() {
     info.msg_hash                    = $("#msg_hash").val();
     info.channel_address_private_key = $("#channel_address_private_key").val();
 
-    signR(nodeID, userID, info);
     displaySentMessage100046(nodeID, userID, info);
+    await signR(nodeID, userID, info);
 }
 
 /** 
  * -100049 closeHTLC API at local.
  */
-function sdkCloseHTLC() {
+async function sdkCloseHTLC() {
 
     let nodeID    = $("#recipient_node_peer_id").val();
     let userID    = $("#recipient_user_peer_id").val();
@@ -191,14 +191,14 @@ function sdkCloseHTLC() {
     info.curr_rsmc_temp_address_pub_key              = $("#curr_rsmc_temp_address_pub_key").val();
     info.curr_rsmc_temp_address_private_key          = $("#curr_rsmc_temp_address_private_key").val();
 
-    closeHTLC($("#logined").text(), nodeID, userID, info);
     displaySentMessage100049(nodeID, userID, info);
+    await closeHTLC($("#logined").text(), nodeID, userID, info);
 }
 
 /** 
  * -100050 closeHTLCSigned API at local.
  */
-function sdkCloseHTLCSigned() {
+async function sdkCloseHTLCSigned() {
 
     let nodeID    = $("#recipient_node_peer_id").val();
     let userID    = $("#recipient_user_peer_id").val();
@@ -212,14 +212,14 @@ function sdkCloseHTLCSigned() {
     info.curr_rsmc_temp_address_pub_key              = $("#curr_rsmc_temp_address_pub_key").val();
     info.curr_rsmc_temp_address_private_key          = $("#curr_rsmc_temp_address_private_key").val();
 
-    closeHTLCSigned($("#logined").text(), nodeID, userID, info);
     displaySentMessage100050(nodeID, userID, info);
+    await closeHTLCSigned($("#logined").text(), nodeID, userID, info);
 }
 
 /** 
  * -100080 atomicSwap API at local.
  */
-function sdkAtomicSwap() {
+async function sdkAtomicSwap() {
 
     let nodeID  = $("#recipient_node_peer_id").val();
     let userID  = $("#recipient_user_peer_id").val();
@@ -235,14 +235,14 @@ function sdkAtomicSwap() {
     info.transaction_id         = $("#transaction_id").val();
     info.time_locker            = Number($("#time_locker").val());
 
-    atomicSwap(nodeID, userID, info);
     displaySentMessage100080(nodeID, userID, info);
+    await atomicSwap(nodeID, userID, info);
 }
 
 /** 
  * -100081 atomicSwapAccepted API at local.
  */
-function sdkAcceptSwap() {
+async function sdkAcceptSwap() {
 
     let nodeID  = $("#recipient_node_peer_id").val();
     let userID  = $("#recipient_user_peer_id").val();
@@ -259,27 +259,27 @@ function sdkAcceptSwap() {
     info.target_transaction_id  = $("#target_transaction_id").val();
     info.time_locker            = Number($("#time_locker").val());
 
-    acceptSwap(nodeID, userID, info);
     displaySentMessage100081(nodeID, userID, info);
+    await acceptSwap(nodeID, userID, info);
 }
 
 /** 
  * -100038 closeChannel API at local.
  */
-function sdkCloseChannel() {
+async function sdkCloseChannel() {
 
     let nodeID     = $("#recipient_node_peer_id").val();
     let userID     = $("#recipient_user_peer_id").val();
     let channel_id = $("#channel_id").val();
 
-    closeChannel(nodeID, userID, channel_id);
     displaySentMessage100038(nodeID, userID, channel_id);
+    await closeChannel(nodeID, userID, channel_id);
 }
 
 /** 
  * -100039 closeChannelSigned API at local.
  */
-function sdkCloseChannelSigned() {
+async function sdkCloseChannelSigned() {
 
     let nodeID = $("#recipient_node_peer_id").val();
     let userID = $("#recipient_user_peer_id").val();
@@ -289,8 +289,8 @@ function sdkCloseChannelSigned() {
     info.request_close_channel_hash = $("#request_close_channel_hash").val();
     info.approval                   = $("#checkbox_n39").prop("checked");
 
-    closeChannelSigned(nodeID, userID, info);
     displaySentMessage100039(nodeID, userID, info);
+    await closeChannelSigned(nodeID, userID, info);
 }
 
 /** 
@@ -460,7 +460,7 @@ function sdkGetAllBreachRemedyTransactions() {
 }
 
 // -100340 BTC Funding Created API at local.
-function sdkBitcoinFundingCreated() {
+async function sdkBitcoinFundingCreated() {
 
     let nodeID = $("#recipient_node_peer_id").val();
     let userID = $("#recipient_user_peer_id").val();
@@ -471,12 +471,12 @@ function sdkBitcoinFundingCreated() {
     info.funding_tx_hex              = $("#funding_tx_hex").val();
 
     displaySentMessage100340(nodeID, userID, info);
-    bitcoinFundingCreated($("#logined").text(), nodeID, userID, info);
+    await bitcoinFundingCreated($("#logined").text(), nodeID, userID, info);
     afterBitcoinFundingCreated();
 }
 
 // -100350 BTC Funding Signed API at local.
-function sdkBitcoinFundingSigned() {
+async function sdkBitcoinFundingSigned() {
 
     let nodeID = $("#recipient_node_peer_id").val();
     let userID = $("#recipient_user_peer_id").val();
@@ -488,12 +488,12 @@ function sdkBitcoinFundingSigned() {
     info.approval                    = $("#checkbox_n3500").prop("checked");
 
     displaySentMessage100350(nodeID, userID, info);
-    bitcoinFundingSigned($("#logined").text(), nodeID, userID, info);
+    await bitcoinFundingSigned($("#logined").text(), nodeID, userID, info);
     afterBitcoinFundingSigned(info.temporary_channel_id);
 }
 
 // -100034 Omni Asset Funding Created API at local.
-function sdkAssetFundingCreated() {
+async function sdkAssetFundingCreated() {
 
     let nodeID   = $("#recipient_node_peer_id").val();
     let userID   = $("#recipient_user_peer_id").val();
@@ -505,12 +505,13 @@ function sdkAssetFundingCreated() {
     info.channel_address_private_key = $("#channel_address_private_key").val();
     info.funding_tx_hex              = $("#funding_tx_hex").val();
 
-    assetFundingCreated($("#logined").text(), nodeID, userID, info);
     displaySentMessage100034(nodeID, userID, info);
+    await assetFundingCreated($("#logined").text(), nodeID, userID, info);
+    afterAssetFundingCreated();
 }
 
 // -100035 Omni Asset Funding Signed API at local.
-function sdkAssetFundingSigned() {
+async function sdkAssetFundingSigned() {
 
     let nodeID    = $("#recipient_node_peer_id").val();
     let userID    = $("#recipient_user_peer_id").val();
@@ -523,12 +524,13 @@ function sdkAssetFundingSigned() {
     info.fundee_channel_address_private_key = privkey;
     // info.approval = approval;
 
-    assetFundingSigned($("#logined").text(), nodeID, userID, info);
     displaySentMessage100035(nodeID, userID, info);
+    let e = await assetFundingSigned($("#logined").text(), nodeID, userID, info);
+    afterAssetFundingSigned(e);
 }
 
 // -102109 funding BTC API at local.
-function sdkFundingBitcoin() {
+async function sdkFundingBitcoin() {
 
     let info                      = new BtcFundingInfo();
     info.from_address             = $("#from_address").val();
@@ -538,12 +540,12 @@ function sdkFundingBitcoin() {
     info.miner_fee                = Number($("#miner_fee").val());
 
     displaySentMessage102109(info);
-    fundingBitcoin($("#logined").text(), info);
+    await fundingBitcoin($("#logined").text(), info);
     afterFundingBitcoin();
 }
 
 //  -102120 funding Omni Asset API at local.
-function sdkFundingAsset() {
+async function sdkFundingAsset() {
 
     let info                      = new OmniFundingAssetInfo();
     info.from_address             = $("#from_address").val();
@@ -552,8 +554,9 @@ function sdkFundingAsset() {
     info.amount                   = Number($("#amount").val());
     info.property_id              = Number($("#property_id").val());
 
-    fundingAsset(info);
     displaySentMessage102120(info);
+    await fundingAsset($("#logined").text(), info);
+    afterFundingAsset();
 }
 
 // -100402 create Invoice API at local.
@@ -599,7 +602,7 @@ function makeQRCode(e) {
 }
 
 // -100040 Old name htlcCreated API at local.
-function sdkAddHTLC() {
+async function sdkAddHTLC() {
 
     let nodeID  = $("#recipient_node_peer_id").val();
     let userID  = $("#recipient_user_peer_id").val();
@@ -620,12 +623,12 @@ function sdkAddHTLC() {
     info.curr_htlc_temp_address_for_ht1a_pub_key     = $("#curr_htlc_temp_address_for_ht1a_pub_key").val();
     info.curr_htlc_temp_address_for_ht1a_private_key = $("#curr_htlc_temp_address_for_ht1a_private_key").val();
 
-    addHTLC($("#logined").text(), nodeID, userID, info);
     displaySentMessage100040(nodeID, userID, info);
+    await addHTLC($("#logined").text(), nodeID, userID, info);
 }
 
 // -100041 htlcSigned API at local.
-function sdkHTLCSigned() {
+async function sdkHTLCSigned() {
 
     let nodeID  = $("#recipient_node_peer_id").val();
     let userID  = $("#recipient_user_peer_id").val();
@@ -639,8 +642,8 @@ function sdkHTLCSigned() {
     info.curr_htlc_temp_address_pub_key     = $("#curr_htlc_temp_address_pub_key").val();
     info.curr_htlc_temp_address_private_key = $("#curr_htlc_temp_address_private_key").val();
 
-    HTLCSigned($("#logined").text(), nodeID, userID, info);
     displaySentMessage100041(nodeID, userID, info);
+    await HTLCSigned($("#logined").text(), nodeID, userID, info);
 }
 
 // -100401 Old name is HtlcFindPath API at local.
@@ -667,7 +670,7 @@ function sdkPayInvoice() {
 }
 
 // -100351 Commitment Transaction Created API at local.
-function sdkCommitmentTransactionCreated() {
+async function sdkCommitmentTransactionCreated() {
 
     let nodeID = $("#recipient_node_peer_id").val();
     let userID = $("#recipient_user_peer_id").val();
@@ -680,12 +683,12 @@ function sdkCommitmentTransactionCreated() {
     info.curr_temp_address_private_key = $("#curr_temp_address_private_key").val();
     info.last_temp_address_private_key = $("#last_temp_address_private_key").val();
 
-    commitmentTransactionCreated($("#logined").text(), nodeID, userID, info);
     displaySentMessage100351(nodeID, userID, info);
+    await commitmentTransactionCreated($("#logined").text(), nodeID, userID, info);
 }
 
 // -100352 Revoke and Acknowledge Commitment Transaction API at local.
-function sdkCommitmentTransactionAccepted() {
+async function sdkCommitmentTransactionAccepted() {
 
     let nodeID = $("#recipient_node_peer_id").val();
     let userID = $("#recipient_user_peer_id").val();
@@ -699,8 +702,8 @@ function sdkCommitmentTransactionAccepted() {
     info.msg_hash                      = $("#msg_hash").val();
     info.approval                      = $("#checkbox_n352").prop("checked");
 
-    commitmentTransactionAccepted($("#logined").text(), nodeID, userID, info);
     displaySentMessage100352(nodeID, userID, info);
+    await commitmentTransactionAccepted($("#logined").text(), nodeID, userID, info);
 }
 
 // Invoke each APIs.
@@ -1399,7 +1402,7 @@ async function fillFundingBtcData() {
 
     // let myUserID   = $("#logined").text();
     let channel_id = $("#curr_channel_id").text();
-    $("#to_address").val(await getChannelAddress(channel_id));
+    $("#to_address").val(await getChannelAddr(channel_id));
 
     $("#amount").val(result.amount);
     $("#miner_fee").val(result.miner_fee);
@@ -1414,7 +1417,7 @@ async function fillFundingAssetData() {
 
     // let myUserID   = $("#logined").text();
     let channel_id = $("#curr_channel_id").text();
-    $("#to_address").val(await getChannelAddress(channel_id));
+    $("#to_address").val(await getChannelAddr(channel_id));
 }
 
 //
@@ -1910,17 +1913,6 @@ function removeInvokeHistoryDiv() {
     div.id = "invoke_history";
     $("#menu").append(div);
 }
-
-// 
-// function removeTrackerDiv() {
-//     $("#name_req_div").empty();
-    // $("#tracker_div").empty();
-    // $("#name_req_div").remove();
-    // $("#tracker_div").remove();
-    // var div = document.createElement('div');
-    // div.id = "tracker_div";
-    // $("#content").append(div);
-// }
 
 // 
 function createConnectNodeDiv(isCustom) {
@@ -3267,11 +3259,11 @@ function addData(user_id, msg) {
         .add({ user_id: user_id, msg: msg });
   
     request.onsuccess = function (e) {
-        console.log('Data write success.');
+        // console.log('Data write success.');
     };
   
     request.onerror = function (e) {
-        console.log('Data write false.');
+        // console.log('Data write false.');
     }
 }
 
@@ -3315,7 +3307,7 @@ function readData(dataDB, user_id) {
             data.push(result.value.msg);
             result.continue();
         } else {
-            console.log('No More Data.');
+            console.log('global msg No More Data.');
             for (let i = data.length - 1; i >= 0; i--) {
                 showMsg += data[i] + '\n\n\n\n';
             }
@@ -3965,7 +3957,7 @@ function registerEvent(netType) {
     let msg_110033 = enumMsgType.MsgType_RecvChannelAccept_33;
     obdApi.registerEvent(msg_110033, function(e) {
         listening110033(e);
-        listening110033ForGUITool(e);
+        listening110033ForGUITool();
     });
 
     // auto response mode
@@ -3977,6 +3969,7 @@ function registerEvent(netType) {
 
     let msg_110350 = enumMsgType.MsgType_FundingSign_RecvBtcSign_350;
     obdApi.registerEvent(msg_110350, function(e) {
+        listening110350(e);
         listening110350ForGUITool(e);
     });
 
@@ -3984,42 +3977,49 @@ function registerEvent(netType) {
     let msg_110034 = enumMsgType.MsgType_FundingCreate_RecvAssetFundingCreated_34;
     obdApi.registerEvent(msg_110034, function(e) {
         listening110034(e);
+        listening110034ForGUITool(e);
     });
 
     // auto response mode
     let msg_110035 = enumMsgType.MsgType_FundingSign_RecvAssetFundingSigned_35;
     obdApi.registerEvent(msg_110035, function(e) {
         listening110035(e);
+        listening110035ForGUITool(e);
     });
 
     // auto response mode
     let msg_110351 = enumMsgType.MsgType_CommitmentTx_RecvCommitmentTransactionCreated_351;
     obdApi.registerEvent(msg_110351, function(e) {
         listening110351(e, netType);
+        listening110351ForGUITool(e);
     });
     
     // auto response mode
     let msg_110040 = enumMsgType.MsgType_HTLC_RecvAddHTLC_40;
     obdApi.registerEvent(msg_110040, function(e) {
         listening110040(e, netType);
+        listening110040ForGUITool(e);
     });
 
     // auto response mode
     let msg_110045 = enumMsgType.MsgType_HTLC_RecvVerifyR_45;
     obdApi.registerEvent(msg_110045, function(e) {
         listening110045(e);
+        listening110045ForGUITool(e);
     });
 
     // auto response mode
     let msg_110049 = enumMsgType.MsgType_HTLC_RecvRequestCloseCurrTx_49;
     obdApi.registerEvent(msg_110049, function(e) {
         listening110049(e, netType);
+        listening110049ForGUITool(e);
     });
 
     // save request_close_channel_hash
     let msg_110038 = enumMsgType.MsgType_RecvCloseChannelRequest_38;
     obdApi.registerEvent(msg_110038, function(e) {
         listening110038(e);
+        listening110038ForGUITool(e);
     });
 }
 
@@ -4036,9 +4036,9 @@ function listening110032ForGUITool(e) {
 /**
  * For GUI Tool. Display tips
  */
-function listening110033ForGUITool(e) {
+function listening110033ForGUITool() {
     console.info('listening110033ForGUITool');
-    tipsOnTop(e.temporary_channel_id, kTips110033, 'Funding Bitcoin', 'fundingBitcoin');
+    tipsOnTop('', kTips110033, 'Funding Bitcoin', 'fundingBitcoin');
 }
 
 /**
@@ -4051,77 +4051,56 @@ async function listening110340ForGUITool(e) {
     $("#recipient_node_peer_id").val(e.funder_node_address);
     $("#recipient_user_peer_id").val(e.funder_peer_id);
 
-    let myUserID     = $("#logined").text();
-    let channel_id   = e.temporary_channel_id;
-    let channel_addr = await getChannelAddress(channel_id);
-    let status       = await getChannelStatus(channel_id, false);
+    let channel_id = e.temporary_channel_id;
+    let status     = await getChannelStatus(channel_id, false);
     console.info('listening110340ForGUITool status = ' + status);
     switch (Number(status)) {
         case 2:
-            await saveChannelData(myUserID, channel_id, channel_addr, false, 4);
             tipsOnTop('', kTipsFirst110340, 'Confirm', 'bitcoinFundingSigned');
             break;
         case 5:
-            await saveChannelData(myUserID, channel_id, channel_addr, false, 7);
             tipsOnTop('', kTipsSecond110340, 'Confirm', 'bitcoinFundingSigned');
             break;
         case 8:
-            await saveChannelData(myUserID, channel_id, channel_addr, false, 10);
             tipsOnTop('', kTipsThird110340, 'Confirm', 'bitcoinFundingSigned');
             break;
     }
-
-    // switch (Number(status)) {
-    //     case 4:
-    //         tipsOnTop('', kTipsFirst110340, 'Confirm', 'bitcoinFundingSigned');
-    //         break;
-    //     case 7:
-    //         tipsOnTop('', kTipsSecond110340, 'Confirm', 'bitcoinFundingSigned');
-    //         break;
-    //     case 10:
-    //         tipsOnTop('', kTipsThird110340, 'Confirm', 'bitcoinFundingSigned');
-    //         break;
-    // }
 }
 
 /**
  * For GUI Tool
  */
 async function listening110350ForGUITool(e) {
-
-    let myUserID     = $("#logined").text();
-    let channel_id   = e.temporary_channel_id;
-    let channel_addr = await getChannelAddress(channel_id);
-    let status       = await getChannelStatus(channel_id, true);
+    let channel_id = e.temporary_channel_id;
+    let status     = await getChannelStatus(channel_id, true);
     console.info('listening110350ForGUITool status = ' + status);
     switch (Number(status)) {
         case 4:
-            await saveChannelData(myUserID, channel_id, channel_addr, true, 5);
             tipsOnTop('', kTipsFirst110350, 'Funding Bitcoin', 'fundingBitcoin');
             break;
         case 7:
-            await saveChannelData(myUserID, channel_id, channel_addr, true, 8);
             tipsOnTop('', kTipsSecond110350, 'Funding Bitcoin', 'fundingBitcoin');
             break;
         case 10:
-            await saveChannelData(myUserID, channel_id, channel_addr, true, 11);
             tipsOnTop('', kTipsThird110350, 'Funding Asset', 'fundingAsset');
             break;
     }
+}
 
-    // status = await getChannelStatus(e.temporary_channel_id);
-    // console.info('listening110350ForGUITool 2 status = ' + status);
-    // switch (Number(status)) {
-    //     case 5:
-    //         tipsOnTop('', kTipsFirst110350, 'Funding Bitcoin', 'fundingBitcoin');
-    //         break;
-    //     case 8:
-    //         tipsOnTop('', kTipsSecond110350, 'Funding Bitcoin', 'fundingBitcoin');
-    //         break;
-    //     case 11:
-    //         tipsOnTop('', kTipsThird110350, 'Funding Asset', 'fundingAsset');
-    //         break;
-    // }
+/**
+ * For GUI Tool. Display tips
+ */
+function listening110034ForGUITool() {
+    console.info('listening110034ForGUITool');
+    tipsOnTop('', kTips110034, 'Confirm', 'assetFundingSigned');
+}
+
+/**
+ * For GUI Tool. Display tips
+ */
+function listening110035ForGUITool(e) {
+    console.info('listening110035ForGUITool');
+    tipsOnTop(e.channel_id, kTips110035, 'RSMC Transfer', 'commitmentTransactionCreated');
 }
 
 //
@@ -4575,9 +4554,9 @@ function afterLogin() {
 /**
  * 
  */
-function afterOpenChannel() {
+function afterOpenChannel(e) {
     disableInvokeAPI();
-    tipsOnTop(getChannelID(), kTipsAfterOpenChannel);
+    tipsOnTop(e.temporary_channel_id, kTipsAfterOpenChannel);
 }
 
 /**
@@ -4600,10 +4579,7 @@ function afterFundingBitcoin() {
  * 
  */
 function afterBitcoinFundingCreated() {
-
     disableInvokeAPI();
-
-    // let channelID = getChannelID();
     tipsOnTop('', kTipsAfterBitcoinFundingCreated);
 }
 
@@ -4627,6 +4603,30 @@ async function afterBitcoinFundingSigned(tempCID) {
             tipsOnTop('', kTipsThirdAfterBitcoinFundingSigned);
             break;
     }
+}
+
+/**
+ * 
+ */
+function afterFundingAsset() {
+    disableInvokeAPI();
+    tipsOnTop('', kTipsAfterFundingAsset, 'Notify Counterparty', 'assetFundingCreated');
+}
+
+/**
+ * 
+ */
+function afterAssetFundingCreated() {
+    disableInvokeAPI();
+    tipsOnTop('', kTipsAfterAssetFundingCreated);
+}
+
+/**
+ * 
+ */
+function afterAssetFundingSigned(e) {
+    disableInvokeAPI();
+    tipsOnTop(e.channel_id, kTipsAfterAssetFundingSigned);
 }
 
 /**

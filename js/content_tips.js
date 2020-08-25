@@ -55,6 +55,21 @@ const kTipsThirdAfterBitcoinFundingSigned = 'Waiting for funding omni asset from
 /**
  * Tips for 
  */
+const kTipsAfterFundingAsset = 'You should notify counterparty.';
+
+/**
+ * Tips for 
+ */
+const kTipsAfterAssetFundingCreated = 'Waiting for response from counterparty (assetFundingSigned) .';
+
+/**
+ * Tips for 
+ */
+const kTipsAfterAssetFundingSigned = 'The channel has been created.';
+
+/**
+ * Tips for 
+ */
 const kTips110032 = 'You received a request to open a channel.';
 
 /**
@@ -91,6 +106,16 @@ const kTipsSecond110350 = 'Counterparty confirm funding bitcoin, you can start t
  * Tips for 
  */
 const kTipsThird110350 = 'Counterparty confirm funding bitcoin. Now, you should be funding omni asset.';
+
+/**
+ * Tips for 
+ */
+const kTips110034 = 'You received a notify to confirm funding asset.';
+
+/**
+ * Tips for 
+ */
+const kTips110035 = 'Counterparty confirm funding asset. Now, the channel has been created.';
 
 /**
  * Tips for 

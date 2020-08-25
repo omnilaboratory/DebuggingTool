@@ -11,14 +11,14 @@
  */
 function openChannel(myUserID, nodeID, userID, info) {
     return new Promise((resolve, reject) => {
-        obdApi.openChannel(nodeID, userID, info, async function(e) {
+        obdApi.openChannel(nodeID, userID, info, function(e) {
             console.info('SDK: -100032 openChannel = ' + JSON.stringify(e));
             // Functions related to save and get data have be moved to SDK.
             saveCounterparties(myUserID, nodeID, userID);
-            await saveChannelData(myUserID, e.temporary_channel_id, '', true, 1);
+            saveChannelStatus(myUserID, e.temporary_channel_id, true, 1);
             let privkey = getFundingPrivKeyFromPubKey(myUserID, info.funding_pubkey);
             saveFundingPrivKey(myUserID, e.temporary_channel_id, privkey, kTbFundingPrivKey);
-            resolve(true);
+            resolve(e);
         });
     })
 }
@@ -34,13 +34,15 @@ function openChannel(myUserID, nodeID, userID, info) {
  */
 function acceptChannel(myUserID, nodeID, userID, info) {
     return new Promise((resolve, reject) => {
-        obdApi.acceptChannel(nodeID, userID, info, async function(e) {
+        obdApi.acceptChannel(nodeID, userID, info, function(e) {
             console.info('SDK: -100033 acceptChannel = ' + JSON.stringify(e));
-            // Functions related to save and get data have be moved to SDK.
-            let privkey = getFundingPrivKeyFromPubKey(myUserID, info.funding_pubkey);
-            saveFundingPrivKey(myUserID, info.temporary_channel_id, privkey, kTbFundingPrivKey);
+
+            let channel_id = e.temporary_channel_id;
+            let privkey    = getFundingPrivKeyFromPubKey(myUserID, info.funding_pubkey);
+            saveFundingPrivKey(myUserID, channel_id, privkey, kTbFundingPrivKey);
             saveCounterparties(myUserID, nodeID, userID);
-            await saveChannelData(myUserID, e.temporary_channel_id, e.channel_address, false, 2);
+            saveChannelStatus(myUserID, channel_id, false, 2);
+            saveChannelAddr(channel_id, e.channel_address);
             resolve(true);
         });
     })
@@ -56,27 +58,29 @@ function acceptChannel(myUserID, nodeID, userID, info) {
  * @param info 
  */
 function fundingBitcoin(myUserID, info) {
-    obdApi.fundingBitcoin(info, async function(e) {
-        console.info('SDK: -102109 fundingBitcoin = ' + JSON.stringify(e));
-        saveTempHash(e.hex);
-        saveFundingBtcData(myUserID, info);
-
-        let channel_addr = info.to_address;
-        let channel_id   = await getChannelIDFromAddr(channel_addr);
-        let status       = await getChannelStatus(channel_id, true);
-        console.info('fundingBitcoin status = ' + status);
-        switch (Number(status)) {
-            case 2:
-                await saveChannelData(myUserID, channel_id, channel_addr, true, 3);
-                break;
-            case 5:
-                await saveChannelData(myUserID, channel_id, channel_addr, true, 6);
-                break;
-            case 8:
-                await saveChannelData(myUserID, channel_id, channel_addr, true, 9);
-                break;
-        }
-    });
+    return new Promise((resolve, reject) => {
+        obdApi.fundingBitcoin(info, async function(e) {
+            console.info('SDK: -102109 fundingBitcoin = ' + JSON.stringify(e));
+            saveTempHash(e.hex);
+            saveFundingBtcData(myUserID, info);
+    
+            let channel_id = await getChannelIDFromAddr(info.to_address);
+            let status     = await getChannelStatus(channel_id, true);
+            console.info('fundingBitcoin status = ' + status);
+            switch (Number(status)) {
+                case 2:
+                    saveChannelStatus(myUserID, channel_id, true, 3);
+                    break;
+                case 5:
+                    saveChannelStatus(myUserID, channel_id, true, 6);
+                    break;
+                case 8:
+                    saveChannelStatus(myUserID, channel_id, true, 9);
+                    break;
+            }
+            resolve(true);
+        });
+    })
 }
 
 /**
@@ -89,25 +93,27 @@ function fundingBitcoin(myUserID, info) {
  * @param info 
  */
 function bitcoinFundingCreated(myUserID, nodeID, userID, info) {
-    obdApi.bitcoinFundingCreated(nodeID, userID, info, async function(e) {
-        console.info('SDK: -100340 bitcoinFundingCreated = ' + JSON.stringify(e));
-
-        let channel_id   = e.temporary_channel_id;
-        let channel_addr = await getChannelAddress(channel_id);
-        let status       = await getChannelStatus(channel_id, true);
-        console.info('bitcoinFundingCreated status = ' + status);
-        switch (Number(status)) {
-            case 3:
-                await saveChannelData(myUserID, channel_id, channel_addr, true, 4);
-                break;
-            case 6:
-                await saveChannelData(myUserID, channel_id, channel_addr, true, 7);
-                break;
-            case 9:
-                await saveChannelData(myUserID, channel_id, channel_addr, true, 10);
-                break;
-        }
-    });
+    return new Promise((resolve, reject) => {
+        obdApi.bitcoinFundingCreated(nodeID, userID, info, async function(e) {
+            console.info('SDK: -100340 bitcoinFundingCreated = ' + JSON.stringify(e));
+    
+            let channel_id = e.temporary_channel_id;
+            let status     = await getChannelStatus(channel_id, true);
+            console.info('bitcoinFundingCreated status = ' + status);
+            switch (Number(status)) {
+                case 3:
+                    saveChannelStatus(myUserID, channel_id, true, 4);
+                    break;
+                case 6:
+                    saveChannelStatus(myUserID, channel_id, true, 7);
+                    break;
+                case 9:
+                    saveChannelStatus(myUserID, channel_id, true, 10);
+                    break;
+            }
+            resolve(true);
+        });
+    })
 }
 
 /**
@@ -120,38 +126,46 @@ function bitcoinFundingCreated(myUserID, nodeID, userID, info) {
  * @param info 
  */
 function bitcoinFundingSigned(myUserID, nodeID, userID, info) {
-    obdApi.bitcoinFundingSigned(nodeID, userID, info, async function(e) {
-        console.info('SDK: -100350 bitcoinFundingSigned = ' + JSON.stringify(e));
-
-        let channel_id   = e.temporary_channel_id;
-        let channel_addr = await getChannelAddress(channel_id);
-        let status       = await getChannelStatus(channel_id, false);
-        console.info('bitcoinFundingSigned status = ' + status);
-        switch (Number(status)) {
-            case 4:
-                await saveChannelData(myUserID, channel_id, channel_addr, false, 5);
-                break;
-            case 7:
-                await saveChannelData(myUserID, channel_id, channel_addr, false, 8);
-                break;
-            case 10:
-                await saveChannelData(myUserID, channel_id, channel_addr, false, 11);
-                break;
-        }
-    });
+    return new Promise((resolve, reject) => {
+        obdApi.bitcoinFundingSigned(nodeID, userID, info, async function(e) {
+            console.info('SDK: -100350 bitcoinFundingSigned = ' + JSON.stringify(e));
+    
+            let channel_id = e.temporary_channel_id;
+            let status     = await getChannelStatus(channel_id, false);
+            console.info('bitcoinFundingSigned status = ' + status);
+            switch (Number(status)) {
+                case 4:
+                    saveChannelStatus(myUserID, channel_id, false, 5);
+                    break;
+                case 7:
+                    saveChannelStatus(myUserID, channel_id, false, 8);
+                    break;
+                case 10:
+                    saveChannelStatus(myUserID, channel_id, false, 11);
+                    break;
+            }
+            resolve(true);
+        });
+    })
 }
 
 /**
  * Type -102120 Protocol is used to Alice starts to deposit omni assets to 
  * the channel. This is quite similar to the the btc funding procedure.
  * 
+ * @param myUserID The user id of logged in
  * @param info 
  */
-function fundingAsset(info) {
-    obdApi.fundingAsset(info, function(e) {
-        console.info('SDK: -102120 fundingAssetOfOmni = ' + JSON.stringify(e));
-        saveTempHash(e.hex);
-    });
+function fundingAsset(myUserID, info) {
+    return new Promise((resolve, reject) => {
+        obdApi.fundingAsset(info, async function(e) {
+            console.info('SDK: -102120 fundingAssetOfOmni = ' + JSON.stringify(e));
+            saveTempHash(e.hex);
+            let channel_id = await getChannelIDFromAddr(info.to_address);
+            saveChannelStatus(myUserID, channel_id, true, 12);
+            resolve(true);
+        });
+    })
 }
 
 /**
@@ -164,12 +178,16 @@ function fundingAsset(info) {
  * @param info 
  */
 function assetFundingCreated(myUserID, nodeID, userID, info) {
-    obdApi.assetFundingCreated(nodeID, userID, info, function(e) {
-        console.info('SDK: -100034 - assetFundingCreated = ' + JSON.stringify(e));
-        // Save temporary private key to local storage
-        saveTempPrivKey(myUserID, kTempPrivKey, info.temporary_channel_id, 
-            info.temp_address_private_key);
-    });
+    return new Promise((resolve, reject) => {
+        obdApi.assetFundingCreated(nodeID, userID, info, function(e) {
+            console.info('SDK: -100034 - assetFundingCreated = ' + JSON.stringify(e));
+            // Save temporary private key to local storage
+            saveTempPrivKey(myUserID, kTempPrivKey, info.temporary_channel_id, 
+                info.temp_address_private_key);
+            saveChannelStatus(myUserID, info.temporary_channel_id, true, 13);
+            resolve(true);
+        });
+    })
 }
 
 /**
@@ -183,15 +201,31 @@ function assetFundingCreated(myUserID, nodeID, userID, info) {
  * @param info 
  */
 function assetFundingSigned(myUserID, nodeID, userID, info) {
-    obdApi.assetFundingSigned(nodeID, userID, info, function(e) {
-        console.info('SDK: -100035 - assetFundingSigned = ' + JSON.stringify(e));
-        
-        // Once sent -100035 AssetFundingSigned , the final channel_id has generated.
-        // So need update the local saved data for funding private key and channel_id.
-        saveFundingPrivKey(myUserID, e.channel_id, 
-            info.fundee_channel_address_private_key, kTbFundingPrivKey);
-        // await saveChannelData(e.channel_id);
-    });
+    return new Promise((resolve, reject) => {
+        obdApi.assetFundingSigned(nodeID, userID, info, async function(e) {
+            console.info('SDK: -100035 - assetFundingSigned = ' + JSON.stringify(e));
+            
+            // Once sent -100035 AssetFundingSigned , the final channel_id has generated.
+            // So need update the local saved data for funding private key and channel_id.
+
+            let priv_key     = info.fundee_channel_address_private_key;
+            let tempCID      = info.temporary_channel_id;
+            let channel_id   = e.channel_id;
+            let channel_addr = await getChannelAddr(tempCID);
+
+            saveFundingPrivKey(myUserID, channel_id, priv_key, kTbFundingPrivKey);
+
+            //
+            delChannelAddr(tempCID);
+            saveChannelAddr(channel_id, channel_addr);
+
+            //
+            delChannelStatus(tempCID, false);
+            saveChannelStatus(myUserID, channel_id, false, 14);
+
+            resolve(e);
+        });
+    })
 }
 
 /**
@@ -204,12 +238,15 @@ function assetFundingSigned(myUserID, nodeID, userID, info) {
  * @param info 
  */
 function commitmentTransactionCreated(myUserID, nodeID, userID, info) {
-    obdApi.commitmentTransactionCreated(nodeID, userID, info, function(e) {
-        console.info('SDK: -100351 commitmentTransactionCreated = ' + JSON.stringify(e));
-        // await saveChannelData(e.channel_id);
-        saveTempPrivKey(myUserID, kTempPrivKey, e.channel_id, 
-            info.curr_temp_address_private_key);
-    });
+    return new Promise((resolve, reject) => {
+        obdApi.commitmentTransactionCreated(nodeID, userID, info, function(e) {
+            console.info('SDK: -100351 commitmentTransactionCreated = ' + JSON.stringify(e));
+            // await saveChannelStatus(e.channel_id);
+            saveTempPrivKey(myUserID, kTempPrivKey, e.channel_id, 
+                info.curr_temp_address_private_key);
+            resolve(true);
+        });
+    })
 }
 
 /**
@@ -222,11 +259,14 @@ function commitmentTransactionCreated(myUserID, nodeID, userID, info) {
  * @param info 
  */
 function commitmentTransactionAccepted(myUserID, nodeID, userID, info) {
-    obdApi.commitmentTransactionAccepted(nodeID, userID, info, function(e) {
-        console.info('SDK: -100352 commitmentTransactionAccepted = ' + JSON.stringify(e));
-        // await saveChannelData(e.channel_id);
-        saveTempPrivKey(myUserID, kTempPrivKey, e.channel_id, info.curr_temp_address_private_key);
-    });
+    return new Promise((resolve, reject) => {
+        obdApi.commitmentTransactionAccepted(nodeID, userID, info, function(e) {
+            console.info('SDK: -100352 commitmentTransactionAccepted = ' + JSON.stringify(e));
+            // await saveChannelStatus(e.channel_id);
+            saveTempPrivKey(myUserID, kTempPrivKey, e.channel_id, info.curr_temp_address_private_key);
+            resolve(true);
+        });
+    })
 }
 
 /**
@@ -237,9 +277,12 @@ function commitmentTransactionAccepted(myUserID, nodeID, userID, info) {
  * @param channel_id 
  */
 function closeChannel(nodeID, userID, channel_id) {
-    obdApi.closeChannel(nodeID, userID, channel_id, function(e) {
-        console.info('SDK: -100038 closeChannel = ' + JSON.stringify(e));
-    });
+    return new Promise((resolve, reject) => {
+        obdApi.closeChannel(nodeID, userID, channel_id, function(e) {
+            console.info('SDK: -100038 closeChannel = ' + JSON.stringify(e));
+            resolve(true);
+        });
+    })
 }
 
 /**
@@ -250,7 +293,10 @@ function closeChannel(nodeID, userID, channel_id) {
  * @param info 
  */
 function closeChannelSigned(nodeID, userID, info) {
-    obdApi.closeChannelSigned(nodeID, userID, info, function(e) {
-        console.info('SDK: -100039 closeChannelSigned = ' + JSON.stringify(e));
-    });
+    return new Promise((resolve, reject) => {
+        obdApi.closeChannelSigned(nodeID, userID, info, function(e) {
+            console.info('SDK: -100039 closeChannelSigned = ' + JSON.stringify(e));
+            resolve(true);
+        });
+    })
 }
