@@ -21,7 +21,7 @@ async function listening110032(e, netType) {
     let nodeID       = e.funder_node_address;
     let userID       = e.funder_peer_id;
     let channel_id   = e.temporary_channel_id;
-    saveChannelStatus(myUserID, channel_id, false, 1);
+    saveChannelStatus(myUserID, channel_id, false, kStatusOpenChannel);
     saveCounterparties(myUserID, nodeID, userID);
 
     if (isAutoMode === 'No' || isAutoMode === null) return;
@@ -48,14 +48,11 @@ async function listening110032(e, netType) {
 }
 
 /**
- * auto response to -100032 (openChannel) 
- * listening to -110032 and send -100033 acceptChannel
- * 
+ * listening to -110033
  * @param e 
  */
 function listening110033(e) {
-    console.info('listening110033');
-    saveChannelStatus(e.to_peer_id, e.temporary_channel_id, true, 2);
+    saveChannelStatus(e.to_peer_id, e.temporary_channel_id, true, kStatusAcceptChannel);
 }
 
 /**
@@ -70,7 +67,7 @@ async function listening110034(e) {
 
     let myUserID   = e.to_peer_id;
     let channel_id = e.temporary_channel_id;
-    saveChannelStatus(myUserID, channel_id, false, 13);
+    saveChannelStatus(myUserID, channel_id, false, kStatusAssetFundingCreated);
 
     if (isAutoMode === 'No' || isAutoMode === null) return;
     
@@ -119,7 +116,7 @@ async function listening110035(e) {
 
     //
     delChannelStatus(tempCID, true);
-    saveChannelStatus(myUserID, channel_id, true, 14);
+    saveChannelStatus(myUserID, channel_id, true, kStatusAssetFundingSigned);
 }
 
 /**
@@ -128,10 +125,19 @@ async function listening110035(e) {
  */
 function listening110038(e) {
     saveTempHash(e.request_close_channel_hash);
+    saveChannelStatus(e.to_peer_id, e.channel_id, false, kStatusCloseChannel);
 }
 
 /**
- * auto response to -100040 (HTLCCreated) 
+ * listening to -110039
+ * @param e 
+ */
+function listening110039(e) {
+    saveChannelStatus(e.to_peer_id, e.channel_id, true, kStatusCloseChannelSigned);
+}
+
+/**
+ * auto response to -100040 (addHTLC) 
  * listening to -110040 and send -100041 HTLCSigned
  * @param e 
  * @param netType true: testnet  false: mainnet
@@ -140,7 +146,11 @@ async function listening110040(e, netType) {
 
     let isAutoMode = getAutoPilot();
     console.info('SDK: NOW isAutoMode = ' + isAutoMode);
+
+    let myUserID = e.to_peer_id;
+
     saveTempHash(e.payer_commitment_tx_hash);
+    saveChannelStatus(myUserID, e.channel_id, false, kStatusAddHTLC);
 
     if (isAutoMode === 'No' || isAutoMode === null) return;
     
@@ -148,7 +158,6 @@ async function listening110040(e, netType) {
 
     let nodeID   = e.payer_node_address;
     let userID   = e.payer_peer_id;
-    let myUserID = e.to_peer_id;
 
     let addr_1 = genNewAddress(myUserID, netType);
     let addr_2 = genNewAddress(myUserID, netType);
@@ -174,6 +183,14 @@ async function listening110040(e, netType) {
 }
 
 /**
+ * listening to -110041
+ * @param e 
+ */
+function listening110041(e) {
+    saveChannelStatus(e.to_peer_id, e.channel_id, true, kStatusHTLCSigned);
+}
+
+/**
  * auto response to -100045 (forwardR) 
  * listening to -110045 and send -100046 signR
  * @param e 
@@ -182,8 +199,12 @@ async function listening110045(e) {
 
     let isAutoMode = getAutoPilot();
     console.info('SDK: NOW isAutoMode = ' + isAutoMode);
+
+    let myUserID = e.to_peer_id;
+
     saveTempHash(e.msg_hash);
     saveForwardR(e.r);
+    saveChannelStatus(myUserID, e.channel_id, true, kStatusForwardR);
 
     if (isAutoMode === 'No' || isAutoMode === null) return;
     
@@ -191,7 +212,6 @@ async function listening110045(e) {
     
     let nodeID   = e.payee_node_address;
     let userID   = e.payee_peer_id;
-    let myUserID = e.to_peer_id;
 
     // Alice will send -100046 signR
     let info                         = new SignRInfo();
@@ -209,6 +229,14 @@ async function listening110045(e) {
 }
 
 /**
+ * listening to -110046
+ * @param e 
+ */
+function listening110046(e) {
+    saveChannelStatus(e.to_peer_id, e.channel_id, false, kStatusSignR);
+}
+
+/**
  * auto response to -100049 (CloseHTLC) 
  * listening to -110049 and send -100050 CloseHTLCSigned
  * @param e 
@@ -218,7 +246,11 @@ async function listening110049(e, netType) {
 
     let isAutoMode = getAutoPilot();
     console.info('SDK: NOW isAutoMode = ' + isAutoMode);
+
+    let myUserID = e.to_peer_id;
+
     saveTempHash(e.msg_hash);
+    saveChannelStatus(myUserID, e.channel_id, false, kStatusCloseHTLC);
 
     if (isAutoMode === 'No' || isAutoMode === null) return;
     
@@ -226,7 +258,6 @@ async function listening110049(e, netType) {
 
     let nodeID   = e.sender_node_address;
     let userID   = e.sender_peer_id;
-    let myUserID = e.to_peer_id;
 
     let addr = genNewAddress(myUserID, netType);
     saveAddress(myUserID, addr);
@@ -250,6 +281,30 @@ async function listening110049(e, netType) {
 }
 
 /**
+ * listening to -110050
+ * @param e 
+ */
+function listening110050(e) {
+    saveChannelStatus(e.to_peer_id, e.channel_id, true, kStatusCloseHTLCSigned);
+}
+
+/**
+ * listening to -110080
+ * @param e 
+ */
+function listening110080(e) {
+    saveChannelStatus(e.to_peer_id, e.channel_id, false, kStatusAtomicSwap);
+}
+
+/**
+ * listening to -110081
+ * @param e 
+ */
+function listening110081(e) {
+    saveChannelStatus(e.to_peer_id, e.channel_id, true, kStatusAcceptSwap);
+}
+
+/**
  * auto response to -100340 (bitcoinFundingCreated)
  * listening to -110340 and send -100350 bitcoinFundingSigned
  * @param e 
@@ -265,14 +320,14 @@ async function listening110340(e) {
     let status       = await getChannelStatus(channel_id, false);
     console.info('listening110340 status = ' + status);
     switch (Number(status)) {
-        case 2:
-            saveChannelStatus(myUserID, channel_id, false, 4);
+        case kStatusAcceptChannel:
+            saveChannelStatus(myUserID, channel_id, false, kStatusFirstBitcoinFundingCreated);
             break;
-        case 5:
-            saveChannelStatus(myUserID, channel_id, false, 7);
+        case kStatusFirstBitcoinFundingSigned:
+            saveChannelStatus(myUserID, channel_id, false, kStatusSecondBitcoinFundingCreated);
             break;
-        case 8:
-            saveChannelStatus(myUserID, channel_id, false, 10);
+        case kStatusSecondBitcoinFundingSigned:
+            saveChannelStatus(myUserID, channel_id, false, kStatusThirdBitcoinFundingCreated);
             break;
     }
             
@@ -311,14 +366,14 @@ async function listening110350(e) {
     let status       = await getChannelStatus(channel_id, true);
     console.info('listening110350 status = ' + status);
     switch (Number(status)) {
-        case 4:
-            saveChannelStatus(myUserID, channel_id, true, 5);
+        case kStatusFirstBitcoinFundingCreated:
+            saveChannelStatus(myUserID, channel_id, true, kStatusFirstBitcoinFundingSigned);
             break;
-        case 7:
-            saveChannelStatus(myUserID, channel_id, true, 8);
+        case kStatusSecondBitcoinFundingCreated:
+            saveChannelStatus(myUserID, channel_id, true, kStatusSecondBitcoinFundingSigned);
             break;
-        case 10:
-            saveChannelStatus(myUserID, channel_id, true, 11);
+        case kStatusThirdBitcoinFundingCreated:
+            saveChannelStatus(myUserID, channel_id, true, kStatusThirdBitcoinFundingSigned);
             break;
     }
 }
@@ -333,7 +388,11 @@ async function listening110351(e, netType) {
 
     let isAutoMode = getAutoPilot();
     console.info('SDK: NOW isAutoMode = ' + isAutoMode);
+
+    let myUserID = e.to_peer_id;
+
     saveTempHash(e.msg_hash);
+    saveChannelStatus(myUserID, e.channel_id, false, kStatusCommitmentTransactionCreated);
 
     if (isAutoMode === 'No' || isAutoMode === null) return;
     
@@ -341,7 +400,7 @@ async function listening110351(e, netType) {
 
     let nodeID   = e.payer_node_address;
     let userID   = e.payer_peer_id;
-    let myUserID = e.to_peer_id;
+    
 
     let addr = genNewAddress(myUserID, netType);
     saveAddress(myUserID, addr);
@@ -362,4 +421,12 @@ async function listening110351(e, netType) {
 
     // NOT SDK API. This a client function, just for Debugging Tool.
     displaySentMessage100352(nodeID, userID, info);
+}
+
+/**
+ * listening to -110352
+ * @param e 
+ */
+function listening110352(e) {
+    saveChannelStatus(e.to_peer_id, e.channel_id, true, kStatusCommitmentTransactionAccepted);
 }

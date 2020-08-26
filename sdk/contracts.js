@@ -6,14 +6,16 @@
  * The background and process of atomic swap can be found here in chapter 5 
  * of the OmniBOLT specification,
  * 
+ * @param myUserID  user id of currently loged in.
  * @param nodeID peer id of the obd node where the fundee logged in.
  * @param userID the user id of the fundee.
  * @param info 
  */
-function atomicSwap(nodeID, userID, info) {
+function atomicSwap(myUserID, nodeID, userID, info) {
     return new Promise((resolve, reject) => {
         obdApi.atomicSwap(nodeID, userID, info, function(e) {
             console.info('SDK: -100080 atomicSwap = ' + JSON.stringify(e));
+            saveChannelStatus(myUserID, e.channel_id, true, kStatusAtomicSwap);
             resolve(true);
         });
     })
@@ -22,14 +24,16 @@ function atomicSwap(nodeID, userID, info) {
 /**
  * Type -81 Protocol accepts or rejects a swap.
  * 
+ * @param myUserID  user id of currently loged in.
  * @param nodeID peer id of the obd node where the fundee logged in.
  * @param userID the user id of the fundee.
  * @param info 
  */
-function acceptSwap(nodeID, userID, info) {
+function acceptSwap(myUserID, nodeID, userID, info) {
     return new Promise((resolve, reject) => {
         obdApi.atomicSwapAccepted(nodeID, userID, info, function(e) {
             console.info('SDK: -100081 atomicSwapAccepted = ' + JSON.stringify(e));
+            saveChannelStatus(myUserID, e.channel_id, false, kStatusAcceptSwap);
             resolve(true);
         });
     })

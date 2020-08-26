@@ -154,6 +154,7 @@ async function sdkForwardR() {
 
     displaySentMessage100045(nodeID, userID, info);
     await forwardR($("#logined").text(), nodeID, userID, info);
+    afterForwardR();
 }
 
 /** 
@@ -171,7 +172,8 @@ async function sdkSignR() {
     info.channel_address_private_key = $("#channel_address_private_key").val();
 
     displaySentMessage100046(nodeID, userID, info);
-    await signR(nodeID, userID, info);
+    await signR($("#logined").text(), nodeID, userID, info);
+    afterSignR();
 }
 
 /** 
@@ -193,6 +195,7 @@ async function sdkCloseHTLC() {
 
     displaySentMessage100049(nodeID, userID, info);
     await closeHTLC($("#logined").text(), nodeID, userID, info);
+    afterCloseHTLC();
 }
 
 /** 
@@ -214,6 +217,7 @@ async function sdkCloseHTLCSigned() {
 
     displaySentMessage100050(nodeID, userID, info);
     await closeHTLCSigned($("#logined").text(), nodeID, userID, info);
+    afterCloseHTLCSigned();
 }
 
 /** 
@@ -236,7 +240,8 @@ async function sdkAtomicSwap() {
     info.time_locker            = Number($("#time_locker").val());
 
     displaySentMessage100080(nodeID, userID, info);
-    await atomicSwap(nodeID, userID, info);
+    await atomicSwap($("#logined").text(), nodeID, userID, info);
+    afterAtomicSwap();
 }
 
 /** 
@@ -260,7 +265,8 @@ async function sdkAcceptSwap() {
     info.time_locker            = Number($("#time_locker").val());
 
     displaySentMessage100081(nodeID, userID, info);
-    await acceptSwap(nodeID, userID, info);
+    await acceptSwap($("#logined").text(), nodeID, userID, info);
+    afterAcceptSwap();
 }
 
 /** 
@@ -273,7 +279,8 @@ async function sdkCloseChannel() {
     let channel_id = $("#channel_id").val();
 
     displaySentMessage100038(nodeID, userID, channel_id);
-    await closeChannel(nodeID, userID, channel_id);
+    await closeChannel($("#logined").text(), nodeID, userID, channel_id);
+    afterCloseChannel();
 }
 
 /** 
@@ -290,7 +297,8 @@ async function sdkCloseChannelSigned() {
     info.approval                   = $("#checkbox_n39").prop("checked");
 
     displaySentMessage100039(nodeID, userID, info);
-    await closeChannelSigned(nodeID, userID, info);
+    await closeChannelSigned($("#logined").text(), nodeID, userID, info);
+    afterCloseChannelSigned();
 }
 
 /** 
@@ -625,6 +633,7 @@ async function sdkAddHTLC() {
 
     displaySentMessage100040(nodeID, userID, info);
     await addHTLC($("#logined").text(), nodeID, userID, info);
+    afterAddHTLC();
 }
 
 // -100041 htlcSigned API at local.
@@ -644,6 +653,7 @@ async function sdkHTLCSigned() {
 
     displaySentMessage100041(nodeID, userID, info);
     await HTLCSigned($("#logined").text(), nodeID, userID, info);
+    afterHTLCSigned();
 }
 
 // -100401 Old name is HtlcFindPath API at local.
@@ -685,6 +695,7 @@ async function sdkCommitmentTransactionCreated() {
 
     displaySentMessage100351(nodeID, userID, info);
     await commitmentTransactionCreated($("#logined").text(), nodeID, userID, info);
+    afterCommitmentTransactionCreated();
 }
 
 // -100352 Revoke and Acknowledge Commitment Transaction API at local.
@@ -704,6 +715,7 @@ async function sdkCommitmentTransactionAccepted() {
 
     displaySentMessage100352(nodeID, userID, info);
     await commitmentTransactionAccepted($("#logined").text(), nodeID, userID, info);
+    afterCommitmentTransactionAccepted();
 }
 
 // Invoke each APIs.
@@ -3993,12 +4005,26 @@ function registerEvent(netType) {
         listening110351(e, netType);
         listening110351ForGUITool(e);
     });
+
+    // auto response mode
+    let msg_110352 = enumMsgType.MsgType_CommitmentTxSigned_RecvRevokeAndAcknowledgeCommitmentTransaction_352;
+    obdApi.registerEvent(msg_110352, function(e) {
+        listening110352(e, netType);
+        listening110352ForGUITool(e);
+    });
     
     // auto response mode
     let msg_110040 = enumMsgType.MsgType_HTLC_RecvAddHTLC_40;
     obdApi.registerEvent(msg_110040, function(e) {
         listening110040(e, netType);
         listening110040ForGUITool(e);
+    });
+    
+    // auto response mode
+    let msg_110041 = enumMsgType.MsgType_HTLC_RecvAddHTLCSigned_41;
+    obdApi.registerEvent(msg_110041, function(e) {
+        listening110041(e, netType);
+        listening110041ForGUITool(e);
     });
 
     // auto response mode
@@ -4008,6 +4034,12 @@ function registerEvent(netType) {
         listening110045ForGUITool(e);
     });
 
+    let msg_110046 = enumMsgType.MsgType_HTLC_RecvSignVerifyR_46;
+    obdApi.registerEvent(msg_110046, function(e) {
+        listening110046(e);
+        listening110046ForGUITool(e);
+    });
+
     // auto response mode
     let msg_110049 = enumMsgType.MsgType_HTLC_RecvRequestCloseCurrTx_49;
     obdApi.registerEvent(msg_110049, function(e) {
@@ -4015,11 +4047,35 @@ function registerEvent(netType) {
         listening110049ForGUITool(e);
     });
 
+    let msg_110050 = enumMsgType.MsgType_HTLC_RecvCloseSigned_50;
+    obdApi.registerEvent(msg_110050, function(e) {
+        listening110050(e, netType);
+        listening110050ForGUITool(e);
+    });
+
     // save request_close_channel_hash
     let msg_110038 = enumMsgType.MsgType_RecvCloseChannelRequest_38;
     obdApi.registerEvent(msg_110038, function(e) {
         listening110038(e);
         listening110038ForGUITool(e);
+    });
+
+    let msg_110039 = enumMsgType.MsgType_RecvCloseChannelSign_39;
+    obdApi.registerEvent(msg_110039, function(e) {
+        listening110039(e);
+        listening110039ForGUITool(e);
+    });
+
+    let msg_110080 = enumMsgType.MsgType_Atomic_RecvSwap_80;
+    obdApi.registerEvent(msg_110080, function(e) {
+        listening110080(e);
+        listening110080ForGUITool(e);
+    });
+
+    let msg_110081 = enumMsgType.MsgType_Atomic_RecvSwapAccept_81;
+    obdApi.registerEvent(msg_110081, function(e) {
+        listening110081(e);
+        listening110081ForGUITool(e);
     });
 }
 
@@ -4088,6 +4144,20 @@ async function listening110350ForGUITool(e) {
 }
 
 /**
+ * For GUI Tool
+ */
+function listening110351ForGUITool() {
+    tipsOnTop('', kTips110351, 'Confirm', 'commitmentTransactionAccepted');
+}
+
+/**
+ * For GUI Tool
+ */
+function listening110352ForGUITool() {
+    tipsOnTop('', kTips110352);
+}
+
+/**
  * For GUI Tool. Display tips
  */
 function listening110034ForGUITool() {
@@ -4102,6 +4172,77 @@ function listening110035ForGUITool(e) {
     console.info('listening110035ForGUITool');
     tipsOnTop(e.channel_id, kTips110035, 'RSMC Transfer', 'commitmentTransactionCreated');
 }
+
+/**
+ * For GUI Tool. Display tips
+ */
+function listening110040ForGUITool() {
+    tipsOnTop('', kTips110040, 'Accept', 'HTLCSigned');
+}
+
+/**
+ * For GUI Tool. Display tips
+ */
+function listening110041ForGUITool() {
+    tipsOnTop('', kTips110041);
+}
+
+/**
+ * For GUI Tool. Display tips
+ */
+function listening110045ForGUITool() {
+    tipsOnTop('', kTips110045, 'Sign R', 'signR');
+}
+
+/**
+ * For GUI Tool. Display tips
+ */
+function listening110046ForGUITool() {
+    tipsOnTop('', kTips110046, 'Close HTLC', 'closeHTLC');
+}
+
+/**
+ * For GUI Tool. Display tips
+ */
+function listening110049ForGUITool() {
+    tipsOnTop('', kTips110049, 'Accept', 'closeHTLCSigned');
+}
+
+/**
+ * For GUI Tool. Display tips
+ */
+function listening110050ForGUITool() {
+    tipsOnTop('', kTips110050);
+}
+
+/**
+ * For GUI Tool. Display tips
+ */
+function listening110080ForGUITool() {
+    tipsOnTop('', kTips110080, 'Accept', 'acceptSwap');
+}
+
+/**
+ * For GUI Tool. Display tips
+ */
+function listening110081ForGUITool() {
+    tipsOnTop('', kTips110081);
+}
+
+/**
+ * For GUI Tool. Display tips
+ */
+function listening110038ForGUITool() {
+    tipsOnTop('', kTips110038, 'Accept', 'closeChannelSigned');
+}
+
+/**
+ * For GUI Tool. Display tips
+ */
+function listening110039ForGUITool() {
+    tipsOnTop('', kTips110039, 'Open Channel', 'openChannel');
+}
+
 
 //
 function displayMyChannelList(page_size, page_index) {
@@ -4627,6 +4768,102 @@ function afterAssetFundingCreated() {
 function afterAssetFundingSigned(e) {
     disableInvokeAPI();
     tipsOnTop(e.channel_id, kTipsAfterAssetFundingSigned);
+}
+
+/**
+ * 
+ */
+function afterCommitmentTransactionCreated() {
+    disableInvokeAPI();
+    tipsOnTop('', kTipsAfterCommitmentTransactionCreated);
+}
+
+/**
+ * 
+ */
+function afterCommitmentTransactionAccepted() {
+    disableInvokeAPI();
+    tipsOnTop('', kTipsAfterCommitmentTransactionAccepted);
+}
+
+/**
+ * 
+ */
+function afterAddHTLC() {
+    disableInvokeAPI();
+    tipsOnTop('', kTipsAfterAddHTLC);
+}
+
+/**
+ * 
+ */
+function afterHTLCSigned() {
+    disableInvokeAPI();
+    tipsOnTop('', kTipsAfterHTLCSigned, 'Forward R', 'forwardR');
+}
+
+/**
+ * 
+ */
+function afterForwardR() {
+    disableInvokeAPI();
+    tipsOnTop('', kTipsAfterForwardR);
+}
+
+/**
+ * 
+ */
+function afterSignR() {
+    disableInvokeAPI();
+    tipsOnTop('', kTipsAfterSignR, 'Close HTLC', 'closeHTLC');
+}
+
+/**
+ * 
+ */
+function afterCloseHTLC() {
+    disableInvokeAPI();
+    tipsOnTop('', kTipsAfterCloseHTLC);
+}
+
+/**
+ * 
+ */
+function afterCloseHTLCSigned() {
+    disableInvokeAPI();
+    tipsOnTop('', kTipsAfterCloseHTLCSigned);
+}
+
+/**
+ * 
+ */
+function afterCloseChannel() {
+    disableInvokeAPI();
+    tipsOnTop('', kTipsAfterCloseChannel);
+}
+
+/**
+ * 
+ */
+function afterCloseChannelSigned() {
+    disableInvokeAPI();
+    tipsOnTop('', kTipsAfterCloseChannelSigned, 'Open Channel', 'openChannel');
+}
+
+/**
+ * 
+ */
+function afterAtomicSwap() {
+    disableInvokeAPI();
+    tipsOnTop('', kTipsAfterAtomicSwap);
+}
+
+/**
+ * 
+ */
+function afterAcceptSwap() {
+    disableInvokeAPI();
+    tipsOnTop('', kTipsAfterAcceptSwap);
 }
 
 /**

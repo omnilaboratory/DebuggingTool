@@ -976,12 +976,12 @@ function openDB() {
  * @param channel_id
  * @param funder  true: myUserID is funder  false: myUserID is NOT funder
  * @param status  1: openChannel done  2: acceptChannel done
- * 3: first fundingBitcoin done   4: bitcoinFundingCreated done   5: bitcoinFundingSigned done
- * 6: second fundingBitcoin done  7: bitcoinFundingCreated done   8: bitcoinFundingSigned done
- * 9: third fundingBitcoin done  10: bitcoinFundingCreated done  11: bitcoinFundingSigned done
+ * 3: first fundingBitcoin done   4: first bitcoinFundingCreated done    5: first bitcoinFundingSigned done
+ * 6: second fundingBitcoin done  7: second bitcoinFundingCreated done   8: second bitcoinFundingSigned done
+ * 9: third fundingBitcoin done  10: third bitcoinFundingCreated done   11: third bitcoinFundingSigned done
  * 12: fundingAsset done  13: assetFundingCreated done  14: assetFundingSigned done
  * 15: commitmentTransactionCreated done  16: commitmentTransactionAccepted done
- * 17: payInvoice done  18: commitmentTransactionAccepted done
+ * 17: payInvoice done  18: addHTLC done
  */
 function saveChannelStatus(myUserID, channel_id, funder, status) {
     

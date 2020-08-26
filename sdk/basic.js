@@ -15,7 +15,7 @@ function openChannel(myUserID, nodeID, userID, info) {
             console.info('SDK: -100032 openChannel = ' + JSON.stringify(e));
             // Functions related to save and get data have be moved to SDK.
             saveCounterparties(myUserID, nodeID, userID);
-            saveChannelStatus(myUserID, e.temporary_channel_id, true, 1);
+            saveChannelStatus(myUserID, e.temporary_channel_id, true, kStatusOpenChannel);
             let privkey = getFundingPrivKeyFromPubKey(myUserID, info.funding_pubkey);
             saveFundingPrivKey(myUserID, e.temporary_channel_id, privkey, kTbFundingPrivKey);
             resolve(e);
@@ -41,7 +41,7 @@ function acceptChannel(myUserID, nodeID, userID, info) {
             let privkey    = getFundingPrivKeyFromPubKey(myUserID, info.funding_pubkey);
             saveFundingPrivKey(myUserID, channel_id, privkey, kTbFundingPrivKey);
             saveCounterparties(myUserID, nodeID, userID);
-            saveChannelStatus(myUserID, channel_id, false, 2);
+            saveChannelStatus(myUserID, channel_id, false, kStatusAcceptChannel);
             saveChannelAddr(channel_id, e.channel_address);
             resolve(true);
         });
@@ -68,14 +68,14 @@ function fundingBitcoin(myUserID, info) {
             let status     = await getChannelStatus(channel_id, true);
             console.info('fundingBitcoin status = ' + status);
             switch (Number(status)) {
-                case 2:
-                    saveChannelStatus(myUserID, channel_id, true, 3);
+                case kStatusAcceptChannel:
+                    saveChannelStatus(myUserID, channel_id, true, kStatusFirstFundingBitcoin);
                     break;
-                case 5:
-                    saveChannelStatus(myUserID, channel_id, true, 6);
+                case kStatusFirstBitcoinFundingSigned:
+                    saveChannelStatus(myUserID, channel_id, true, kStatusSecondFundingBitcoin);
                     break;
-                case 8:
-                    saveChannelStatus(myUserID, channel_id, true, 9);
+                case kStatusSecondBitcoinFundingSigned:
+                    saveChannelStatus(myUserID, channel_id, true, kStatusThirdFundingBitcoin);
                     break;
             }
             resolve(true);
@@ -101,14 +101,14 @@ function bitcoinFundingCreated(myUserID, nodeID, userID, info) {
             let status     = await getChannelStatus(channel_id, true);
             console.info('bitcoinFundingCreated status = ' + status);
             switch (Number(status)) {
-                case 3:
-                    saveChannelStatus(myUserID, channel_id, true, 4);
+                case kStatusFirstFundingBitcoin:
+                    saveChannelStatus(myUserID, channel_id, true, kStatusFirstBitcoinFundingCreated);
                     break;
-                case 6:
-                    saveChannelStatus(myUserID, channel_id, true, 7);
+                case kStatusSecondFundingBitcoin:
+                    saveChannelStatus(myUserID, channel_id, true, kStatusSecondBitcoinFundingCreated);
                     break;
-                case 9:
-                    saveChannelStatus(myUserID, channel_id, true, 10);
+                case kStatusThirdFundingBitcoin:
+                    saveChannelStatus(myUserID, channel_id, true, kStatusThirdBitcoinFundingCreated);
                     break;
             }
             resolve(true);
@@ -134,14 +134,14 @@ function bitcoinFundingSigned(myUserID, nodeID, userID, info) {
             let status     = await getChannelStatus(channel_id, false);
             console.info('bitcoinFundingSigned status = ' + status);
             switch (Number(status)) {
-                case 4:
-                    saveChannelStatus(myUserID, channel_id, false, 5);
+                case kStatusFirstBitcoinFundingCreated:
+                    saveChannelStatus(myUserID, channel_id, false, kStatusFirstBitcoinFundingSigned);
                     break;
-                case 7:
-                    saveChannelStatus(myUserID, channel_id, false, 8);
+                case kStatusSecondBitcoinFundingCreated:
+                    saveChannelStatus(myUserID, channel_id, false, kStatusSecondBitcoinFundingSigned);
                     break;
-                case 10:
-                    saveChannelStatus(myUserID, channel_id, false, 11);
+                case kStatusThirdBitcoinFundingCreated:
+                    saveChannelStatus(myUserID, channel_id, false, kStatusThirdBitcoinFundingSigned);
                     break;
             }
             resolve(true);
@@ -162,7 +162,7 @@ function fundingAsset(myUserID, info) {
             console.info('SDK: -102120 fundingAssetOfOmni = ' + JSON.stringify(e));
             saveTempHash(e.hex);
             let channel_id = await getChannelIDFromAddr(info.to_address);
-            saveChannelStatus(myUserID, channel_id, true, 12);
+            saveChannelStatus(myUserID, channel_id, true, kStatusFundingAsset);
             resolve(true);
         });
     })
@@ -184,7 +184,7 @@ function assetFundingCreated(myUserID, nodeID, userID, info) {
             // Save temporary private key to local storage
             saveTempPrivKey(myUserID, kTempPrivKey, info.temporary_channel_id, 
                 info.temp_address_private_key);
-            saveChannelStatus(myUserID, info.temporary_channel_id, true, 13);
+            saveChannelStatus(myUserID, info.temporary_channel_id, true, kStatusAssetFundingCreated);
             resolve(true);
         });
     })
@@ -221,7 +221,7 @@ function assetFundingSigned(myUserID, nodeID, userID, info) {
 
             //
             delChannelStatus(tempCID, false);
-            saveChannelStatus(myUserID, channel_id, false, 14);
+            saveChannelStatus(myUserID, channel_id, false, kStatusAssetFundingSigned);
 
             resolve(e);
         });
@@ -241,9 +241,8 @@ function commitmentTransactionCreated(myUserID, nodeID, userID, info) {
     return new Promise((resolve, reject) => {
         obdApi.commitmentTransactionCreated(nodeID, userID, info, function(e) {
             console.info('SDK: -100351 commitmentTransactionCreated = ' + JSON.stringify(e));
-            // await saveChannelStatus(e.channel_id);
-            saveTempPrivKey(myUserID, kTempPrivKey, e.channel_id, 
-                info.curr_temp_address_private_key);
+            saveTempPrivKey(myUserID, kTempPrivKey, e.channel_id, info.curr_temp_address_private_key);
+            saveChannelStatus(myUserID, e.channel_id, true, kStatusCommitmentTransactionCreated);
             resolve(true);
         });
     })
@@ -262,8 +261,8 @@ function commitmentTransactionAccepted(myUserID, nodeID, userID, info) {
     return new Promise((resolve, reject) => {
         obdApi.commitmentTransactionAccepted(nodeID, userID, info, function(e) {
             console.info('SDK: -100352 commitmentTransactionAccepted = ' + JSON.stringify(e));
-            // await saveChannelStatus(e.channel_id);
             saveTempPrivKey(myUserID, kTempPrivKey, e.channel_id, info.curr_temp_address_private_key);
+            saveChannelStatus(myUserID, e.channel_id, false, kStatusCommitmentTransactionAccepted);
             resolve(true);
         });
     })
@@ -272,14 +271,16 @@ function commitmentTransactionAccepted(myUserID, nodeID, userID, info) {
 /**
  * Type -100038 Protocol is used to close a channel. 
  * 
+ * @param myUserID The user id of logged in
  * @param nodeID peer id of the obd node where the fundee logged in.
  * @param userID the user id of the fundee.
  * @param channel_id 
  */
-function closeChannel(nodeID, userID, channel_id) {
+function closeChannel(myUserID, nodeID, userID, channel_id) {
     return new Promise((resolve, reject) => {
         obdApi.closeChannel(nodeID, userID, channel_id, function(e) {
             console.info('SDK: -100038 closeChannel = ' + JSON.stringify(e));
+            saveChannelStatus(myUserID, channel_id, true, kStatusCloseChannel);
             resolve(true);
         });
     })
@@ -288,14 +289,16 @@ function closeChannel(nodeID, userID, channel_id) {
 /**
  * Type -100039 Protocol is used to response the close channel request.
  * 
+ * @param myUserID The user id of logged in
  * @param nodeID peer id of the obd node where the fundee logged in.
  * @param userID the user id of the fundee.
  * @param info 
  */
-function closeChannelSigned(nodeID, userID, info) {
+function closeChannelSigned(myUserID, nodeID, userID, info) {
     return new Promise((resolve, reject) => {
         obdApi.closeChannelSigned(nodeID, userID, info, function(e) {
             console.info('SDK: -100039 closeChannelSigned = ' + JSON.stringify(e));
+            saveChannelStatus(myUserID, e.channel_id, false, kStatusCloseChannelSigned);
             resolve(true);
         });
     })
