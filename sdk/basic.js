@@ -13,11 +13,13 @@ function openChannel(myUserID, nodeID, userID, info) {
     return new Promise((resolve, reject) => {
         obdApi.openChannel(nodeID, userID, info, function(e) {
             console.info('SDK: -100032 openChannel = ' + JSON.stringify(e));
-            // Functions related to save and get data have be moved to SDK.
-            saveCounterparties(myUserID, nodeID, userID);
-            saveChannelStatus(myUserID, e.temporary_channel_id, true, kStatusOpenChannel);
-            let privkey = getFundingPrivKeyFromPubKey(myUserID, info.funding_pubkey);
-            saveFundingPrivKey(myUserID, e.temporary_channel_id, privkey, kTbFundingPrivKey);
+
+            let channel_id = e.temporary_channel_id;
+            saveCounterparty(myUserID,  channel_id, nodeID, userID);
+            saveChannelStatus(myUserID, channel_id, true, kStatusOpenChannel);
+
+            let privkey = getPrivKeyFromPubKey(myUserID, info.funding_pubkey);
+            saveFundingPrivKey(myUserID, channel_id, privkey);
             resolve(e);
         });
     })
@@ -38,9 +40,9 @@ function acceptChannel(myUserID, nodeID, userID, info) {
             console.info('SDK: -100033 acceptChannel = ' + JSON.stringify(e));
 
             let channel_id = e.temporary_channel_id;
-            let privkey    = getFundingPrivKeyFromPubKey(myUserID, info.funding_pubkey);
-            saveFundingPrivKey(myUserID, channel_id, privkey, kTbFundingPrivKey);
-            saveCounterparties(myUserID, nodeID, userID);
+            let privkey    = getPrivKeyFromPubKey(myUserID, info.funding_pubkey);
+            saveFundingPrivKey(myUserID, channel_id, privkey);
+            // saveCounterparty(myUserID, channel_id, nodeID, userID);
             saveChannelStatus(myUserID, channel_id, false, kStatusAcceptChannel);
             saveChannelAddr(channel_id, e.channel_address);
             resolve(true);
@@ -61,9 +63,7 @@ function fundingBitcoin(myUserID, info) {
     return new Promise((resolve, reject) => {
         obdApi.fundingBitcoin(info, async function(e) {
             console.info('SDK: -102109 fundingBitcoin = ' + JSON.stringify(e));
-            saveTempHash(e.hex);
-            saveFundingBtcData(myUserID, info);
-    
+
             let channel_id = await getChannelIDFromAddr(info.to_address);
             let status     = await getChannelStatus(channel_id, true);
             console.info('fundingBitcoin status = ' + status);
@@ -78,6 +78,9 @@ function fundingBitcoin(myUserID, info) {
                     saveChannelStatus(myUserID, channel_id, true, kStatusThirdFundingBitcoin);
                     break;
             }
+
+            saveFundingBtcData(myUserID, channel_id, info);
+            saveTempData(myUserID, channel_id, e.hex);
             resolve(true);
         });
     })
@@ -160,9 +163,10 @@ function fundingAsset(myUserID, info) {
     return new Promise((resolve, reject) => {
         obdApi.fundingAsset(info, async function(e) {
             console.info('SDK: -102120 fundingAssetOfOmni = ' + JSON.stringify(e));
-            saveTempHash(e.hex);
+            
             let channel_id = await getChannelIDFromAddr(info.to_address);
             saveChannelStatus(myUserID, channel_id, true, kStatusFundingAsset);
+            saveTempData(myUserID, channel_id, e.hex);
             resolve(true);
         });
     })
@@ -213,7 +217,7 @@ function assetFundingSigned(myUserID, nodeID, userID, info) {
             let channel_id   = e.channel_id;
             let channel_addr = await getChannelAddr(tempCID);
 
-            saveFundingPrivKey(myUserID, channel_id, priv_key, kTbFundingPrivKey);
+            saveFundingPrivKey(myUserID, channel_id, priv_key);
 
             //
             delChannelAddr(tempCID);
@@ -222,6 +226,10 @@ function assetFundingSigned(myUserID, nodeID, userID, info) {
             //
             delChannelStatus(tempCID, false);
             saveChannelStatus(myUserID, channel_id, false, kStatusAssetFundingSigned);
+
+            //
+            delCounterparty(myUserID, tempCID);
+            saveCounterparty(myUserID, channel_id, nodeID, userID);
 
             resolve(e);
         });

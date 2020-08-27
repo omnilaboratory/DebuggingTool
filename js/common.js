@@ -1289,11 +1289,11 @@ function createInputParamDiv(obj, jsonFile) {
 }
 
 //
-function fillCounterparty() {
-    let result = getCounterparty($("#logined").text());
+async function fillCounterparty() {
+    let result = await getCounterparty($("#logined").text(), $("#curr_channel_id").text());
     if (result === '') return;
-    $("#recipient_node_peer_id").val(result.nodeID);
-    $("#recipient_user_peer_id").val(result.userID);
+    $("#recipient_node_peer_id").val(result.toNodeID);
+    $("#recipient_user_peer_id").val(result.toUserID);
 }
 
 /**
@@ -1310,8 +1310,7 @@ async function fillChannelIDAndFundingPrivKey() {
     let channelID = getChannelID();
     $("#channel_id").val(channelID);
 
-    let fundingPrivKey = await asyncGetFundingPrivKey(
-        $("#logined").text(), db, channelID, kTbFundingPrivKey);
+    let fundingPrivKey = await getFundingPrivKey($("#logined").text(), channelID);
     $("#channel_address_private_key").val(fundingPrivKey);
 }
 
@@ -1328,8 +1327,7 @@ async function fillTempChannelIDAndFundingPrivKey(msgType) {
     let channelID = getChannelID();
     $("#temporary_channel_id").val(channelID);
 
-    let fundingPrivKey = await asyncGetFundingPrivKey(
-        $("#logined").text(), db, channelID, kTbFundingPrivKey);
+    let fundingPrivKey = await getFundingPrivKey($("#logined").text(), channelID);
 
     if (msgType === 35) {
         $("#fundee_channel_address_private_key").val(fundingPrivKey);
@@ -1406,36 +1404,33 @@ function fillCurrHtlcHt1aTempKey() {
 
 //
 async function fillFundingBtcData() {
-    let result = getFundingBtcData($("#logined").text());
-    // console.info('AUTO FILL result ==>  ' + result);
-    // if (result === '') return;
-    $("#from_address").val(result.from_address);
-    $("#from_address_private_key").val(result.from_address_private_key);
 
-    // let myUserID   = $("#logined").text();
     let channel_id = $("#curr_channel_id").text();
     $("#to_address").val(await getChannelAddr(channel_id));
 
+    let result = await getFundingBtcData($("#logined").text(), channel_id);
+    $("#from_address").val(result.from_address);
+    $("#from_address_private_key").val(result.from_address_private_key);
     $("#amount").val(result.amount);
     $("#miner_fee").val(result.miner_fee);
 }
 
 //
 async function fillFundingAssetData() {
-    let result = getFundingBtcData($("#logined").text());
-    if (result === '') return;
+
+    let channel_id = $("#curr_channel_id").text();
+    $("#to_address").val(await getChannelAddr(channel_id));
+
+    let result = await getFundingBtcData($("#logined").text(), channel_id);
     $("#from_address").val(result.from_address);
     $("#from_address_private_key").val(result.from_address_private_key);
 
-    // let myUserID   = $("#logined").text();
-    let channel_id = $("#curr_channel_id").text();
-    $("#to_address").val(await getChannelAddr(channel_id));
 }
 
 //
 async function autoFillValue(arrParams, obj) {
 
-    // Auto fill some values
+    let data;
     let msgType = Number(obj.getAttribute("type_id"));
     switch (msgType) {
         case enumMsgType.MsgType_HTLC_FindPath_401:
@@ -1472,10 +1467,11 @@ async function autoFillValue(arrParams, obj) {
             fillCounterparty();
             fillTempChannelIDAndFundingPrivKey();
 
+            data = await getTempData($("#logined").text(), $("#curr_channel_id").text());
             if (msgType === enumMsgType.MsgType_FundingSign_SendBtcSign_350) {
-                $("#funding_txid").val(getTempHash());
+                $("#funding_txid").val(data);
             } else {
-                $("#funding_tx_hex").val(getTempHash());
+                $("#funding_tx_hex").val(data);
             }
             break;
 
@@ -1483,7 +1479,9 @@ async function autoFillValue(arrParams, obj) {
             if (!isLogined) return;  // Not logined
             fillCounterparty();
             fillTempChannelIDAndFundingPrivKey();
-            $("#funding_tx_hex").val(getTempHash());
+
+            data = await getTempData($("#logined").text(), $("#curr_channel_id").text());
+            $("#funding_tx_hex").val(data);
             fillTempAddrKey();
             break;
 
@@ -1499,7 +1497,8 @@ async function autoFillValue(arrParams, obj) {
             fillCounterparty();
             $("#channel_id").val(getChannelID());
             if (msgType === enumMsgType.MsgType_SendCloseChannelSign_39) {
-                $("#request_close_channel_hash").val(getTempHash());
+                data = await getTempData($("#logined").text(), $("#curr_channel_id").text());
+                $("#request_close_channel_hash").val(data);
             }
             break;
 
@@ -1509,7 +1508,8 @@ async function autoFillValue(arrParams, obj) {
             fillCounterparty();
             fillChannelFundingLastTempKeys();
             if (msgType === enumMsgType.MsgType_CommitmentTxSigned_SendRevokeAndAcknowledgeCommitmentTransaction_352) {
-                $("#msg_hash").val(getTempHash());
+                data = await getTempData($("#logined").text(), $("#curr_channel_id").text());
+                $("#msg_hash").val(data);
             }
             fillCurrTempAddrKey();
             break;
@@ -1538,7 +1538,8 @@ async function autoFillValue(arrParams, obj) {
             $("#channel_id").attr("class", "input input_color");
 
             fillCounterparty();
-            $("#payer_commitment_tx_hash").val(getTempHash());
+            data = await getTempData($("#logined").text(), $("#curr_channel_id").text());
+            $("#payer_commitment_tx_hash").val(data);
             fillChannelFundingLastTempKeys();
             fillCurrRsmcTempKey();
             fillCurrHtlcTempKey();
@@ -1555,7 +1556,8 @@ async function autoFillValue(arrParams, obj) {
             if (!isLogined) return;  // Not logined
             fillCounterparty();
             fillChannelIDAndFundingPrivKey();
-            $("#msg_hash").val(getTempHash());
+            data = await getTempData($("#logined").text(), $("#curr_channel_id").text());
+            $("#msg_hash").val(data);
             $("#r").val(getForwardR());
             break;
 
@@ -1565,14 +1567,14 @@ async function autoFillValue(arrParams, obj) {
             fillCounterparty();
 
             if (msgType === enumMsgType.MsgType_HTLC_SendCloseSigned_50) {
-                $("#msg_hash").val(getTempHash());
+                data = await getTempData($("#logined").text(), $("#curr_channel_id").text());
+                $("#msg_hash").val(data);
             }
 
             let channelID = getChannelID();
             $("#channel_id").val(channelID);
 
-            let fundingPrivKey = await asyncGetFundingPrivKey(
-                $("#logined").text(), db, channelID, kTbFundingPrivKey);
+            let fundingPrivKey = await getFundingPrivKey($("#logined").text(), channelID);
             $("#channel_address_private_key").val(fundingPrivKey);
 
             let privkey_1 = getTempPrivKey($("#logined").text(), kRsmcTempPrivKey, channelID);
@@ -2577,12 +2579,11 @@ function createBalanceElement(parent, strAddr) {
 }
 
 // List of Counterparties who have interacted
-function displayCounterparties(param) {
+async function displayCounterparties(param) {
 
     let arrData, point, title, content;;
     let userID = $("#logined").text();
     let parent = $("#name_req_div");
-    let list   = JSON.parse(localStorage.getItem(kCounterparties));
     let newDiv = document.createElement('div');
     newDiv.setAttribute('class', 'panelItem');
 
@@ -2604,37 +2605,28 @@ function displayCounterparties(param) {
         }
     }
 
-    // If has data
-    if (list) {
-        for (let i = 0; i < list.result.length; i++) {
-            if (userID === list.result[i].userID) {
-                for (let i2 = 0; i2 < list.result[i].data.length; i2++) {
-                    createElement(newDiv, 'h3', 'NO. ' + (i2 + 1), 'responseText');
-                    arrData = [
-                        'NodePeerID : ' + list.result[i].data[i2].nodeID,
-                        'UserPeerID : ' + list.result[i].data[i2].userID,
-                    ];
+    //
+    let data = await getAllCounterpartyFromUserID(userID);
+    if (data.length > 0) {
+        for (let i = 0; i < data.length; i++) {
+            createElement(newDiv, 'h3', 'NO. ' + (i + 1), 'responseText');
+            arrData = [
+                'NodePeerID : ' + data[i].toNodeID,
+                'UserPeerID : ' + data[i].toUserID,
+            ];
 
-                    for (let i3 = 0; i3 < arrData.length; i3++) {
-                        point   = arrData[i3].indexOf(':') + 1;
-                        title   = arrData[i3].substring(0, point);
-                        content = arrData[i3].substring(point);
-                        createElement(newDiv, 'text', title);
-                        createElement(newDiv, 'text', content, 'responseText');
-                        createElement(newDiv, 'p');
-                    }
-                }
-
-                parent.append(newDiv);
-                return;
+            for (let j = 0; j < arrData.length; j++) {
+                point   = arrData[j].indexOf(':') + 1;
+                title   = arrData[j].substring(0, point);
+                content = arrData[j].substring(point);
+                createElement(newDiv, 'text', title);
+                createElement(newDiv, 'text', content, 'responseText');
+                createElement(newDiv, 'p');
             }
         }
 
-        // The user has not counterparty yet.
-        createElement(newDiv, 'h3', 'NO DATA YET.');
         parent.append(newDiv);
-
-    } else { // NO LOCAL STORAGE DATA YET.
+    } else {
         createElement(newDiv, 'h3', 'NO DATA YET.');
         parent.append(newDiv);
     }
@@ -3989,7 +3981,7 @@ function registerEvent(netType) {
     let msg_110034 = enumMsgType.MsgType_FundingCreate_RecvAssetFundingCreated_34;
     obdApi.registerEvent(msg_110034, function(e) {
         listening110034(e);
-        listening110034ForGUITool(e);
+        listening110034ForGUITool();
     });
 
     // auto response mode
@@ -4003,79 +3995,79 @@ function registerEvent(netType) {
     let msg_110351 = enumMsgType.MsgType_CommitmentTx_RecvCommitmentTransactionCreated_351;
     obdApi.registerEvent(msg_110351, function(e) {
         listening110351(e, netType);
-        listening110351ForGUITool(e);
+        listening110351ForGUITool();
     });
 
     // auto response mode
     let msg_110352 = enumMsgType.MsgType_CommitmentTxSigned_RecvRevokeAndAcknowledgeCommitmentTransaction_352;
     obdApi.registerEvent(msg_110352, function(e) {
-        listening110352(e, netType);
-        listening110352ForGUITool(e);
+        listening110352(e);
+        listening110352ForGUITool();
     });
     
     // auto response mode
     let msg_110040 = enumMsgType.MsgType_HTLC_RecvAddHTLC_40;
     obdApi.registerEvent(msg_110040, function(e) {
         listening110040(e, netType);
-        listening110040ForGUITool(e);
+        listening110040ForGUITool();
     });
     
     // auto response mode
     let msg_110041 = enumMsgType.MsgType_HTLC_RecvAddHTLCSigned_41;
     obdApi.registerEvent(msg_110041, function(e) {
-        listening110041(e, netType);
-        listening110041ForGUITool(e);
+        listening110041(e);
+        listening110041ForGUITool();
     });
 
     // auto response mode
     let msg_110045 = enumMsgType.MsgType_HTLC_RecvVerifyR_45;
     obdApi.registerEvent(msg_110045, function(e) {
         listening110045(e);
-        listening110045ForGUITool(e);
+        listening110045ForGUITool();
     });
 
     let msg_110046 = enumMsgType.MsgType_HTLC_RecvSignVerifyR_46;
     obdApi.registerEvent(msg_110046, function(e) {
         listening110046(e);
-        listening110046ForGUITool(e);
+        listening110046ForGUITool();
     });
 
     // auto response mode
     let msg_110049 = enumMsgType.MsgType_HTLC_RecvRequestCloseCurrTx_49;
     obdApi.registerEvent(msg_110049, function(e) {
         listening110049(e, netType);
-        listening110049ForGUITool(e);
+        listening110049ForGUITool();
     });
 
     let msg_110050 = enumMsgType.MsgType_HTLC_RecvCloseSigned_50;
     obdApi.registerEvent(msg_110050, function(e) {
-        listening110050(e, netType);
-        listening110050ForGUITool(e);
+        listening110050(e);
+        listening110050ForGUITool();
     });
 
     // save request_close_channel_hash
     let msg_110038 = enumMsgType.MsgType_RecvCloseChannelRequest_38;
     obdApi.registerEvent(msg_110038, function(e) {
         listening110038(e);
-        listening110038ForGUITool(e);
+        listening110038ForGUITool();
     });
 
     let msg_110039 = enumMsgType.MsgType_RecvCloseChannelSign_39;
     obdApi.registerEvent(msg_110039, function(e) {
         listening110039(e);
-        listening110039ForGUITool(e);
+        listening110039ForGUITool();
     });
 
     let msg_110080 = enumMsgType.MsgType_Atomic_RecvSwap_80;
     obdApi.registerEvent(msg_110080, function(e) {
         listening110080(e);
-        listening110080ForGUITool(e);
+        listening110080ForGUITool();
     });
 
     let msg_110081 = enumMsgType.MsgType_Atomic_RecvSwapAccept_81;
     obdApi.registerEvent(msg_110081, function(e) {
         listening110081(e);
-        listening110081ForGUITool(e);
+        listening110081ForGUITool();
     });
 }
 
@@ -4093,7 +4085,6 @@ function listening110032ForGUITool(e) {
  * For GUI Tool. Display tips
  */
 function listening110033ForGUITool() {
-    console.info('listening110033ForGUITool');
     tipsOnTop('', kTips110033, 'Funding Bitcoin', 'fundingBitcoin');
 }
 
@@ -4102,7 +4093,6 @@ function listening110033ForGUITool() {
  * @param e 
  */
 async function listening110340ForGUITool(e) {
-    // console.info('listening110340 = ' + JSON.stringify(e));
     $("#funding_txid").val(e.funding_txid);
     $("#recipient_node_peer_id").val(e.funder_node_address);
     $("#recipient_user_peer_id").val(e.funder_peer_id);
@@ -4111,13 +4101,13 @@ async function listening110340ForGUITool(e) {
     let status     = await getChannelStatus(channel_id, false);
     console.info('listening110340ForGUITool status = ' + status);
     switch (Number(status)) {
-        case 2:
+        case kStatusAcceptChannel:
             tipsOnTop('', kTipsFirst110340, 'Confirm', 'bitcoinFundingSigned');
             break;
-        case 5:
+        case kStatusFirstBitcoinFundingSigned:
             tipsOnTop('', kTipsSecond110340, 'Confirm', 'bitcoinFundingSigned');
             break;
-        case 8:
+        case kStatusSecondBitcoinFundingSigned:
             tipsOnTop('', kTipsThird110340, 'Confirm', 'bitcoinFundingSigned');
             break;
     }
@@ -4125,19 +4115,20 @@ async function listening110340ForGUITool(e) {
 
 /**
  * For GUI Tool
+ * @param e
  */
 async function listening110350ForGUITool(e) {
     let channel_id = e.temporary_channel_id;
     let status     = await getChannelStatus(channel_id, true);
     console.info('listening110350ForGUITool status = ' + status);
     switch (Number(status)) {
-        case 4:
+        case kStatusFirstBitcoinFundingCreated:
             tipsOnTop('', kTipsFirst110350, 'Funding Bitcoin', 'fundingBitcoin');
             break;
-        case 7:
+        case kStatusSecondBitcoinFundingCreated:
             tipsOnTop('', kTipsSecond110350, 'Funding Bitcoin', 'fundingBitcoin');
             break;
-        case 10:
+        case kStatusThirdBitcoinFundingCreated:
             tipsOnTop('', kTipsThird110350, 'Funding Asset', 'fundingAsset');
             break;
     }
@@ -4161,15 +4152,14 @@ function listening110352ForGUITool() {
  * For GUI Tool. Display tips
  */
 function listening110034ForGUITool() {
-    console.info('listening110034ForGUITool');
     tipsOnTop('', kTips110034, 'Confirm', 'assetFundingSigned');
 }
 
 /**
  * For GUI Tool. Display tips
+ * @param e
  */
 function listening110035ForGUITool(e) {
-    console.info('listening110035ForGUITool');
     tipsOnTop(e.channel_id, kTips110035, 'RSMC Transfer', 'commitmentTransactionCreated');
 }
 
@@ -4403,10 +4393,12 @@ function displayMyChannelListAtTopRight(page_size, page_index) {
                 tableMyChannelListAtTopRight(e);
 
                 // Get the lastest channel
-                if (e.data[0].channel_id === '') {
-                    lastestChannel = e.data[0].temporary_channel_id;
-                } else {
-                    lastestChannel = e.data[0].channel_id;
+                if (lastestChannel === '') {
+                    if (e.data[0].channel_id === '') {
+                        lastestChannel = e.data[0].temporary_channel_id;
+                    } else {
+                        lastestChannel = e.data[0].channel_id;
+                    }
                 }
             }
 
@@ -4565,20 +4557,6 @@ function rowMyChannelListAtTopRight(e, i, tr) {
 }
 
 /**
- * getChannelIDFromTopRight
- * @param obj 
- */
-function getChannelIDFromTopRight(obj) {
-
-    let sel_channel_id = obj.getAttribute('channel_id');
-
-    console.info('the channel_id is --> ' + sel_channel_id);
-
-    $("#div_top").hide();
-    $("#curr_channel_id").text(sel_channel_id);
-}
-
-/**
  * 
  */
 function showWrapper() {
@@ -4734,13 +4712,13 @@ async function afterBitcoinFundingSigned(tempCID) {
     let status = await getChannelStatus(tempCID, false);
     console.info('afterBitcoinFundingSigned status = ' + status);
     switch (Number(status)) {
-        case 5:
+        case kStatusFirstBitcoinFundingSigned:
             tipsOnTop('', kTipsFirstAfterBitcoinFundingSigned);
             break;
-        case 8:
+        case kStatusSecondBitcoinFundingSigned:
             tipsOnTop('', kTipsSecondAfterBitcoinFundingSigned);
             break;
-        case 11:
+        case kStatusThirdBitcoinFundingSigned:
             tipsOnTop('', kTipsThirdAfterBitcoinFundingSigned);
             break;
     }
@@ -4867,13 +4845,6 @@ function afterAcceptSwap() {
 }
 
 /**
- * 
- */
-function clickLastestChannel() {
-    $("#curr_channel_id").text(lastestChannel);
-}
-
-/**
  * Display tips on top
  * @param channelID 
  * @param tipsNextStep 
@@ -4891,5 +4862,216 @@ function tipsOnTop(channelID, tipsNextStep, butText, apiName) {
     $("#button_next").empty();
     if (butText) {
         buttonNextStep($("#button_next"), butText, "goNextStep('" + apiName + "')");
+    }
+}
+
+/**
+ * 
+ */
+function clickLastestChannel() {
+
+    console.info('lastestChannel is --> ' + lastestChannel);
+    $("#curr_channel_id").text(lastestChannel);
+
+    switchChannel($("#logined").text(), lastestChannel);
+}
+
+/**
+ * 
+ * @param obj 
+ */
+function getChannelIDFromTopRight(obj) {
+
+    let sel_channel_id = obj.getAttribute('channel_id');
+    console.info('the channel_id is --> ' + sel_channel_id);
+
+    $("#div_top").hide();
+    $("#curr_channel_id").text(sel_channel_id);
+
+    switchChannel($("#logined").text(), sel_channel_id);
+}
+
+/**
+ * 
+ * @param user_id 
+ * @param channel_id 
+ */
+async function switchChannel(user_id, channel_id) {
+
+    let isFunder = await getIsFunder(user_id, channel_id);
+    let status   = await getChannelStatus(channel_id, isFunder);
+    console.info('switchChannel status = ' + status);
+
+    switch (Number(status)) {
+        case kStatusOpenChannel:
+            if (isFunder === true) {
+                tipsOnTop('', kTipsAfterOpenChannel);
+            } else {
+                tipsOnTop('', kTips110032, 'Accept', 'acceptChannel');
+            }
+            break;
+        case kStatusAcceptChannel:
+            if (isFunder === true) {
+                listening110033ForGUITool();
+            } else {
+                tipsOnTop('', kTipsAfterAcceptChannel);
+            }
+            break;
+        case kStatusFirstFundingBitcoin:
+        case kStatusSecondFundingBitcoin:
+        case kStatusThirdFundingBitcoin:
+            tipsOnTop('', kTipsAfterFundingBitcoin, 'Notify Counterparty', 'bitcoinFundingCreated');
+            break;
+        case kStatusFirstBitcoinFundingCreated:
+            if (isFunder === true) {
+                tipsOnTop('', kTipsAfterBitcoinFundingCreated);
+            } else {
+                tipsOnTop('', kTipsFirst110340, 'Confirm', 'bitcoinFundingSigned');
+            }
+            break;
+        case kStatusFirstBitcoinFundingSigned:
+            if (isFunder === true) {
+                tipsOnTop('', kTipsFirst110350, 'Funding Bitcoin', 'fundingBitcoin');
+            } else {
+                tipsOnTop('', kTipsFirstAfterBitcoinFundingSigned);
+            }
+            break;
+        case kStatusSecondBitcoinFundingCreated:
+            if (isFunder === true) {
+                tipsOnTop('', kTipsAfterBitcoinFundingCreated);
+            } else {
+                tipsOnTop('', kTipsSecond110340, 'Confirm', 'bitcoinFundingSigned');
+            }
+            break;
+        case kStatusSecondBitcoinFundingSigned:
+            if (isFunder === true) {
+                tipsOnTop('', kTipsSecond110350, 'Funding Bitcoin', 'fundingBitcoin');
+            } else {
+                tipsOnTop('', kTipsSecondAfterBitcoinFundingSigned);
+            }
+            break;
+        case kStatusThirdBitcoinFundingCreated:
+            if (isFunder === true) {
+                tipsOnTop('', kTipsAfterBitcoinFundingCreated);
+            } else {
+                tipsOnTop('', kTipsThird110340, 'Confirm', 'bitcoinFundingSigned');
+            }
+            break;
+        case kStatusThirdBitcoinFundingSigned:
+            if (isFunder === true) {
+                tipsOnTop('', kTipsThird110350, 'Funding Asset', 'fundingAsset');
+            } else {
+                tipsOnTop('', kTipsThirdAfterBitcoinFundingSigned);
+            }
+            break;
+        case kStatusFundingAsset:
+            tipsOnTop('', kTipsAfterFundingAsset, 'Notify Counterparty', 'assetFundingCreated');
+            break;
+        case kStatusAssetFundingCreated:
+            if (isFunder === true) {
+                tipsOnTop('', kTipsAfterAssetFundingCreated);
+            } else {
+                listening110034ForGUITool();
+            }
+            break;
+        case kStatusAssetFundingSigned:
+            if (isFunder === true) {
+                tipsOnTop('', kTips110035, 'RSMC Transfer', 'commitmentTransactionCreated');
+            } else {
+                tipsOnTop('', kTipsAfterAssetFundingSigned);
+            }
+            break;
+        case kStatusCommitmentTransactionCreated:
+            if (isFunder === true) {
+                tipsOnTop('', kTipsAfterCommitmentTransactionCreated);
+            } else {
+                listening110351ForGUITool();
+            }
+            break;
+        case kStatusCommitmentTransactionAccepted:
+            if (isFunder === true) {
+                listening110352ForGUITool()
+            } else {
+                tipsOnTop('', kTipsAfterCommitmentTransactionAccepted);
+            }
+            break;
+        case kStatusPayInvoice: // WILL BE UPDATE
+            if (isFunder === true) {
+            } else {
+            }
+            break;
+        case kStatusAddHTLC:
+            if (isFunder === true) {
+                tipsOnTop('', kTipsAfterAddHTLC);
+            } else {
+                listening110040ForGUITool();
+            }
+            break;
+        case kStatusHTLCSigned:
+            if (isFunder === true) {
+                listening110041ForGUITool();
+            } else {
+                tipsOnTop('', kTipsAfterHTLCSigned, 'Forward R', 'forwardR');
+            }
+            break;
+        case kStatusForwardR:
+            if (isFunder === true) {
+                listening110045ForGUITool()
+            } else {
+                tipsOnTop('', kTipsAfterForwardR);
+            }
+            break;
+        case kStatusSignR:
+            if (isFunder === true) {
+                tipsOnTop('', kTipsAfterSignR, 'Close HTLC', 'closeHTLC');
+            } else {
+                listening110046ForGUITool();
+            }
+            break;
+        case kStatusCloseHTLC:
+            if (isFunder === true) {
+                tipsOnTop('', kTipsAfterCloseHTLC);
+            } else {
+                listening110049ForGUITool();
+            }
+            break;
+        case kStatusCloseHTLCSigned:
+            if (isFunder === true) {
+                listening110050ForGUITool();
+            } else {
+                tipsOnTop('', kTipsAfterCloseHTLCSigned);
+            }
+            break;
+        case kStatusCloseChannel:
+            if (isFunder === true) {
+                tipsOnTop('', kTipsAfterCloseChannel);
+            } else {
+                listening110038ForGUITool();
+            }
+            break;
+        case kStatusCloseChannelSigned:
+            if (isFunder === true) {
+                listening110039ForGUITool();
+            } else {
+                tipsOnTop('', kTipsAfterCloseChannelSigned, 'Open Channel', 'openChannel');
+            }
+            break;
+        case kStatusAtomicSwap:
+            if (isFunder === true) {
+                tipsOnTop('', kTipsAfterAtomicSwap);
+            } else {
+                listening110080ForGUITool();
+            }
+            break;
+        case kStatusAcceptSwap:
+            if (isFunder === true) {
+                listening110081ForGUITool();
+            } else {
+                tipsOnTop('', kTipsAfterAcceptSwap);
+            }
+            break;
+        default:
+            tipsOnTop('', kTipsNoLocalData);
+            break;
     }
 }

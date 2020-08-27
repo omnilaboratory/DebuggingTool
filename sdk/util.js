@@ -2,19 +2,10 @@
 // Functions related to save and get data 
 
 //
-const kCounterparties = 'counterparties';
-
-//
 const kAddress = 'address';
 
 //
 const kMnemonic = 'mnemonic';
-
-//
-const kTempHash = 'temp_hash';
-
-//
-const kFundingBtc = 'funding_btc';
 
 //
 const kRoutingPacket = 'routing_packet';
@@ -84,6 +75,24 @@ const kTbChannelAddr = 'tb_channel_addr';
 
 /**
  * Object Store (table) name of IndexedDB.
+ * tb_channel_addr
+ */
+const kTbCounterparty = 'tb_counterparty';
+
+/**
+ * Object Store (table) name of IndexedDB.
+ * tb_channel_addr
+ */
+const kTbFundingBTC = 'tb_funding_btc';
+
+/**
+ * Object Store (table) name of IndexedDB.
+ * tb_channel_addr
+ */
+const kTbTempData = 'tb_temp_data';
+
+/**
+ * Object Store (table) name of IndexedDB.
  * temp private key
  */
 // const kTbTempPrivKey = 'tb_temp_priv_key';
@@ -91,90 +100,120 @@ const kTbChannelAddr = 'tb_channel_addr';
 /**
  *  List of Counterparties who have interacted
  *  @param myUserID The user id of logged in
+ *  @param channel_id 
  *  @param toNodeID The node id of the counterparty.
  *  @param toUserID The user id of the counterparty.
  */
-function saveCounterparties(myUserID, toNodeID, toUserID) {
+function saveCounterparty(myUserID, channel_id, toNodeID, toUserID) {
 
-    let list = JSON.parse(localStorage.getItem(kCounterparties));
-
-    // If has data.
-    if (list) {
-        // console.info('HAS DATA');
-        for (let i = 0; i < list.result.length; i++) {
-            // same userID
-            if (myUserID === list.result[i].userID) {
-                for (let i2 = 0; i2 < list.result[i].data.length; i2++) {
-                    // if UserPeerID is same, then NodePeerID is updated.
-                    if (list.result[i].data[i2].userID === toUserID) {
-                        list.result[i].data[i2].nodeID = toNodeID;
-                        localStorage.setItem(kCounterparties, JSON.stringify(list));
-                        return;
-                    }
-                }
-
-                // Add a new data to the userID
-                let new_data = {
-                    userID: toUserID,
-                    nodeID: toNodeID
-                }
-                list.result[i].data.push(new_data);
-                localStorage.setItem(kCounterparties, JSON.stringify(list));
-                return;
-            }
-        }
-
-        // A new User ID.
-        let new_data = {
-            userID: myUserID,
-            data: [{
-                userID: toUserID,
-                nodeID: toNodeID
-            }]
-        }
-        list.result.push(new_data);
-        localStorage.setItem(kCounterparties, JSON.stringify(list));
-
-    } else {
-        // console.info('FIRST DATA');
-        let data = {
-            result: [{
-                userID: myUserID,
-                data: [{
-                    userID: toUserID,
-                    nodeID: toNodeID
-                }]
-            }]
-        }
-        localStorage.setItem(kCounterparties, JSON.stringify(data));
+    let key     =  myUserID + channel_id;
+    let request = db.transaction([kTbCounterparty], 'readwrite')
+        .objectStore(kTbCounterparty)
+        .put({ key: key, user_id: myUserID, toNodeID: toNodeID, toUserID: toUserID });
+  
+    request.onsuccess = function (e) {
+        console.log('saveCounterparty Data write success.');
+    };
+  
+    request.onerror = function (e) {
+        console.log('saveCounterparty Data write false.');
     }
 }
 
 /**
  * Get Lastest Counterparty
  * @param myUserID The user id of logged in
+ * @param channel_id 
  */
-function getCounterparty(myUserID) {
+function getCounterparty(myUserID, channel_id) {
 
-    let data = JSON.parse(localStorage.getItem(kCounterparties));
-
-    // If has data.
-    if (data) {
-        // console.info('HAS DATA');
-        for (let i = 0; i < data.result.length; i++) {
-            if (myUserID === data.result[i].userID) {
-                let lastIndex = data.result[i].data.length - 1;
-                return data.result[i].data[lastIndex];
+    return new Promise((resolve, reject) => {
+        let key         = myUserID + channel_id;
+        let transaction = db.transaction([kTbCounterparty], 'readonly');
+        let store       = transaction.objectStore(kTbCounterparty);
+        let request     = store.get(key);
+    
+        request.onerror = function(e) {
+            console.log('Read data false.');
+            reject('Read data false.');
+        };
+    
+        request.onsuccess = function (e) {
+            if (request.result) {
+                let data = {
+                    toNodeID: request.result.toNodeID,
+                    toUserID: request.result.toUserID
+                };
+                console.log('getCounterparty = ' + JSON.stringify(data));
+                resolve(data);
+            } else {
+                console.log('getCounterparty = No Data.');
+                resolve('');
             }
         }
-        return '';
-    } else {
-        return '';
+    })
+}
+
+/**
+ * Get all Counterparty
+ * @param myUserID The user id of logged in
+ */
+function getAllCounterpartyFromUserID(myUserID) {
+
+    return new Promise((resolve, reject) => {
+
+        let data        = [];
+        let transaction = db.transaction([kTbCounterparty], 'readonly');
+        let store       = transaction.objectStore(kTbCounterparty);
+        let index       = store.index('user_id');
+        let request     = index.get(myUserID);
+            request     = index.openCursor(myUserID);
+    
+        request.onerror = function(e) {
+            console.log('Read data false.');
+            reject('Read data false.');
+        };
+    
+        request.onsuccess = function (e) {
+            let result = e.target.result;
+            if (result) {
+                let value = {
+                    toNodeID: result.value.toNodeID,
+                    toUserID: result.value.toUserID
+                };
+                data.push(value);
+                result.continue();
+            } else {
+                console.log('getAllCounterpartyFromUserID No More Data.');
+                console.log('getAllCounterpartyFromUserID = ' + JSON.stringify(data));
+                resolve(data);
+            }
+        }
+    })
+}
+
+/**
+ * Delete counterparty
+ * @param myUserID The user id of logged in
+ * @param channel_id 
+ */
+function delCounterparty(myUserID, channel_id) {
+    let key     = myUserID + channel_id;
+    let request = db.transaction([kTbCounterparty], 'readwrite')
+        .objectStore(kTbCounterparty)
+        .delete(key);
+
+    request.onerror = function(e) {
+        console.log('delCounterparty failed');
+    };
+
+    request.onsuccess = function (e) {
+        console.log('delCounterparty success');
     }
 }
 
 //
-function getFundingPrivKeyFromPubKey(myUserID, pubkey) {
+function getPrivKeyFromPubKey(myUserID, pubkey) {
 
     let addr = JSON.parse(localStorage.getItem(kAddress));
 
@@ -213,28 +252,6 @@ function getPrivKeyFromAddress(address) {
         return '';
     } else {
         return '';
-    }
-}
-
-/**
- * Add a record to table Funding private key or Last temp private key
- * @param user_id
- * @param channel_id
- * @param privkey
- * @param tbName: Funding private key or Last temp private key
- */
-function saveFundingPrivKey(user_id, channel_id, privkey, tbName) {
-
-    let request = db.transaction([tbName], 'readwrite')
-        .objectStore(tbName)
-        .add({ user_id: user_id, channel_id: channel_id, privkey: privkey });
-  
-    request.onsuccess = function (e) {
-        // console.log('Data write success.');
-    };
-  
-    request.onerror = function (e) {
-        // console.log('Data write false.');
     }
 }
 
@@ -318,6 +335,43 @@ function getChannelStatus(channel_id, funder) {
                 resolve(request.result.status);
             } else {
                 console.log('channel status = No Data.');
+                resolve('');
+            }
+        }
+    })
+}
+
+/**
+ * Get funder
+ * @param user_id
+ * @param channel_id
+ */
+function getIsFunder(user_id, channel_id) {
+
+    return new Promise((resolve, reject) => {
+        let transaction = db.transaction([kTbChannelStatus], 'readonly');
+        let store       = transaction.objectStore(kTbChannelStatus);
+        let index       = store.index('channel_id');
+        let request     = index.get(channel_id);
+            request     = index.openCursor(channel_id);
+
+        request.onerror = function(e) {
+            console.log('Read data false.');
+            reject('Read data false.');
+        };
+    
+        request.onsuccess = function (e) {
+            let result = e.target.result;
+            if (result) {
+                if (result.value.user_id === user_id) {
+                    console.log('getIsFunder - funder = ' + result.value.funder);
+                    resolve(result.value.funder);
+                } else {
+                    result.continue();
+                }
+            } else {
+                console.log('getIsFunder No More Data.');
+                // Not found 
                 resolve('');
             }
         }
@@ -476,88 +530,122 @@ function delChannelAddr(channel_id) {
 
 /**
  * save temp hash from:
- * @param hex
+ * 
+ * @param myUserID
+ * @param channel_id
+ * @param value
+ * 
  * 1) fundingBitcoin -102109 return
  * 2) bitcoinFundingCreated type ( -100340 ) return
  * 3) FundingAsset type ( -102120 ) return
  * 4) commitmentTransactionCreated type ( -100351 ) return
  * 5) HTLCCreated type ( -100040 ) return
  */
-function saveTempHash(hex) {
-    localStorage.setItem(kTempHash, hex);
+function saveTempData(myUserID, channel_id, value) {
+
+    let key     = myUserID + channel_id;
+    let request = db.transaction([kTbTempData], 'readwrite')
+        .objectStore(kTbTempData)
+        .put({ key: key, value: value });
+  
+    request.onsuccess = function (e) {
+        // console.log('Data write success.');
+    };
+  
+    request.onerror = function (e) {
+        // console.log('Data write false.');
+    }
 }
 
 /**
  * get temp hash from:
+ * 
+ * @param myUserID
+ * @param channel_id
+ * 
  * 1) fundingBitcoin -102109 return
  * 2) bitcoinFundingCreated type ( -100340 ) return
  * 3) FundingAsset type ( -102120 ) return
  * 4) commitmentTransactionCreated type ( -100351 ) return
  * 5) HTLCCreated type ( -100040 ) return
  */
-function getTempHash() {
-    return localStorage.getItem(kTempHash);
-}
+function getTempData(myUserID, channel_id) {
 
-// 
-function saveFundingBtcData(myUserID, info) {
+    return new Promise((resolve, reject) => {
 
-    let resp = JSON.parse(localStorage.getItem(kFundingBtc));
-
-    // If has data.
-    if (resp) {
-        // console.info('HAS DATA');
-        for (let i = 0; i < resp.result.length; i++) {
-            if (myUserID === resp.result[i].userID) {
-                // Remove
-                resp.result.splice(i, 1);
+        let key         = myUserID + channel_id;
+        let transaction = db.transaction([kTbTempData], 'readonly');
+        let store       = transaction.objectStore(kTbTempData);
+        let request     = store.get(key);
+    
+        request.onerror = function(e) {
+            console.log('Read data false.');
+            reject('Read data false.');
+        };
+    
+        request.onsuccess = function (e) {
+            if (request.result) {
+                console.log('getTempData = ' + request.result.value);
+                resolve(request.result.value);
+            } else {
+                console.log('getTempData = No Data.');
+                resolve('');
             }
         }
+    })
+}
 
-        // A new User ID.
-        let new_data = {
-            userID:                   myUserID,
-            from_address:             info.from_address,
-            from_address_private_key: info.from_address_private_key,
-            to_address:               info.to_address,
-            amount:                   info.amount,
-            miner_fee:                info.miner_fee
-        }
-        resp.result.push(new_data);
-        localStorage.setItem(kFundingBtc, JSON.stringify(resp));
+/**
+ * 
+ * @param {*} myUserID 
+ * @param {*} channel_id 
+ * @param {*} info 
+ */
+function saveFundingBtcData(myUserID, channel_id, info) {
 
-    } else {
-        // console.info('FIRST DATA');
-        let data = {
-            result: [{
-                userID:                   myUserID,
-                from_address:             info.from_address,
-                from_address_private_key: info.from_address_private_key,
-                to_address:               info.to_address,
-                amount:                   info.amount,
-                miner_fee:                info.miner_fee
-            }]
-        }
-        localStorage.setItem(kFundingBtc, JSON.stringify(data));
+    let key     = myUserID + channel_id;
+    let request = db.transaction([kTbFundingBTC], 'readwrite')
+        .objectStore(kTbFundingBTC)
+        .put({ key: key, info: info });
+  
+    request.onsuccess = function (e) {
+        // console.log('Data write success.');
+    };
+  
+    request.onerror = function (e) {
+        // console.log('Data write false.');
     }
 }
 
-//
-function getFundingBtcData(myUserID) {
+/**
+ * 
+ * @param {*} myUserID 
+ * @param {*} channel_id 
+ */
+function getFundingBtcData(myUserID, channel_id) {
 
-    let resp = JSON.parse(localStorage.getItem(kFundingBtc));
+    return new Promise((resolve, reject) => {
 
-    // If has data.
-    if (resp) {
-        for (let i = 0; i < resp.result.length; i++) {
-            if (myUserID === resp.result[i].userID) {
-                return resp.result[i];
+        let key         = myUserID + channel_id;
+        let transaction = db.transaction([kTbFundingBTC], 'readonly');
+        let store       = transaction.objectStore(kTbFundingBTC);
+        let request     = store.get(key);
+    
+        request.onerror = function(e) {
+            console.log('Read data false.');
+            reject('Read data false.');
+        };
+    
+        request.onsuccess = function (e) {
+            if (request.result) {
+                console.log('getFundingBtcData = ' + JSON.stringify(request.result.info));
+                resolve(request.result.info);
+            } else {
+                console.log('getFundingBtcData No Data.');
+                resolve('');
             }
         }
-        return '';
-    } else {
-        return '';
-    }
+    })
 }
 
 /**
@@ -815,27 +903,16 @@ function getNewAddrIndex(myUserID) {
 
 /**
  * Type -103156 is used to check channel address if has already created.
- * Return - True: created False: not created
+ * Return - 0: created 1: not created
  * 
  * @param nodeID peer id of the obd node where the fundee logged in.
  * @param userID the user id of the fundee.
  * @param info 
- * @param callback 
  */
-function checkChannelAddessExist(nodeID, userID, info, callback) {
-    obdApi.checkChannelAddessExist(nodeID, userID, info, callback);
-}
-
-/**
- * Read data from IndexedDB
- * @param nodeID peer id of the obd node where the fundee logged in.
- * @param userID the user id of the fundee.
- * @param info 
- */
-function asyncCheckChannelAddessExist(nodeID, userID, info) {
+function checkChannelAddessExist(nodeID, userID, info) {
 
     return new Promise((resolve, reject) => {
-        checkChannelAddessExist(nodeID, userID, info, function(e) {
+        obdApi.checkChannelAddessExist(nodeID, userID, info, function(e) {
             console.info('SDK: -103156 checkChannelAddessExist = ' + JSON.stringify(e));
             let value = JSON.stringify(e);
             value = value.replace("\"", "").replace("\"", "");
@@ -850,48 +927,52 @@ function asyncCheckChannelAddessExist(nodeID, userID, info) {
 }
 
 /**
- * Read data from IndexedDB
- * @param myUserID 
- * @param dataDB
+ * Save Funding private key
+ * @param myUserID
  * @param channel_id
- * @param tbName: Funding private key or Last temp private key
+ * @param priv_key
  */
-function asyncGetFundingPrivKey(myUserID, dataDB, channel_id, tbName) {
+function saveFundingPrivKey(myUserID, channel_id, priv_key) {
+    
+    let key     = myUserID + channel_id;
+    let request = db.transaction([kTbFundingPrivKey], 'readwrite')
+        .objectStore(kTbFundingPrivKey)
+        .put({ key: key, priv_key: priv_key });
+  
+    request.onsuccess = function (e) {
+        // console.log('Data write success.');
+    };
+  
+    request.onerror = function (e) {
+        // console.log('Data write false.');
+    }
+}
+
+/**
+ * 
+ * @param myUserID 
+ * @param channel_id
+ */
+function getFundingPrivKey(myUserID, channel_id) {
 
     return new Promise((resolve, reject) => {
 
-        let data        = [];
-        let transaction = dataDB.transaction([tbName], 'readonly');
-        let store       = transaction.objectStore(tbName);
-        let index       = store.index('channel_id');
-        let request     = index.get(channel_id);
-            request     = index.openCursor(channel_id);
-
+        let key         = myUserID + channel_id;
+        let transaction = db.transaction([kTbFundingPrivKey], 'readonly');
+        let store       = transaction.objectStore(kTbFundingPrivKey);
+        let request     = store.get(key);
+    
         request.onerror = function(e) {
             console.log('Read data false.');
             reject('Read data false.');
-        }
-
+        };
+    
         request.onsuccess = function (e) {
-            let result = e.target.result;
-            if (result) {
-                let value = {
-                    user_id: result.value.user_id,
-                    privkey: result.value.privkey
-                };
-
-                data.push(value);
-                result.continue();
+            if (request.result) {
+                console.log('getFundingPrivKey = ' + request.result.priv_key);
+                resolve(request.result.priv_key);
             } else {
-                console.log('asyncGetFundingPrivKey No More Data.');
-                for (let i = data.length - 1; i >= 0; i--) {
-                    if (myUserID === data[i].user_id) {
-                        console.log('FINAL privkey: ' + data[i].privkey);
-                        resolve(data[i].privkey);
-                    }
-                }
-
-                // Not found private key
+                console.log('getFundingPrivKey = No Data.');
                 resolve('');
             }
         }
@@ -949,8 +1030,7 @@ function openDB() {
 
         let os2;
         if (!db.objectStoreNames.contains(kTbFundingPrivKey)) {
-            os2 = db.createObjectStore(kTbFundingPrivKey, { autoIncrement: true });
-            os2.createIndex('channel_id', 'channel_id', { unique: false });
+            os2 = db.createObjectStore(kTbFundingPrivKey, { keyPath: 'key' });
         }
 
         let os3;
@@ -966,6 +1046,22 @@ function openDB() {
         if (!db.objectStoreNames.contains(kTbChannelAddr)) {
             os4 = db.createObjectStore(kTbChannelAddr, { keyPath: 'channel_id' });
             os4.createIndex('channel_addr', 'channel_addr', { unique: true });
+        }
+
+        let os5;
+        if (!db.objectStoreNames.contains(kTbCounterparty)) {
+            os5 = db.createObjectStore(kTbCounterparty, { keyPath: 'key' });
+            os5.createIndex('user_id', 'user_id', { unique: false });
+        }
+
+        let os6;
+        if (!db.objectStoreNames.contains(kTbFundingBTC)) {
+            os6 = db.createObjectStore(kTbFundingBTC, { keyPath: 'key' });
+        }
+
+        let os7;
+        if (!db.objectStoreNames.contains(kTbTempData)) {
+            os7 = db.createObjectStore(kTbTempData, { keyPath: 'key' });
         }
     }
 }

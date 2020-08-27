@@ -22,7 +22,7 @@ async function listening110032(e, netType) {
     let userID       = e.funder_peer_id;
     let channel_id   = e.temporary_channel_id;
     saveChannelStatus(myUserID, channel_id, false, kStatusOpenChannel);
-    saveCounterparties(myUserID, nodeID, userID);
+    saveCounterparty(myUserID, channel_id, nodeID, userID);
 
     if (isAutoMode === 'No' || isAutoMode === null) return;
     
@@ -37,7 +37,7 @@ async function listening110032(e, netType) {
         let addr = genNewAddress(myUserID, netType);
         saveAddress(myUserID, addr);
         info.funding_pubkey = addr.result.pubkey;
-        isExist = await asyncCheckChannelAddessExist(nodeID, userID, info);
+        isExist = await checkChannelAddessExist(nodeID, userID, info);
     }
 
     // SDK API send -100033 acceptChannel
@@ -79,8 +79,7 @@ async function listening110034(e) {
     // will send -100035 AssetFundingSigned
     let info                                = new AssetFundingSignedInfo();
     info.temporary_channel_id               = channel_id;
-    info.fundee_channel_address_private_key = await asyncGetFundingPrivKey(
-        myUserID, db, channel_id, kTbFundingPrivKey);
+    info.fundee_channel_address_private_key = await getFundingPrivKey(myUserID, channel_id);
 
     // SDK API
     assetFundingSigned(myUserID, nodeID, userID, info);
@@ -103,8 +102,8 @@ async function listening110035(e) {
     let channel_id   = e.channel_id;
     let channel_addr = await getChannelAddr(tempCID);
 
-    let fundingPrivKey = await asyncGetFundingPrivKey(myUserID, db, tempCID, kTbFundingPrivKey);
-    saveFundingPrivKey(myUserID, channel_id, fundingPrivKey, kTbFundingPrivKey);
+    let fundingPrivKey = await getFundingPrivKey(myUserID, tempCID);
+    saveFundingPrivKey(myUserID, channel_id, fundingPrivKey);
 
     //
     let tempPrivKey = getTempPrivKey(myUserID, kTempPrivKey, tempCID);
@@ -117,6 +116,11 @@ async function listening110035(e) {
     //
     delChannelStatus(tempCID, true);
     saveChannelStatus(myUserID, channel_id, true, kStatusAssetFundingSigned);
+
+    //
+    let result = await getCounterparty(myUserID, tempCID);
+    saveCounterparty(myUserID, channel_id, result.toNodeID, result.toUserID);
+    delCounterparty(myUserID, tempCID);
 }
 
 /**
@@ -124,7 +128,7 @@ async function listening110035(e) {
  * @param e 
  */
 function listening110038(e) {
-    saveTempHash(e.request_close_channel_hash);
+    saveTempData(e.to_peer_id, e.channel_id, e.request_close_channel_hash);
     saveChannelStatus(e.to_peer_id, e.channel_id, false, kStatusCloseChannel);
 }
 
@@ -149,7 +153,7 @@ async function listening110040(e, netType) {
 
     let myUserID = e.to_peer_id;
 
-    saveTempHash(e.payer_commitment_tx_hash);
+    saveTempData(myUserID, e.channel_id, e.payer_commitment_tx_hash);
     saveChannelStatus(myUserID, e.channel_id, false, kStatusAddHTLC);
 
     if (isAutoMode === 'No' || isAutoMode === null) return;
@@ -172,8 +176,7 @@ async function listening110040(e, netType) {
     info.curr_htlc_temp_address_pub_key     = addr_2.result.pubkey;
     info.curr_htlc_temp_address_private_key = addr_2.result.wif;
     info.last_temp_address_private_key      = getTempPrivKey(myUserID, kTempPrivKey, e.channel_id);
-    info.channel_address_private_key        = await asyncGetFundingPrivKey(
-        myUserID, db, e.channel_id, kTbFundingPrivKey);
+    info.channel_address_private_key        = await getFundingPrivKey(myUserID, e.channel_id);
 
     // SDK API
     HTLCSigned(myUserID, nodeID, userID, info);
@@ -202,7 +205,7 @@ async function listening110045(e) {
 
     let myUserID = e.to_peer_id;
 
-    saveTempHash(e.msg_hash);
+    saveTempData(myUserID, e.channel_id, e.msg_hash);
     saveForwardR(e.r);
     saveChannelStatus(myUserID, e.channel_id, true, kStatusForwardR);
 
@@ -218,8 +221,7 @@ async function listening110045(e) {
     info.channel_id                  = e.channel_id;
     info.r                           = e.r;
     info.msg_hash                    = e.msg_hash;
-    info.channel_address_private_key = await asyncGetFundingPrivKey(
-        myUserID, db, e.channel_id, kTbFundingPrivKey);
+    info.channel_address_private_key = await getFundingPrivKey(myUserID, e.channel_id);
 
     // SDK API
     signR(nodeID, userID, info);
@@ -249,7 +251,7 @@ async function listening110049(e, netType) {
 
     let myUserID = e.to_peer_id;
 
-    saveTempHash(e.msg_hash);
+    saveTempData(myUserID, e.channel_id, e.msg_hash);
     saveChannelStatus(myUserID, e.channel_id, false, kStatusCloseHTLC);
 
     if (isAutoMode === 'No' || isAutoMode === null) return;
@@ -265,8 +267,7 @@ async function listening110049(e, netType) {
     // will send -100050 CloseHTLCSigned
     let info                                         = new CloseHtlcTxInfoSigned();
     info.msg_hash                                    = e.msg_hash;
-    info.channel_address_private_key                 = await asyncGetFundingPrivKey(
-        myUserID, db, e.channel_id, kTbFundingPrivKey);
+    info.channel_address_private_key                 = await getFundingPrivKey(myUserID, e.channel_id);
     info.last_rsmc_temp_address_private_key          = getTempPrivKey(myUserID, kRsmcTempPrivKey, e.channel_id);
     info.last_htlc_temp_address_private_key          = getTempPrivKey(myUserID, kHtlcTempPrivKey, e.channel_id);
     info.last_htlc_temp_address_for_htnx_private_key = getTempPrivKey(myUserID, kHtlcHtnxTempPrivKey, e.channel_id);
@@ -313,7 +314,6 @@ async function listening110340(e) {
 
     let isAutoMode = getAutoPilot();
     console.info('SDK: NOW isAutoMode = ' + isAutoMode);
-    saveTempHash(e.funding_txid);
 
     let myUserID     = e.to_peer_id;
     let channel_id   = e.temporary_channel_id;
@@ -331,6 +331,7 @@ async function listening110340(e) {
             break;
     }
             
+    saveTempData(myUserID, channel_id, e.funding_txid);
 
     if (isAutoMode === 'No' || isAutoMode === null) return;
     
@@ -342,8 +343,7 @@ async function listening110340(e) {
     // will send -100350 bitcoinFundingSigned
     let info                          = new FundingBtcSigned();
     info.temporary_channel_id         = channel_id;
-    info.channel_address_private_key  = await asyncGetFundingPrivKey(
-        myUserID, db, channel_id, kTbFundingPrivKey);
+    info.channel_address_private_key  = await getFundingPrivKey(myUserID, channel_id);
     info.funding_txid                 = e.funding_txid;
     info.approval                     = true;
 
@@ -391,7 +391,7 @@ async function listening110351(e, netType) {
 
     let myUserID = e.to_peer_id;
 
-    saveTempHash(e.msg_hash);
+    saveTempData(myUserID, e.channel_id, e.msg_hash);
     saveChannelStatus(myUserID, e.channel_id, false, kStatusCommitmentTransactionCreated);
 
     if (isAutoMode === 'No' || isAutoMode === null) return;
@@ -413,8 +413,7 @@ async function listening110351(e, netType) {
     info.curr_temp_address_private_key = addr.result.wif;
     info.approval                      = true;
     info.last_temp_address_private_key = getTempPrivKey(myUserID, kTempPrivKey, e.channel_id);
-    info.channel_address_private_key   = await asyncGetFundingPrivKey(
-        myUserID, db, e.channel_id, kTbFundingPrivKey);
+    info.channel_address_private_key   = await getFundingPrivKey(myUserID, e.channel_id);
 
     // SDK API
     commitmentTransactionAccepted(myUserID, nodeID, userID, info);

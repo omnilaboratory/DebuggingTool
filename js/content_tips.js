@@ -50,7 +50,7 @@ const kTipsSecondAfterBitcoinFundingSigned = 'You have signed second bitcoin fun
 /**
  * Tips for 
  */
-const kTipsThirdAfterBitcoinFundingSigned = 'You have signed third bitcoin funding. Waiting for funding omni asset from counterparty.';
+const kTipsThirdAfterBitcoinFundingSigned = 'You have signed third bitcoin funding. Waiting for funding asset from counterparty.';
 
 /**
  * Tips for 
@@ -75,7 +75,7 @@ const kTipsAfterCommitmentTransactionCreated = 'You have sent a RSMC transfer. W
 /**
  * Tips for 
  */
-const kTipsAfterCommitmentTransactionAccepted = 'You have received a RSMC transfer.';
+const kTipsAfterCommitmentTransactionAccepted = 'You have accepted a RSMC transfer.';
 
 /**
  * Tips for 
@@ -240,7 +240,12 @@ const kTips110039 = 'Counterparty has accepted to close the channel. Next you ca
 /**
  * Tips for 
  */
-const kTips = 'kTip';
+const kTipsNoLocalData = 'The channel you selected has no locally saved data.';
+
+/**
+ * Tips for 
+ */
+const kTips = '';
 
 
 //----------------------------------------------------------------
