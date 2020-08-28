@@ -8,16 +8,16 @@ const kAddress = 'address';
 const kMnemonic = 'mnemonic';
 
 //
-const kRoutingPacket = 'routing_packet';
+// const kRoutingPacket = 'routing_packet';
 
 //
-const kCltvExpiry = 'cltv_expiry';
+// const kCltvExpiry = 'cltv_expiry';
 
 //
-const kHtlcH = 'htlc_h';
+// const kHtlcH = 'htlc_h';
 
 //
-const kHtlcR = 'htlc_r';
+// const kHtlcR = 'htlc_r';
 
 /**
  * Save RSMC tx temporary private key to local storage
@@ -90,6 +90,18 @@ const kTbFundingBTC = 'tb_funding_btc';
  * tb_channel_addr
  */
 const kTbTempData = 'tb_temp_data';
+
+/**
+ * Object Store (table) name of IndexedDB.
+ * tb_channel_addr
+ */
+const kTbHTLCPathData = 'tb_htlc_path_data';
+
+/**
+ * Object Store (table) name of IndexedDB.
+ * tb_channel_addr
+ */
+const kTbForwardR = 'tb_forward_r';
 
 /**
  * Object Store (table) name of IndexedDB.
@@ -253,32 +265,6 @@ function getPrivKeyFromAddress(address) {
     } else {
         return '';
     }
-}
-
-/**
- * Get channelID from local storage
- */
-function getChannelID() {
-
-    // BACKUP CODE
-    /*
-    let data = {
-        result: [{
-            userID: myUserID,
-            data: [{
-                channel_id:    value.channel_id,
-                channel_addr:  value.channel_addr,
-                status:        value.status,
-                is_accepted:   value.is_accepted,
-                btc_times:     value.btc_times,
-                funding_asset: value.funding_asset,
-            }]
-        }]
-    }
-    */
-
-    // Temp code, maybe will be updated.
-    return $("#curr_channel_id").text();
 }
 
 /**
@@ -539,7 +525,7 @@ function delChannelAddr(channel_id) {
  * 2) bitcoinFundingCreated type ( -100340 ) return
  * 3) FundingAsset type ( -102120 ) return
  * 4) commitmentTransactionCreated type ( -100351 ) return
- * 5) HTLCCreated type ( -100040 ) return
+ * 5) addHTLC type ( -100040 ) return
  */
 function saveTempData(myUserID, channel_id, value) {
 
@@ -567,7 +553,7 @@ function saveTempData(myUserID, channel_id, value) {
  * 2) bitcoinFundingCreated type ( -100340 ) return
  * 3) FundingAsset type ( -102120 ) return
  * 4) commitmentTransactionCreated type ( -100351 ) return
- * 5) HTLCCreated type ( -100040 ) return
+ * 5) addHTLC type ( -100040 ) return
  */
 function getTempData(myUserID, channel_id) {
 
@@ -652,46 +638,46 @@ function getFundingBtcData(myUserID, channel_id) {
  * Save Htlc H
  * @param value
  */
-function saveHtlcH(value) {
-    localStorage.setItem(kHtlcH, value);
-}
+// function saveHtlcH(value) {
+//     localStorage.setItem(kHtlcH, value);
+// }
 
 /**
  * Get Htlc H
  */
-function getHtlcH() {
-    return localStorage.getItem(kHtlcH);
-}
+// function getHtlcH() {
+//     return localStorage.getItem(kHtlcH);
+// }
 
 /**
  * Save Routing Packet
  * @param value
  */
-function saveRoutingPacket(value) {
-    localStorage.setItem(kRoutingPacket, value);
-}
+// function saveRoutingPacket(value) {
+//     localStorage.setItem(kRoutingPacket, value);
+// }
 
 /**
  * Get Routing Packet
  */
-function getRoutingPacket() {
-    return localStorage.getItem(kRoutingPacket);
-}
+// function getRoutingPacket() {
+//     return localStorage.getItem(kRoutingPacket);
+// }
 
 /**
  * Save Cltv Expiry
  * @param value
  */
-function saveCltvExpiry(value) {
-    localStorage.setItem(kCltvExpiry, value);
-}
+// function saveCltvExpiry(value) {
+//     localStorage.setItem(kCltvExpiry, value);
+// }
 
 /**
  * Get Cltv Expiry
  */
-function getCltvExpiry() {
-    return localStorage.getItem(kCltvExpiry);
-}
+// function getCltvExpiry() {
+//     return localStorage.getItem(kCltvExpiry);
+// }
 
 /**
  * Save temporary private key to local storage
@@ -848,14 +834,57 @@ function getMnemonic(myUserID, param) {
     }
 }
 
-// save r from forwardR type ( -100045 ) return
-function saveForwardR(r) {
-    localStorage.setItem(kHtlcR, r);
+/**
+ * save r from forwardR type ( -100045 ) return
+ * @param myUserID
+ * @param channel_id
+ * @param r
+ */
+function saveForwardR(myUserID, channel_id, r) {
+
+    let key     = myUserID + channel_id;
+    let request = db.transaction([kTbForwardR], 'readwrite')
+        .objectStore(kTbForwardR)
+        .put({ key: key, r: r });
+  
+    request.onsuccess = function (e) {
+        // console.log('Data write success.');
+    };
+  
+    request.onerror = function (e) {
+        // console.log('Data write false.');
+    }
 }
 
-// get r from forwardR type ( -100045 ) return
-function getForwardR() {
-    return localStorage.getItem(kHtlcR);
+/**
+ * get r from forwardR type ( -100045 ) return
+ * @param myUserID 
+ * @param channel_id
+ */
+function getForwardR(myUserID, channel_id) {
+
+    return new Promise((resolve, reject) => {
+
+        let key         = myUserID + channel_id;
+        let transaction = db.transaction([kTbForwardR], 'readonly');
+        let store       = transaction.objectStore(kTbForwardR);
+        let request     = store.get(key);
+    
+        request.onerror = function(e) {
+            console.log('Read data false.');
+            reject('Read data false.');
+        };
+    
+        request.onsuccess = function (e) {
+            if (request.result) {
+                console.log('getForwardR = ' + request.result.r);
+                resolve(request.result.r);
+            } else {
+                console.log('getForwardR = No Data.');
+                resolve('');
+            }
+        }
+    })
 }
 
 /**
@@ -923,6 +952,67 @@ function checkChannelAddessExist(nodeID, userID, info) {
                 resolve(1);
             }
         });
+    })
+}
+
+/**
+ * Save Funding private key
+ * @param myUserID
+ * @param channel_id
+ * @param h
+ * @param routing_packet
+ * @param cltv_expiry
+ */
+function saveHTLCPathData(myUserID, channel_id, h, routing_packet, cltv_expiry) {
+    
+    let key     = myUserID + channel_id;
+    let request = db.transaction([kTbHTLCPathData], 'readwrite')
+        .objectStore(kTbHTLCPathData)
+        .put({ key: key, h: h, routing_packet: routing_packet, cltv_expiry: cltv_expiry });
+  
+    request.onsuccess = function (e) {
+        // console.log('Data write success.');
+    };
+  
+    request.onerror = function (e) {
+        // console.log('Data write false.');
+    }
+}
+
+/**
+ * 
+ * @param myUserID 
+ * @param channel_id
+ */
+function getHTLCPathData(myUserID, channel_id) {
+
+    return new Promise((resolve, reject) => {
+
+        let key         = myUserID + channel_id;
+        let transaction = db.transaction([kTbHTLCPathData], 'readonly');
+        let store       = transaction.objectStore(kTbHTLCPathData);
+        let request     = store.get(key);
+    
+        request.onerror = function(e) {
+            console.log('Read data false.');
+            reject('Read data false.');
+        };
+    
+        request.onsuccess = function (e) {
+            if (request.result) {
+                let data = {
+                    h:              request.result.h,
+                    routing_packet: request.result.routing_packet,
+                    cltv_expiry:    request.result.cltv_expiry
+                };
+
+                console.log('getHTLCPathData = ' + JSON.stringify(data));
+                resolve(data);
+            } else {
+                console.log('getHTLCPathData = No Data.');
+                resolve('');
+            }
+        }
     })
 }
 
@@ -1062,6 +1152,16 @@ function openDB() {
         let os7;
         if (!db.objectStoreNames.contains(kTbTempData)) {
             os7 = db.createObjectStore(kTbTempData, { keyPath: 'key' });
+        }
+
+        let os8;
+        if (!db.objectStoreNames.contains(kTbHTLCPathData)) {
+            os8 = db.createObjectStore(kTbHTLCPathData, { keyPath: 'key' });
+        }
+
+        let os9;
+        if (!db.objectStoreNames.contains(kTbForwardR)) {
+            os9 = db.createObjectStore(kTbForwardR, { keyPath: 'key' });
         }
     }
 }

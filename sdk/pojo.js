@@ -104,17 +104,18 @@ class InvoiceInfo {
         this.h = "";
         this.expiry_time = "";
         this.description = "";
-    }
-}
-class PayInvoiceInfo extends InvoiceInfo {
-    constructor() {
-        super(...arguments);
-        this.invoice = "";
-        this.recipient_user_peer_id = "";
         this.is_private = false;
     }
 }
-class HtlcCreatedInfo {
+class HTLCFindPathInfo extends InvoiceInfo {
+    constructor() {
+        super(...arguments);
+        this.invoice = "";
+        this.recipient_node_peer_id = "";
+        this.recipient_user_peer_id = "";
+    }
+}
+class addHTLCInfo {
     constructor() {
         this.recipient_user_peer_id = "";
         this.property_id = 0;

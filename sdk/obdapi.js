@@ -217,10 +217,10 @@ class ObdApi {
                 this.onAddInvoice(resultData);
                 break;
             case this.messageType.MsgType_HTLC_FindPath_401:
-                this.onPayInvoice(resultData);
+                this.onHTLCFindPath(resultData);
                 break;
             case this.messageType.MsgType_HTLC_SendAddHTLC_40:
-                this.onHtlcCreated(resultData);
+                this.onAddHTLC(resultData);
                 break;
             case this.messageType.MsgType_HTLC_SendAddHTLCSigned_41:
                 this.onHtlcSigned(resultData);
@@ -831,28 +831,24 @@ class ObdApi {
     onAddInvoice(jsonData) { }
     /**
      * MsgType_HTLC_FindPath_401
-     * @param info PayInvoiceInfo
+     * @param info HTLCFindPathInfo
      * @param callback function
      */
-    payInvoice(info, callback) {
-        // if (this.isNotString(info.invoice)) {
-        //   alert("empty invoice");
-        //   return;
-        // }
+    HTLCFindPath(info, callback) {
         let msg = new Message();
         msg.type = this.messageType.MsgType_HTLC_FindPath_401;
         msg.data = info;
         this.sendData(msg, callback);
     }
-    onPayInvoice(jsonData) { }
+    onHTLCFindPath(jsonData) { }
     /**
      * MsgType_HTLC_SendAddHTLC_40
      * @param recipient_node_peer_id string
      * @param recipient_user_peer_id string
-     * @param info HtlcCreatedInfo
+     * @param info addHTLCInfo
      * @param callback function
      */
-    htlcCreated(recipient_node_peer_id, recipient_user_peer_id, info, callback) {
+    addHTLC(recipient_node_peer_id, recipient_user_peer_id, info, callback) {
         if (this.isNotString(recipient_node_peer_id)) {
             alert("error recipient_node_peer_id");
             return;
@@ -919,7 +915,7 @@ class ObdApi {
         msg.recipient_node_peer_id = recipient_node_peer_id;
         this.sendData(msg, callback);
     }
-    onHtlcCreated(jsonData) { }
+    onAddHTLC(jsonData) { }
     /**
      * MsgType_HTLC_SendAddHTLCSigned_41
      * @param recipient_node_peer_id string
@@ -1373,12 +1369,12 @@ class ObdApi {
      * MsgType_HTLC_CreatedRAndHInfoList_N4001
      * @param callback function
      */
-    getHtlcCreatedRandHInfoList(callback) {
+    getAddHTLCRandHInfoList(callback) {
         let msg = new Message();
         // msg.type = this.messageType.MsgType_HTLC_CreatedRAndHInfoList_N4001;
         this.sendData(msg, callback);
     }
-    onGetHtlcCreatedRandHInfoList(jsonData) { }
+    onGetAddHTLCRandHInfoList(jsonData) { }
     /**
      * MsgType_HTLC_SignedRAndHInfoList_N4101
      * @param callback function

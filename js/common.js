@@ -576,6 +576,7 @@ function sdkAddInvoice() {
     info.h           = $("#h").val();
     info.expiry_time = $("#expiry_time").val();
     info.description = $("#description").val();
+    info.is_private  = $("#checkbox_n402").prop("checked");
 
     // SDK API
     addInvoice(info, function(e) {
@@ -609,13 +610,13 @@ function makeQRCode(e) {
     qrcode.makeCode(strInvoice);
 }
 
-// -100040 Old name htlcCreated API at local.
+// -100040 Old name addHTLC API at local.
 async function sdkAddHTLC() {
 
     let nodeID  = $("#recipient_node_peer_id").val();
     let userID  = $("#recipient_user_peer_id").val();
 
-    let info                                         = new HtlcCreatedInfo();
+    let info                                         = new addHTLCInfo();
     info.recipient_user_peer_id                      = userID;
     info.property_id                                 = Number($("#property_id").val());
     info.amount                                      = Number($("#amount").val());
@@ -656,16 +657,17 @@ async function sdkHTLCSigned() {
     afterHTLCSigned();
 }
 
-// -100401 Old name is HtlcFindPath API at local.
-function sdkPayInvoice() {
+// -100401 
+async function sdkHTLCFindPath() {
 
-    let info     = new PayInvoiceInfo();
+    let info     = new HTLCFindPathInfo();
     let isInvPay = Boolean($("#n401_InvPay").prop("checked"));
 
     // Invoice Payment is true
     if (isInvPay === true) {
         info.invoice = $("#invoice").val();
     } else {
+        info.recipient_node_peer_id = $("#recipient_node_peer_id").val();
         info.recipient_user_peer_id = $("#recipient_user_peer_id").val();
         info.property_id            = Number($("#property_id").val());
         info.amount                 = Number($("#amount").val());
@@ -675,8 +677,8 @@ function sdkPayInvoice() {
         info.is_private             = $("#checkbox_n401").prop("checked");
     }
 
-    payInvoice(info);
     displaySentMessage100401(info, isInvPay);
+    await HTLCFindPath($("#logined").text(), $("#curr_channel_id").text(), info);
 }
 
 // -100351 Commitment Transaction Created API at local.
@@ -832,7 +834,7 @@ function invokeAPIs(obj) {
             sdkAddInvoice();
             break;
         case enumMsgType.MsgType_HTLC_FindPath_401:
-            sdkPayInvoice();
+            sdkHTLCFindPath();
             break;
         case enumMsgType.MsgType_HTLC_SendAddHTLC_40:
             sdkAddHTLC();
@@ -1280,6 +1282,7 @@ function createInputParamDiv(obj, jsonFile) {
                 case enumMsgType.MsgType_CommitmentTxSigned_SendRevokeAndAcknowledgeCommitmentTransaction_352:
                 case enumMsgType.MsgType_SendCloseChannelSign_39:
                 // case enumMsgType.MsgType_HTLC_SendAddHTLCSigned_41:
+                case enumMsgType.MsgType_HTLC_Invoice_402:
                     displayApprovalCheckbox(newDiv, msgType);
                     content_div.append(newDiv);
                     break;
@@ -1299,15 +1302,16 @@ async function fillCounterparty() {
 /**
  * Auto fill h, routing packet, cltv expiry
  */
-function fillH_RP_CE() {
-    $("#h").val(getHtlcH());
-    $("#routing_packet").val(getRoutingPacket());
-    $("#cltv_expiry").val(getCltvExpiry());
+async function fillH_RP_CE() {
+    let data = await getHTLCPathData($("#logined").text(), $("#curr_channel_id").text());
+    $("#h").val(data.h);
+    $("#routing_packet").val(data.routing_packet);
+    $("#cltv_expiry").val(data.cltv_expiry);
 }
 
 //
 async function fillChannelIDAndFundingPrivKey() {
-    let channelID = getChannelID();
+    let channelID = $("#curr_channel_id").text();
     $("#channel_id").val(channelID);
 
     let fundingPrivKey = await getFundingPrivKey($("#logined").text(), channelID);
@@ -1317,14 +1321,14 @@ async function fillChannelIDAndFundingPrivKey() {
 //
 function fillChannelFundingLastTempKeys() {
     fillChannelIDAndFundingPrivKey();
-    let channel_id  = getChannelID();
+    let channel_id  = $("#curr_channel_id").text();
     let tempPrivKey = getTempPrivKey($("#logined").text(), kTempPrivKey, channel_id);
     $("#last_temp_address_private_key").val(tempPrivKey);
 }
 
 //
 async function fillTempChannelIDAndFundingPrivKey(msgType) {
-    let channelID = getChannelID();
+    let channelID = $("#curr_channel_id").text();
     $("#temporary_channel_id").val(channelID);
 
     let fundingPrivKey = await getFundingPrivKey($("#logined").text(), channelID);
@@ -1448,7 +1452,7 @@ async function autoFillValue(arrParams, obj) {
         case enumMsgType.MsgType_SendChannelAccept_33:
             if (!isLogined) return;  // Not logined
             fillCounterparty();
-            $("#temporary_channel_id").val(getChannelID());
+            $("#temporary_channel_id").val($("#curr_channel_id").text());
             break;
 
         case enumMsgType.MsgType_Core_FundingBTC_2109:
@@ -1495,7 +1499,7 @@ async function autoFillValue(arrParams, obj) {
         case enumMsgType.MsgType_SendCloseChannelSign_39:
             if (!isLogined) return;  // Not logined
             fillCounterparty();
-            $("#channel_id").val(getChannelID());
+            $("#channel_id").val($("#curr_channel_id").text());
             if (msgType === enumMsgType.MsgType_SendCloseChannelSign_39) {
                 data = await getTempData($("#logined").text(), $("#curr_channel_id").text());
                 $("#request_close_channel_hash").val(data);
@@ -1521,9 +1525,6 @@ async function autoFillValue(arrParams, obj) {
 
         case enumMsgType.MsgType_HTLC_SendAddHTLC_40:
             if (!isLogined) return;  // Not logined
-            $("#channel_id").val(getChannelID());
-            $("#channel_id").attr("class", "input input_color");
-            
             fillCounterparty();
             fillH_RP_CE();
             fillChannelFundingLastTempKeys();
@@ -1534,9 +1535,6 @@ async function autoFillValue(arrParams, obj) {
 
         case enumMsgType.MsgType_HTLC_SendAddHTLCSigned_41:
             if (!isLogined) return;  // Not logined
-            $("#channel_id").val(getChannelID());
-            $("#channel_id").attr("class", "input input_color");
-
             fillCounterparty();
             data = await getTempData($("#logined").text(), $("#curr_channel_id").text());
             $("#payer_commitment_tx_hash").val(data);
@@ -1566,13 +1564,13 @@ async function autoFillValue(arrParams, obj) {
             if (!isLogined) return;  // Not logined
             fillCounterparty();
 
+            let channelID = $("#curr_channel_id").text();
+            $("#channel_id").val(channelID);
+
             if (msgType === enumMsgType.MsgType_HTLC_SendCloseSigned_50) {
-                data = await getTempData($("#logined").text(), $("#curr_channel_id").text());
+                data = await getTempData($("#logined").text(), channelID);
                 $("#msg_hash").val(data);
             }
-
-            let channelID = getChannelID();
-            $("#channel_id").val(channelID);
 
             let fundingPrivKey = await getFundingPrivKey($("#logined").text(), channelID);
             $("#channel_address_private_key").val(fundingPrivKey);
@@ -1595,7 +1593,8 @@ async function autoFillValue(arrParams, obj) {
 function displayApprovalCheckbox(content_div, msgType) {
 
     if (msgType === enumMsgType.MsgType_SendChannelOpen_32 || 
-        msgType === enumMsgType.MsgType_HTLC_FindPath_401) {
+        msgType === enumMsgType.MsgType_HTLC_FindPath_401  || 
+        msgType === enumMsgType.MsgType_HTLC_Invoice_402) {
         createElement(content_div, 'text', 'is_private ');
     } else {
         createElement(content_div, 'text', 'Approval ');
@@ -1628,12 +1627,16 @@ function displayApprovalCheckbox(content_div, msgType) {
         case enumMsgType.MsgType_HTLC_FindPath_401:
             element.id = 'checkbox_n401';
             break;
+        case enumMsgType.MsgType_HTLC_Invoice_402:
+            element.id = 'checkbox_n402';
+            break;
     }
 
     element.type = 'checkbox';
 
     if (msgType === enumMsgType.MsgType_SendChannelOpen_32 || 
-        msgType === enumMsgType.MsgType_HTLC_FindPath_401) {
+        msgType === enumMsgType.MsgType_HTLC_FindPath_401  || 
+        msgType === enumMsgType.MsgType_HTLC_Invoice_402) {
         element.defaultChecked = false;
     } else {
         element.defaultChecked = true;
@@ -1661,6 +1664,8 @@ function checkboxInvoicePayment(content_div) {
 //
 function hide401Elements() {
     $("#invoice").show();
+    $("#recipient_node_peer_id").hide();
+    $("#recipient_node_peer_idCou").hide();
     $("#recipient_user_peer_id").hide();
     $("#recipient_user_peer_idCou").hide();
     $("#property_id").hide();
@@ -1679,6 +1684,8 @@ function clickInvoicePayment(obj) {
         hide401Elements();
     } else {
         $("#invoice").hide();
+        $("#recipient_node_peer_id").show();
+        $("#recipient_node_peer_idCou").show();
         $("#recipient_user_peer_id").show();
         $("#recipient_user_peer_idCou").show();
         $("#property_id").show();

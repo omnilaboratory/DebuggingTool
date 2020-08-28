@@ -91,15 +91,16 @@ class InvoiceInfo {
   h: string = "";
   expiry_time: string = "";
   description: string = "";
-}
-
-class PayInvoiceInfo extends InvoiceInfo {
-  invoice: string = "";
-  recipient_user_peer_id: string = "";
   is_private: boolean = false;
 }
 
-class HtlcCreatedInfo {
+class HTLCFindPathInfo extends InvoiceInfo {
+  invoice: string = "";
+  recipient_node_peer_id: string = "";
+  recipient_user_peer_id: string = "";
+}
+
+class addHTLCInfo {
   recipient_user_peer_id: string = "";
   property_id: number = 0;
   amount: number = 0;

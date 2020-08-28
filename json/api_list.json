@@ -699,13 +699,22 @@
             ]
         },
         {
-            "id": "payInvoice",
+            "id": "HTLCFindPath",
             "type_id": -100401,
-            "description": "payInvoice is used to find a routing between A and B node for launch a HTLC transfer.",
+            "description": "HTLCFindPath is used to find a routing between A and B node for launch a HTLC transfer.",
             "parameters": [
                 {
                     "name": "invoice",
                     "buttons": []
+                },
+                {
+                    "name": "recipient_node_peer_id",
+                    "buttons": [
+                        {
+                            "innerText": "Counterparties",
+                            "onclick": "displayUserDataInNewHtml('Counterparties')"
+                        }
+                    ]
                 },
                 {
                     "name": "recipient_user_peer_id",
@@ -756,11 +765,6 @@
             "type_id": -100040,
             "description": "addHTLC is used for looking for a path to transfer to target and Send H to middleman.",
             "parameters": [
-                {
-                    "name": "channel_id",
-                    "buttons": [
-                    ]
-                },
                 {
                     "name": "recipient_node_peer_id",
                     "buttons": [
@@ -926,11 +930,6 @@
             "description": "HTLCSigned is used to response a routing request by middleman.",
             "parameters": [
                 {
-                    "name": "channel_id",
-                    "buttons": [
-                    ]
-                },
-                {
                     "name": "recipient_node_peer_id",
                     "buttons": [
                         {
@@ -950,7 +949,7 @@
                 },
                 {
                     "name": "payer_commitment_tx_hash",
-                    "help": "The hash of commitment transaction created in HTLCCreated (type -40).",
+                    "help": "The hash of commitment transaction created in addHTLC (type -40).",
                     "buttons": [
                     ]
                 },

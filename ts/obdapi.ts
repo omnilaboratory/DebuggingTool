@@ -260,10 +260,10 @@ class ObdApi {
         this.onAddInvoice(resultData);
         break;
       case this.messageType.MsgType_HTLC_FindPath_401:
-        this.onPayInvoice(resultData);
+        this.onHTLCFindPath(resultData);
         break;
       case this.messageType.MsgType_HTLC_SendAddHTLC_40:
-        this.onHtlcCreated(resultData);
+        this.onAddHTLC(resultData);
         break;
       case this.messageType.MsgType_HTLC_SendAddHTLCSigned_41:
         this.onHtlcSigned(resultData);
@@ -998,33 +998,29 @@ class ObdApi {
 
   /**
    * MsgType_HTLC_FindPath_401
-   * @param info PayInvoiceInfo
+   * @param info HTLCFindPathInfo
    * @param callback function
    */
-  public payInvoice(info: PayInvoiceInfo, callback: Function) {
-    // if (this.isNotString(info.invoice)) {
-    //   alert("empty invoice");
-    //   return;
-    // }
+  public HTLCFindPath(info: HTLCFindPathInfo, callback: Function) {
 
     let msg  = new Message();
     msg.type = this.messageType.MsgType_HTLC_FindPath_401;
     msg.data = info;
     this.sendData(msg, callback);
   }
-  public onPayInvoice(jsonData: any) {}
+  public onHTLCFindPath(jsonData: any) {}
 
   /**
    * MsgType_HTLC_SendAddHTLC_40
    * @param recipient_node_peer_id string 
    * @param recipient_user_peer_id string 
-   * @param info HtlcCreatedInfo
+   * @param info addHTLCInfo
    * @param callback function
    */
-  public htlcCreated(
+  public addHTLC(
     recipient_node_peer_id: string,
     recipient_user_peer_id: string,
-    info: HtlcCreatedInfo, 
+    info: addHTLCInfo, 
     callback: Function) {
 
     if (this.isNotString(recipient_node_peer_id)) {
@@ -1099,7 +1095,7 @@ class ObdApi {
     msg.recipient_node_peer_id = recipient_node_peer_id;
     this.sendData(msg, callback);
   }
-  public onHtlcCreated(jsonData: any) {}
+  public onAddHTLC(jsonData: any) {}
 
   /**
    * MsgType_HTLC_SendAddHTLCSigned_41
@@ -1624,12 +1620,12 @@ class ObdApi {
    * MsgType_HTLC_CreatedRAndHInfoList_N4001
    * @param callback function
    */
-  public getHtlcCreatedRandHInfoList(callback: Function) {
+  public getAddHTLCRandHInfoList(callback: Function) {
     let msg = new Message();
     // msg.type = this.messageType.MsgType_HTLC_CreatedRAndHInfoList_N4001;
     this.sendData(msg, callback);
   }
-  public onGetHtlcCreatedRandHInfoList(jsonData: any) {}
+  public onGetAddHTLCRandHInfoList(jsonData: any) {}
 
   /**
    * MsgType_HTLC_SignedRAndHInfoList_N4101

@@ -16,15 +16,18 @@ function addInvoice(info, callback) {
  * which seeks a full path of nodes, decide which path is the 
  * optimistic one, in terms of hops, node's histroy service quility, and fees.
  * 
- *  @param info 
+ * @param myUserID The user id of logged in
+ * @param channel_id 
+ * @param info 
  */
-function payInvoice(info) {
+function HTLCFindPath(myUserID, channel_id, info) {
     return new Promise((resolve, reject) => {
-        obdApi.payInvoice(info, function(e) {
-            console.info('SDK: -100401 - payInvoice = ' + JSON.stringify(e));
-            saveHtlcH(e.h);
-            saveRoutingPacket(e.routing_packet);
-            saveCltvExpiry(e.min_cltv_expiry);
+        obdApi.HTLCFindPath(info, function(e) {
+            console.info('SDK: -100401 - HTLCFindPath = ' + JSON.stringify(e));
+            // saveHtlcH(e.h);
+            // saveRoutingPacket(e.routing_packet);
+            // saveCltvExpiry(e.min_cltv_expiry);
+            saveHTLCPathData(myUserID, channel_id, e.h, e.routing_packet, e.cltv_expiry);
             resolve(true);
         });
     })
@@ -39,8 +42,8 @@ function payInvoice(info) {
  */
 function addHTLC(myUserID, nodeID, userID, info) {
     return new Promise((resolve, reject) => {
-        obdApi.htlcCreated(nodeID, userID, info, function(e) {
-            console.info('SDK: -100040 htlcCreated = ' + JSON.stringify(e));
+        obdApi.addHTLC(nodeID, userID, info, function(e) {
+            console.info('SDK: -100040 addHTLC = ' + JSON.stringify(e));
             // save 3 privkeys
             saveTempPrivKey(myUserID, kRsmcTempPrivKey, e.channel_id, 
                 info.curr_rsmc_temp_address_private_key);
