@@ -242,11 +242,6 @@ const kTips110039 = 'Counterparty has accepted to close the channel. Next you ca
  */
 const kTipsNoLocalData = 'The channel you selected has no locally saved data.';
 
-/**
- * Tips for 
- */
-const kTips = '';
-
 
 //----------------------------------------------------------------
 // Status of a channel
@@ -385,10 +380,3 @@ const kStatusAtomicSwap = 26;
  * acceptSwap done
  */
 const kStatusAcceptSwap = 27;
-
-/**
- * xxxx done
- */
-const kStatus = 2;
-
-

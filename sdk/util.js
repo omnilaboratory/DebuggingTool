@@ -481,7 +481,6 @@ function getChannelAddr(channel_id) {
     
         request.onerror = function(e) {
             console.log('Read data false.');
-            reject('Read data false.');
         };
     
         request.onsuccess = function (e) {

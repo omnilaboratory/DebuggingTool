@@ -34,6 +34,11 @@ var channelInfo;
  */
 var lastestChannel = '';
 
+/**
+ * The channel status
+ */
+// var channelStatus = '';
+
 
 ////////////////////////////////
 // Functions are here
@@ -79,7 +84,7 @@ function displaySentMessage(msgSend) {
     newMsg += '\n\n' + 'Sent -  ' + msgTime;
     newMsg += '\n\n' + '------------------------------------';
     newMsg += '\n\n' + msgSend;
-    addData($("#logined").text(), newMsg);
+    saveGlobalMsg($("#logined").text(), newMsg);
 
     // Add sent message in messages box at right side
     arrObdMsg.push('\n');
@@ -1008,7 +1013,7 @@ function displayOBDMessages(msg) {
         newMsg += '\n\n' + 'Received -  ' + msgHead;
         newMsg += '\n\n' + '------------------------------------';
         newMsg += '\n\n' + fullMsg;
-    addData(user_id, newMsg);
+    saveGlobalMsg(user_id, newMsg);
 
     //-----------------
     content = JSON.stringify(content.result);
@@ -1201,7 +1206,7 @@ function createRequestDiv(obj) {
     createElement(newDiv, 'text', 'func: ');
 
     // create [func_name] element: id = JS function name.
-    createElement(newDiv, 'text', obj.getAttribute("id"), 'funcText');
+    createElement(newDiv, 'text', obj.getAttribute("id"), 'funcText', 'api_name');
 
     // create [type_id] element
     let value = " type ( " + obj.getAttribute("type_id") + " )";
@@ -1262,7 +1267,7 @@ function createInputParamDiv(obj, jsonFile) {
                 // Parameters
                 createParamOfAPI(arrParams, newDiv);
                 content_div.append(newDiv);
-                autoFillValue(arrParams, obj);
+                autoFillValue(obj);
             }
         }
 
@@ -1432,7 +1437,32 @@ async function fillFundingAssetData() {
 }
 
 //
-async function autoFillValue(arrParams, obj) {
+async function autoFillValue(obj) {
+
+    let api_name = $("#api_name").text();
+    console.info('api_name = ' + api_name);
+
+    // get channel status
+    let isFunder = await getIsFunder(user_id, channel_id);
+    let status   = await getChannelStatus(channel_id, isFunder);
+    console.info('switchChannel status = ' + status);
+
+    switch (api_name) {
+        case 'openChannel':
+            if (!isLogined) { // Not loged in
+                disableInvokeAPI();
+            }
+            break;
+        case 'acceptChannel':
+            if (!isLogined) { // Not loged in
+                disableInvokeAPI();
+            }
+            break;
+    
+        default:
+            break;
+    }
+
 
     let data;
     let msgType = Number(obj.getAttribute("type_id"));
@@ -2896,7 +2926,7 @@ function openLogPage() {
 }
 
 // Show complete log of OBD messages in log page.
-function showLog() {
+async function showLog() {
     // Receive params to new page
     let receive = window.opener["params"];
     let user_id = receive["user_id"];
@@ -2904,8 +2934,8 @@ function showLog() {
 
     console.log('Sent user_id = ' + user_id);
 
-    // Read log data from IndexedDB
-    openDBAndShowData(user_id);
+    await openDBInNewHtml();
+    getGlobalMsg(user_id);
 }
 
 //
@@ -3201,9 +3231,7 @@ function autoMode(obj) {
  * This is a OBD JS API. Will be moved to obdapi.js file.
  */
 function sdkGenMnemonic() {
-    // return btctool.generateMnemonic(128);
     return genMnemonic();
-    // return wallet.genMnemonic();
 }
 
 /**
@@ -3216,9 +3244,7 @@ function sdkGenAddressFromMnemonic() {
         return;
     }
 
-    // SDK API
     let index = getNewAddrIndex($("#logined").text());
-    // console.info('addr index = ' + newIndex);
     return genAddressFromMnemonic(mnemonicWithLogined, index, true);
 }
 
@@ -3233,37 +3259,36 @@ function sdkGetAddressInfo(msgType) {
         return;
     }
 
-    let index = $("#index").val();
-    // console.info('index = ' + index);
-
-    // SDK API
+    let index  = $("#index").val();
     let result = getAddressInfo(mnemonicWithLogined, index, true);
     if (result === '') return;
     createOBDResponseDiv(result, msgType);
 }
 
 /**
- * Open a new IndexedDB instance for log page.
- * And read data belong one user.
+ * Open a new IndexedDB instance for new page.
  */
-function openDBAndShowData(user_id) {
+function openDBInNewHtml() {
 
-    let request = window.indexedDB.open('data');
+    return new Promise((resolve, reject) => {
+        let request = window.indexedDB.open('data');
+        
+        request.onerror = function (e) {
+            console.log('NEW PAGE DB open error!');
+        };
     
-    request.onerror = function (e) {
-        console.log('LOG PAGE DB open error!');
-    };
-
-    request.onsuccess = function (e) {
-        console.log('LOG PAGE DB open success!');
-        readData(request.result, user_id);
-    };
+        request.onsuccess = function (e) {
+            console.log('NEW PAGE DB open success!');
+            db = request.result;
+            resolve();
+        };
+    })
 }
 
 /**
  * Add a record to table GlobalMsg
  */
-function addData(user_id, msg) {
+function saveGlobalMsg(user_id, msg) {
 
     let request = db.transaction([kTbGlobalMsg], 'readwrite')
         .objectStore(kTbGlobalMsg)
@@ -3278,30 +3303,14 @@ function addData(user_id, msg) {
     }
 }
 
-
-/**
- * Remove data from IndexedDB
- * @param channel_id Key value
- * @param tbName: Funding private key or Last temp private key
- */
-function removeData(channel_id, tbName) {
-    let request = db.transaction([tbName], 'readwrite')
-        .objectStore(tbName)
-        .delete(channel_id);
-
-    request.onsuccess = function (event) {
-        console.log('Data deleted successfully.');
-    };
-}
-
 /**
  * Read data belong one user from IndexedDB
  */
-function readData(dataDB, user_id) {
+function getGlobalMsg(user_id) {
 
     let showMsg     = '';
     let data        = [];
-    let transaction = dataDB.transaction([kTbGlobalMsg], 'readonly');
+    let transaction = db.transaction([kTbGlobalMsg], 'readonly');
     let store       = transaction.objectStore(kTbGlobalMsg);
     let index       = store.index('user_id');
     let request     = index.get(user_id);
