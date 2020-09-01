@@ -120,6 +120,10 @@ async function sdkOpenChannel() {
     let info            = new OpenChannelInfo();
     info.funding_pubkey = $("#funding_pubkey").val();
     info.is_private     = $("#checkbox_n32").prop("checked");
+    
+    // Save address index to OBD and can get private key back if lose it.
+    info.funder_address_index = Number(getIndexFromPubKey(info.funding_pubkey));
+    // console.info('get index = ' + info.funder_address_index);
 
     displaySentMessage100032(nodeID, userID, info);
     let e = await openChannel($("#logined").text(), nodeID, userID, info);
@@ -136,6 +140,9 @@ async function sdkAcceptChannel() {
     info.temporary_channel_id = $("#temporary_channel_id").val();
     info.funding_pubkey       = $("#funding_pubkey").val();
     info.approval             = $("#checkbox_n33").prop("checked");
+
+    // Save address index to OBD and can get private key back if lose it.
+    info.fundee_address_index = Number(getIndexFromPubKey(info.funding_pubkey));
 
     displaySentMessage100033(nodeID, userID, info);
     await acceptChannel($("#logined").text(), nodeID, userID, info);
@@ -156,6 +163,9 @@ async function sdkForwardR() {
     info.channel_address_private_key                 = $("#channel_address_private_key").val();
     info.curr_htlc_temp_address_for_he1b_pub_key     = $("#curr_htlc_temp_address_for_he1b_pub_key").val();
     info.curr_htlc_temp_address_for_he1b_private_key = $("#curr_htlc_temp_address_for_he1b_private_key").val();
+
+    // Save address index to OBD and can get private key back if lose it.
+    info.curr_htlc_temp_address_for_he1b_index = Number(getIndexFromPubKey(info.curr_htlc_temp_address_for_he1b_pub_key));
 
     displaySentMessage100045(nodeID, userID, info);
     await forwardR($("#logined").text(), nodeID, userID, info);
@@ -198,6 +208,9 @@ async function sdkCloseHTLC() {
     info.curr_rsmc_temp_address_pub_key              = $("#curr_rsmc_temp_address_pub_key").val();
     info.curr_rsmc_temp_address_private_key          = $("#curr_rsmc_temp_address_private_key").val();
 
+    // Save address index to OBD and can get private key back if lose it.
+    info.curr_rsmc_temp_address_index = Number(getIndexFromPubKey(info.curr_rsmc_temp_address_pub_key));
+
     displaySentMessage100049(nodeID, userID, info);
     await closeHTLC($("#logined").text(), nodeID, userID, info);
     afterCloseHTLC();
@@ -219,6 +232,9 @@ async function sdkCloseHTLCSigned() {
     info.last_htlc_temp_address_for_htnx_private_key = $("#last_htlc_temp_address_for_htnx_private_key").val();
     info.curr_rsmc_temp_address_pub_key              = $("#curr_rsmc_temp_address_pub_key").val();
     info.curr_rsmc_temp_address_private_key          = $("#curr_rsmc_temp_address_private_key").val();
+
+    // Save address index to OBD and can get private key back if lose it.
+    info.curr_rsmc_temp_address_index = Number(getIndexFromPubKey(info.curr_rsmc_temp_address_pub_key));
 
     displaySentMessage100050(nodeID, userID, info);
     await closeHTLCSigned($("#logined").text(), nodeID, userID, info);
@@ -518,6 +534,9 @@ async function sdkAssetFundingCreated() {
     info.channel_address_private_key = $("#channel_address_private_key").val();
     info.funding_tx_hex              = $("#funding_tx_hex").val();
 
+    // Save address index to OBD and can get private key back if lose it.
+    info.temp_address_index = Number(getIndexFromPubKey(info.temp_address_pub_key));
+
     displaySentMessage100034(nodeID, userID, info);
     await assetFundingCreated($("#logined").text(), nodeID, userID, info);
     afterAssetFundingCreated();
@@ -637,6 +656,11 @@ async function sdkAddHTLC() {
     info.curr_htlc_temp_address_for_ht1a_pub_key     = $("#curr_htlc_temp_address_for_ht1a_pub_key").val();
     info.curr_htlc_temp_address_for_ht1a_private_key = $("#curr_htlc_temp_address_for_ht1a_private_key").val();
 
+    // Save address index to OBD and can get private key back if lose it.
+    info.curr_rsmc_temp_address_index          = Number(getIndexFromPubKey(info.curr_rsmc_temp_address_pub_key));
+    info.curr_htlc_temp_address_index          = Number(getIndexFromPubKey(info.curr_htlc_temp_address_pub_key));
+    info.curr_htlc_temp_address_for_ht1a_index = Number(getIndexFromPubKey(info.curr_htlc_temp_address_for_ht1a_pub_key));
+
     displaySentMessage100040(nodeID, userID, info);
     await addHTLC($("#logined").text(), nodeID, userID, info);
     afterAddHTLC();
@@ -656,6 +680,10 @@ async function sdkHTLCSigned() {
     info.curr_rsmc_temp_address_private_key = $("#curr_rsmc_temp_address_private_key").val();
     info.curr_htlc_temp_address_pub_key     = $("#curr_htlc_temp_address_pub_key").val();
     info.curr_htlc_temp_address_private_key = $("#curr_htlc_temp_address_private_key").val();
+
+    // Save address index to OBD and can get private key back if lose it.
+    info.curr_rsmc_temp_address_index = Number(getIndexFromPubKey(info.curr_rsmc_temp_address_pub_key));
+    info.curr_htlc_temp_address_index = Number(getIndexFromPubKey(info.curr_htlc_temp_address_pub_key));
 
     displaySentMessage100041(nodeID, userID, info);
     await HTLCSigned($("#logined").text(), nodeID, userID, info);
@@ -700,6 +728,9 @@ async function sdkCommitmentTransactionCreated() {
     info.curr_temp_address_private_key = $("#curr_temp_address_private_key").val();
     info.last_temp_address_private_key = $("#last_temp_address_private_key").val();
 
+    // Save address index to OBD and can get private key back if lose it.
+    info.curr_temp_address_index = Number(getIndexFromPubKey(info.curr_temp_address_pub_key));
+
     displaySentMessage100351(nodeID, userID, info);
     await commitmentTransactionCreated($("#logined").text(), nodeID, userID, info);
     afterCommitmentTransactionCreated();
@@ -719,6 +750,9 @@ async function sdkCommitmentTransactionAccepted() {
     info.last_temp_address_private_key = $("#last_temp_address_private_key").val();
     info.msg_hash                      = $("#msg_hash").val();
     info.approval                      = $("#checkbox_n352").prop("checked");
+
+    // Save address index to OBD and can get private key back if lose it.
+    info.curr_temp_address_index = Number(getIndexFromPubKey(info.curr_temp_address_pub_key));
 
     displaySentMessage100352(nodeID, userID, info);
     await commitmentTransactionAccepted($("#logined").text(), nodeID, userID, info);

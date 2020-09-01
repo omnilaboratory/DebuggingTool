@@ -43,12 +43,14 @@ class OmniSendAssetInfo {
 
 class OpenChannelInfo {
   funding_pubkey: string = "";
+  funder_address_index: number = 0;
   is_private: boolean = false;
 }
 
 class AcceptChannelInfo {
   temporary_channel_id: string = "";
   funding_pubkey: string = "";
+  fundee_address_index: number = 0;
   approval: boolean = false;
 }
 
@@ -57,6 +59,7 @@ class AssetFundingCreatedInfo {
   funding_tx_hex: string = "";
   temp_address_pub_key: string = "";
   temp_address_private_key: string = "";
+  temp_address_index: number = 0;
   channel_address_private_key: string = "";
 }
 
@@ -71,6 +74,7 @@ class CommitmentTx {
   amount: number = 0;
   curr_temp_address_pub_key: string = "";
   curr_temp_address_private_key: string = "";
+  curr_temp_address_index: number = 0;
   channel_address_private_key: string = "";
   last_temp_address_private_key: string = "";
 }
@@ -79,6 +83,7 @@ class CommitmentTxSigned {
   channel_id: string = "";
   curr_temp_address_pub_key: string = "";
   curr_temp_address_private_key: string = "";
+  curr_temp_address_index: number = 0;
   last_temp_address_private_key: string = "";
   msg_hash: string = "";
   channel_address_private_key: string = "";
@@ -111,10 +116,13 @@ class addHTLCInfo {
   last_temp_address_private_key: string = "";
   curr_rsmc_temp_address_pub_key: string = "";
   curr_rsmc_temp_address_private_key: string = "";
+  curr_rsmc_temp_address_index: number = 0;
   curr_htlc_temp_address_pub_key: string = "";
   curr_htlc_temp_address_private_key: string = "";
+  curr_htlc_temp_address_index: number = 0;
   curr_htlc_temp_address_for_ht1a_pub_key: string = "";
   curr_htlc_temp_address_for_ht1a_private_key: string = "";
+  curr_htlc_temp_address_for_ht1a_index: number = 0;
 }
 
 class HtlcSignedInfo {
@@ -124,8 +132,10 @@ class HtlcSignedInfo {
   last_temp_address_private_key: string = "";
   curr_rsmc_temp_address_pub_key: string = "";
   curr_rsmc_temp_address_private_key: string = "";
+  curr_rsmc_temp_address_index: number = 0;
   curr_htlc_temp_address_pub_key: string = "";
   curr_htlc_temp_address_private_key: string = "";
+  curr_htlc_temp_address_index: number = 0;
 }
 
 class SignGetHInfo {
@@ -157,6 +167,7 @@ class ForwardRInfo {
   channel_address_private_key: string = "";
   curr_htlc_temp_address_for_he1b_pub_key: string = "";
   curr_htlc_temp_address_for_he1b_private_key: string = "";
+  curr_htlc_temp_address_for_he1b_index: number = 0;
 }
 
 class SignRInfo {
@@ -174,6 +185,7 @@ class CloseHtlcTxInfo {
   last_htlc_temp_address_for_htnx_private_key: string = "";
   curr_rsmc_temp_address_pub_key: string = "";
   curr_rsmc_temp_address_private_key: string = "";
+  curr_rsmc_temp_address_index: number = 0;
 }
 
 class CloseHtlcTxInfoSigned {
@@ -184,6 +196,7 @@ class CloseHtlcTxInfoSigned {
   last_htlc_temp_address_for_htnx_private_key: string = "";
   curr_rsmc_temp_address_pub_key: string = "";
   curr_rsmc_temp_address_private_key: string = "";
+  curr_rsmc_temp_address_index: number = 0;
 }
 
 class IssueManagedAmoutInfo {

@@ -268,6 +268,29 @@ function getPrivKeyFromAddress(address) {
 }
 
 /**
+ * Get address index from address public key.
+ * @param pubkey 
+ */
+function getIndexFromPubKey(pubkey) {
+
+    let resp = JSON.parse(localStorage.getItem(kAddress));
+
+    // If has data.
+    if (resp) {
+        for (let i = 0; i < resp.result.length; i++) {
+            for (let j = 0; j < resp.result[i].data.length; j++) {
+                if (pubkey === resp.result[i].data[j].pubkey) {
+                    return resp.result[i].data[j].index;
+                }
+            }
+        }
+        return '';
+    } else {
+        return '';
+    }
+}
+
+/**
  * Get channelID from channel address
  * @param channel_addr
  */
