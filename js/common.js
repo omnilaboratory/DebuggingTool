@@ -1162,11 +1162,11 @@ function displayAPIContent(obj) {
     createInputParamDiv(obj, 'json/manage_asset.json');
 
     // Temp code, will be update
-    if (obj.getAttribute("id") === 'logIn') {
-        if (isLogined) {
-            alreadyLogin();
-        }
-    }
+    // if (obj.getAttribute("id") === 'logIn') {
+    //     if (isLogined) {
+    //         alreadyLogin();
+    //     }
+    // }
 }
 
 // create 
@@ -1436,18 +1436,32 @@ async function fillFundingAssetData() {
 
 }
 
-//
-async function autoFillValue(obj) {
+/**
+ * 
+ */
+async function changeInvokeAPIEnable() {
 
     let api_name = $("#api_name").text();
     console.info('api_name = ' + api_name);
 
     // get channel status
-    let isFunder = await getIsFunder(user_id, channel_id);
-    let status   = await getChannelStatus(channel_id, isFunder);
+    let user_id    = $("#logined").text();
+    let channel_id = $("#curr_channel_id").text();
+    let isFunder   = await getIsFunder(user_id, channel_id);
+    let status     = await getChannelStatus(channel_id, isFunder);
     console.info('switchChannel status = ' + status);
 
     switch (api_name) {
+        case 'logIn':
+            if (isLogined) { // loged in
+                disableInvokeAPI();
+            }
+            break;
+        case 'connectP2PPeer':
+            if (!isLogined) { // Not loged in
+                disableInvokeAPI();
+            }
+            break;
         case 'openChannel':
             if (!isLogined) { // Not loged in
                 disableInvokeAPI();
@@ -1456,13 +1470,147 @@ async function autoFillValue(obj) {
         case 'acceptChannel':
             if (!isLogined) { // Not loged in
                 disableInvokeAPI();
+            } else if (status != kStatusOpenChannel) {
+                // Only channel status is openChannel, the Invoke API button is enable.
+                disableInvokeAPI();
             }
             break;
-    
+        case 'fundingBitcoin':
+            if (!isLogined) { // Not loged in
+                disableInvokeAPI();
+            } else if (status != kStatusAcceptChannel && 
+                       status != kStatusFirstBitcoinFundingSigned &&
+                       status != kStatusSecondBitcoinFundingSigned   ) {
+                disableInvokeAPI();
+            }
+            break;
+        case 'bitcoinFundingCreated':
+            if (!isLogined) { // Not loged in
+                disableInvokeAPI();
+            } else if (status != kStatusFirstFundingBitcoin && 
+                       status != kStatusSecondFundingBitcoin &&
+                       status != kStatusThirdFundingBitcoin   ) {
+                disableInvokeAPI();
+            }
+            break;
+        case 'bitcoinFundingSigned':
+            if (!isLogined) { // Not loged in
+                disableInvokeAPI();
+            } else if (status != kStatusFirstBitcoinFundingCreated && 
+                       status != kStatusSecondBitcoinFundingCreated &&
+                       status != kStatusThirdBitcoinFundingCreated   ) {
+                disableInvokeAPI();
+            }
+            break;
+        case 'fundingAsset':
+            if (!isLogined) { // Not loged in
+                disableInvokeAPI();
+            } else if (status != kStatusThirdBitcoinFundingSigned) {
+                // Only channel status is funding bitcoin completed, 
+                // the Invoke API button is enable.
+                disableInvokeAPI();
+            }
+            break;
+        case 'assetFundingCreated':
+            if (!isLogined) { // Not loged in
+                disableInvokeAPI();
+            } else if (status != kStatusFundingAsset) {
+                disableInvokeAPI();
+            }
+            break;
+        case 'assetFundingSigned':
+            if (!isLogined) { // Not loged in
+                disableInvokeAPI();
+            } else if (status != kStatusAssetFundingCreated) {
+                disableInvokeAPI();
+            }
+            break;
+        case 'commitmentTransactionCreated':
+            if (!isLogined) { // Not loged in
+                disableInvokeAPI();
+            } else if (status < kStatusAssetFundingSigned) {
+                disableInvokeAPI();
+            }
+            break;
+        case 'commitmentTransactionAccepted':
+            if (!isLogined) { // Not loged in
+                disableInvokeAPI();
+            } else if (status != kStatusCommitmentTransactionCreated) {
+                disableInvokeAPI();
+            }
+            break;
+        case 'addInvoice':
+        case 'HTLCFindPath':
+        case 'addHTLC':
+        case 'atomicSwap':
+        case 'closeChannel':
+            if (!isLogined) { // Not loged in
+                disableInvokeAPI();
+            } else if (status < kStatusAssetFundingSigned) {
+                disableInvokeAPI();
+            }
+            break;
+        case 'HTLCSigned':
+            if (!isLogined) { // Not loged in
+                disableInvokeAPI();
+            } else if (status != kStatusAddHTLC) {
+                disableInvokeAPI();
+            }
+            break;
+        case 'forwardR':
+            if (!isLogined) { // Not loged in
+                disableInvokeAPI();
+            } else if (status != kStatusHTLCSigned) {
+                disableInvokeAPI();
+            }
+            break;
+        case 'signR':
+            if (!isLogined) { // Not loged in
+                disableInvokeAPI();
+            } else if (status != kStatusForwardR) {
+                disableInvokeAPI();
+            }
+            break;
+        case 'closeHTLC':
+            if (!isLogined) { // Not loged in
+                disableInvokeAPI();
+            } else if (status != kStatusSignR) {
+                disableInvokeAPI();
+            }
+            break;
+        case 'closeHTLCSigned':
+            if (!isLogined) { // Not loged in
+                disableInvokeAPI();
+            } else if (status != kStatusCloseHTLC) {
+                disableInvokeAPI();
+            }
+            break;
+        case 'closeChannelSigned':
+            if (!isLogined) { // Not loged in
+                disableInvokeAPI();
+            } else if (status != kStatusCloseChannel) {
+                disableInvokeAPI();
+            }
+            break;
+        case 'acceptSwap':
+            if (!isLogined) { // Not loged in
+                disableInvokeAPI();
+            } else if (status != kStatusAtomicSwap) {
+                disableInvokeAPI();
+            }
+            break;
         default:
             break;
     }
+}
 
+/**
+ * 
+ * @param obj 
+ */
+async function autoFillValue(obj) {
+
+    changeInvokeAPIEnable();
 
     let data;
     let msgType = Number(obj.getAttribute("type_id"));
@@ -3241,7 +3389,7 @@ function sdkGenMnemonic() {
 function sdkGenAddressFromMnemonic() {
     if (!isLogined) { // Not logined
         alert('Please login first.');
-        return;
+        return '';
     }
 
     let index = getNewAddrIndex($("#logined").text());
@@ -4639,15 +4787,15 @@ function goNextStep(apiName) {
 /**
  * 
  */
-function alreadyLogin() {
+// function alreadyLogin() {
 
-    disableInvokeAPI();
+//     disableInvokeAPI();
 
-    let div_resp = document.createElement('div');
-    div_resp.setAttribute('class', 'resp_area');
-    createElement(div_resp, 'text', 'You have logged in.');
-    $("#name_req_div").append(div_resp);
-}
+//     let div_resp = document.createElement('div');
+//     div_resp.setAttribute('class', 'resp_area');
+//     createElement(div_resp, 'text', 'You have logged in.');
+//     $("#name_req_div").append(div_resp);
+// }
 
 /**
  * 
@@ -4913,6 +5061,8 @@ function getChannelIDFromTopRight(obj) {
  * @param channel_id 
  */
 async function switchChannel(user_id, channel_id) {
+
+    changeInvokeAPIEnable();
 
     let isFunder = await getIsFunder(user_id, channel_id);
     let status   = await getChannelStatus(channel_id, isFunder);

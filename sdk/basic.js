@@ -42,7 +42,6 @@ function acceptChannel(myUserID, nodeID, userID, info) {
             let channel_id = e.temporary_channel_id;
             let privkey    = getPrivKeyFromPubKey(myUserID, info.funding_pubkey);
             saveFundingPrivKey(myUserID, channel_id, privkey);
-            // saveCounterparty(myUserID, channel_id, nodeID, userID);
             saveChannelStatus(myUserID, channel_id, false, kStatusAcceptChannel);
             saveChannelAddr(channel_id, e.channel_address);
             resolve(true);

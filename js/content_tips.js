@@ -369,7 +369,7 @@ const kStatusCloseChannel = 24;
 /**
  * closeChannelSigned done
  */
-const kStatusCloseChannelSigned = 25;
+const kStatusCloseChannelSigned = 0;
 
 /**
  * atomicSwap done
