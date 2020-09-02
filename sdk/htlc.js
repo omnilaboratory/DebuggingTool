@@ -28,7 +28,7 @@ function HTLCFindPath(myUserID, channel_id, info) {
             // saveRoutingPacket(e.routing_packet);
             // saveCltvExpiry(e.min_cltv_expiry);
             saveHTLCPathData(myUserID, channel_id, e.h, e.routing_packet, e.cltv_expiry);
-            resolve(true);
+            resolve(e);
         });
     })
 }
@@ -73,7 +73,7 @@ function HTLCSigned(myUserID, nodeID, userID, info) {
             saveTempPrivKey(myUserID, kRsmcTempPrivKey, e.channel_id, info.curr_rsmc_temp_address_private_key);
             saveTempPrivKey(myUserID, kHtlcTempPrivKey, e.channel_id, info.curr_htlc_temp_address_private_key);
             saveChannelStatus(myUserID, e.channel_id, false, kStatusHTLCSigned);
-            resolve(true);
+            resolve(e);
         });
     })
 }

@@ -24,8 +24,8 @@ async function listening110032(e, netType) {
     saveChannelStatus(myUserID, channel_id, false, kStatusOpenChannel);
     saveCounterparty(myUserID, channel_id, nodeID, userID);
 
-    if (isAutoMode === 'No' || isAutoMode === null) return;
-    
+    if (isAutoMode != 'Yes') return;
+
     console.info('SDK: listening110032 = ' + JSON.stringify(e));
     
     let info                  = new AcceptChannelInfo();
@@ -69,8 +69,8 @@ async function listening110034(e) {
     let channel_id = e.temporary_channel_id;
     saveChannelStatus(myUserID, channel_id, false, kStatusAssetFundingCreated);
 
-    if (isAutoMode === 'No' || isAutoMode === null) return;
-    
+    if (isAutoMode != 'Yes') return;
+
     console.info('listening110034 = ' + JSON.stringify(e));
 
     let nodeID   = e.funder_node_address;
@@ -156,8 +156,8 @@ async function listening110040(e, netType) {
     saveTempData(myUserID, e.channel_id, e.payer_commitment_tx_hash);
     saveChannelStatus(myUserID, e.channel_id, false, kStatusAddHTLC);
 
-    if (isAutoMode === 'No' || isAutoMode === null) return;
-    
+    if (isAutoMode != 'Yes') return;
+
     console.info('listening110040 = ' + JSON.stringify(e));
 
     let nodeID   = e.payer_node_address;
@@ -169,6 +169,8 @@ async function listening110040(e, netType) {
     saveAddress(myUserID, addr_2);
 
     // will send -100041 HTLCSigned
+    // is payInvoice Step 3 also
+
     let info                                = new HtlcSignedInfo();
     info.payer_commitment_tx_hash           = e.payer_commitment_tx_hash;
     info.curr_rsmc_temp_address_pub_key     = addr_1.result.pubkey;
@@ -179,10 +181,54 @@ async function listening110040(e, netType) {
     info.channel_address_private_key        = await getFundingPrivKey(myUserID, e.channel_id);
 
     // SDK API
-    HTLCSigned(myUserID, nodeID, userID, info);
+    let e = await HTLCSigned(myUserID, nodeID, userID, info);
 
     // NOT SDK API. This a client function, just for Debugging Tool.
     displaySentMessage100041(nodeID, userID, info);
+
+    //------------------------
+    // If is payInvoice case, will send -100045 forwardR
+    // payInvoice Step 4
+    // Can not automatically input R, so step 4 must be manually.
+
+    // payInvoiceStep4(e);
+}
+
+/**
+ * payInvoice Step 4, -100045 forwardR
+ * @param e 
+ */
+function payInvoiceStep4(e) {
+
+    // let isInPayInvoice = getPayInvoiceCase();
+    // console.info('isInPayInvoice = ' + isInPayInvoice);
+
+    // // Not in pay invoice case
+    // if (isInPayInvoice != 'Yes') return;
+
+    // if (e === null) {
+    //     alert("HTLCSigned failed. payInvoice paused.");
+    //     return;
+    // }
+
+    // send -100045 forwardR
+
+    // let nodeID      = $("#recipient_node_peer_id").val();
+    // let userID      = $("#recipient_user_peer_id").val();
+
+    // let info        = new ForwardRInfo();
+    // info.channel_id = $("#channel_id").val();
+    // info.r          = $("#r").val();
+    // info.channel_address_private_key                 = $("#channel_address_private_key").val();
+    // info.curr_htlc_temp_address_for_he1b_pub_key     = $("#curr_htlc_temp_address_for_he1b_pub_key").val();
+    // info.curr_htlc_temp_address_for_he1b_private_key = $("#curr_htlc_temp_address_for_he1b_private_key").val();
+
+    // // Save address index to OBD and can get private key back if lose it.
+    // info.curr_htlc_temp_address_for_he1b_index = Number(getIndexFromPubKey(info.curr_htlc_temp_address_for_he1b_pub_key));
+
+    // displaySentMessage100045(nodeID, userID, info);
+    // await forwardR($("#logined").text(), nodeID, userID, info);
+    // afterForwardR();
 }
 
 /**
@@ -209,14 +255,21 @@ async function listening110045(e) {
     saveForwardR(e.r);
     saveChannelStatus(myUserID, e.channel_id, true, kStatusForwardR);
 
-    if (isAutoMode === 'No' || isAutoMode === null) return;
-    
+    if (isAutoMode != 'Yes') {  // auto mode closed
+        let isInPayInvoice = getPayInvoiceCase();
+        console.info('isInPayInvoice = ' + isInPayInvoice);
+        // Not in pay invoice case
+        if (isInPayInvoice != 'Yes') return;
+    }
+
     console.info('listening110045 = ' + JSON.stringify(e));
     
     let nodeID   = e.payee_node_address;
     let userID   = e.payee_peer_id;
 
     // Alice will send -100046 signR
+    // is payInvoice Step 5 also
+
     let info                         = new SignRInfo();
     info.channel_id                  = e.channel_id;
     info.r                           = e.r;
@@ -228,6 +281,32 @@ async function listening110045(e) {
 
     // NOT SDK API. This a client function, just for Debugging Tool.
     displaySentMessage100046(nodeID, userID, info);
+
+    //------------------------
+    // If is payInvoice case, will send -100049 closeHTLC
+    // payInvoice Step 6
+
+    payInvoiceStep6(e);
+}
+
+/**
+ * payInvoice Step 4, -100045 forwardR
+ * @param e 
+ */
+function payInvoiceStep6(e) {
+
+    let isInPayInvoice = getPayInvoiceCase();
+    console.info('isInPayInvoice = ' + isInPayInvoice);
+
+    // Not in pay invoice case
+    if (isInPayInvoice != 'Yes') return;
+
+    if (e === null) {
+        alert("signR failed. payInvoice paused.");
+        return;
+    }
+
+    // send -100049 closeHTLC
 }
 
 /**
@@ -254,8 +333,8 @@ async function listening110049(e, netType) {
     saveTempData(myUserID, e.channel_id, e.msg_hash);
     saveChannelStatus(myUserID, e.channel_id, false, kStatusCloseHTLC);
 
-    if (isAutoMode === 'No' || isAutoMode === null) return;
-    
+    if (isAutoMode != 'Yes') return;
+
     console.info('listening110049 = ' + JSON.stringify(e));
 
     let nodeID   = e.sender_node_address;
@@ -333,8 +412,8 @@ async function listening110340(e) {
             
     saveTempData(myUserID, channel_id, e.funding_txid);
 
-    if (isAutoMode === 'No' || isAutoMode === null) return;
-    
+    if (isAutoMode != 'Yes') return;
+
     console.info('listening110340 = ' + JSON.stringify(e));
 
     let nodeID   = e.funder_node_address;
@@ -394,8 +473,8 @@ async function listening110351(e, netType) {
     saveTempData(myUserID, e.channel_id, e.msg_hash);
     saveChannelStatus(myUserID, e.channel_id, false, kStatusCommitmentTransactionCreated);
 
-    if (isAutoMode === 'No' || isAutoMode === null) return;
-    
+    if (isAutoMode != 'Yes') return;
+
     console.info('listening110351 = ' + JSON.stringify(e));
 
     let nodeID   = e.payer_node_address;

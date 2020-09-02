@@ -45,6 +45,11 @@ const kHtlcHtnxTempPrivKey = 'htlc_htnx_temp_priv_key';
 const kAutoPilot = 'auto_pilot';
 
 /**
+ * Save pay invoice case
+ */
+const kPayInvoiceCase = 'pay_invoice_case';
+
+/**
  * Object of IndexedDB.
  */
 var db;
@@ -102,6 +107,12 @@ const kTbHTLCPathData = 'tb_htlc_path_data';
  * tb_channel_addr
  */
 const kTbForwardR = 'tb_forward_r';
+
+/**
+ * Object Store (table) name of IndexedDB.
+ * tb_channel_addr
+ */
+const kTbInvoiceR = 'tb_invoice_r';
 
 /**
  * Object Store (table) name of IndexedDB.
@@ -857,6 +868,59 @@ function getMnemonic(myUserID, param) {
 }
 
 /**
+ * save r from addInvoice type ( -100402 )
+ * @param myUserID
+ * @param channel_id
+ * @param r
+ */
+function saveInvoiceR(myUserID, channel_id, r) {
+
+    let key     = myUserID + channel_id;
+    let request = db.transaction([kTbInvoiceR], 'readwrite')
+        .objectStore(kTbInvoiceR)
+        .put({ key: key, r: r });
+  
+    request.onsuccess = function (e) {
+        // console.log('Data write success.');
+    };
+  
+    request.onerror = function (e) {
+        // console.log('Data write false.');
+    }
+}
+
+/**
+ * get r from addInvoice type ( -100402 )
+ * @param myUserID 
+ * @param channel_id
+ */
+function getInvoiceR(myUserID, channel_id) {
+
+    return new Promise((resolve, reject) => {
+
+        let key         = myUserID + channel_id;
+        let transaction = db.transaction([kTbInvoiceR], 'readonly');
+        let store       = transaction.objectStore(kTbInvoiceR);
+        let request     = store.get(key);
+    
+        request.onerror = function(e) {
+            console.log('Read data false.');
+            reject('Read data false.');
+        };
+    
+        request.onsuccess = function (e) {
+            if (request.result) {
+                console.log('getInvoiceR = ' + request.result.r);
+                resolve(request.result.r);
+            } else {
+                console.log('getInvoiceR = No Data.');
+                resolve('');
+            }
+        }
+    })
+}
+
+/**
  * save r from forwardR type ( -100045 ) return
  * @param myUserID
  * @param channel_id
@@ -922,6 +986,21 @@ function saveAutoPilot(value) {
  */
 function getAutoPilot() {
     return localStorage.getItem(kAutoPilot);
+}
+
+/**
+ * Save auto pilot status
+ * @param value Yes or No
+ */
+function savePayInvoiceCase(value) {
+    localStorage.setItem(kPayInvoiceCase, value);
+}
+
+/**
+ * Get auto pilot status
+ */
+function getPayInvoiceCase() {
+    return localStorage.getItem(kPayInvoiceCase);
 }
 
 /**
@@ -1184,6 +1263,11 @@ function openDB() {
         let os9;
         if (!db.objectStoreNames.contains(kTbForwardR)) {
             os9 = db.createObjectStore(kTbForwardR, { keyPath: 'key' });
+        }
+
+        let os10;
+        if (!db.objectStoreNames.contains(kTbInvoiceR)) {
+            os10 = db.createObjectStore(kTbInvoiceR, { keyPath: 'key' });
         }
     }
 }

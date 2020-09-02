@@ -605,9 +605,87 @@ function sdkAddInvoice() {
     // SDK API
     addInvoice(info, function(e) {
         console.info('-100402 sdkAddInvoice = ' + JSON.stringify(e));
+
+        let myUserID   = $("#logined").text();
+        let channel_id = $("#curr_channel_id").text();
+        let r          = getPrivKeyFromPubKey(myUserID, info.h);
+        saveInvoiceR(myUserID, channel_id, r);
+
         displaySentMessage100402(info);
         makeQRCode(e);
     });
+}
+
+/**
+ * automatically transfer asset to counterparty
+ */
+async function payInvoice() {
+
+    let myUserID   = $("#logined").text();
+    let channel_id = $("#curr_channel_id").text();
+
+    // Step 1: HTLCFindPath
+    let info     = new HTLCFindPathInfo();
+    info.invoice = $("#invoice").val();
+    
+    displaySentMessage100401(info, true);
+    let e = await HTLCFindPath(myUserID, channel_id, info);
+    
+    savePayInvoiceCase('Yes');
+
+    // Step 2: addHTLC
+    payInvoiceStep2(e, myUserID, channel_id);
+}
+
+/**
+ * Step 2: addHTLC
+ * @param e
+ * @param myUserID
+ * @param channel_id
+ */
+async function payInvoiceStep2(e, myUserID, channel_id) {
+
+    if (e === null) {
+        alert("HTLCFindPath failed. No path found.");
+        return;
+    }
+    
+    // automatically invoke addHTLC
+    let result = await getCounterparty(myUserID, channel_id);
+    let nodeID = result.toNodeID;
+    let userID = result.toUserID;
+    
+    let info                            = new addHTLCInfo();
+    info.recipient_user_peer_id         = userID;
+    info.h                              = e.h;
+    info.routing_packet                 = e.routing_packet;
+    info.amount                         = e.amount;
+    info.channel_address_private_key    = await getFundingPrivKey(myUserID, channel_id);
+    info.last_temp_address_private_key  = getTempPrivKey(myUserID, kTempPrivKey, channel_id);
+
+    result = sdkGenAddressFromMnemonic();
+    saveAddress(myUserID, result);
+    info.curr_rsmc_temp_address_pub_key     = result.result.pubkey;
+    info.curr_rsmc_temp_address_private_key = result.result.wif;
+
+    result = sdkGenAddressFromMnemonic();
+    saveAddress(myUserID, result);
+    info.curr_htlc_temp_address_pub_key     = result.result.pubkey;
+    info.curr_htlc_temp_address_private_key = result.result.wif;
+
+    result = sdkGenAddressFromMnemonic();
+    saveAddress(myUserID, result);
+    info.curr_htlc_temp_address_for_ht1a_pub_key     = result.result.pubkey;
+    info.curr_htlc_temp_address_for_ht1a_private_key = result.result.wif;
+
+    // Save address index to OBD and can get private key back if lose it.
+    info.curr_rsmc_temp_address_index          = Number(getIndexFromPubKey(info.curr_rsmc_temp_address_pub_key));
+    info.curr_htlc_temp_address_index          = Number(getIndexFromPubKey(info.curr_htlc_temp_address_pub_key));
+    info.curr_htlc_temp_address_for_ht1a_index = Number(getIndexFromPubKey(info.curr_htlc_temp_address_for_ht1a_pub_key));
+
+    displaySentMessage100040(nodeID, userID, info);
+    await addHTLC(myUserID, nodeID, userID, info);
+    afterAddHTLC();
 }
 
 /**
@@ -766,6 +844,9 @@ function invokeAPIs(obj) {
     console.info('type_id = ' + msgType);
 
     switch (msgType) {
+        case -10: // payInvoice is a local solution.
+            payInvoice();
+            break;
         case enumMsgType.MsgType_Core_Omni_Getbalance_2112:
             sdkGetAllBalancesForAddress();
             break;

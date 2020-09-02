@@ -699,6 +699,17 @@
             ]
         },
         {
+            "id": "payInvoice",
+            "type_id": -10,
+            "description": "payInvoice is used to automatically transfer asset to counterparty.",
+            "parameters": [
+                {
+                    "name": "invoice",
+                    "buttons": []
+                }
+            ]
+        },
+        {
             "id": "HTLCFindPath",
             "type_id": -100401,
             "description": "HTLCFindPath is used to find a routing between A and B node for launch a HTLC transfer.",
