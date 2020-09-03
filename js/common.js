@@ -638,7 +638,7 @@ async function payInvoice() {
 }
 
 /**
- * Step 2: addHTLC
+ * Step 2: -100040 addHTLC
  * @param e
  * @param myUserID
  * @param channel_id
@@ -1728,6 +1728,9 @@ async function autoFillValue(obj) {
     changeInvokeAPIEnable();
 
     let data;
+    let myUserID   = $("#logined").text();
+    let channel_id = $("#curr_channel_id").text();
+
     let msgType = Number(obj.getAttribute("type_id"));
     switch (msgType) {
         case enumMsgType.MsgType_HTLC_FindPath_401:
@@ -1745,7 +1748,7 @@ async function autoFillValue(obj) {
         case enumMsgType.MsgType_SendChannelAccept_33:
             if (!isLogined) return;  // Not logined
             fillCounterparty();
-            $("#temporary_channel_id").val($("#curr_channel_id").text());
+            $("#temporary_channel_id").val(channel_id);
             break;
 
         case enumMsgType.MsgType_Core_FundingBTC_2109:
@@ -1764,7 +1767,7 @@ async function autoFillValue(obj) {
             fillCounterparty();
             fillTempChannelIDAndFundingPrivKey();
 
-            data = await getTempData($("#logined").text(), $("#curr_channel_id").text());
+            data = await getTempData(myUserID, channel_id);
             if (msgType === enumMsgType.MsgType_FundingSign_SendBtcSign_350) {
                 $("#funding_txid").val(data);
             } else {
@@ -1777,7 +1780,7 @@ async function autoFillValue(obj) {
             fillCounterparty();
             fillTempChannelIDAndFundingPrivKey();
 
-            data = await getTempData($("#logined").text(), $("#curr_channel_id").text());
+            data = await getTempData(myUserID, channel_id);
             $("#funding_tx_hex").val(data);
             fillTempAddrKey();
             break;
@@ -1792,9 +1795,9 @@ async function autoFillValue(obj) {
         case enumMsgType.MsgType_SendCloseChannelSign_39:
             if (!isLogined) return;  // Not logined
             fillCounterparty();
-            $("#channel_id").val($("#curr_channel_id").text());
+            $("#channel_id").val(channel_id);
             if (msgType === enumMsgType.MsgType_SendCloseChannelSign_39) {
-                data = await getTempData($("#logined").text(), $("#curr_channel_id").text());
+                data = await getTempData(myUserID, channel_id);
                 $("#request_close_channel_hash").val(data);
             }
             break;
@@ -1805,7 +1808,7 @@ async function autoFillValue(obj) {
             fillCounterparty();
             fillChannelFundingLastTempKeys();
             if (msgType === enumMsgType.MsgType_CommitmentTxSigned_SendRevokeAndAcknowledgeCommitmentTransaction_352) {
-                data = await getTempData($("#logined").text(), $("#curr_channel_id").text());
+                data = await getTempData(myUserID, channel_id);
                 $("#msg_hash").val(data);
             }
             fillCurrTempAddrKey();
@@ -1829,7 +1832,7 @@ async function autoFillValue(obj) {
         case enumMsgType.MsgType_HTLC_SendAddHTLCSigned_41:
             if (!isLogined) return;  // Not logined
             fillCounterparty();
-            data = await getTempData($("#logined").text(), $("#curr_channel_id").text());
+            data = await getTempData(myUserID, channel_id);
             $("#payer_commitment_tx_hash").val(data);
             fillChannelFundingLastTempKeys();
             fillCurrRsmcTempKey();
@@ -1847,34 +1850,32 @@ async function autoFillValue(obj) {
             if (!isLogined) return;  // Not logined
             fillCounterparty();
             fillChannelIDAndFundingPrivKey();
-            data = await getTempData($("#logined").text(), $("#curr_channel_id").text());
+            data = await getTempData(myUserID, channel_id);
             $("#msg_hash").val(data);
-            $("#r").val(getForwardR());
+            $("#r").val(getForwardR(myUserID, channel_id));
             break;
 
         case enumMsgType.MsgType_HTLC_SendRequestCloseCurrTx_49:
         case enumMsgType.MsgType_HTLC_SendCloseSigned_50:
             if (!isLogined) return;  // Not logined
             fillCounterparty();
-
-            let channelID = $("#curr_channel_id").text();
-            $("#channel_id").val(channelID);
+            $("#channel_id").val(channel_id);
 
             if (msgType === enumMsgType.MsgType_HTLC_SendCloseSigned_50) {
-                data = await getTempData($("#logined").text(), channelID);
+                data = await getTempData(myUserID, channel_id);
                 $("#msg_hash").val(data);
             }
 
-            let fundingPrivKey = await getFundingPrivKey($("#logined").text(), channelID);
+            let fundingPrivKey = await getFundingPrivKey(myUserID, channel_id);
             $("#channel_address_private_key").val(fundingPrivKey);
 
-            let privkey_1 = getTempPrivKey($("#logined").text(), kRsmcTempPrivKey, channelID);
+            let privkey_1 = getTempPrivKey(myUserID, kRsmcTempPrivKey, channel_id);
             $("#last_rsmc_temp_address_private_key").val(privkey_1);
 
-            let privkey_2 = getTempPrivKey($("#logined").text(), kHtlcTempPrivKey, channelID);
+            let privkey_2 = getTempPrivKey(myUserID, kHtlcTempPrivKey, channel_id);
             $("#last_htlc_temp_address_private_key").val(privkey_2);
 
-            let privkey_3 = getTempPrivKey($("#logined").text(), kHtlcHtnxTempPrivKey, channelID);
+            let privkey_3 = getTempPrivKey(myUserID, kHtlcHtnxTempPrivKey, channel_id);
             $("#last_htlc_temp_address_for_htnx_private_key").val(privkey_3);
 
             fillCurrRsmcTempKey();

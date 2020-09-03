@@ -204,8 +204,21 @@ function getAllCounterpartyFromUserID(myUserID) {
                     toNodeID: result.value.toNodeID,
                     toUserID: result.value.toUserID
                 };
-                data.push(value);
+
+                let hasRepeat = false;
+                for (let i = 0; i < data.length; i++) {
+                    if ( (value.toNodeID === data[i].toNodeID) && 
+                         (value.toUserID === data[i].toUserID) ) {
+
+                        hasRepeat = true;
+                    }
+                }
+
+                if (!hasRepeat) { // No repeat
+                    data.push(value);
+                }
                 result.continue();
+                
             } else {
                 console.log('getAllCounterpartyFromUserID No More Data.');
                 console.log('getAllCounterpartyFromUserID = ' + JSON.stringify(data));

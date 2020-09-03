@@ -27,7 +27,8 @@ async function listening110032(e, netType) {
     if (isAutoMode != 'Yes') return;
 
     console.info('SDK: listening110032 = ' + JSON.stringify(e));
-    
+
+    // will send -100033 acceptChannel
     let info                  = new AcceptChannelInfo();
     info.temporary_channel_id = channel_id;
     info.approval             = true;
@@ -39,6 +40,9 @@ async function listening110032(e, netType) {
         info.funding_pubkey = addr.result.pubkey;
         isExist = await checkChannelAddessExist(nodeID, userID, info);
     }
+
+    // Save address index to OBD and can get private key back if lose it.
+    info.fundee_address_index = Number(getIndexFromPubKey(info.funding_pubkey));
 
     // SDK API send -100033 acceptChannel
     acceptChannel(myUserID, nodeID, userID, info);
@@ -168,7 +172,7 @@ async function listening110040(e, netType) {
     saveAddress(myUserID, addr_1);
     saveAddress(myUserID, addr_2);
 
-    // will send -100041 HTLCSigned
+    // Bob will send -100041 HTLCSigned
     // is payInvoice Step 3 also
 
     let info                                = new HtlcSignedInfo();
@@ -180,6 +184,10 @@ async function listening110040(e, netType) {
     info.last_temp_address_private_key      = getTempPrivKey(myUserID, kTempPrivKey, e.channel_id);
     info.channel_address_private_key        = await getFundingPrivKey(myUserID, e.channel_id);
 
+    // Save address index to OBD and can get private key back if lose it.
+    info.curr_rsmc_temp_address_index = Number(getIndexFromPubKey(addr_1.result.pubkey));
+    info.curr_htlc_temp_address_index = Number(getIndexFromPubKey(addr_2.result.pubkey));
+
     // SDK API
     let resp = await HTLCSigned(myUserID, nodeID, userID, info);
 
@@ -188,46 +196,50 @@ async function listening110040(e, netType) {
 
     //------------------------
     // If is payInvoice case, will send -100045 forwardR
-    // payInvoice Step 4
-    // Can not automatically input R, so step 4 must be manually.
-
-    // payInvoiceStep4(e);
+    let fundingPrivKey = info.channel_address_private_key;
+    payInvoiceStep4(myUserID, resp, nodeID, userID, e.channel_id, fundingPrivKey);
 }
 
 /**
- * payInvoice Step 4, -100045 forwardR
+ * payInvoice Step 4, Bob will send -100045 forwardR
+ * @param myUserID 
  * @param e 
+ * @param nodeID 
+ * @param userID 
+ * @param channel_id
+ * @param fundingPrivKey
  */
-function payInvoiceStep4(e) {
+async function payInvoiceStep4(myUserID, e, nodeID, userID, channel_id, fundingPrivKey) {
 
-    // let isInPayInvoice = getPayInvoiceCase();
-    // console.info('isInPayInvoice = ' + isInPayInvoice);
+    let isInPayInvoice = getPayInvoiceCase();
+    console.info('isInPayInvoice = ' + isInPayInvoice);
 
-    // // Not in pay invoice case
-    // if (isInPayInvoice != 'Yes') return;
+    // Not in pay invoice case
+    if (isInPayInvoice != 'Yes') return;
 
-    // if (e === null) {
-    //     alert("HTLCSigned failed. payInvoice paused.");
-    //     return;
-    // }
+    if (e === null) {
+        alert("HTLCSigned failed. payInvoice paused.");
+        return;
+    }
 
-    // send -100045 forwardR
+    // Bob will send -100045 forwardR
 
-    // let nodeID      = $("#recipient_node_peer_id").val();
-    // let userID      = $("#recipient_user_peer_id").val();
+    let info        = new ForwardRInfo();
+    info.channel_id = channel_id;
+    info.r          = await getInvoiceR(myUserID, channel_id);
+    
+    let result = genNewAddress(myUserID, true);
+    saveAddress(myUserID, result);
 
-    // let info        = new ForwardRInfo();
-    // info.channel_id = $("#channel_id").val();
-    // info.r          = $("#r").val();
-    // info.channel_address_private_key                 = $("#channel_address_private_key").val();
-    // info.curr_htlc_temp_address_for_he1b_pub_key     = $("#curr_htlc_temp_address_for_he1b_pub_key").val();
-    // info.curr_htlc_temp_address_for_he1b_private_key = $("#curr_htlc_temp_address_for_he1b_private_key").val();
+    info.curr_htlc_temp_address_for_he1b_pub_key     = result.result.pubkey;
+    info.curr_htlc_temp_address_for_he1b_private_key = result.result.wif;
+    info.channel_address_private_key                 = fundingPrivKey;
 
-    // // Save address index to OBD and can get private key back if lose it.
-    // info.curr_htlc_temp_address_for_he1b_index = Number(getIndexFromPubKey(info.curr_htlc_temp_address_for_he1b_pub_key));
+    // Save address index to OBD and can get private key back if lose it.
+    info.curr_htlc_temp_address_for_he1b_index = Number(getIndexFromPubKey(result.result.pubkey));
 
-    // displaySentMessage100045(nodeID, userID, info);
-    // await forwardR($("#logined").text(), nodeID, userID, info);
+    displaySentMessage100045(nodeID, userID, info);
+    await forwardR(myUserID, nodeID, userID, info);
     // afterForwardR();
 }
 
@@ -252,7 +264,7 @@ async function listening110045(e) {
     let myUserID = e.to_peer_id;
 
     saveTempData(myUserID, e.channel_id, e.msg_hash);
-    saveForwardR(e.r);
+    saveForwardR(myUserID, e.channel_id, e.r);
     saveChannelStatus(myUserID, e.channel_id, true, kStatusForwardR);
 
     if (isAutoMode != 'Yes') {  // auto mode closed
@@ -277,26 +289,30 @@ async function listening110045(e) {
     info.channel_address_private_key = await getFundingPrivKey(myUserID, e.channel_id);
 
     // SDK API
-    signR(nodeID, userID, info);
+    let resp = await signR(nodeID, userID, info);
 
     // NOT SDK API. This a client function, just for Debugging Tool.
     displaySentMessage100046(nodeID, userID, info);
 
     //------------------------
-    // If is payInvoice case, will send -100049 closeHTLC
-    // payInvoice Step 6
-
-    payInvoiceStep6(e);
+    // If is payInvoice case, Alice will send -100049 closeHTLC
+    let fundingPrivKey = info.channel_address_private_key;
+    payInvoiceStep6(myUserID, resp, nodeID, userID, e.channel_id, fundingPrivKey);
 }
 
 /**
- * payInvoice Step 4, -100045 forwardR
+ * payInvoice Step 6, Alice will send -100049 closeHTLC
+ * @param myUserID 
  * @param e 
+ * @param nodeID 
+ * @param userID 
+ * @param channel_id 
+ * @param fundingPrivKey 
  */
-function payInvoiceStep6(e) {
+async function payInvoiceStep6(myUserID, e, nodeID, userID, channel_id, fundingPrivKey) {
 
     let isInPayInvoice = getPayInvoiceCase();
-    console.info('isInPayInvoice = ' + isInPayInvoice);
+    console.info('payInvoiceStep6 isInPayInvoice = ' + isInPayInvoice);
 
     // Not in pay invoice case
     if (isInPayInvoice != 'Yes') return;
@@ -306,7 +322,32 @@ function payInvoiceStep6(e) {
         return;
     }
 
-    // send -100049 closeHTLC
+    // Alice will send -100049 closeHTLC
+
+    let info                                         = new CloseHtlcTxInfo();
+    info.channel_id                                  = channel_id;
+    info.channel_address_private_key                 = fundingPrivKey;
+
+    let privkey_1 = getTempPrivKey(myUserID, kRsmcTempPrivKey, channel_id);
+    let privkey_2 = getTempPrivKey(myUserID, kHtlcTempPrivKey, channel_id);
+    let privkey_3 = getTempPrivKey(myUserID, kHtlcHtnxTempPrivKey, channel_id);
+
+    info.last_rsmc_temp_address_private_key          = privkey_1;
+    info.last_htlc_temp_address_private_key          = privkey_2;
+    info.last_htlc_temp_address_for_htnx_private_key = privkey_3;
+    
+    let result = genNewAddress(myUserID, true);
+    saveAddress(myUserID, result);
+
+    info.curr_rsmc_temp_address_pub_key     = result.result.pubkey;
+    info.curr_rsmc_temp_address_private_key = result.result.wif;
+
+    // Save address index to OBD and can get private key back if lose it.
+    info.curr_rsmc_temp_address_index = Number(getIndexFromPubKey(result.result.pubkey));
+
+    displaySentMessage100049(nodeID, userID, info);
+    await closeHTLC(myUserID, nodeID, userID, info);
+    // afterCloseHTLC();
 }
 
 /**
@@ -333,7 +374,12 @@ async function listening110049(e, netType) {
     saveTempData(myUserID, e.channel_id, e.msg_hash);
     saveChannelStatus(myUserID, e.channel_id, false, kStatusCloseHTLC);
 
-    if (isAutoMode != 'Yes') return;
+    if (isAutoMode != 'Yes') {  // auto mode closed
+        let isInPayInvoice = getPayInvoiceCase();
+        console.info('listening110049 isInPayInvoice = ' + isInPayInvoice);
+        // Not in pay invoice case
+        if (isInPayInvoice != 'Yes') return;
+    }
 
     console.info('listening110049 = ' + JSON.stringify(e));
 
@@ -344,6 +390,8 @@ async function listening110049(e, netType) {
     saveAddress(myUserID, addr);
     
     // will send -100050 CloseHTLCSigned
+    // is payInvoice Step 7 also
+
     let info                                         = new CloseHtlcTxInfoSigned();
     info.msg_hash                                    = e.msg_hash;
     info.channel_address_private_key                 = await getFundingPrivKey(myUserID, e.channel_id);
@@ -352,6 +400,9 @@ async function listening110049(e, netType) {
     info.last_htlc_temp_address_for_htnx_private_key = getTempPrivKey(myUserID, kHtlcHtnxTempPrivKey, e.channel_id);
     info.curr_rsmc_temp_address_pub_key              = addr.result.pubkey;
     info.curr_rsmc_temp_address_private_key          = addr.result.wif;
+
+    // Save address index to OBD and can get private key back if lose it.
+    info.curr_rsmc_temp_address_index = Number(getIndexFromPubKey(addr.result.pubkey));
 
     // SDK API
     closeHTLCSigned(myUserID, nodeID, userID, info);
@@ -493,6 +544,9 @@ async function listening110351(e, netType) {
     info.approval                      = true;
     info.last_temp_address_private_key = getTempPrivKey(myUserID, kTempPrivKey, e.channel_id);
     info.channel_address_private_key   = await getFundingPrivKey(myUserID, e.channel_id);
+
+    // Save address index to OBD and can get private key back if lose it.
+    info.curr_temp_address_index = Number(getIndexFromPubKey(addr.result.pubkey));
 
     // SDK API
     commitmentTransactionAccepted(myUserID, nodeID, userID, info);
