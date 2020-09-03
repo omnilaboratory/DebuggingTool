@@ -167,7 +167,7 @@ function getCounterparty(myUserID, channel_id) {
                     toNodeID: request.result.toNodeID,
                     toUserID: request.result.toUserID
                 };
-                console.log('getCounterparty = ' + JSON.stringify(data));
+                // console.log('getCounterparty = ' + JSON.stringify(data));
                 resolve(data);
             } else {
                 console.log('getCounterparty = No Data.');
@@ -218,7 +218,7 @@ function getAllCounterpartyFromUserID(myUserID) {
                     data.push(value);
                 }
                 result.continue();
-                
+
             } else {
                 console.log('getAllCounterpartyFromUserID No More Data.');
                 console.log('getAllCounterpartyFromUserID = ' + JSON.stringify(data));
@@ -397,7 +397,7 @@ function getIsFunder(user_id, channel_id) {
             let result = e.target.result;
             if (result) {
                 if (result.value.user_id === user_id) {
-                    console.log('getIsFunder - funder = ' + result.value.funder);
+                    console.log('getIsFunder = ' + result.value.funder);
                     resolve(result.value.funder);
                 } else {
                     result.continue();

@@ -1554,17 +1554,10 @@ async function fillFundingAssetData() {
 /**
  * 
  */
-async function changeInvokeAPIEnable() {
+async function changeInvokeAPIEnable(status, isFunder) {
 
     let api_name = $("#api_name").text();
-    console.info('api_name = ' + api_name);
-
-    // get channel status
-    let user_id    = $("#logined").text();
-    let channel_id = $("#curr_channel_id").text();
-    let isFunder   = await getIsFunder(user_id, channel_id);
-    let status     = await getChannelStatus(channel_id, isFunder);
-    console.info('switchChannel status = ' + status);
+    // console.info('api_name = ' + api_name);
 
     switch (api_name) {
         case 'logIn':
@@ -1589,6 +1582,10 @@ async function changeInvokeAPIEnable() {
                 // Only channel status is openChannel, the Invoke API button is enable.
                 disableInvokeAPI();
             }
+
+            if (isFunder === true) { // Is Alice
+                disableInvokeAPI();
+            }
             break;
         case 'fundingBitcoin':
             if (!isLogined) { // Not loged in
@@ -1596,6 +1593,10 @@ async function changeInvokeAPIEnable() {
             } else if (status != kStatusAcceptChannel && 
                        status != kStatusFirstBitcoinFundingSigned &&
                        status != kStatusSecondBitcoinFundingSigned   ) {
+                disableInvokeAPI();
+            }
+
+            if (isFunder === false) { // Is Bob
                 disableInvokeAPI();
             }
             break;
@@ -1607,6 +1608,10 @@ async function changeInvokeAPIEnable() {
                        status != kStatusThirdFundingBitcoin   ) {
                 disableInvokeAPI();
             }
+
+            if (isFunder === false) { // Is Bob
+                disableInvokeAPI();
+            }
             break;
         case 'bitcoinFundingSigned':
             if (!isLogined) { // Not loged in
@@ -1614,6 +1619,10 @@ async function changeInvokeAPIEnable() {
             } else if (status != kStatusFirstBitcoinFundingCreated && 
                        status != kStatusSecondBitcoinFundingCreated &&
                        status != kStatusThirdBitcoinFundingCreated   ) {
+                disableInvokeAPI();
+            }
+
+            if (isFunder === true) { // Is Alice
                 disableInvokeAPI();
             }
             break;
@@ -1625,6 +1634,10 @@ async function changeInvokeAPIEnable() {
                 // the Invoke API button is enable.
                 disableInvokeAPI();
             }
+
+            if (isFunder === false) { // Is Bob
+                disableInvokeAPI();
+            }
             break;
         case 'assetFundingCreated':
             if (!isLogined) { // Not loged in
@@ -1632,11 +1645,19 @@ async function changeInvokeAPIEnable() {
             } else if (status != kStatusFundingAsset) {
                 disableInvokeAPI();
             }
+
+            if (isFunder === false) { // Is Bob
+                disableInvokeAPI();
+            }
             break;
         case 'assetFundingSigned':
             if (!isLogined) { // Not loged in
                 disableInvokeAPI();
             } else if (status != kStatusAssetFundingCreated) {
+                disableInvokeAPI();
+            }
+
+            if (isFunder === true) { // Is Alice
                 disableInvokeAPI();
             }
             break;
@@ -1655,6 +1676,7 @@ async function changeInvokeAPIEnable() {
             }
             break;
         case 'addInvoice':
+        case 'payInvoice':
         case 'HTLCFindPath':
         case 'addHTLC':
         case 'atomicSwap':
@@ -1725,12 +1747,14 @@ async function changeInvokeAPIEnable() {
  */
 async function autoFillValue(obj) {
 
-    changeInvokeAPIEnable();
-
-    let data;
+    // get channel status
     let myUserID   = $("#logined").text();
     let channel_id = $("#curr_channel_id").text();
+    let isFunder   = await getIsFunder(myUserID, channel_id);
+    let status     = await getChannelStatus(channel_id, isFunder);
+    changeInvokeAPIEnable(status, isFunder);
 
+    let data;
     let msgType = Number(obj.getAttribute("type_id"));
     switch (msgType) {
         case enumMsgType.MsgType_HTLC_FindPath_401:
@@ -5149,10 +5173,8 @@ function tipsOnTop(channelID, tipsNextStep, butText, apiName) {
  * 
  */
 function clickLastestChannel() {
-
-    console.info('lastestChannel is --> ' + lastestChannel);
+    // console.info('lastestChannel is --> ' + lastestChannel);
     $("#curr_channel_id").text(lastestChannel);
-
     switchChannel($("#logined").text(), lastestChannel);
 }
 
@@ -5163,11 +5185,10 @@ function clickLastestChannel() {
 function getChannelIDFromTopRight(obj) {
 
     let sel_channel_id = obj.getAttribute('channel_id');
-    console.info('the channel_id is --> ' + sel_channel_id);
+    // console.info('the channel_id is --> ' + sel_channel_id);
 
     $("#div_top").hide();
     $("#curr_channel_id").text(sel_channel_id);
-
     switchChannel($("#logined").text(), sel_channel_id);
 }
 
@@ -5178,11 +5199,10 @@ function getChannelIDFromTopRight(obj) {
  */
 async function switchChannel(user_id, channel_id) {
 
-    changeInvokeAPIEnable();
-
     let isFunder = await getIsFunder(user_id, channel_id);
     let status   = await getChannelStatus(channel_id, isFunder);
-    console.info('switchChannel status = ' + status);
+    
+    changeInvokeAPIEnable(status, isFunder);
 
     switch (Number(status)) {
         case kStatusOpenChannel:
