@@ -181,7 +181,7 @@ async function listening110040(e, netType) {
     info.channel_address_private_key        = await getFundingPrivKey(myUserID, e.channel_id);
 
     // SDK API
-    let e = await HTLCSigned(myUserID, nodeID, userID, info);
+    let resp = await HTLCSigned(myUserID, nodeID, userID, info);
 
     // NOT SDK API. This a client function, just for Debugging Tool.
     displaySentMessage100041(nodeID, userID, info);
