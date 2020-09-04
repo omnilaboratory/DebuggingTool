@@ -211,7 +211,7 @@ function assetFundingSigned(myUserID, nodeID, userID, info) {
             // Once sent -100035 AssetFundingSigned , the final channel_id has generated.
             // So need update the local saved data for funding private key and channel_id.
 
-            let priv_key     = info.fundee_channel_address_private_key;
+            let priv_key     = info.channel_address_private_key;
             let tempCID      = info.temporary_channel_id;
             let channel_id   = e.channel_id;
             let channel_addr = await getChannelAddr(tempCID);

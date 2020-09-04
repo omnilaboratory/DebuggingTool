@@ -471,7 +471,7 @@
                     ]
                 },
                 {
-                    "name": "fundee_channel_address_private_key",
+                    "name": "channel_address_private_key",
                     "help": "This private key of the counterparty (Bob) address used to create the Channel Address. OBD use the private key to sign the C1a and RD1a transactions created by AssetFundingCreated (type -34).",
                     "imgPath": "doc/tooltip/34-35.png",
                     "buttons": [

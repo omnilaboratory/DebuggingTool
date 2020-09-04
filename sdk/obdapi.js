@@ -691,8 +691,8 @@ class ObdApi {
         //   info.approval = false;
         // }
         // if (info.approval == true) {
-        //   if (this.isNotString(info.fundee_channel_address_private_key)) {
-        //     alert("empty fundee_channel_address_private_key");
+        //   if (this.isNotString(info.channel_address_private_key)) {
+        //     alert("empty channel_address_private_key");
         //     return;
         //   }
         // }

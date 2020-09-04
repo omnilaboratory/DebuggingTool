@@ -548,12 +548,12 @@ async function sdkAssetFundingSigned() {
     let nodeID    = $("#recipient_node_peer_id").val();
     let userID    = $("#recipient_user_peer_id").val();
     let temp_cid  = $("#temporary_channel_id").val();
-    let privkey   = $("#fundee_channel_address_private_key").val();
+    let privkey   = $("#channel_address_private_key").val();
     // let approval   = $("#checkbox_n35").prop("checked");
 
     let info                                = new AssetFundingSignedInfo();
     info.temporary_channel_id               = temp_cid;
-    info.fundee_channel_address_private_key = privkey;
+    info.channel_address_private_key = privkey;
     // info.approval = approval;
 
     displaySentMessage100035(nodeID, userID, info);
@@ -1412,8 +1412,8 @@ function createInputParamDiv(obj, jsonFile) {
 }
 
 //
-async function fillCounterparty() {
-    let result = await getCounterparty($("#logined").text(), $("#curr_channel_id").text());
+async function fillCounterparty(myUserID, channel_id) {
+    let result = await getCounterparty(myUserID, channel_id);
     if (result === '') return;
     $("#recipient_node_peer_id").val(result.toNodeID);
     $("#recipient_user_peer_id").val(result.toUserID);
@@ -1429,35 +1429,34 @@ async function fillH_RP_CE() {
     $("#cltv_expiry").val(data.cltv_expiry);
 }
 
-//
-async function fillChannelIDAndFundingPrivKey() {
-    let channelID = $("#curr_channel_id").text();
-    $("#channel_id").val(channelID);
-
-    let fundingPrivKey = await getFundingPrivKey($("#logined").text(), channelID);
+/**
+ * 
+ * @param {*} myUserID 
+ * @param {*} channel_id 
+ */
+async function fillChannelIDAndFundingPrivKey(myUserID, channel_id) {
+    let fundingPrivKey = await getFundingPrivKey(myUserID, channel_id);
     $("#channel_address_private_key").val(fundingPrivKey);
+    $("#channel_id").val(channel_id);
 }
 
-//
-function fillChannelFundingLastTempKeys() {
-    fillChannelIDAndFundingPrivKey();
-    let channel_id  = $("#curr_channel_id").text();
-    let tempPrivKey = getTempPrivKey($("#logined").text(), kTempPrivKey, channel_id);
+/**
+ * 
+ * @param {*} myUserID 
+ * @param {*} channel_id 
+ */
+function fillChannelFundingLastTempKeys(myUserID, channel_id) {
+    fillChannelIDAndFundingPrivKey(myUserID, channel_id);
+    let tempPrivKey = getTempPrivKey(myUserID, kTempPrivKey, channel_id);
     $("#last_temp_address_private_key").val(tempPrivKey);
 }
 
 //
-async function fillTempChannelIDAndFundingPrivKey(msgType) {
-    let channelID = $("#curr_channel_id").text();
-    $("#temporary_channel_id").val(channelID);
+async function fillTempChannelIDAndFundingPrivKey(myUserID, channel_id) {
 
-    let fundingPrivKey = await getFundingPrivKey($("#logined").text(), channelID);
-
-    if (msgType === 35) {
-        $("#fundee_channel_address_private_key").val(fundingPrivKey);
-    } else {
-        $("#channel_address_private_key").val(fundingPrivKey);
-    }
+    $("#temporary_channel_id").val(channel_id);
+    let fundingPrivKey = await getFundingPrivKey(myUserID, channel_id);
+    $("#channel_address_private_key").val(fundingPrivKey);
 }
 
 //
@@ -1527,37 +1526,36 @@ function fillCurrHtlcHt1aTempKey() {
 }
 
 //
-async function fillFundingBtcData() {
+async function fillFundingBtcData(myUserID, channel_id) {
 
-    let channel_id = $("#curr_channel_id").text();
-    $("#to_address").val(await getChannelAddr(channel_id));
-
-    let result = await getFundingBtcData($("#logined").text(), channel_id);
+    let result = await getFundingBtcData(myUserID, channel_id);
     $("#from_address").val(result.from_address);
     $("#from_address_private_key").val(result.from_address_private_key);
+    $("#to_address").val(await getChannelAddr(channel_id));
     $("#amount").val(result.amount);
     $("#miner_fee").val(result.miner_fee);
 }
 
 //
-async function fillFundingAssetData() {
+async function fillFundingAssetData(myUserID, channel_id) {
 
-    let channel_id = $("#curr_channel_id").text();
-    $("#to_address").val(await getChannelAddr(channel_id));
-
-    let result = await getFundingBtcData($("#logined").text(), channel_id);
+    let result = await getFundingBtcData(myUserID, channel_id);
     $("#from_address").val(result.from_address);
     $("#from_address_private_key").val(result.from_address_private_key);
-
+    $("#to_address").val(await getChannelAddr(channel_id));
 }
 
 /**
  * 
+ * @param {*} status 
+ * @param {*} isFunder 
+ * @param {*} myUserID 
+ * @param {*} channel_id 
  */
-async function changeInvokeAPIEnable(status, isFunder) {
+async function changeInvokeAPIEnable(status, isFunder, myUserID, channel_id) {
 
-    let api_name = $("#api_name").text();
-    // console.info('api_name = ' + api_name);
+    let api_name   = $("#api_name").text();
+    console.info('changeInvokeAPIEnable api_name = ' + api_name);
 
     switch (api_name) {
         case 'logIn':
@@ -1566,27 +1564,30 @@ async function changeInvokeAPIEnable(status, isFunder) {
             }
             break;
         case 'connectP2PPeer':
-            if (!isLogined) { // Not loged in
-                disableInvokeAPI();
-            }
-            break;
         case 'openChannel':
             if (!isLogined) { // Not loged in
                 disableInvokeAPI();
             }
             break;
+
         case 'acceptChannel':
             if (!isLogined) { // Not loged in
                 disableInvokeAPI();
             } else if (status != kStatusOpenChannel) {
                 // Only channel status is openChannel, the Invoke API button is enable.
                 disableInvokeAPI();
+                break;
             }
 
             if (isFunder === true) { // Is Alice
                 disableInvokeAPI();
+            } else if (isFunder === false) { // Is Bob
+                enableInvokeAPI();
+                fillCounterparty(myUserID, channel_id);
+                $("#temporary_channel_id").val(channel_id);
             }
             break;
+
         case 'fundingBitcoin':
             if (!isLogined) { // Not loged in
                 disableInvokeAPI();
@@ -1594,12 +1595,17 @@ async function changeInvokeAPIEnable(status, isFunder) {
                        status != kStatusFirstBitcoinFundingSigned &&
                        status != kStatusSecondBitcoinFundingSigned   ) {
                 disableInvokeAPI();
+                break;
             }
 
             if (isFunder === false) { // Is Bob
                 disableInvokeAPI();
+            } else if (isFunder === true) { // Is Alice
+                enableInvokeAPI();
+                fillFundingBtcData(myUserID, channel_id);
             }
             break;
+
         case 'bitcoinFundingCreated':
             if (!isLogined) { // Not loged in
                 disableInvokeAPI();
@@ -1607,12 +1613,20 @@ async function changeInvokeAPIEnable(status, isFunder) {
                        status != kStatusSecondFundingBitcoin &&
                        status != kStatusThirdFundingBitcoin   ) {
                 disableInvokeAPI();
+                break;
             }
 
             if (isFunder === false) { // Is Bob
                 disableInvokeAPI();
+            } else if (isFunder === true) { // Is Alice
+                enableInvokeAPI();
+                fillCounterparty(myUserID, channel_id);
+                fillTempChannelIDAndFundingPrivKey(myUserID, channel_id);
+                let data = await getTempData(myUserID, channel_id);
+                $("#funding_tx_hex").val(data);
             }
             break;
+
         case 'bitcoinFundingSigned':
             if (!isLogined) { // Not loged in
                 disableInvokeAPI();
@@ -1620,12 +1634,20 @@ async function changeInvokeAPIEnable(status, isFunder) {
                        status != kStatusSecondBitcoinFundingCreated &&
                        status != kStatusThirdBitcoinFundingCreated   ) {
                 disableInvokeAPI();
+                break;
             }
 
             if (isFunder === true) { // Is Alice
                 disableInvokeAPI();
+            } else if (isFunder === false) { // Is Bob
+                enableInvokeAPI();
+                fillCounterparty(myUserID, channel_id);
+                fillTempChannelIDAndFundingPrivKey(myUserID, channel_id);
+                let data = await getTempData(myUserID, channel_id);
+                $("#funding_txid").val(data);
             }
             break;
+
         case 'fundingAsset':
             if (!isLogined) { // Not loged in
                 disableInvokeAPI();
@@ -1633,48 +1655,84 @@ async function changeInvokeAPIEnable(status, isFunder) {
                 // Only channel status is funding bitcoin completed, 
                 // the Invoke API button is enable.
                 disableInvokeAPI();
+                break;
             }
 
             if (isFunder === false) { // Is Bob
                 disableInvokeAPI();
+            } else if (isFunder === true) { // Is Alice
+                enableInvokeAPI();
+                fillFundingAssetData(myUserID, channel_id);
             }
             break;
+
         case 'assetFundingCreated':
             if (!isLogined) { // Not loged in
                 disableInvokeAPI();
             } else if (status != kStatusFundingAsset) {
                 disableInvokeAPI();
+                break;
             }
 
             if (isFunder === false) { // Is Bob
                 disableInvokeAPI();
+            } else if (isFunder === true) { // Is Alice
+                enableInvokeAPI();
+                fillCounterparty(myUserID, channel_id);
+                fillTempChannelIDAndFundingPrivKey(myUserID, channel_id);
+                fillTempAddrKey();
+                let data = await getTempData(myUserID, channel_id);
+                $("#funding_tx_hex").val(data);
             }
             break;
+
         case 'assetFundingSigned':
             if (!isLogined) { // Not loged in
                 disableInvokeAPI();
             } else if (status != kStatusAssetFundingCreated) {
                 disableInvokeAPI();
+                break;
             }
 
             if (isFunder === true) { // Is Alice
                 disableInvokeAPI();
+            } else if (isFunder === false) { // Is Bob
+                enableInvokeAPI();
+                fillCounterparty(myUserID, channel_id);
+                fillTempChannelIDAndFundingPrivKey(myUserID, channel_id);
             }
             break;
+
         case 'commitmentTransactionCreated':
             if (!isLogined) { // Not loged in
                 disableInvokeAPI();
+                break;
             } else if (status < kStatusAssetFundingSigned) {
                 disableInvokeAPI();
+                break;
             }
+
+            fillCounterparty(myUserID, channel_id);
+            fillChannelFundingLastTempKeys(myUserID, channel_id);
+            fillCurrTempAddrKey();
             break;
+
         case 'commitmentTransactionAccepted':
             if (!isLogined) { // Not loged in
                 disableInvokeAPI();
+                break;
             } else if (status != kStatusCommitmentTransactionCreated) {
                 disableInvokeAPI();
+                break;
             }
+
+            fillCounterparty(myUserID, channel_id);
+            fillChannelFundingLastTempKeys(myUserID, channel_id);
+            fillCurrTempAddrKey();
+            let data = await getTempData(myUserID, channel_id);
+            $("#msg_hash").val(data);
             break;
+
         case 'addInvoice':
         case 'payInvoice':
         case 'HTLCFindPath':
@@ -1752,13 +1810,14 @@ async function autoFillValue(obj) {
     let channel_id = $("#curr_channel_id").text();
     let isFunder   = await getIsFunder(myUserID, channel_id);
     let status     = await getChannelStatus(channel_id, isFunder);
-    changeInvokeAPIEnable(status, isFunder);
+    changeInvokeAPIEnable(status, isFunder, myUserID, channel_id);
 
     let data;
     let msgType = Number(obj.getAttribute("type_id"));
     switch (msgType) {
         case enumMsgType.MsgType_HTLC_FindPath_401:
         case enumMsgType.MsgType_HTLC_Invoice_402:
+            if (!isLogined) return;  // Not logined
             let date = new Date().toJSON().substr(0, 10).replace('T', ' ');
             $("#expiry_time").val(date);
             $("#expiry_time").attr("type", "date");
@@ -1766,30 +1825,30 @@ async function autoFillValue(obj) {
 
         case enumMsgType.MsgType_SendChannelOpen_32:
             if (!isLogined) return;  // Not logined
-            fillCounterparty();
+            fillCounterparty(myUserID, channel_id);
             break;
 
         case enumMsgType.MsgType_SendChannelAccept_33:
             if (!isLogined) return;  // Not logined
-            fillCounterparty();
+            fillCounterparty(myUserID, channel_id);
             $("#temporary_channel_id").val(channel_id);
             break;
 
         case enumMsgType.MsgType_Core_FundingBTC_2109:
             if (!isLogined) return;  // Not logined
-            fillFundingBtcData();
+            fillFundingBtcData(myUserID, channel_id);
             break;
 
         case enumMsgType.MsgType_Core_Omni_FundingAsset_2120:
             if (!isLogined) return;  // Not logined
-            fillFundingAssetData();
+            fillFundingAssetData(myUserID, channel_id);
             break;
 
         case enumMsgType.MsgType_FundingCreate_SendBtcFundingCreated_340:
         case enumMsgType.MsgType_FundingSign_SendBtcSign_350:
             if (!isLogined) return;  // Not logined
-            fillCounterparty();
-            fillTempChannelIDAndFundingPrivKey();
+            fillCounterparty(myUserID, channel_id);
+            fillTempChannelIDAndFundingPrivKey(myUserID, channel_id);
 
             data = await getTempData(myUserID, channel_id);
             if (msgType === enumMsgType.MsgType_FundingSign_SendBtcSign_350) {
@@ -1801,8 +1860,8 @@ async function autoFillValue(obj) {
 
         case enumMsgType.MsgType_FundingCreate_SendAssetFundingCreated_34:
             if (!isLogined) return;  // Not logined
-            fillCounterparty();
-            fillTempChannelIDAndFundingPrivKey();
+            fillCounterparty(myUserID, channel_id);
+            fillTempChannelIDAndFundingPrivKey(myUserID, channel_id);
 
             data = await getTempData(myUserID, channel_id);
             $("#funding_tx_hex").val(data);
@@ -1811,14 +1870,14 @@ async function autoFillValue(obj) {
 
         case enumMsgType.MsgType_FundingSign_SendAssetFundingSigned_35:
             if (!isLogined) return;  // Not logined
-            fillCounterparty();
-            fillTempChannelIDAndFundingPrivKey(35);
+            fillCounterparty(myUserID, channel_id);
+            fillTempChannelIDAndFundingPrivKey(myUserID, channel_id);
             break;
 
         case enumMsgType.MsgType_SendCloseChannelRequest_38:
         case enumMsgType.MsgType_SendCloseChannelSign_39:
             if (!isLogined) return;  // Not logined
-            fillCounterparty();
+            fillCounterparty(myUserID, channel_id);
             $("#channel_id").val(channel_id);
             if (msgType === enumMsgType.MsgType_SendCloseChannelSign_39) {
                 data = await getTempData(myUserID, channel_id);
@@ -1829,8 +1888,8 @@ async function autoFillValue(obj) {
         case enumMsgType.MsgType_CommitmentTx_SendCommitmentTransactionCreated_351:
         case enumMsgType.MsgType_CommitmentTxSigned_SendRevokeAndAcknowledgeCommitmentTransaction_352:
             if (!isLogined) return;  // Not logined
-            fillCounterparty();
-            fillChannelFundingLastTempKeys();
+            fillCounterparty(myUserID, channel_id);
+            fillChannelFundingLastTempKeys(myUserID, channel_id);
             if (msgType === enumMsgType.MsgType_CommitmentTxSigned_SendRevokeAndAcknowledgeCommitmentTransaction_352) {
                 data = await getTempData(myUserID, channel_id);
                 $("#msg_hash").val(data);
@@ -1840,14 +1899,14 @@ async function autoFillValue(obj) {
             
         case enumMsgType.MsgType_HTLC_FindPath_401:
             if (!isLogined) return;  // Not logined
-            fillCounterparty();
+            fillCounterparty(myUserID, channel_id);
             break;
 
         case enumMsgType.MsgType_HTLC_SendAddHTLC_40:
             if (!isLogined) return;  // Not logined
-            fillCounterparty();
+            fillCounterparty(myUserID, channel_id);
             fillH_RP_CE();
-            fillChannelFundingLastTempKeys();
+            fillChannelFundingLastTempKeys(myUserID, channel_id);
             fillCurrRsmcTempKey();
             fillCurrHtlcTempKey();
             fillCurrHtlcHt1aTempKey();
@@ -1855,25 +1914,25 @@ async function autoFillValue(obj) {
 
         case enumMsgType.MsgType_HTLC_SendAddHTLCSigned_41:
             if (!isLogined) return;  // Not logined
-            fillCounterparty();
+            fillCounterparty(myUserID, channel_id);
             data = await getTempData(myUserID, channel_id);
             $("#payer_commitment_tx_hash").val(data);
-            fillChannelFundingLastTempKeys();
+            fillChannelFundingLastTempKeys(myUserID, channel_id);
             fillCurrRsmcTempKey();
             fillCurrHtlcTempKey();
             break;
         
         case enumMsgType.MsgType_HTLC_SendVerifyR_45:
             if (!isLogined) return;  // Not logined
-            fillCounterparty();
-            fillChannelIDAndFundingPrivKey();
+            fillCounterparty(myUserID, channel_id);
+            fillChannelIDAndFundingPrivKey(myUserID, channel_id);
             fillCurrHtlcHe1bTempKey();
             break;
 
         case enumMsgType.MsgType_HTLC_SendSignVerifyR_46:
             if (!isLogined) return;  // Not logined
-            fillCounterparty();
-            fillChannelIDAndFundingPrivKey();
+            fillCounterparty(myUserID, channel_id);
+            fillChannelIDAndFundingPrivKey(myUserID, channel_id);
             data = await getTempData(myUserID, channel_id);
             $("#msg_hash").val(data);
             $("#r").val(getForwardR(myUserID, channel_id));
@@ -1882,7 +1941,7 @@ async function autoFillValue(obj) {
         case enumMsgType.MsgType_HTLC_SendRequestCloseCurrTx_49:
         case enumMsgType.MsgType_HTLC_SendCloseSigned_50:
             if (!isLogined) return;  // Not logined
-            fillCounterparty();
+            fillCounterparty(myUserID, channel_id);
             $("#channel_id").val(channel_id);
 
             if (msgType === enumMsgType.MsgType_HTLC_SendCloseSigned_50) {
@@ -2049,11 +2108,11 @@ function clickApproval(obj) {
 
         // case 'checkbox_n35':
         //     if (obj.checked) {
-        //         $("#fundee_channel_address_private_key").show();
-        //         $("#fundee_channel_address_private_keyDis").show();
+        //         $("#channel_address_private_key").show();
+        //         $("#channel_address_private_keyDis").show();
         //     } else {
-        //         $("#fundee_channel_address_private_key").hide();
-        //         $("#fundee_channel_address_private_keyDis").hide();
+        //         $("#channel_address_private_key").hide();
+        //         $("#channel_address_private_keyDis").hide();
         //     }
         //     break;
 
@@ -3701,7 +3760,7 @@ function displaySentMessage100035(nodeID, userID, info) {
         recipient_user_peer_id: userID,
         data: {
             temporary_channel_id:               info.temporary_channel_id,
-            fundee_channel_address_private_key: info.fundee_channel_address_private_key,
+            channel_address_private_key: info.channel_address_private_key,
         }
     }
 
@@ -4265,7 +4324,7 @@ function registerEvent(netType) {
     let msg_110033 = enumMsgType.MsgType_RecvChannelAccept_33;
     obdApi.registerEvent(msg_110033, function(e) {
         listening110033(e);
-        listening110033ForGUITool();
+        listening110033ForGUITool(e);
     });
 
     // auto response mode
@@ -4285,7 +4344,7 @@ function registerEvent(netType) {
     let msg_110034 = enumMsgType.MsgType_FundingCreate_RecvAssetFundingCreated_34;
     obdApi.registerEvent(msg_110034, function(e) {
         listening110034(e);
-        listening110034ForGUITool();
+        listening110034ForGUITool(e);
     });
 
     // auto response mode
@@ -4299,79 +4358,79 @@ function registerEvent(netType) {
     let msg_110351 = enumMsgType.MsgType_CommitmentTx_RecvCommitmentTransactionCreated_351;
     obdApi.registerEvent(msg_110351, function(e) {
         listening110351(e, netType);
-        listening110351ForGUITool();
+        listening110351ForGUITool(e);
     });
 
     // auto response mode
     let msg_110352 = enumMsgType.MsgType_CommitmentTxSigned_RecvRevokeAndAcknowledgeCommitmentTransaction_352;
     obdApi.registerEvent(msg_110352, function(e) {
         listening110352(e);
-        listening110352ForGUITool();
+        listening110352ForGUITool(e);
     });
     
     // auto response mode
     let msg_110040 = enumMsgType.MsgType_HTLC_RecvAddHTLC_40;
     obdApi.registerEvent(msg_110040, function(e) {
         listening110040(e, netType);
-        listening110040ForGUITool();
+        listening110040ForGUITool(e);
     });
     
     // auto response mode
     let msg_110041 = enumMsgType.MsgType_HTLC_RecvAddHTLCSigned_41;
     obdApi.registerEvent(msg_110041, function(e) {
         listening110041(e);
-        listening110041ForGUITool();
+        listening110041ForGUITool(e);
     });
 
     // auto response mode
     let msg_110045 = enumMsgType.MsgType_HTLC_RecvVerifyR_45;
     obdApi.registerEvent(msg_110045, function(e) {
         listening110045(e);
-        listening110045ForGUITool();
+        listening110045ForGUITool(e);
     });
 
     let msg_110046 = enumMsgType.MsgType_HTLC_RecvSignVerifyR_46;
     obdApi.registerEvent(msg_110046, function(e) {
         listening110046(e);
-        listening110046ForGUITool();
+        listening110046ForGUITool(e);
     });
 
     // auto response mode
     let msg_110049 = enumMsgType.MsgType_HTLC_RecvRequestCloseCurrTx_49;
     obdApi.registerEvent(msg_110049, function(e) {
         listening110049(e, netType);
-        listening110049ForGUITool();
+        listening110049ForGUITool(e);
     });
 
     let msg_110050 = enumMsgType.MsgType_HTLC_RecvCloseSigned_50;
     obdApi.registerEvent(msg_110050, function(e) {
         listening110050(e);
-        listening110050ForGUITool();
+        listening110050ForGUITool(e);
     });
 
     // save request_close_channel_hash
     let msg_110038 = enumMsgType.MsgType_RecvCloseChannelRequest_38;
     obdApi.registerEvent(msg_110038, function(e) {
         listening110038(e);
-        listening110038ForGUITool();
+        listening110038ForGUITool(e);
     });
 
     let msg_110039 = enumMsgType.MsgType_RecvCloseChannelSign_39;
     obdApi.registerEvent(msg_110039, function(e) {
         listening110039(e);
-        listening110039ForGUITool();
+        listening110039ForGUITool(e);
     });
 
     let msg_110080 = enumMsgType.MsgType_Atomic_RecvSwap_80;
     obdApi.registerEvent(msg_110080, function(e) {
         listening110080(e);
-        listening110080ForGUITool();
+        listening110080ForGUITool(e);
     });
 
     let msg_110081 = enumMsgType.MsgType_Atomic_RecvSwapAccept_81;
     obdApi.registerEvent(msg_110081, function(e) {
         listening110081(e);
-        listening110081ForGUITool();
+        listening110081ForGUITool(e);
     });
 }
 
@@ -4380,16 +4439,25 @@ function registerEvent(netType) {
  * @param e 
  */
 function listening110032ForGUITool(e) {
-    $("#recipient_node_peer_id").val(e.funder_node_address);
-    $("#recipient_user_peer_id").val(e.funder_peer_id);
+
     tipsOnTop(e.temporary_channel_id, kTips110032, 'Accept', 'acceptChannel');
+    
+    let api_name = $("#api_name").text();
+    console.info('listening110032ForGUITool api_name = ' + api_name);
+    
+    if (api_name === 'acceptChannel') {
+        enableInvokeAPI();
+        $("#recipient_node_peer_id").val(e.funder_node_address);
+        $("#recipient_user_peer_id").val(e.funder_peer_id);
+        $("#temporary_channel_id").val(e.temporary_channel_id);
+    }
 }
 
 /**
  * For GUI Tool. Display tips
  */
-function listening110033ForGUITool() {
-    tipsOnTop('', kTips110033, 'Funding Bitcoin', 'fundingBitcoin');
+function listening110033ForGUITool(e) {
+    tipsOnTop(e.temporary_channel_id, kTips110033, 'Funding Bitcoin', 'fundingBitcoin');
 }
 
 /**
@@ -4397,23 +4465,32 @@ function listening110033ForGUITool() {
  * @param e 
  */
 async function listening110340ForGUITool(e) {
-    $("#funding_txid").val(e.funding_txid);
-    $("#recipient_node_peer_id").val(e.funder_node_address);
-    $("#recipient_user_peer_id").val(e.funder_peer_id);
 
     let channel_id = e.temporary_channel_id;
     let status     = await getChannelStatus(channel_id, false);
     console.info('listening110340ForGUITool status = ' + status);
     switch (Number(status)) {
         case kStatusAcceptChannel:
-            tipsOnTop('', kTipsFirst110340, 'Confirm', 'bitcoinFundingSigned');
+            tipsOnTop(channel_id, kTipsFirst110340, 'Confirm', 'bitcoinFundingSigned');
             break;
         case kStatusFirstBitcoinFundingSigned:
-            tipsOnTop('', kTipsSecond110340, 'Confirm', 'bitcoinFundingSigned');
+            tipsOnTop(channel_id, kTipsSecond110340, 'Confirm', 'bitcoinFundingSigned');
             break;
         case kStatusSecondBitcoinFundingSigned:
-            tipsOnTop('', kTipsThird110340, 'Confirm', 'bitcoinFundingSigned');
+            tipsOnTop(channel_id, kTipsThird110340, 'Confirm', 'bitcoinFundingSigned');
             break;
+    }
+
+    let api_name = $("#api_name").text();
+    console.info('listening110340ForGUITool api_name = ' + api_name);
+    
+    if (api_name === 'bitcoinFundingSigned') {
+        enableInvokeAPI();
+        fillTempChannelIDAndFundingPrivKey($("#logined").text(), channel_id);
+
+        $("#recipient_node_peer_id").val(e.funder_node_address);
+        $("#recipient_user_peer_id").val(e.funder_peer_id);
+        $("#funding_txid").val(e.funding_txid);
     }
 }
 
@@ -4427,13 +4504,13 @@ async function listening110350ForGUITool(e) {
     console.info('listening110350ForGUITool status = ' + status);
     switch (Number(status)) {
         case kStatusFirstBitcoinFundingCreated:
-            tipsOnTop('', kTipsFirst110350, 'Funding Bitcoin', 'fundingBitcoin');
+            tipsOnTop(channel_id, kTipsFirst110350, 'Funding Bitcoin', 'fundingBitcoin');
             break;
         case kStatusSecondBitcoinFundingCreated:
-            tipsOnTop('', kTipsSecond110350, 'Funding Bitcoin', 'fundingBitcoin');
+            tipsOnTop(channel_id, kTipsSecond110350, 'Funding Bitcoin', 'fundingBitcoin');
             break;
         case kStatusThirdBitcoinFundingCreated:
-            tipsOnTop('', kTipsThird110350, 'Funding Asset', 'fundingAsset');
+            tipsOnTop(channel_id, kTipsThird110350, 'Funding Asset', 'fundingAsset');
             break;
     }
 }
@@ -4441,22 +4518,44 @@ async function listening110350ForGUITool(e) {
 /**
  * For GUI Tool
  */
-function listening110351ForGUITool() {
-    tipsOnTop('', kTips110351, 'Confirm', 'commitmentTransactionAccepted');
+function listening110351ForGUITool(e) {
+
+    tipsOnTop(e.channel_id, kTips110351, 'Confirm', 'commitmentTransactionAccepted');
+
+    if (api_name === 'commitmentTransactionAccepted') {
+        enableInvokeAPI();
+        fillCurrTempAddrKey();
+        fillChannelFundingLastTempKeys($("#logined").text(), e.channel_id);
+
+        $("#recipient_node_peer_id").val(e.payer_node_address);
+        $("#recipient_user_peer_id").val(e.payer_peer_id);
+        $("#msg_hash").val(e.msg_hash);
+    }
 }
 
 /**
  * For GUI Tool
  */
-function listening110352ForGUITool() {
-    tipsOnTop('', kTips110352);
+function listening110352ForGUITool(e) {
+    tipsOnTop(e.channel_id, kTips110352);
 }
 
 /**
  * For GUI Tool. Display tips
  */
-function listening110034ForGUITool() {
-    tipsOnTop('', kTips110034, 'Confirm', 'assetFundingSigned');
+function listening110034ForGUITool(e) {
+
+    tipsOnTop(e.temporary_channel_id, kTips110034, 'Confirm', 'assetFundingSigned');
+
+    let api_name = $("#api_name").text();
+    console.info('listening110034ForGUITool api_name = ' + api_name);
+    
+    if (api_name === 'assetFundingSigned') {
+        enableInvokeAPI();
+        fillTempChannelIDAndFundingPrivKey($("#logined").text(), e.temporary_channel_id);
+        $("#recipient_node_peer_id").val(e.funder_node_address);
+        $("#recipient_user_peer_id").val(e.funder_peer_id);
+    }
 }
 
 /**
@@ -4949,6 +5048,14 @@ function disableInvokeAPI() {
 /**
  * 
  */
+function enableInvokeAPI() {
+    let butInvokeAPI = $("#invoke_api");
+    butInvokeAPI.attr('class', 'button button_big');
+}
+
+/**
+ * 
+ */
 function afterLogin() {
 
     disableInvokeAPI();
@@ -5194,15 +5301,15 @@ function getChannelIDFromTopRight(obj) {
 
 /**
  * 
- * @param user_id 
+ * @param myUserID 
  * @param channel_id 
  */
-async function switchChannel(user_id, channel_id) {
+async function switchChannel(myUserID, channel_id) {
 
-    let isFunder = await getIsFunder(user_id, channel_id);
+    let isFunder = await getIsFunder(myUserID, channel_id);
     let status   = await getChannelStatus(channel_id, isFunder);
     
-    changeInvokeAPIEnable(status, isFunder);
+    changeInvokeAPIEnable(status, isFunder, myUserID, channel_id);
 
     switch (Number(status)) {
         case kStatusOpenChannel:

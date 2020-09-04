@@ -75,7 +75,7 @@ class AssetFundingCreatedInfo {
 class AssetFundingSignedInfo {
     constructor() {
         this.temporary_channel_id = "";
-        this.fundee_channel_address_private_key = "";
+        this.channel_address_private_key = "";
         // approval: boolean = false;
     }
 }

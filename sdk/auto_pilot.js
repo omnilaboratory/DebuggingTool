@@ -83,7 +83,7 @@ async function listening110034(e) {
     // will send -100035 AssetFundingSigned
     let info                                = new AssetFundingSignedInfo();
     info.temporary_channel_id               = channel_id;
-    info.fundee_channel_address_private_key = await getFundingPrivKey(myUserID, channel_id);
+    info.channel_address_private_key = await getFundingPrivKey(myUserID, channel_id);
 
     // SDK API
     assetFundingSigned(myUserID, nodeID, userID, info);
@@ -530,7 +530,6 @@ async function listening110351(e, netType) {
 
     let nodeID   = e.payer_node_address;
     let userID   = e.payer_peer_id;
-    
 
     let addr = genNewAddress(myUserID, netType);
     saveAddress(myUserID, addr);

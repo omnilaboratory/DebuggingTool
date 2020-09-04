@@ -65,7 +65,7 @@ class AssetFundingCreatedInfo {
 
 class AssetFundingSignedInfo {
   temporary_channel_id: string = "";
-  fundee_channel_address_private_key: string = "";
+  channel_address_private_key: string = "";
   // approval: boolean = false;
 }
 
