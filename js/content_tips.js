@@ -75,7 +75,7 @@ const kTipsAfterCommitmentTransactionCreated = 'You have sent a RSMC transfer. W
 /**
  * Tips for 
  */
-const kTipsAfterCommitmentTransactionAccepted = 'You have accepted a RSMC transfer.';
+const kTipsAfterCommitmentTransactionAccepted = 'You have accepted a RSMC transfer. You can also start a RSMC transfer.';
 
 /**
  * Tips for 
@@ -185,7 +185,7 @@ const kTips110351 = 'You received a notification to confirm the RSMC transfer.';
 /**
  * Tips for 
  */
-const kTips110352 = 'Counterparty confirmed the RSMC transfer.';
+const kTips110352 = 'Counterparty confirmed the RSMC transfer. You can start a RSMC transfer again.';
 
 /**
  * Tips for 

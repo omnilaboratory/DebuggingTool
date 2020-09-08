@@ -1565,10 +1565,17 @@ async function changeInvokeAPIEnable(status, isFunder, myUserID, channel_id) {
             }
             break;
         case 'connectP2PPeer':
+            if (!isLogined) { // Not loged in
+                disableInvokeAPI();
+            }
+            break;
         case 'openChannel':
             if (!isLogined) { // Not loged in
                 disableInvokeAPI();
             }
+
+            // Data of lastest channel
+            fillCounterparty(myUserID, lastestChannel);
             break;
 
         case 'acceptChannel':
@@ -1605,7 +1612,11 @@ async function changeInvokeAPIEnable(status, isFunder, myUserID, channel_id) {
                 disableInvokeAPI();
             } else if (isFunder === true) { // Is Alice
                 enableInvokeAPI();
-                fillFundingBtcData(myUserID, channel_id);
+                if (status === kStatusAcceptChannel) { // First fundingBitcoin
+                    fillFundingBtcData(myUserID, lastestChannel); // Data of lastest channel
+                } else {
+                    fillFundingBtcData(myUserID, channel_id);
+                }
             }
             break;
 
@@ -4702,7 +4713,7 @@ function listening110351ForGUITool(e) {
  * For GUI Tool
  */
 function listening110352ForGUITool(e) {
-    tipsOnTop(e.channel_id, kTips110352);
+    tipsOnTop(e.channel_id, kTips110352, 'RSMC Transfer', 'commitmentTransactionCreated');
 }
 
 /**
@@ -5273,6 +5284,7 @@ function disableInvokeAPI() {
 function enableInvokeAPI() {
     let butInvokeAPI = $("#invoke_api");
     butInvokeAPI.attr('class', 'button button_big');
+    butInvokeAPI.attr("disabled", false);
 }
 
 /**
@@ -5394,7 +5406,7 @@ function afterCommitmentTransactionCreated() {
  */
 function afterCommitmentTransactionAccepted() {
     disableInvokeAPI();
-    tipsOnTop('', kTipsAfterCommitmentTransactionAccepted);
+    tipsOnTop('', kTipsAfterCommitmentTransactionAccepted, 'RSMC Transfer', 'commitmentTransactionCreated');
 }
 
 /**
@@ -5543,7 +5555,7 @@ async function switchChannel(myUserID, channel_id) {
             break;
         case kStatusAcceptChannel:
             if (isFunder === true) {
-                listening110033ForGUITool();
+                tipsOnTop('', kTips110033, 'Funding Bitcoin', 'fundingBitcoin');
             } else {
                 tipsOnTop('', kTipsAfterAcceptChannel);
             }
@@ -5602,7 +5614,7 @@ async function switchChannel(myUserID, channel_id) {
             if (isFunder === true) {
                 tipsOnTop('', kTipsAfterAssetFundingCreated);
             } else {
-                listening110034ForGUITool();
+                tipsOnTop('', kTips110034, 'Confirm', 'assetFundingSigned');
             }
             break;
         case kStatusAssetFundingSigned:
@@ -5616,14 +5628,14 @@ async function switchChannel(myUserID, channel_id) {
             if (isFunder === true) {
                 tipsOnTop('', kTipsAfterCommitmentTransactionCreated);
             } else {
-                listening110351ForGUITool();
+                tipsOnTop('', kTips110351, 'Confirm', 'commitmentTransactionAccepted');
             }
             break;
         case kStatusCommitmentTransactionAccepted:
             if (isFunder === true) {
-                listening110352ForGUITool()
+                tipsOnTop('', kTips110352, 'RSMC Transfer', 'commitmentTransactionCreated');
             } else {
-                tipsOnTop('', kTipsAfterCommitmentTransactionAccepted);
+                tipsOnTop('', kTipsAfterCommitmentTransactionAccepted, 'RSMC Transfer', 'commitmentTransactionCreated');
             }
             break;
         case kStatusPayInvoice: // WILL BE UPDATE
@@ -5635,19 +5647,19 @@ async function switchChannel(myUserID, channel_id) {
             if (isFunder === true) {
                 tipsOnTop('', kTipsAfterAddHTLC);
             } else {
-                listening110040ForGUITool();
+                tipsOnTop('', kTips110040, 'Accept', 'HTLCSigned');
             }
             break;
         case kStatusHTLCSigned:
             if (isFunder === true) {
-                listening110041ForGUITool();
+                tipsOnTop('', kTips110041);
             } else {
                 tipsOnTop('', kTipsAfterHTLCSigned, 'Forward R', 'forwardR');
             }
             break;
         case kStatusForwardR:
             if (isFunder === true) {
-                listening110045ForGUITool()
+                tipsOnTop('', kTips110045, 'Sign R', 'signR');
             } else {
                 tipsOnTop('', kTipsAfterForwardR);
             }
@@ -5656,19 +5668,19 @@ async function switchChannel(myUserID, channel_id) {
             if (isFunder === true) {
                 tipsOnTop('', kTipsAfterSignR, 'Close HTLC', 'closeHTLC');
             } else {
-                listening110046ForGUITool();
+                tipsOnTop('', kTips110046, 'Close HTLC', 'closeHTLC');
             }
             break;
         case kStatusCloseHTLC:
             if (isFunder === true) {
                 tipsOnTop('', kTipsAfterCloseHTLC);
             } else {
-                listening110049ForGUITool();
+                tipsOnTop('', kTips110049, 'Accept', 'closeHTLCSigned');
             }
             break;
         case kStatusCloseHTLCSigned:
             if (isFunder === true) {
-                listening110050ForGUITool();
+                tipsOnTop('', kTips110050);
             } else {
                 tipsOnTop('', kTipsAfterCloseHTLCSigned);
             }
@@ -5677,12 +5689,12 @@ async function switchChannel(myUserID, channel_id) {
             if (isFunder === true) {
                 tipsOnTop('', kTipsAfterCloseChannel);
             } else {
-                listening110038ForGUITool();
+                tipsOnTop('', kTips110038, 'Accept', 'closeChannelSigned');
             }
             break;
         case kStatusCloseChannelSigned:
             if (isFunder === true) {
-                listening110039ForGUITool();
+                tipsOnTop('', kTips110039, 'Open Channel', 'openChannel');
             } else {
                 tipsOnTop('', kTipsAfterCloseChannelSigned, 'Open Channel', 'openChannel');
             }
@@ -5691,12 +5703,12 @@ async function switchChannel(myUserID, channel_id) {
             if (isFunder === true) {
                 tipsOnTop('', kTipsAfterAtomicSwap);
             } else {
-                listening110080ForGUITool();
+                tipsOnTop('', kTips110080, 'Accept', 'acceptSwap');
             }
             break;
         case kStatusAcceptSwap:
             if (isFunder === true) {
-                listening110081ForGUITool();
+                tipsOnTop('', kTips110081);
             } else {
                 tipsOnTop('', kTipsAfterAcceptSwap);
             }
