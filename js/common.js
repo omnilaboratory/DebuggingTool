@@ -1731,6 +1731,7 @@ async function changeInvokeAPIEnable(status, isFunder, myUserID, channel_id) {
                 break;
             }
 
+            enableInvokeAPI();
             fillCounterparty(myUserID, channel_id);
             fillChannelFundingLastTempKeys(myUserID, channel_id);
             fillCurrTempAddrKey();
@@ -1745,6 +1746,7 @@ async function changeInvokeAPIEnable(status, isFunder, myUserID, channel_id) {
                 break;
             }
 
+            enableInvokeAPI();
             fillCounterparty(myUserID, channel_id);
             fillChannelFundingLastTempKeys(myUserID, channel_id);
             fillCurrTempAddrKey();
@@ -1761,6 +1763,7 @@ async function changeInvokeAPIEnable(status, isFunder, myUserID, channel_id) {
                 break;
             }
 
+            enableInvokeAPI();
             date = new Date().toJSON().substr(0, 10).replace('T', ' ');
             $("#expiry_time").val(date);
             $("#expiry_time").attr("type", "date");
@@ -1784,6 +1787,7 @@ async function changeInvokeAPIEnable(status, isFunder, myUserID, channel_id) {
                 break;
             }
 
+            enableInvokeAPI();
             fillCounterparty(myUserID, channel_id);
 
             date = new Date().toJSON().substr(0, 10).replace('T', ' ');
@@ -1801,6 +1805,7 @@ async function changeInvokeAPIEnable(status, isFunder, myUserID, channel_id) {
                 break;
             }
 
+            enableInvokeAPI();
             fillCounterparty(myUserID, channel_id);
             fillH_RP_CE(myUserID, channel_id);
             fillChannelFundingLastTempKeys(myUserID, channel_id);
@@ -1819,17 +1824,17 @@ async function changeInvokeAPIEnable(status, isFunder, myUserID, channel_id) {
                 break;
             }
 
-            if (isFunder === true) { // Is Alice
-                disableInvokeAPI();
-            } else if (isFunder === false) { // Is Bob
-                enableInvokeAPI();
-                fillCounterparty(myUserID, channel_id);
-                data = await getTempData(myUserID, channel_id);
-                $("#payer_commitment_tx_hash").val(data);
-                fillChannelFundingLastTempKeys(myUserID, channel_id);
-                fillCurrRsmcTempKey();
-                fillCurrHtlcTempKey();
-            }
+            // if (isFunder === true) { // Is Alice
+            //     disableInvokeAPI();
+            // } else if (isFunder === false) { // Is Bob
+            // }
+            enableInvokeAPI();
+            fillCounterparty(myUserID, channel_id);
+            data = await getTempData(myUserID, channel_id);
+            $("#payer_commitment_tx_hash").val(data);
+            fillChannelFundingLastTempKeys(myUserID, channel_id);
+            fillCurrRsmcTempKey();
+            fillCurrHtlcTempKey();
 
             break;
 
@@ -1842,11 +1847,17 @@ async function changeInvokeAPIEnable(status, isFunder, myUserID, channel_id) {
                 break;
             }
 
+            // if (isFunder === true) { // Is Alice
+            //     disableInvokeAPI();
+            // } else if (isFunder === false) { // Is Bob
+            // }
+            enableInvokeAPI();
             fillCounterparty(myUserID, channel_id);
             fillChannelIDAndFundingPrivKey(myUserID, channel_id);
             fillCurrHtlcHe1bTempKey();
             data = await getInvoiceR(myUserID, channel_id);
             $("#r").val(data);
+
             break;
 
         case 'signR':
@@ -1858,15 +1869,15 @@ async function changeInvokeAPIEnable(status, isFunder, myUserID, channel_id) {
                 break;
             }
 
-            if (isFunder === false) { // Is Bob
-                disableInvokeAPI();
-            } else if (isFunder === true) { // Is Alice
-                enableInvokeAPI();
-                fillCounterparty(myUserID, channel_id);
-                fillChannelIDAndFundingPrivKey(myUserID, channel_id);
-                $("#msg_hash").val(await getTempData(myUserID, channel_id));
-                $("#r").val(await getForwardR(myUserID, channel_id));
-            }
+            // if (isFunder === false) { // Is Bob
+            //     disableInvokeAPI();
+            // } else if (isFunder === true) { // Is Alice
+            // }
+            enableInvokeAPI();
+            fillCounterparty(myUserID, channel_id);
+            fillChannelIDAndFundingPrivKey(myUserID, channel_id);
+            $("#msg_hash").val(await getTempData(myUserID, channel_id));
+            $("#r").val(await getForwardR(myUserID, channel_id));
 
             break;
 
@@ -1879,6 +1890,7 @@ async function changeInvokeAPIEnable(status, isFunder, myUserID, channel_id) {
                 break;
             }
 
+            enableInvokeAPI();
             fillCounterparty(myUserID, channel_id);
             fillChannelIDAndFundingPrivKey(myUserID, channel_id);
             fillThreeLastPrivKey(myUserID, channel_id);
@@ -1895,6 +1907,7 @@ async function changeInvokeAPIEnable(status, isFunder, myUserID, channel_id) {
                 break;
             }
 
+            enableInvokeAPI();
             fillCounterparty(myUserID, channel_id);
             fillChannelIDAndFundingPrivKey(myUserID, channel_id);
             fillThreeLastPrivKey(myUserID, channel_id);
@@ -1913,6 +1926,7 @@ async function changeInvokeAPIEnable(status, isFunder, myUserID, channel_id) {
                 break;
             }
 
+            enableInvokeAPI();
             fillCounterparty(myUserID, channel_id);
             $("#channel_id").val(channel_id);
             break;
@@ -1926,6 +1940,7 @@ async function changeInvokeAPIEnable(status, isFunder, myUserID, channel_id) {
                 break;
             }
 
+            enableInvokeAPI();
             fillCounterparty(myUserID, channel_id);
             $("#channel_id").val(channel_id);
             data = await getTempData(myUserID, channel_id);
@@ -1941,6 +1956,7 @@ async function changeInvokeAPIEnable(status, isFunder, myUserID, channel_id) {
                 break;
             }
 
+            enableInvokeAPI();
             fillCounterparty(myUserID, channel_id);
             $("#channel_id_from").val(channel_id);
             break;
@@ -1954,6 +1970,7 @@ async function changeInvokeAPIEnable(status, isFunder, myUserID, channel_id) {
                 break;
             }
 
+            enableInvokeAPI();
             fillCounterparty(myUserID, channel_id);
             $("#channel_id_from").val(channel_id);
             break;
