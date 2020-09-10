@@ -20,15 +20,12 @@ function addInvoice(info, callback) {
  * @param channel_id 
  * @param info 
  */
-function HTLCFindPath(myUserID, channel_id, info) {
+// function HTLCFindPath(myUserID, channel_id, info) {
+function HTLCFindPath(info) {
     return new Promise((resolve, reject) => {
         obdApi.HTLCFindPath(info, function(e) {
             console.info('SDK: -100401 - HTLCFindPath = ' + JSON.stringify(e));
-            // saveHtlcH(e.h);
-            // saveRoutingPacket(e.routing_packet);
-            // saveCltvExpiry(e.min_cltv_expiry);
-            // saveHTLCPathData(myUserID, channel_id, e.h, e.routing_packet, e.min_cltv_expiry);
-            saveHTLCPathData(myUserID, channel_id, e);
+            // saveHTLCPathData(myUserID, channel_id, e);
             resolve(e);
         });
     })

@@ -80,6 +80,11 @@ const kTipsAfterCommitmentTransactionAccepted = 'You have accepted a RSMC transf
 /**
  * Tips for 
  */
+const kTipsAfterHTLCFindPath = 'You have found a HTLC path and the next operation is AddHTLC.';
+
+/**
+ * Tips for 
+ */
 const kTipsAfterAddHTLC = 'You have requested to add HTLC. Waiting for response from counterparty.';
 
 /**
@@ -241,6 +246,25 @@ const kTips110039 = 'Counterparty has accepted to close the channel. Next you ca
  * Tips for 
  */
 const kTipsNoLocalData = 'The channel you selected has no locally saved data.';
+
+
+//----------------------------------------------------------------
+// Others
+
+/**
+ * 找到的路径不是当前通道，需要切换通道，请确认。
+ */
+const k100401 = 'The path found is not the current channel, and will switch to.';
+
+/**
+ * 你没有确认通道切换，下一步操作可能会出错。
+ */
+const k100401_ClickCancel = 'You did not confirm the channel switch, the next operation may be wrong.';
+
+/**
+ * 
+ */
+const kNo = '';
 
 
 //----------------------------------------------------------------
