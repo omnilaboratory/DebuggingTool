@@ -27,7 +27,8 @@ function HTLCFindPath(myUserID, channel_id, info) {
             // saveHtlcH(e.h);
             // saveRoutingPacket(e.routing_packet);
             // saveCltvExpiry(e.min_cltv_expiry);
-            saveHTLCPathData(myUserID, channel_id, e.h, e.routing_packet, e.cltv_expiry);
+            // saveHTLCPathData(myUserID, channel_id, e.h, e.routing_packet, e.min_cltv_expiry);
+            saveHTLCPathData(myUserID, channel_id, e);
             resolve(e);
         });
     })

@@ -1424,9 +1424,12 @@ async function fillCounterparty(myUserID, channel_id) {
  */
 async function fillH_RP_CE(myUserID, channel_id) {
     let data = await getHTLCPathData(myUserID, channel_id);
+    $("#property_id").val(data.property_id);
+    $("#amount").val(data.amount);
+    $("#memo").val(data.memo);
     $("#h").val(data.h);
     $("#routing_packet").val(data.routing_packet);
-    $("#cltv_expiry").val(data.cltv_expiry);
+    $("#cltv_expiry").val(data.min_cltv_expiry);
 }
 
 /**
@@ -1614,6 +1617,7 @@ async function changeInvokeAPIEnable(status, isFunder, myUserID, channel_id) {
                 enableInvokeAPI();
                 if (status === kStatusAcceptChannel) { // First fundingBitcoin
                     fillFundingBtcData(myUserID, lastestChannel); // Data of lastest channel
+                    $("#to_address").val(await getChannelAddr(channel_id));
                 } else {
                     fillFundingBtcData(myUserID, channel_id);
                 }

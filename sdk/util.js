@@ -368,7 +368,7 @@ function getChannelStatus(channel_id, funder) {
                 resolve(request.result.status);
             } else {
                 console.log('channel status = No Data.');
-                resolve('');
+                resolve(-1);
             }
         }
     })
@@ -1077,12 +1077,14 @@ function checkChannelAddessExist(nodeID, userID, info) {
  * @param routing_packet
  * @param cltv_expiry
  */
-function saveHTLCPathData(myUserID, channel_id, h, routing_packet, cltv_expiry) {
+function saveHTLCPathData(myUserID, channel_id, e) {
+// function saveHTLCPathData(myUserID, channel_id, h, routing_packet, cltv_expiry) {
     
     let key     = myUserID + channel_id;
     let request = db.transaction([kTbHTLCPathData], 'readwrite')
         .objectStore(kTbHTLCPathData)
-        .put({ key: key, h: h, routing_packet: routing_packet, cltv_expiry: cltv_expiry });
+        .put({ key: key, e: e});
+        // .put({ key: key, h: h, routing_packet: routing_packet, cltv_expiry: cltv_expiry });
   
     request.onsuccess = function (e) {
         // console.log('Data write success.');
@@ -1114,14 +1116,15 @@ function getHTLCPathData(myUserID, channel_id) {
     
         request.onsuccess = function (e) {
             if (request.result) {
-                let data = {
-                    h:              request.result.h,
-                    routing_packet: request.result.routing_packet,
-                    cltv_expiry:    request.result.cltv_expiry
-                };
+                // let data = {
+                //     h:              request.result.h,
+                //     routing_packet: request.result.routing_packet,
+                //     cltv_expiry:    request.result.cltv_expiry
+                // };
 
-                console.log('getHTLCPathData = ' + JSON.stringify(data));
-                resolve(data);
+                console.log('getHTLCPathData = ' + JSON.stringify(request.result.e));
+                resolve(request.result.e);
+                // resolve(data);
             } else {
                 console.log('getHTLCPathData = No Data.');
                 resolve('');
