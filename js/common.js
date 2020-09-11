@@ -35,9 +35,9 @@ var channelInfo;
 var lastestChannel = '';
 
 /**
- * The channel status
+ * a channel that had funding btc.
  */
-// var channelStatus = '';
+var channelHadBtcData = '';
 
 
 ////////////////////////////////
@@ -1548,14 +1548,17 @@ function fillCurrHtlcHt1aTempKey() {
 }
 
 //
-async function fillFundingBtcData(myUserID, channel_id) {
+async function fillFundingBtcData(myUserID, channel_id, status) {
 
     let result = await getFundingBtcData(myUserID, channel_id);
     $("#from_address").val(result.from_address);
     $("#from_address_private_key").val(result.from_address_private_key);
-    $("#to_address").val(await getChannelAddr(channel_id));
     $("#amount").val(result.amount);
     $("#miner_fee").val(result.miner_fee);
+    
+    if (status != kStatusAcceptChannel) {
+        $("#to_address").val(await getChannelAddr(channel_id));
+    }
 }
 
 //
@@ -1635,7 +1638,7 @@ async function changeInvokeAPIEnable(status, isFunder, myUserID, channel_id) {
             } else if (isFunder === true) { // Is Alice
                 enableInvokeAPI();
                 if (status === kStatusAcceptChannel) { // First fundingBitcoin
-                    fillFundingBtcData(myUserID, lastestChannel); // Data of lastest channel
+                    fillFundingBtcData(myUserID, channelHadBtcData, status); // channel that had funding btc
                     $("#to_address").val(await getChannelAddr(channel_id));
                 } else {
                     fillFundingBtcData(myUserID, channel_id);
@@ -4911,6 +4914,7 @@ function displayMyChannelListAtTopRight(page_size, page_index) {
             if (e.totalCount === 0) {
                 $("#div_channels").html("No Channel");
                 lastestChannel = '';
+                displayRefreshButton($("#div_channels"));
             } else {
                 tableMyChannelListAtTopRight(e);
 
@@ -4920,6 +4924,14 @@ function displayMyChannelListAtTopRight(page_size, page_index) {
                         lastestChannel = e.data[0].temporary_channel_id;
                     } else {
                         lastestChannel = e.data[0].channel_id;
+                    }
+                }
+
+                // get a channel that had funding btc.
+                for (let i = 0; i < e.data.length; i++) {
+                    if (e.data[i].btc_funding_times > 0) {
+                        channelHadBtcData = e.data[i].temporary_channel_id;
+                        break;
                     }
                 }
             }
@@ -5031,6 +5043,14 @@ function tableMyChannelListAtTopRight(e) {
     }
 
     // refresh button
+    displayRefreshButton(bottom_div);
+}
+
+/**
+ * 
+ * @param bottom_div
+ */
+function displayRefreshButton(bottom_div) {
     let butRefresh = document.createElement('button');
     butRefresh.setAttribute('class', 'button button_small');
     butRefresh.setAttribute('onclick', 'displayMyChannelListAtTopRight(5, 1)');
@@ -5038,6 +5058,12 @@ function tableMyChannelListAtTopRight(e) {
     bottom_div.append(butRefresh);
 }
 
+/**
+ * 
+ * @param {*} e 
+ * @param {*} i 
+ * @param {*} tr 
+ */
 function rowMyChannelListAtTopRight(e, i, tr) {
 
     if (e.data[i].channel_id === '') {
