@@ -607,9 +607,10 @@ function sdkAddInvoice() {
         console.info('-100402 sdkAddInvoice = ' + JSON.stringify(e));
 
         let myUserID   = $("#logined").text();
-        let channel_id = $("#curr_channel_id").text();
+        // let channel_id = $("#curr_channel_id").text();
         let r          = getPrivKeyFromPubKey(myUserID, info.h);
-        saveInvoiceR(myUserID, channel_id, r);
+        saveInvoiceR(r);
+        // saveInvoiceR(myUserID, channel_id, r);
 
         displaySentMessage100402(info);
         makeQRCode(e);
@@ -629,11 +630,22 @@ async function payInvoice() {
     info.invoice = $("#invoice").val();
     
     displaySentMessage100401(info, true);
-    let e = await HTLCFindPath(myUserID, channel_id, info);
     
+    let e    = await HTLCFindPath(info);
+    let path = e.routing_packet;
+
+    if (channel_id != path) {
+        // Using new channel to process htlc.
+        $("#curr_channel_id").text(path);
+        channel_id = path;
+    }
+    
+    saveHTLCPathData(e);
+    afterHTLCFindPath();
     savePayInvoiceCase('Yes');
 
     // Step 2: addHTLC
+    // disableInvokeAPI();
     payInvoiceStep2(e, myUserID, channel_id);
 }
 
@@ -657,9 +669,11 @@ async function payInvoiceStep2(e, myUserID, channel_id) {
     
     let info                            = new addHTLCInfo();
     info.recipient_user_peer_id         = userID;
+    info.property_id                    = e.property_id;
+    info.amount                         = e.amount;
     info.h                              = e.h;
     info.routing_packet                 = e.routing_packet;
-    info.amount                         = e.amount;
+    info.memo                           = e.memo;
     info.channel_address_private_key    = await getFundingPrivKey(myUserID, channel_id);
     info.last_temp_address_private_key  = getTempPrivKey(myUserID, kTempPrivKey, channel_id);
 
@@ -747,8 +761,9 @@ async function sdkAddHTLC() {
 // -100041 htlcSigned API at local.
 async function sdkHTLCSigned() {
 
-    let nodeID  = $("#recipient_node_peer_id").val();
-    let userID  = $("#recipient_user_peer_id").val();
+    let myUserID = $("#logined").text();
+    let nodeID   = $("#recipient_node_peer_id").val();
+    let userID   = $("#recipient_user_peer_id").val();
 
     let info                                = new HtlcSignedInfo();
     info.payer_commitment_tx_hash           = $("#payer_commitment_tx_hash").val();
@@ -764,8 +779,13 @@ async function sdkHTLCSigned() {
     info.curr_htlc_temp_address_index = Number(getIndexFromPubKey(info.curr_htlc_temp_address_pub_key));
 
     displaySentMessage100041(nodeID, userID, info);
-    await HTLCSigned($("#logined").text(), nodeID, userID, info);
+    let e = await HTLCSigned(myUserID, nodeID, userID, info);
     afterHTLCSigned();
+
+    //------------------------
+    // If is payInvoice case, will send -100045 forwardR
+    let fundingPrivKey = info.channel_address_private_key;
+    payInvoiceStep4(myUserID, e, nodeID, userID, e.channel_id, fundingPrivKey);
 }
 
 // -100401 
@@ -790,10 +810,9 @@ async function sdkHTLCFindPath() {
 
     displaySentMessage100401(info, isInvPay);
     let e = await HTLCFindPath(info);
-    // let e = await HTLCFindPath($("#logined").text(), $("#curr_channel_id").text(), info);
 
     let get_new_id = e.routing_packet;
-    let myUserID   = $("#logined").text();
+    // let myUserID   = $("#logined").text();
     let channel_id = $("#curr_channel_id").text();
 
     if (channel_id != get_new_id) {
@@ -801,13 +820,13 @@ async function sdkHTLCFindPath() {
         if (resp === true) { // clicked OK buttoin
             $("#curr_channel_id").text(get_new_id);
             afterHTLCFindPath();
-            saveHTLCPathData(myUserID, get_new_id, e);
+            saveHTLCPathData(e);
         } else {
             tipsOnTop('', k100401_ClickCancel);
         }
     } else {
         afterHTLCFindPath();
-        saveHTLCPathData(myUserID, channel_id, e);
+        saveHTLCPathData(e);
     }
 }
 
@@ -1442,7 +1461,8 @@ async function fillCounterparty(myUserID, channel_id) {
  * Auto fill h, routing packet, cltv expiry
  */
 async function fillHTLCPathData(myUserID, channel_id) {
-    let data = await getHTLCPathData(myUserID, channel_id);
+    // let data = await getHTLCPathData(myUserID, channel_id);
+    let data = getHTLCPathData();
     $("#property_id").val(data.property_id);
     $("#amount").val(data.amount);
     $("#memo").val(data.memo);
@@ -1783,17 +1803,15 @@ async function changeInvokeAPIEnable(status, isFunder, myUserID, channel_id) {
         case 'addInvoice':
             if (!isLogined) { // Not loged in
                 disableInvokeAPI();
-                break;
-            } else if (status < kStatusAssetFundingSigned) {
-                disableInvokeAPI();
-                break;
+            } else {
+                enableInvokeAPI();
+
+                date = new Date();
+                date = date.setDate(date.getDate() + 1);
+                date = new Date(date).toJSON().substr(0, 10).replace('T', ' ');
+                $("#expiry_time").val(date);
+                $("#expiry_time").attr("type", "date");
             }
-
-            enableInvokeAPI();
-            date = new Date().toJSON().substr(0, 10).replace('T', ' ');
-            $("#expiry_time").val(date);
-            $("#expiry_time").attr("type", "date");
-
             break;
 
         case 'payInvoice':
@@ -1816,7 +1834,9 @@ async function changeInvokeAPIEnable(status, isFunder, myUserID, channel_id) {
             enableInvokeAPI();
             fillCounterparty(myUserID, channel_id);
 
-            date = new Date().toJSON().substr(0, 10).replace('T', ' ');
+            date = new Date();
+            date = date.setDate(date.getDate() + 1);
+            date = new Date(date).toJSON().substr(0, 10).replace('T', ' ');
             $("#expiry_time").val(date);
             $("#expiry_time").attr("type", "date");
 
@@ -1881,7 +1901,8 @@ async function changeInvokeAPIEnable(status, isFunder, myUserID, channel_id) {
             fillCounterparty(myUserID, channel_id);
             fillChannelIDAndFundingPrivKey(myUserID, channel_id);
             fillCurrHtlcHe1bTempKey();
-            data = await getInvoiceR(myUserID, channel_id);
+            // data = await getInvoiceR(myUserID, channel_id);
+            data = getInvoiceR();
             $("#r").val(data);
 
             break;
@@ -1903,7 +1924,8 @@ async function changeInvokeAPIEnable(status, isFunder, myUserID, channel_id) {
             fillCounterparty(myUserID, channel_id);
             fillChannelIDAndFundingPrivKey(myUserID, channel_id);
             $("#msg_hash").val(await getTempData(myUserID, channel_id));
-            $("#r").val(await getForwardR(myUserID, channel_id));
+            $("#r").val(getInvoiceR());
+            // $("#r").val(await getForwardR(myUserID, channel_id));
 
             break;
 

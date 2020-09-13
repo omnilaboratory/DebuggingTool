@@ -882,56 +882,71 @@ function getMnemonic(myUserID, param) {
 
 /**
  * save r from addInvoice type ( -100402 )
+ * @param r
+ */
+function saveInvoiceR(r) {
+    localStorage.setItem(kTbInvoiceR, r);
+}
+
+/**
+ * get r from addInvoice type ( -100402 )
+ */
+function getInvoiceR() {
+    return localStorage.getItem(kTbInvoiceR);
+}
+
+/**
+ * save r from addInvoice type ( -100402 )
  * @param myUserID
  * @param channel_id
  * @param r
  */
-function saveInvoiceR(myUserID, channel_id, r) {
+// function OLDsaveInvoiceR(myUserID, channel_id, r) {
 
-    let key     = myUserID + channel_id;
-    let request = db.transaction([kTbInvoiceR], 'readwrite')
-        .objectStore(kTbInvoiceR)
-        .put({ key: key, r: r });
+//     let key     = myUserID + channel_id;
+//     let request = db.transaction([kTbInvoiceR], 'readwrite')
+//         .objectStore(kTbInvoiceR)
+//         .put({ key: key, r: r });
   
-    request.onsuccess = function (e) {
-        // console.log('Data write success.');
-    };
+//     request.onsuccess = function (e) {
+//         // console.log('Data write success.');
+//     };
   
-    request.onerror = function (e) {
-        // console.log('Data write false.');
-    }
-}
+//     request.onerror = function (e) {
+//         // console.log('Data write false.');
+//     }
+// }
 
 /**
  * get r from addInvoice type ( -100402 )
  * @param myUserID 
  * @param channel_id
  */
-function getInvoiceR(myUserID, channel_id) {
+// function OLDgetInvoiceR(myUserID, channel_id) {
 
-    return new Promise((resolve, reject) => {
+//     return new Promise((resolve, reject) => {
 
-        let key         = myUserID + channel_id;
-        let transaction = db.transaction([kTbInvoiceR], 'readonly');
-        let store       = transaction.objectStore(kTbInvoiceR);
-        let request     = store.get(key);
+//         let key         = myUserID + channel_id;
+//         let transaction = db.transaction([kTbInvoiceR], 'readonly');
+//         let store       = transaction.objectStore(kTbInvoiceR);
+//         let request     = store.get(key);
     
-        request.onerror = function(e) {
-            console.log('Read data false.');
-            reject('Read data false.');
-        };
+//         request.onerror = function(e) {
+//             console.log('Read data false.');
+//             reject('Read data false.');
+//         };
     
-        request.onsuccess = function (e) {
-            if (request.result) {
-                console.log('getInvoiceR = ' + request.result.r);
-                resolve(request.result.r);
-            } else {
-                console.log('getInvoiceR = No Data.');
-                resolve('');
-            }
-        }
-    })
-}
+//         request.onsuccess = function (e) {
+//             if (request.result) {
+//                 console.log('getInvoiceR = ' + request.result.r);
+//                 resolve(request.result.r);
+//             } else {
+//                 console.log('getInvoiceR = No Data.');
+//                 resolve('');
+//             }
+//         }
+//     })
+// }
 
 /**
  * save r from forwardR type ( -100045 ) return
@@ -939,52 +954,52 @@ function getInvoiceR(myUserID, channel_id) {
  * @param channel_id
  * @param r
  */
-function saveForwardR(myUserID, channel_id, r) {
+// function saveForwardR(myUserID, channel_id, r) {
 
-    let key     = myUserID + channel_id;
-    let request = db.transaction([kTbForwardR], 'readwrite')
-        .objectStore(kTbForwardR)
-        .put({ key: key, r: r });
+//     let key     = myUserID + channel_id;
+//     let request = db.transaction([kTbForwardR], 'readwrite')
+//         .objectStore(kTbForwardR)
+//         .put({ key: key, r: r });
   
-    request.onsuccess = function (e) {
-        // console.log('Data write success.');
-    };
+//     request.onsuccess = function (e) {
+//         // console.log('Data write success.');
+//     };
   
-    request.onerror = function (e) {
-        // console.log('Data write false.');
-    }
-}
+//     request.onerror = function (e) {
+//         // console.log('Data write false.');
+//     }
+// }
 
 /**
  * get r from forwardR type ( -100045 ) return
  * @param myUserID 
  * @param channel_id
  */
-function getForwardR(myUserID, channel_id) {
+// function getForwardR(myUserID, channel_id) {
 
-    return new Promise((resolve, reject) => {
+//     return new Promise((resolve, reject) => {
 
-        let key         = myUserID + channel_id;
-        let transaction = db.transaction([kTbForwardR], 'readonly');
-        let store       = transaction.objectStore(kTbForwardR);
-        let request     = store.get(key);
+//         let key         = myUserID + channel_id;
+//         let transaction = db.transaction([kTbForwardR], 'readonly');
+//         let store       = transaction.objectStore(kTbForwardR);
+//         let request     = store.get(key);
     
-        request.onerror = function(e) {
-            console.log('Read data false.');
-            reject('Read data false.');
-        };
+//         request.onerror = function(e) {
+//             console.log('Read data false.');
+//             reject('Read data false.');
+//         };
     
-        request.onsuccess = function (e) {
-            if (request.result) {
-                console.log('getForwardR = ' + request.result.r);
-                resolve(request.result.r);
-            } else {
-                console.log('getForwardR = No Data.');
-                resolve('');
-            }
-        }
-    })
-}
+//         request.onsuccess = function (e) {
+//             if (request.result) {
+//                 console.log('getForwardR = ' + request.result.r);
+//                 resolve(request.result.r);
+//             } else {
+//                 console.log('getForwardR = No Data.');
+//                 resolve('');
+//             }
+//         }
+//     })
+// }
 
 /**
  * Save auto pilot status
@@ -1070,68 +1085,67 @@ function checkChannelAddessExist(nodeID, userID, info) {
 }
 
 /**
- * Save Funding private key
- * @param myUserID
- * @param channel_id
- * @param h
- * @param routing_packet
- * @param cltv_expiry
+ * Save HTLC Path Data
+ * @param e
  */
-function saveHTLCPathData(myUserID, channel_id, e) {
-// function saveHTLCPathData(myUserID, channel_id, h, routing_packet, cltv_expiry) {
-    
-    let key     = myUserID + channel_id;
-    let request = db.transaction([kTbHTLCPathData], 'readwrite')
-        .objectStore(kTbHTLCPathData)
-        .put({ key: key, e: e});
-        // .put({ key: key, h: h, routing_packet: routing_packet, cltv_expiry: cltv_expiry });
-  
-    request.onsuccess = function (e) {
-        // console.log('Data write success.');
-    };
-  
-    request.onerror = function (e) {
-        // console.log('Data write false.');
-    }
+function saveHTLCPathData(e) {
+    localStorage.setItem(kTbHTLCPathData, JSON.stringify(e));
 }
 
 /**
  * 
- * @param myUserID 
- * @param channel_id
  */
-function getHTLCPathData(myUserID, channel_id) {
-
-    return new Promise((resolve, reject) => {
-
-        let key         = myUserID + channel_id;
-        let transaction = db.transaction([kTbHTLCPathData], 'readonly');
-        let store       = transaction.objectStore(kTbHTLCPathData);
-        let request     = store.get(key);
-    
-        request.onerror = function(e) {
-            console.log('Read data false.');
-            reject('Read data false.');
-        };
-    
-        request.onsuccess = function (e) {
-            if (request.result) {
-                // let data = {
-                //     h:              request.result.h,
-                //     routing_packet: request.result.routing_packet,
-                //     cltv_expiry:    request.result.cltv_expiry
-                // };
-
-                console.log('getHTLCPathData = ' + JSON.stringify(request.result.e));
-                resolve(request.result.e);
-                // resolve(data);
-            } else {
-                console.log('getHTLCPathData = No Data.');
-                resolve('');
-            }
-        }
-    })
+function getHTLCPathData() {
+    return JSON.parse(localStorage.getItem(kTbHTLCPathData));
 }
+
+/**
+ * Save HTLC Path Data
+ * @param e
+ */
+// function OLDsaveHTLCPathData(e) {
+    
+//     let key     = myUserID + channel_id;
+//     let request = db.transaction([kTbHTLCPathData], 'readwrite')
+//         .objectStore(kTbHTLCPathData)
+//         .put({ key: key, e: e});
+  
+//     request.onsuccess = function (e) {
+//     };
+  
+//     request.onerror = function (e) {
+//     }
+// }
+
+/**
+ * 
+ */
+// function OLDgetHTLCPathData() {
+
+//     return new Promise((resolve, reject) => {
+
+//         let key         = myUserID + channel_id;
+//         let transaction = db.transaction([kTbHTLCPathData], 'readonly');
+//         let store       = transaction.objectStore(kTbHTLCPathData);
+//         let request     = store.get(key);
+    
+//         request.onerror = function(e) {
+//             console.log('Read data false.');
+//             reject('Read data false.');
+//         };
+    
+//         request.onsuccess = function (e) {
+//             if (request.result) {
+//                 console.log('getHTLCPathData = ' + JSON.stringify(request.result.e));
+//                 resolve(request.result.e);
+//                 // resolve(data);
+//             } else {
+//                 console.log('getHTLCPathData = No Data.');
+//                 resolve('');
+//             }
+//         }
+//     })
+// }
 
 /**
  * Save Funding private key

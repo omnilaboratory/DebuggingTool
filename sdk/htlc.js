@@ -12,20 +12,16 @@ function addInvoice(info, callback) {
 }
 
 /**
- *  Pay an invoice. This protocol is the first step of a payment, 
+ * This protocol is the first step of a payment, 
  * which seeks a full path of nodes, decide which path is the 
  * optimistic one, in terms of hops, node's histroy service quility, and fees.
  * 
- * @param myUserID The user id of logged in
- * @param channel_id 
  * @param info 
  */
-// function HTLCFindPath(myUserID, channel_id, info) {
 function HTLCFindPath(info) {
     return new Promise((resolve, reject) => {
         obdApi.HTLCFindPath(info, function(e) {
             console.info('SDK: -100401 - HTLCFindPath = ' + JSON.stringify(e));
-            // saveHTLCPathData(myUserID, channel_id, e);
             resolve(e);
         });
     })

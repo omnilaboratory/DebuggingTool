@@ -226,7 +226,8 @@ async function payInvoiceStep4(myUserID, e, nodeID, userID, channel_id, fundingP
 
     let info        = new ForwardRInfo();
     info.channel_id = channel_id;
-    info.r          = await getInvoiceR(myUserID, channel_id);
+    info.r          = getInvoiceR();
+    // info.r          = await getInvoiceR(myUserID, channel_id);
     
     let result = genNewAddress(myUserID, true);
     saveAddress(myUserID, result);
@@ -240,7 +241,7 @@ async function payInvoiceStep4(myUserID, e, nodeID, userID, channel_id, fundingP
 
     displaySentMessage100045(nodeID, userID, info);
     await forwardR(myUserID, nodeID, userID, info);
-    // afterForwardR();
+    afterForwardR();
 }
 
 /**
@@ -264,7 +265,8 @@ async function listening110045(e) {
     let myUserID = e.to_peer_id;
 
     saveTempData(myUserID, e.channel_id, e.msg_hash);
-    saveForwardR(myUserID, e.channel_id, e.r);
+    saveInvoiceR(e.r);
+    // saveForwardR(myUserID, e.channel_id, e.r);
     saveChannelStatus(myUserID, e.channel_id, true, kStatusForwardR);
 
     if (isAutoMode != 'Yes') {  // auto mode closed
@@ -289,7 +291,7 @@ async function listening110045(e) {
     info.channel_address_private_key = await getFundingPrivKey(myUserID, e.channel_id);
 
     // SDK API
-    let resp = await signR(nodeID, userID, info);
+    let resp = await signR(myUserID, nodeID, userID, info);
 
     // NOT SDK API. This a client function, just for Debugging Tool.
     displaySentMessage100046(nodeID, userID, info);
@@ -347,7 +349,7 @@ async function payInvoiceStep6(myUserID, e, nodeID, userID, channel_id, fundingP
 
     displaySentMessage100049(nodeID, userID, info);
     await closeHTLC(myUserID, nodeID, userID, info);
-    // afterCloseHTLC();
+    afterCloseHTLC();
 }
 
 /**
@@ -403,12 +405,14 @@ async function listening110049(e, netType) {
 
     // Save address index to OBD and can get private key back if lose it.
     info.curr_rsmc_temp_address_index = Number(getIndexFromPubKey(addr.result.pubkey));
-
-    // SDK API
-    closeHTLCSigned(myUserID, nodeID, userID, info);
-
+    
     // NOT SDK API. This a client function, just for Debugging Tool.
     displaySentMessage100050(nodeID, userID, info);
+
+    // SDK API
+    await closeHTLCSigned(myUserID, nodeID, userID, info);
+    afterCloseHTLCSigned();
+    savePayInvoiceCase('No');
 }
 
 /**
