@@ -128,6 +128,7 @@ class addHTLCInfo {
         this.memo = "";
         this.h = "";
         this.routing_packet = "";
+        this.cltv_expiry = 0;
         this.channel_address_private_key = "";
         this.last_temp_address_private_key = "";
         this.curr_rsmc_temp_address_pub_key = "";

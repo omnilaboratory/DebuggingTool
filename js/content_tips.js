@@ -262,9 +262,9 @@ const k100401 = 'The path found is not the current channel, and will switch to.'
 const k100401_ClickCancel = 'You did not confirm the channel switch, the next operation may be wrong.';
 
 /**
- * 
+ * Pay Invoice is processing
  */
-const kNo = '';
+const kPayInvoice = 'Pay Invoice is processing ... Waiting for response from counterparty.';
 
 
 //----------------------------------------------------------------

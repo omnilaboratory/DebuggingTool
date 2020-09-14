@@ -115,6 +115,11 @@ const kTbForwardR = 'tb_forward_r';
 const kTbInvoiceR = 'tb_invoice_r';
 
 /**
+ * 
+ */
+const kInvoiceH = 'invoice_h';
+
+/**
  * Object Store (table) name of IndexedDB.
  * temp private key
  */
@@ -893,6 +898,21 @@ function saveInvoiceR(r) {
  */
 function getInvoiceR() {
     return localStorage.getItem(kTbInvoiceR);
+}
+
+/**
+ * save h from addHTLC type ( -100040 )
+ * @param h
+ */
+function saveInvoiceH(h) {
+    localStorage.setItem(kInvoiceH, h);
+}
+
+/**
+ * get h from addHTLC type ( -100040 )
+ */
+function getInvoiceH() {
+    return localStorage.getItem(kInvoiceH);
 }
 
 /**

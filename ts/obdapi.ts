@@ -1054,7 +1054,10 @@ class ObdApi {
       alert("empty routing_packet");
       return;
     }
-
+    if (info.cltv_expiry <= 0) {
+      alert("wrong cltv_expiry");
+      return;
+    }
     if (this.isNotString(info.channel_address_private_key)) {
       alert("empty channel_address_private_key");
       return;

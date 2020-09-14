@@ -830,7 +830,7 @@
                 },
                 {
                     "name": "cltv_expiry",
-                    "help": "The.",
+                    "help": "The blocks height for waiting time.",
                     "buttons": []
                 },
                 {

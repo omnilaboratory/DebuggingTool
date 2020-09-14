@@ -157,6 +157,7 @@ async function listening110040(e, netType) {
 
     let myUserID = e.to_peer_id;
 
+    saveInvoiceH(e.h);
     saveTempData(myUserID, e.channel_id, e.payer_commitment_tx_hash);
     saveChannelStatus(myUserID, e.channel_id, false, kStatusAddHTLC);
 
@@ -195,7 +196,7 @@ async function listening110040(e, netType) {
     displaySentMessage100041(nodeID, userID, info);
 
     //------------------------
-    // If is payInvoice case, will send -100045 forwardR
+    // If Bob has R, will send -100045 forwardR
     let fundingPrivKey = info.channel_address_private_key;
     payInvoiceStep4(myUserID, resp, nodeID, userID, e.channel_id, fundingPrivKey);
 }
@@ -210,24 +211,22 @@ async function listening110040(e, netType) {
  * @param fundingPrivKey
  */
 async function payInvoiceStep4(myUserID, e, nodeID, userID, channel_id, fundingPrivKey) {
-
-    let isInPayInvoice = getPayInvoiceCase();
-    console.info('isInPayInvoice = ' + isInPayInvoice);
-
-    // Not in pay invoice case
-    if (isInPayInvoice != 'Yes') return;
-
+    
     if (e === null) {
         alert("HTLCSigned failed. payInvoice paused.");
         return;
     }
 
-    // Bob will send -100045 forwardR
+    let r = getPrivKeyFromPubKey(myUserID, getInvoiceH());
 
+    // Bob has NOT R. Bob maybe a middleman node.
+    if (r === '') return;
+
+    // Bob will send -100045 forwardR
     let info        = new ForwardRInfo();
     info.channel_id = channel_id;
-    info.r          = getInvoiceR();
-    // info.r          = await getInvoiceR(myUserID, channel_id);
+    info.r          = r;
+    console.info('-100045 forwardR info.r = ' + info.r);
     
     let result = genNewAddress(myUserID, true);
     saveAddress(myUserID, result);
@@ -241,6 +240,8 @@ async function payInvoiceStep4(myUserID, e, nodeID, userID, channel_id, fundingP
 
     displaySentMessage100045(nodeID, userID, info);
     await forwardR(myUserID, nodeID, userID, info);
+
+    // NOT SDK API. This a client function, just for Debugging Tool.
     afterForwardR();
 }
 
@@ -313,16 +314,16 @@ async function listening110045(e) {
  */
 async function payInvoiceStep6(myUserID, e, nodeID, userID, channel_id, fundingPrivKey) {
 
+    if (e === null) {
+        alert("signR failed. payInvoice paused.");
+        return;
+    }
+
     let isInPayInvoice = getPayInvoiceCase();
     console.info('payInvoiceStep6 isInPayInvoice = ' + isInPayInvoice);
 
     // Not in pay invoice case
     if (isInPayInvoice != 'Yes') return;
-
-    if (e === null) {
-        alert("signR failed. payInvoice paused.");
-        return;
-    }
 
     // Alice will send -100049 closeHTLC
 
@@ -349,7 +350,6 @@ async function payInvoiceStep6(myUserID, e, nodeID, userID, channel_id, fundingP
 
     displaySentMessage100049(nodeID, userID, info);
     await closeHTLC(myUserID, nodeID, userID, info);
-    afterCloseHTLC();
 }
 
 /**
@@ -377,10 +377,9 @@ async function listening110049(e, netType) {
     saveChannelStatus(myUserID, e.channel_id, false, kStatusCloseHTLC);
 
     if (isAutoMode != 'Yes') {  // auto mode closed
-        let isInPayInvoice = getPayInvoiceCase();
-        console.info('listening110049 isInPayInvoice = ' + isInPayInvoice);
-        // Not in pay invoice case
-        if (isInPayInvoice != 'Yes') return;
+        let r = getPrivKeyFromPubKey(myUserID, getInvoiceH());
+        // Bob has NOT R. Bob maybe a middleman node.
+        if (r === '') return;
     }
 
     console.info('listening110049 = ' + JSON.stringify(e));
@@ -408,11 +407,13 @@ async function listening110049(e, netType) {
     
     // NOT SDK API. This a client function, just for Debugging Tool.
     displaySentMessage100050(nodeID, userID, info);
+    tipsOnTop('', kTipsAfterCloseHTLCSigned);
 
     // SDK API
     await closeHTLCSigned(myUserID, nodeID, userID, info);
-    afterCloseHTLCSigned();
-    savePayInvoiceCase('No');
+
+    // Clear H at Bob side
+    saveInvoiceH('');
 }
 
 /**
@@ -421,6 +422,7 @@ async function listening110049(e, netType) {
  */
 function listening110050(e) {
     saveChannelStatus(e.to_peer_id, e.channel_id, true, kStatusCloseHTLCSigned);
+    savePayInvoiceCase('No');
 }
 
 /**

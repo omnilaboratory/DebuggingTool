@@ -112,6 +112,7 @@ class addHTLCInfo {
   memo: string = "";
   h: string = "";
   routing_packet: string = "";
+  cltv_expiry: number = 0;
   channel_address_private_key: string = "";
   last_temp_address_private_key: string = "";
   curr_rsmc_temp_address_pub_key: string = "";

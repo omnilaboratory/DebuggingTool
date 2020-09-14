@@ -606,10 +606,10 @@ function sdkAddInvoice() {
     addInvoice(info, function(e) {
         console.info('-100402 sdkAddInvoice = ' + JSON.stringify(e));
 
-        let myUserID   = $("#logined").text();
+        // let myUserID   = $("#logined").text();
         // let channel_id = $("#curr_channel_id").text();
-        let r          = getPrivKeyFromPubKey(myUserID, info.h);
-        saveInvoiceR(r);
+        // let r          = getPrivKeyFromPubKey(myUserID, info.h);
+        // saveInvoiceR(r);
         // saveInvoiceR(myUserID, channel_id, r);
 
         displaySentMessage100402(info);
@@ -641,11 +641,11 @@ async function payInvoice() {
     }
     
     saveHTLCPathData(e);
-    afterHTLCFindPath();
+    disableInvokeAPI();
+    tipsOnTop('', kPayInvoice);
     savePayInvoiceCase('Yes');
 
     // Step 2: addHTLC
-    // disableInvokeAPI();
     payInvoiceStep2(e, myUserID, channel_id);
 }
 
@@ -673,6 +673,7 @@ async function payInvoiceStep2(e, myUserID, channel_id) {
     info.amount                         = e.amount;
     info.h                              = e.h;
     info.routing_packet                 = e.routing_packet;
+    info.cltv_expiry                    = e.min_cltv_expiry;
     info.memo                           = e.memo;
     info.channel_address_private_key    = await getFundingPrivKey(myUserID, channel_id);
     info.last_temp_address_private_key  = getTempPrivKey(myUserID, kTempPrivKey, channel_id);
@@ -699,7 +700,6 @@ async function payInvoiceStep2(e, myUserID, channel_id) {
 
     displaySentMessage100040(nodeID, userID, info);
     await addHTLC(myUserID, nodeID, userID, info);
-    afterAddHTLC();
 }
 
 /**
@@ -739,6 +739,7 @@ async function sdkAddHTLC() {
     info.memo                                        = $("#memo").val();
     info.h                                           = $("#h").val();
     info.routing_packet                              = $("#routing_packet").val();
+    info.cltv_expiry                                 = Number($("#cltv_expiry").val());
     info.channel_address_private_key                 = $("#channel_address_private_key").val();
     info.last_temp_address_private_key               = $("#last_temp_address_private_key").val();
     info.curr_rsmc_temp_address_pub_key              = $("#curr_rsmc_temp_address_pub_key").val();
@@ -1902,7 +1903,8 @@ async function changeInvokeAPIEnable(status, isFunder, myUserID, channel_id) {
             fillChannelIDAndFundingPrivKey(myUserID, channel_id);
             fillCurrHtlcHe1bTempKey();
             // data = await getInvoiceR(myUserID, channel_id);
-            data = getInvoiceR();
+            // data = getInvoiceR();
+            data = getPrivKeyFromPubKey(myUserID, getInvoiceH());
             $("#r").val(data);
 
             break;
