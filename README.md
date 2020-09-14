@@ -14,6 +14,10 @@ In this tutorial, you can connect either your own OBD node, or the [nodes in the
   <img width="500" alt="Debugging Tool Screenshot" src="https://github.com/omnilaboratory/DebuggingTool/blob/master/doc/img/image_screen.png">
 </p>
 
+The latest document/tutorial has been moved to [GUI Playground](https://omnilaboratory.github.io/obd/#/GUI-tool).  
+ 
+The following doc will be removed:  
+
 * [Installation](https://github.com/omnilaboratory/DebuggingTool#installation-clone-this-project-and-run-it-by-chrome)
 * [Nodes in the testnet](https://github.com/omnilaboratory/DebuggingTool#Nodes-in-testnet)
 * [Operations](https://github.com/omnilaboratory/DebuggingTool#operations) 

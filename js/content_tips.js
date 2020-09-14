@@ -3,134 +3,134 @@
 
 
 /**
- * Tips for 
+ * Tips for the fist time you open the page.
  */
-const kTipsInit = 'You should connect to an OBD node first.';
+const kTipsInit = 'You should firstly connect to an OBD node.';
 
 /**
  * Tips for after connect to an OBD node
  */
-const kTipsAfterConnectOBD = 'Next you could be log in.';
+const kTipsAfterConnectOBD = 'Next you need to log in.';
+
+/**
+ * Tips for openning a channel.
+ */
+const kTipsAfterLogin = 'You have logged in. Next you can create a channel with a remote peer using openChannel interface.';
+
+/**
+ * Tips for waiting for response.
+ */
+const kTipsAfterOpenChannel = 'You requested to open channel. Wait for response from your counterparty, who will accept using acceptChannel(...) .';
+
+/**
+ * Tips for waiting funding.
+ */
+const kTipsAfterAcceptChannel = 'You accepted the request to open a channel. Wait for funding bitcoin by your counterparty.';
+
+/**
+ * Tips for funding btc.
+ */
+const kTipsAfterFundingBitcoin = 'Funding bitcoin is finished successfully and you now should notify your counterparty.';
 
 /**
  * Tips for 
  */
-const kTipsAfterLogin = 'You have logged in. Next you can create a channel with openChannel api.';
+const kTipsAfterBitcoinFundingCreated = 'Funding bitcoin notification sent. Wait for response from your counterparty (bitcoinFundingSigned) .';
 
 /**
  * Tips for 
  */
-const kTipsAfterOpenChannel = 'You request to open channel. Waiting for response from counterparty (acceptChannel) .';
+const kTipsFirstAfterBitcoinFundingSigned = 'You have signed first bitcoin funding. Wait for second funding bitcoin from your  counterparty.';
 
 /**
  * Tips for 
  */
-const kTipsAfterAcceptChannel = 'You have accepted the request to open channel. Waiting for funding bitcoin from counterparty.';
+const kTipsSecondAfterBitcoinFundingSigned = 'You have signed second bitcoin funding. Wait for third funding bitcoin from your counterparty.';
 
 /**
  * Tips for 
  */
-const kTipsAfterFundingBitcoin = 'Funding bitcoin done and you should notify counterparty.';
+const kTipsThirdAfterBitcoinFundingSigned = 'You have signed third bitcoin funding. Wait for funding asset from your counterparty.';
 
 /**
  * Tips for 
  */
-const kTipsAfterBitcoinFundingCreated = 'Funding bitcoin notification sent. Waiting for response from counterparty (bitcoinFundingSigned) .';
+const kTipsAfterFundingAsset = 'Funding asset is finished successfully and you now should notify counterparty.';
 
 /**
  * Tips for 
  */
-const kTipsFirstAfterBitcoinFundingSigned = 'You have signed first bitcoin funding. Waiting for second funding bitcoin from counterparty.';
+const kTipsAfterAssetFundingCreated = 'Funding asset notification sent. Wait for response from your counterparty (assetFundingSigned) .';
 
 /**
  * Tips for 
  */
-const kTipsSecondAfterBitcoinFundingSigned = 'You have signed second bitcoin funding. Waiting for third funding bitcoin from counterparty.';
+const kTipsAfterAssetFundingSigned = 'You have signed asset funding. The channel has been created and funded successfully.';
 
 /**
  * Tips for 
  */
-const kTipsThirdAfterBitcoinFundingSigned = 'You have signed third bitcoin funding. Waiting for funding asset from counterparty.';
+const kTipsAfterCommitmentTransactionCreated = 'You have sent a RSMC transfer. Wait for response from your counterparty.';
 
 /**
  * Tips for 
  */
-const kTipsAfterFundingAsset = 'Funding asset done and you should notify counterparty.';
+const kTipsAfterCommitmentTransactionAccepted = 'You have accepted a RSMC transfer, check your balance and see the payment successfully recorded. You can also make your RSMC transfer to any other peer.';
 
 /**
  * Tips for 
  */
-const kTipsAfterAssetFundingCreated = 'Funding asset notification sent. Waiting for response from counterparty (assetFundingSigned) .';
+const kTipsAfterHTLCFindPath = 'You found a HTLC payment path successfully, the next operation is AddHTLC.';
 
 /**
  * Tips for 
  */
-const kTipsAfterAssetFundingSigned = 'You have signed asset funding. The channel has been created.';
-
-/**
- * Tips for 
- */
-const kTipsAfterCommitmentTransactionCreated = 'You have sent a RSMC transfer. Waiting for response from counterparty.';
-
-/**
- * Tips for 
- */
-const kTipsAfterCommitmentTransactionAccepted = 'You have accepted a RSMC transfer. You can also start a RSMC transfer.';
-
-/**
- * Tips for 
- */
-const kTipsAfterHTLCFindPath = 'You have found a HTLC path and the next operation is AddHTLC.';
-
-/**
- * Tips for 
- */
-const kTipsAfterAddHTLC = 'You have requested to add HTLC. Waiting for response from counterparty.';
+const kTipsAfterAddHTLC = 'You have requested to add HTLC. Wait for response from your counterparty.';
 
 /**
  * Tips for
  */
-const kTipsAfterHTLCSigned = 'You have accepted the request to HTLC. Now, you should be forward R to counterparty.';
+const kTipsAfterHTLCSigned = 'You have accepted the request to add an HTLC. Now, you should forward the secrete key R to your counterparty.';
 
 /**
  * Tips for 
  */
-const kTipsAfterForwardR = 'You have forwarded R. Waiting for response from counterparty.';
+const kTipsAfterForwardR = 'You have forwarded R. Wait for response from counterparty.';
 
 /**
  * Tips for 
  */
-const kTipsAfterSignR = 'You have signed the R. The HTLC has completed and you can request to close the HTLC.';
+const kTipsAfterSignR = 'You have signed the R. This HTLC has completed and you can request to close it.';
 
 /**
  * Tips for 
  */
-const kTipsAfterCloseHTLC = 'You have requested to close the HTLC. Waiting for response from counterparty.';
+const kTipsAfterCloseHTLC = 'You have requested to close the HTLC. Wait for response from counterparty.';
 
 /**
  * Tips for 
  */
-const kTipsAfterCloseHTLCSigned = 'You have confirmed to close the HTLC. Next you can continue to use the channel.';
+const kTipsAfterCloseHTLCSigned = 'You have confirmed to close the HTLC, and freed the resurce of this channel it occupied. The life cycle of this HTLC is finished. The channel now is available for other operations.';
 
 /**
  * Tips for 
  */
-const kTipsAfterCloseChannel = 'You request to close the channel. Waiting for response from counterparty.';
+const kTipsAfterCloseChannel = 'You requested to close the channel. Wait for response from counterparty.';
 
 /**
  * Tips for 
  */
-const kTipsAfterCloseChannelSigned = 'You have confirmed to close the channel. Now you can create a new channel with counterparty.';
+const kTipsAfterCloseChannelSigned = 'You confirmed to close the channel. You may want to create a new channel with someone else.';
 
 /**
  * Tips for 
  */
-const kTipsAfterAtomicSwap = 'You request to send an atomic swap. Waiting for response from counterparty.';
+const kTipsAfterAtomicSwap = 'You requested to send an atomic swap. Wait for response from counterparty.';
 
 /**
  * Tips for 
  */
-const kTipsAfterAcceptSwap = 'You have accepted atomic swap. Next you can continue to use the channel.';
+const kTipsAfterAcceptSwap = 'You accepted an atomic swap. ';
 
 /**
  * Tips for 
@@ -140,52 +140,52 @@ const kTips110032 = 'You received a request to open a channel.';
 /**
  * Tips for 
  */
-const kTips110033 = 'Counterparty accepted to open channel, you should be start to funding bitcoin.';
+const kTips110033 = 'Counterparty accepted to open channel, you should start to funding bitcoin.';
 
 /**
  * Tips for 
  */
-const kTipsFirst110340 = 'You received a notification to confirm first funding bitcoin.';
+const kTipsFirst110340 = 'You received a notification, please confirm the first bitcoin funding.';
 
 /**
  * Tips for 
  */
-const kTipsSecond110340 = 'You received a notification to confirm second funding bitcoin.';
+const kTipsSecond110340 = 'You received a notification, please confirm the second bitcoin funding.';
 
 /**
  * Tips for 
  */
-const kTipsThird110340 = 'You received a notification to confirm third funding bitcoin.';
+const kTipsThird110340 = 'You received a notification, please confirm the third bitcoin funding.';
 
 /**
  * Tips for 
  */
-const kTipsFirst110350 = 'Counterparty confirmed funding bitcoin, you can start second funding bitcoin.';
+const kTipsFirst110350 = 'Counterparty confirmed bitcoin funding, you can start the second bitcoin funding.';
 
 /**
  * Tips for 
  */
-const kTipsSecond110350 = 'Counterparty confirmed funding bitcoin, you can start third funding bitcoin.';
+const kTipsSecond110350 = 'Counterparty confirmed funding bitcoin, you can start the third bitcoin funding.';
 
 /**
  * Tips for 
  */
-const kTipsThird110350 = 'Counterparty confirmed funding bitcoin. Now, you should be funding asset.';
+const kTipsThird110350 = 'Counterparty confirmed funding bitcoin. Now, you should fund asset.';
 
 /**
  * Tips for 
  */
-const kTips110034 = 'You received a notification to confirm funding asset.';
+const kTips110034 = 'You received a notification, please confirm asset funding.';
 
 /**
  * Tips for 
  */
-const kTips110035 = 'Counterparty confirmed funding asset. Now, the channel has been created.';
+const kTips110035 = 'Counterparty confirmed asset funding. Now, the channel has been successfully created and funded.';
 
 /**
  * Tips for 
  */
-const kTips110351 = 'You received a notification to confirm the RSMC transfer.';
+const kTips110351 = 'You received a notification, please confirm the RSMC transfer.';
 
 /**
  * Tips for 
@@ -200,22 +200,22 @@ const kTips110040 = 'You received a request to add HTLC.';
 /**
  * Tips for 
  */
-const kTips110041 = 'Counterparty accepted the add HTLC. Waiting for forward R from counterparty.';
+const kTips110041 = 'Counterparty accepted the HTLC. Wait for secrete R from counterparty.';
 
 /**
  * Tips for 
  */
-const kTips110045 = 'You received the R from counterparty and you can sign the R.';
+const kTips110045 = 'You received the secrete R from counterparty and you can sign the R.';
 
 /**
  * Tips for 
  */
-const kTips110046 = 'Counterparty has signed the R. The HTLC has completed and you can request to close it.';
+const kTips110046 = 'Counterparty has signed the R. The HTLC has been completed and you can request to close it.';
 
 /**
  * Tips for 
  */
-const kTips110049 = 'You received a request to close HTLC.';
+const kTips110049 = 'You received a request to close current HTLC.';
 
 /**
  * Tips for 
@@ -240,31 +240,33 @@ const kTips110038 = 'You received a request to close the channel.';
 /**
  * Tips for 
  */
-const kTips110039 = 'Counterparty has accepted to close the channel. Next you can create a new channel.';
+const kTips110039 = 'Counterparty has accepted to close the channel. This channel is closed. You are able to use other channels you have, or create a new one with someone else.';
 
 /**
  * Tips for 
  */
-const kTipsNoLocalData = 'The channel you selected has no locally saved data.';
+const kTipsNoLocalData = 'The channel you selected has no locally stored data.';
 
 
 //----------------------------------------------------------------
 // Others
 
 /**
- * 找到的路径不是当前通道，需要切换通道，请确认。
+ * cn team: 找到的路径不是当前通道，需要切换通道，请确认。
+ * The path found is not for the current channel, please swith channel 
  */
-const k100401 = 'The path found is not the current channel, and will switch to.';
+const k100401 = 'The path found is not for the current channel, and will switch to.';
 
 /**
- * 你没有确认通道切换，下一步操作可能会出错。
+ * cn team: 你没有确认通道切换，下一步操作可能会出错。
+ * You did not confirm to switch the channel, the next operation may go wrong
  */
-const k100401_ClickCancel = 'You did not confirm the channel switch, the next operation may be wrong.';
+const k100401_ClickCancel = 'You did not confirm to switch the channel, the next operation may go wrong.';
 
 /**
  * Pay Invoice is processing
  */
-const kPayInvoice = 'Pay Invoice is processing ... Waiting for response from counterparty.';
+const kPayInvoice = 'Pay Invoice is processing ... Wait for response from counterparty.';
 
 
 //----------------------------------------------------------------
