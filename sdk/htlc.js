@@ -33,8 +33,9 @@ function HTLCFindPath(info) {
  * @param nodeID peer id of the obd node where the fundee logged in.
  * @param userID the user id of the fundee.
  * @param info 
+ * @param isFunder 
  */
-function addHTLC(myUserID, nodeID, userID, info) {
+function addHTLC(myUserID, nodeID, userID, info, isFunder) {
     return new Promise((resolve, reject) => {
         obdApi.addHTLC(nodeID, userID, info, function(e) {
             console.info('SDK: -100040 addHTLC = ' + JSON.stringify(e));
@@ -47,7 +48,7 @@ function addHTLC(myUserID, nodeID, userID, info) {
                 info.curr_htlc_temp_address_for_ht1a_private_key);
 
             //
-            saveChannelStatus(myUserID, e.channel_id, true, kStatusAddHTLC);
+            saveChannelStatus(myUserID, e.channel_id, isFunder, kStatusAddHTLC);
             resolve(true);
         });
     })
@@ -59,14 +60,15 @@ function addHTLC(myUserID, nodeID, userID, info) {
  * @param nodeID peer id of the obd node where the fundee logged in.
  * @param userID the user id of the fundee.
  * @param info 
+ * @param isFunder 
  */
-function HTLCSigned(myUserID, nodeID, userID, info) {
+function HTLCSigned(myUserID, nodeID, userID, info, isFunder) {
     return new Promise((resolve, reject) => {
         obdApi.htlcSigned(nodeID, userID, info, function(e) {
             console.info('SDK: -100041 htlcSigned = ' + JSON.stringify(e));
             saveTempPrivKey(myUserID, kRsmcTempPrivKey, e.channel_id, info.curr_rsmc_temp_address_private_key);
             saveTempPrivKey(myUserID, kHtlcTempPrivKey, e.channel_id, info.curr_htlc_temp_address_private_key);
-            saveChannelStatus(myUserID, e.channel_id, false, kStatusHTLCSigned);
+            saveChannelStatus(myUserID, e.channel_id, isFunder, kStatusHTLCSigned);
             resolve(e);
         });
     })
@@ -78,14 +80,15 @@ function HTLCSigned(myUserID, nodeID, userID, info) {
  * @param nodeID peer id of the obd node where the fundee logged in.
  * @param userID the user id of the fundee.
  * @param info 
+ * @param isFunder 
  */
-function forwardR(myUserID, nodeID, userID, info) {
+function forwardR(myUserID, nodeID, userID, info, isFunder) {
     return new Promise((resolve, reject) => {
         obdApi.forwardR(nodeID, userID, info, function(e) {
             console.info('SDK: -100045 forwardR = ' + JSON.stringify(e));
             saveTempPrivKey(myUserID, kHtlcHtnxTempPrivKey, e.channel_id, 
                 info.curr_htlc_temp_address_for_he1b_private_key);
-            saveChannelStatus(myUserID, e.channel_id, false, kStatusForwardR);
+            saveChannelStatus(myUserID, e.channel_id, isFunder, kStatusForwardR);
             resolve(true);
         });
     })
@@ -99,12 +102,13 @@ function forwardR(myUserID, nodeID, userID, info) {
  * @param nodeID peer id of the obd node where the fundee logged in.
  * @param userID the user id of the fundee.
  * @param info 
+ * @param isFunder 
  */
-function signR(myUserID, nodeID, userID, info) {
+function signR(myUserID, nodeID, userID, info, isFunder) {
     return new Promise((resolve, reject) => {
         obdApi.signR(nodeID, userID, info, function(e) {
             console.info('SDK: -100046 signR = ' + JSON.stringify(e));
-            saveChannelStatus(myUserID, e.channel_id, true, kStatusSignR);
+            saveChannelStatus(myUserID, e.channel_id, isFunder, kStatusSignR);
             resolve(true);
         });
     })
@@ -117,14 +121,15 @@ function signR(myUserID, nodeID, userID, info) {
  * @param nodeID peer id of the obd node where the fundee logged in.
  * @param userID the user id of the fundee.
  * @param info 
+ * @param isFunder 
  */
-function closeHTLC(myUserID, nodeID, userID, info) {
+function closeHTLC(myUserID, nodeID, userID, info, isFunder) {
     return new Promise((resolve, reject) => {
         obdApi.closeHTLC(nodeID, userID, info, function(e) {
             console.info('SDK: -100049 closeHTLC = ' + JSON.stringify(e));
             saveTempPrivKey(myUserID, kTempPrivKey, e.channel_id, 
                 info.curr_rsmc_temp_address_private_key);
-            saveChannelStatus(myUserID, e.channel_id, true, kStatusCloseHTLC);
+            saveChannelStatus(myUserID, e.channel_id, isFunder, kStatusCloseHTLC);
             resolve(true);
         });
     })
@@ -137,13 +142,14 @@ function closeHTLC(myUserID, nodeID, userID, info) {
  * @param nodeID peer id of the obd node where the fundee logged in.
  * @param userID the user id of the fundee.
  * @param info 
+ * @param isFunder 
  */
-function closeHTLCSigned(myUserID, nodeID, userID, info) {
+function closeHTLCSigned(myUserID, nodeID, userID, info, isFunder) {
     return new Promise((resolve, reject) => {
         obdApi.closeHTLCSigned(nodeID, userID, info, function(e) {
             console.info('SDK: -100050 closeHTLCSigned = ' + JSON.stringify(e));
             saveTempPrivKey(myUserID, kTempPrivKey, e.channel_id, info.curr_rsmc_temp_address_private_key);
-            saveChannelStatus(myUserID, e.channel_id, false, kStatusCloseHTLCSigned);
+            saveChannelStatus(myUserID, e.channel_id, isFunder, kStatusCloseHTLCSigned);
             resolve(true);
         });
     })

@@ -1,0 +1,1 @@
+var ecc = require('tiny-secp256k1');

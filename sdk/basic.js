@@ -243,13 +243,14 @@ function assetFundingSigned(myUserID, nodeID, userID, info) {
  * @param nodeID peer id of the obd node where the fundee logged in.
  * @param userID the user id of the fundee.
  * @param info 
+ * @param isFunder 
  */
-function commitmentTransactionCreated(myUserID, nodeID, userID, info) {
+function commitmentTransactionCreated(myUserID, nodeID, userID, info, isFunder) {
     return new Promise((resolve, reject) => {
         obdApi.commitmentTransactionCreated(nodeID, userID, info, function(e) {
             console.info('SDK: -100351 commitmentTransactionCreated = ' + JSON.stringify(e));
             saveTempPrivKey(myUserID, kTempPrivKey, e.channel_id, info.curr_temp_address_private_key);
-            saveChannelStatus(myUserID, e.channel_id, true, kStatusCommitmentTransactionCreated);
+            saveChannelStatus(myUserID, e.channel_id, isFunder, kStatusCommitmentTransactionCreated);
             resolve(true);
         });
     })
@@ -263,13 +264,14 @@ function commitmentTransactionCreated(myUserID, nodeID, userID, info) {
  * @param nodeID peer id of the obd node where the fundee logged in.
  * @param userID the user id of the fundee.
  * @param info 
+ * @param isFunder 
  */
-function commitmentTransactionAccepted(myUserID, nodeID, userID, info) {
+function commitmentTransactionAccepted(myUserID, nodeID, userID, info, isFunder) {
     return new Promise((resolve, reject) => {
         obdApi.commitmentTransactionAccepted(nodeID, userID, info, function(e) {
             console.info('SDK: -100352 commitmentTransactionAccepted = ' + JSON.stringify(e));
             saveTempPrivKey(myUserID, kTempPrivKey, e.channel_id, info.curr_temp_address_private_key);
-            saveChannelStatus(myUserID, e.channel_id, false, kStatusCommitmentTransactionAccepted);
+            saveChannelStatus(myUserID, e.channel_id, isFunder, kStatusCommitmentTransactionAccepted);
             resolve(true);
         });
     })
@@ -282,12 +284,13 @@ function commitmentTransactionAccepted(myUserID, nodeID, userID, info) {
  * @param nodeID peer id of the obd node where the fundee logged in.
  * @param userID the user id of the fundee.
  * @param channel_id 
+ * @param isFunder 
  */
-function closeChannel(myUserID, nodeID, userID, channel_id) {
+function closeChannel(myUserID, nodeID, userID, channel_id, isFunder) {
     return new Promise((resolve, reject) => {
         obdApi.closeChannel(nodeID, userID, channel_id, function(e) {
             console.info('SDK: -100038 closeChannel = ' + JSON.stringify(e));
-            saveChannelStatus(myUserID, channel_id, true, kStatusCloseChannel);
+            saveChannelStatus(myUserID, channel_id, isFunder, kStatusCloseChannel);
             resolve(true);
         });
     })
@@ -300,12 +303,13 @@ function closeChannel(myUserID, nodeID, userID, channel_id) {
  * @param nodeID peer id of the obd node where the fundee logged in.
  * @param userID the user id of the fundee.
  * @param info 
+ * @param isFunder 
  */
-function closeChannelSigned(myUserID, nodeID, userID, info) {
+function closeChannelSigned(myUserID, nodeID, userID, info, isFunder) {
     return new Promise((resolve, reject) => {
         obdApi.closeChannelSigned(nodeID, userID, info, function(e) {
             console.info('SDK: -100039 closeChannelSigned = ' + JSON.stringify(e));
-            saveChannelStatus(myUserID, e.channel_id, false, kStatusCloseChannelSigned);
+            saveChannelStatus(myUserID, e.channel_id, isFunder, kStatusCloseChannelSigned);
             resolve(true);
         });
     })

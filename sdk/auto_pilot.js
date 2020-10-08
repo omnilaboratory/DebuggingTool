@@ -57,6 +57,7 @@ async function listening110032(e, netType) {
  */
 function listening110033(e) {
     saveChannelStatus(e.to_peer_id, e.temporary_channel_id, true, kStatusAcceptChannel);
+    saveChannelAddr(e.temporary_channel_id, e.channel_address);
 }
 
 /**

@@ -1,6 +1,9 @@
 // var obdApi = new ObdApi();
 var enumMsgType = new MessageType();
 
+// testing code...
+// const ecc = require('tiny-secp256k1');
+
 // Save connection status.
 var isConnectToOBD = false;
 
@@ -47,6 +50,11 @@ var channelHadBtcData = '';
  * 
  */
 async function sdkLogIn() {
+
+    // testing code...
+    // let sig = ecc.sign("hash", "priv");
+    // console.info('sig = ' + sig);
+    // return;
 
     let mnemonic = $("#mnemonic").val();
     let e = await logIn(mnemonic);
@@ -168,7 +176,11 @@ async function sdkForwardR() {
     info.curr_htlc_temp_address_for_he1b_index = Number(getIndexFromPubKey(info.curr_htlc_temp_address_for_he1b_pub_key));
 
     displaySentMessage100045(nodeID, userID, info);
-    await forwardR($("#logined").text(), nodeID, userID, info);
+
+    let myUserID = $("#logined").text();
+    let isFunder = await getIsFunder(myUserID, info.channel_id);
+    await forwardR(myUserID, nodeID, userID, info, isFunder);
+
     afterForwardR();
 }
 
@@ -187,7 +199,11 @@ async function sdkSignR() {
     info.channel_address_private_key = $("#channel_address_private_key").val();
 
     displaySentMessage100046(nodeID, userID, info);
-    await signR($("#logined").text(), nodeID, userID, info);
+
+    let myUserID = $("#logined").text();
+    let isFunder = await getIsFunder(myUserID, info.channel_id);
+    await signR(myUserID, nodeID, userID, info, isFunder);
+
     afterSignR();
 }
 
@@ -212,7 +228,11 @@ async function sdkCloseHTLC() {
     info.curr_rsmc_temp_address_index = Number(getIndexFromPubKey(info.curr_rsmc_temp_address_pub_key));
 
     displaySentMessage100049(nodeID, userID, info);
-    await closeHTLC($("#logined").text(), nodeID, userID, info);
+
+    let myUserID = $("#logined").text();
+    let isFunder = await getIsFunder(myUserID, info.channel_id);
+    await closeHTLC(myUserID, nodeID, userID, info, isFunder);
+
     afterCloseHTLC();
 }
 
@@ -237,7 +257,11 @@ async function sdkCloseHTLCSigned() {
     info.curr_rsmc_temp_address_index = Number(getIndexFromPubKey(info.curr_rsmc_temp_address_pub_key));
 
     displaySentMessage100050(nodeID, userID, info);
-    await closeHTLCSigned($("#logined").text(), nodeID, userID, info);
+
+    let myUserID = $("#logined").text();
+    let isFunder = await getIsFunder(myUserID, $("#curr_channel_id").text());
+    await closeHTLCSigned(myUserID, nodeID, userID, info, isFunder);
+
     afterCloseHTLCSigned();
 }
 
@@ -300,7 +324,11 @@ async function sdkCloseChannel() {
     let channel_id = $("#channel_id").val();
 
     displaySentMessage100038(nodeID, userID, channel_id);
-    await closeChannel($("#logined").text(), nodeID, userID, channel_id);
+    
+    let myUserID = $("#logined").text();
+    let isFunder = await getIsFunder(myUserID, channel_id);
+    await closeChannel(myUserID, nodeID, userID, channel_id, isFunder);
+
     afterCloseChannel();
 }
 
@@ -318,7 +346,11 @@ async function sdkCloseChannelSigned() {
     info.approval                   = $("#checkbox_n39").prop("checked");
 
     displaySentMessage100039(nodeID, userID, info);
-    await closeChannelSigned($("#logined").text(), nodeID, userID, info);
+
+    let myUserID = $("#logined").text();
+    let isFunder = await getIsFunder(myUserID, info.channel_id);
+    await closeChannelSigned(myUserID, nodeID, userID, info, isFunder);
+
     afterCloseChannelSigned();
 }
 
@@ -755,7 +787,11 @@ async function sdkAddHTLC() {
     info.curr_htlc_temp_address_for_ht1a_index = Number(getIndexFromPubKey(info.curr_htlc_temp_address_for_ht1a_pub_key));
 
     displaySentMessage100040(nodeID, userID, info);
-    await addHTLC($("#logined").text(), nodeID, userID, info);
+
+    let myUserID = $("#logined").text();
+    let isFunder = await getIsFunder(myUserID, $("#curr_channel_id").text());
+    await addHTLC(myUserID, nodeID, userID, info, isFunder);
+
     afterAddHTLC();
 }
 
@@ -780,7 +816,10 @@ async function sdkHTLCSigned() {
     info.curr_htlc_temp_address_index = Number(getIndexFromPubKey(info.curr_htlc_temp_address_pub_key));
 
     displaySentMessage100041(nodeID, userID, info);
-    let e = await HTLCSigned(myUserID, nodeID, userID, info);
+
+    let isFunder = await getIsFunder(myUserID, $("#curr_channel_id").text());
+    let e        = await HTLCSigned(myUserID, nodeID, userID, info, isFunder);
+
     afterHTLCSigned();
 
     //------------------------
@@ -849,7 +888,11 @@ async function sdkCommitmentTransactionCreated() {
     info.curr_temp_address_index = Number(getIndexFromPubKey(info.curr_temp_address_pub_key));
 
     displaySentMessage100351(nodeID, userID, info);
-    await commitmentTransactionCreated($("#logined").text(), nodeID, userID, info);
+
+    let myUserID = $("#logined").text();
+    let isFunder = await getIsFunder(myUserID, info.channel_id);
+    await commitmentTransactionCreated(myUserID, nodeID, userID, info, isFunder);
+
     afterCommitmentTransactionCreated();
 }
 
@@ -872,7 +915,11 @@ async function sdkCommitmentTransactionAccepted() {
     info.curr_temp_address_index = Number(getIndexFromPubKey(info.curr_temp_address_pub_key));
 
     displaySentMessage100352(nodeID, userID, info);
-    await commitmentTransactionAccepted($("#logined").text(), nodeID, userID, info);
+
+    let myUserID = $("#logined").text();
+    let isFunder = await getIsFunder(myUserID, info.channel_id);
+    await commitmentTransactionAccepted(myUserID, nodeID, userID, info, isFunder);
+
     afterCommitmentTransactionAccepted();
 }
 
