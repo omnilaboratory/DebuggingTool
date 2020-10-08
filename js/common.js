@@ -285,7 +285,11 @@ async function sdkAtomicSwap() {
     info.time_locker            = Number($("#time_locker").val());
 
     displaySentMessage100080(nodeID, userID, info);
-    await atomicSwap($("#logined").text(), nodeID, userID, info);
+
+    let myUserID = $("#logined").text();
+    let isFunder = await getIsFunder(myUserID, $("#curr_channel_id").text());
+    await atomicSwap(myUserID, nodeID, userID, info, isFunder);
+
     afterAtomicSwap();
 }
 
@@ -310,7 +314,11 @@ async function sdkAcceptSwap() {
     info.time_locker            = Number($("#time_locker").val());
 
     displaySentMessage100081(nodeID, userID, info);
-    await acceptSwap($("#logined").text(), nodeID, userID, info);
+
+    let myUserID = $("#logined").text();
+    let isFunder = await getIsFunder(myUserID, $("#curr_channel_id").text());
+    await acceptSwap(myUserID, nodeID, userID, info, isFunder);
+
     afterAcceptSwap();
 }
 

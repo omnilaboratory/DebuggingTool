@@ -132,17 +132,19 @@ async function listening110035(e) {
  * listening to -110038 and save request_close_channel_hash
  * @param e 
  */
-function listening110038(e) {
+async function listening110038(e) {
     saveTempData(e.to_peer_id, e.channel_id, e.request_close_channel_hash);
-    saveChannelStatus(e.to_peer_id, e.channel_id, false, kStatusCloseChannel);
+    let isFunder = await getIsFunder(e.to_peer_id, e.channel_id);
+    saveChannelStatus(e.to_peer_id, e.channel_id, isFunder, kStatusCloseChannel);
 }
 
 /**
  * listening to -110039
  * @param e 
  */
-function listening110039(e) {
-    saveChannelStatus(e.to_peer_id, e.channel_id, true, kStatusCloseChannelSigned);
+async function listening110039(e) {
+    let isFunder = await getIsFunder(e.to_peer_id, e.channel_id);
+    saveChannelStatus(e.to_peer_id, e.channel_id, isFunder, kStatusCloseChannelSigned);
 }
 
 /**
@@ -160,7 +162,9 @@ async function listening110040(e, netType) {
 
     saveInvoiceH(e.h);
     saveTempData(myUserID, e.channel_id, e.payer_commitment_tx_hash);
-    saveChannelStatus(myUserID, e.channel_id, false, kStatusAddHTLC);
+
+    let isFunder = await getIsFunder(myUserID, e.channel_id);
+    saveChannelStatus(myUserID, e.channel_id, isFunder, kStatusAddHTLC);
 
     if (isAutoMode != 'Yes') return;
 
@@ -191,7 +195,7 @@ async function listening110040(e, netType) {
     info.curr_htlc_temp_address_index = Number(getIndexFromPubKey(addr_2.result.pubkey));
 
     // SDK API
-    let resp = await HTLCSigned(myUserID, nodeID, userID, info);
+    let resp = await HTLCSigned(myUserID, nodeID, userID, info, isFunder);
 
     // NOT SDK API. This a client function, just for Debugging Tool.
     displaySentMessage100041(nodeID, userID, info);
@@ -240,7 +244,9 @@ async function payInvoiceStep4(myUserID, e, nodeID, userID, channel_id, fundingP
     info.curr_htlc_temp_address_for_he1b_index = Number(getIndexFromPubKey(result.result.pubkey));
 
     displaySentMessage100045(nodeID, userID, info);
-    await forwardR(myUserID, nodeID, userID, info);
+
+    let isFunder = await getIsFunder(myUserID, channel_id);
+    await forwardR(myUserID, nodeID, userID, info, isFunder);
 
     // NOT SDK API. This a client function, just for Debugging Tool.
     afterForwardR();
@@ -250,8 +256,9 @@ async function payInvoiceStep4(myUserID, e, nodeID, userID, channel_id, fundingP
  * listening to -110041
  * @param e 
  */
-function listening110041(e) {
-    saveChannelStatus(e.to_peer_id, e.channel_id, true, kStatusHTLCSigned);
+async function listening110041(e) {
+    let isFunder = await getIsFunder(e.to_peer_id, e.channel_id);
+    saveChannelStatus(e.to_peer_id, e.channel_id, isFunder, kStatusHTLCSigned);
 }
 
 /**
@@ -269,7 +276,9 @@ async function listening110045(e) {
     saveTempData(myUserID, e.channel_id, e.msg_hash);
     saveInvoiceR(e.r);
     // saveForwardR(myUserID, e.channel_id, e.r);
-    saveChannelStatus(myUserID, e.channel_id, true, kStatusForwardR);
+
+    let isFunder = await getIsFunder(myUserID, e.channel_id);
+    saveChannelStatus(myUserID, e.channel_id, isFunder, kStatusForwardR);
 
     if (isAutoMode != 'Yes') {  // auto mode closed
         let isInPayInvoice = getPayInvoiceCase();
@@ -293,7 +302,7 @@ async function listening110045(e) {
     info.channel_address_private_key = await getFundingPrivKey(myUserID, e.channel_id);
 
     // SDK API
-    let resp = await signR(myUserID, nodeID, userID, info);
+    let resp = await signR(myUserID, nodeID, userID, info, isFunder);
 
     // NOT SDK API. This a client function, just for Debugging Tool.
     displaySentMessage100046(nodeID, userID, info);
@@ -350,15 +359,18 @@ async function payInvoiceStep6(myUserID, e, nodeID, userID, channel_id, fundingP
     info.curr_rsmc_temp_address_index = Number(getIndexFromPubKey(result.result.pubkey));
 
     displaySentMessage100049(nodeID, userID, info);
-    await closeHTLC(myUserID, nodeID, userID, info);
+
+    let isFunder = await getIsFunder(myUserID, channel_id);
+    await closeHTLC(myUserID, nodeID, userID, info, isFunder);
 }
 
 /**
  * listening to -110046
  * @param e 
  */
-function listening110046(e) {
-    saveChannelStatus(e.to_peer_id, e.channel_id, false, kStatusSignR);
+async function listening110046(e) {
+    let isFunder = await getIsFunder(e.to_peer_id, e.channel_id);
+    saveChannelStatus(e.to_peer_id, e.channel_id, isFunder, kStatusSignR);
 }
 
 /**
@@ -375,7 +387,9 @@ async function listening110049(e, netType) {
     let myUserID = e.to_peer_id;
 
     saveTempData(myUserID, e.channel_id, e.msg_hash);
-    saveChannelStatus(myUserID, e.channel_id, false, kStatusCloseHTLC);
+
+    let isFunder = await getIsFunder(myUserID, e.channel_id);
+    saveChannelStatus(myUserID, e.channel_id, isFunder, kStatusCloseHTLC);
 
     if (isAutoMode != 'Yes') {  // auto mode closed
         let r = getPrivKeyFromPubKey(myUserID, getInvoiceH());
@@ -411,7 +425,7 @@ async function listening110049(e, netType) {
     tipsOnTop('', kTipsAfterCloseHTLCSigned);
 
     // SDK API
-    await closeHTLCSigned(myUserID, nodeID, userID, info);
+    await closeHTLCSigned(myUserID, nodeID, userID, info, isFunder);
 
     // Clear H at Bob side
     saveInvoiceH('');
@@ -421,8 +435,9 @@ async function listening110049(e, netType) {
  * listening to -110050
  * @param e 
  */
-function listening110050(e) {
-    saveChannelStatus(e.to_peer_id, e.channel_id, true, kStatusCloseHTLCSigned);
+async function listening110050(e) {
+    let isFunder = await getIsFunder(e.to_peer_id, e.channel_id);
+    saveChannelStatus(e.to_peer_id, e.channel_id, isFunder, kStatusCloseHTLCSigned);
     savePayInvoiceCase('No');
 }
 
@@ -430,16 +445,18 @@ function listening110050(e) {
  * listening to -110080
  * @param e 
  */
-function listening110080(e) {
-    saveChannelStatus(e.to_peer_id, e.channel_id, false, kStatusAtomicSwap);
+async function listening110080(e) {
+    let isFunder = await getIsFunder(e.to_peer_id, e.channel_id);
+    saveChannelStatus(e.to_peer_id, e.channel_id, isFunder, kStatusAtomicSwap);
 }
 
 /**
  * listening to -110081
  * @param e 
  */
-function listening110081(e) {
-    saveChannelStatus(e.to_peer_id, e.channel_id, true, kStatusAcceptSwap);
+async function listening110081(e) {
+    let isFunder = await getIsFunder(e.to_peer_id, e.channel_id);
+    saveChannelStatus(e.to_peer_id, e.channel_id, isFunder, kStatusAcceptSwap);
 }
 
 /**
@@ -529,7 +546,9 @@ async function listening110351(e, netType) {
     let myUserID = e.to_peer_id;
 
     saveTempData(myUserID, e.channel_id, e.msg_hash);
-    saveChannelStatus(myUserID, e.channel_id, false, kStatusCommitmentTransactionCreated);
+
+    let isFunder = await getIsFunder(myUserID, e.channel_id);
+    saveChannelStatus(myUserID, e.channel_id, isFunder, kStatusCommitmentTransactionCreated);
 
     if (isAutoMode != 'Yes') return;
 
@@ -555,7 +574,7 @@ async function listening110351(e, netType) {
     info.curr_temp_address_index = Number(getIndexFromPubKey(addr.result.pubkey));
 
     // SDK API
-    commitmentTransactionAccepted(myUserID, nodeID, userID, info);
+    commitmentTransactionAccepted(myUserID, nodeID, userID, info, isFunder);
 
     // NOT SDK API. This a client function, just for Debugging Tool.
     displaySentMessage100352(nodeID, userID, info);
@@ -565,6 +584,7 @@ async function listening110351(e, netType) {
  * listening to -110352
  * @param e 
  */
-function listening110352(e) {
-    saveChannelStatus(e.to_peer_id, e.channel_id, true, kStatusCommitmentTransactionAccepted);
+async function listening110352(e) {
+    let isFunder = await getIsFunder(e.to_peer_id, e.channel_id);
+    saveChannelStatus(e.to_peer_id, e.channel_id, isFunder, kStatusCommitmentTransactionAccepted);
 }
