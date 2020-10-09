@@ -516,6 +516,10 @@
                     ]
                 },
                 {
+                    "name": "amount",
+                    "buttons": []
+                },
+                {
                     "name": "channel_address_private_key",
                     "help": "This private key used by Alice to create the channel. It will be used to sign C2a transaction in below picture as <Alice Sig>.",
                     "imgPath": "doc/tooltip/C2a.png",
@@ -562,10 +566,6 @@
                             "onclick": "displayUserDataInNewHtml('MyAddresses')"
                         }
                     ]
-                },
-                {
-                    "name": "amount",
-                    "buttons": []
                 }
             ]
         },

@@ -74,7 +74,7 @@ async function sdkLogIn() {
     isLogined = true;
 
     displaySentMessage102001(mnemonic);
-    await displayMyChannelListAtTopRight(5, 1);
+    await displayMyChannelListAtTopRight(kPageSize, kPageIndex);
     afterLogin();
 }
 
@@ -263,6 +263,7 @@ async function sdkCloseHTLCSigned() {
     await closeHTLCSigned(myUserID, nodeID, userID, info, isFunder);
 
     afterCloseHTLCSigned();
+    displayMyChannelListAtTopRight(kPageSize, kPageIndex);
 }
 
 /** 
@@ -599,6 +600,7 @@ async function sdkAssetFundingSigned() {
     displaySentMessage100035(nodeID, userID, info);
     let e = await assetFundingSigned($("#logined").text(), nodeID, userID, info);
     afterAssetFundingSigned(e);
+    displayMyChannelListAtTopRight(kPageSize, kPageIndex);
 }
 
 // -102109 funding BTC API at local.
@@ -739,7 +741,9 @@ async function payInvoiceStep2(e, myUserID, channel_id) {
     info.curr_htlc_temp_address_for_ht1a_index = Number(getIndexFromPubKey(info.curr_htlc_temp_address_for_ht1a_pub_key));
 
     displaySentMessage100040(nodeID, userID, info);
-    await addHTLC(myUserID, nodeID, userID, info);
+
+    let isFunder = await getIsFunder(myUserID, channel_id);
+    await addHTLC(myUserID, nodeID, userID, info, isFunder);
 }
 
 /**
@@ -929,6 +933,7 @@ async function sdkCommitmentTransactionAccepted() {
     await commitmentTransactionAccepted(myUserID, nodeID, userID, info, isFunder);
 
     afterCommitmentTransactionAccepted();
+    displayMyChannelListAtTopRight(kPageSize, kPageIndex);
 }
 
 // Invoke each APIs.
@@ -3686,13 +3691,13 @@ function nextPageForChannelList(obj) {
 //
 function previousPageForChannelListAtTopRight(obj) {
     let previousPage = Number(obj.getAttribute("pageNum")) - 1;
-    displayMyChannelListAtTopRight(5, previousPage);
+    displayMyChannelListAtTopRight(kPageSize, previousPage);
 }
 
 //
 function nextPageForChannelListAtTopRight(obj) {
     let nextPage = Number(obj.getAttribute("pageNum")) + 1;
-    displayMyChannelListAtTopRight(5, nextPage);
+    displayMyChannelListAtTopRight(kPageSize, nextPage);
 }
 
 //
@@ -4644,16 +4649,27 @@ async function listening110340ForGUITool(e) {
 async function listening110350ForGUITool(e) {
     let channel_id = e.temporary_channel_id;
     let status     = await getChannelStatus(channel_id, true);
+    let api_name   = $("#api_name").text();
     console.info('listening110350ForGUITool status = ' + status);
+
     switch (Number(status)) {
         case kStatusFirstBitcoinFundingCreated:
             tipsOnTop(channel_id, kTipsFirst110350, 'Funding Bitcoin', 'fundingBitcoin');
+            if (api_name === 'fundingBitcoin') {
+                enableInvokeAPI();
+            }
             break;
         case kStatusSecondBitcoinFundingCreated:
             tipsOnTop(channel_id, kTipsSecond110350, 'Funding Bitcoin', 'fundingBitcoin');
+            if (api_name === 'fundingBitcoin') {
+                enableInvokeAPI();
+            }
             break;
         case kStatusThirdBitcoinFundingCreated:
             tipsOnTop(channel_id, kTipsThird110350, 'Funding Asset', 'fundingAsset');
+            if (api_name === 'fundingAsset') {
+                enableInvokeAPI();
+            }
             break;
     }
 }
@@ -4663,7 +4679,8 @@ async function listening110350ForGUITool(e) {
  */
 function listening110351ForGUITool(e) {
 
-    tipsOnTop(e.channel_id, kTips110351, 'Confirm', 'commitmentTransactionAccepted');
+    let msg = kTips110351 + ' Transfer amount is : ' + e.amount;
+    tipsOnTop(e.channel_id, msg, 'Confirm', 'commitmentTransactionAccepted');
 
     let api_name = $("#api_name").text();
     if (api_name === 'commitmentTransactionAccepted') {
@@ -4682,6 +4699,12 @@ function listening110351ForGUITool(e) {
  */
 function listening110352ForGUITool(e) {
     tipsOnTop(e.channel_id, kTips110352, 'RSMC Transfer', 'commitmentTransactionCreated');
+    displayMyChannelListAtTopRight(kPageSize, kPageIndex);
+
+    let api_name = $("#api_name").text();
+    if (api_name === 'commitmentTransactionCreated') {
+        enableInvokeAPI();
+    }
 }
 
 /**
@@ -4786,6 +4809,7 @@ function listening110049ForGUITool(e) {
  */
 function listening110050ForGUITool(e) {
     tipsOnTop(e.channel_id, kTips110050);
+    displayMyChannelListAtTopRight(kPageSize, kPageIndex);
 }
 
 /**

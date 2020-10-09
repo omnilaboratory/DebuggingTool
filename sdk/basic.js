@@ -78,6 +78,7 @@ function fundingBitcoin(myUserID, info) {
                     break;
             }
 
+            saveFundingPrivKey(myUserID, channel_id, info.from_address_private_key);
             saveFundingBtcData(myUserID, channel_id, info);
             saveTempData(myUserID, channel_id, e.hex);
             resolve(true);
@@ -146,6 +147,8 @@ function bitcoinFundingSigned(myUserID, nodeID, userID, info) {
                     saveChannelStatus(myUserID, channel_id, false, kStatusThirdBitcoinFundingSigned);
                     break;
             }
+
+            saveFundingPrivKey(myUserID, channel_id, info.channel_address_private_key);
             resolve(true);
         });
     })

@@ -1128,36 +1128,30 @@ class ObdApi {
       return;
     }
 
-    // if (info.approval == null) {
-    //   info.approval = false;
-    // }
-
-    // if (info.approval == true) {
-    //   if (this.isNotString(info.channel_address_private_key)) {
-    //     alert("empty channel_address_private_key");
-    //     return;
-    //   }
-    //   if (this.isNotString(info.last_temp_address_private_key)) {
-    //     alert("empty last_temp_address_private_key");
-    //     return;
-    //   }
-    //   if (this.isNotString(info.curr_rsmc_temp_address_pub_key)) {
-    //     alert("empty curr_rsmc_temp_address_pub_key");
-    //     return;
-    //   }
-    //   if (this.isNotString(info.curr_rsmc_temp_address_private_key)) {
-    //     alert("empty curr_rsmc_temp_address_private_key");
-    //     return;
-    //   }
-    //   if (this.isNotString(info.curr_htlc_temp_address_pub_key)) {
-    //     alert("empty curr_htlc_temp_address_pub_key");
-    //     return;
-    //   }
-    //   if (this.isNotString(info.curr_htlc_temp_address_private_key)) {
-    //     alert("empty curr_htlc_temp_address_private_key");
-    //     return;
-    //   }
-    // }
+    if (this.isNotString(info.channel_address_private_key)) {
+      alert("empty channel_address_private_key");
+      return;
+    }
+    if (this.isNotString(info.last_temp_address_private_key)) {
+      alert("empty last_temp_address_private_key");
+      return;
+    }
+    if (this.isNotString(info.curr_rsmc_temp_address_pub_key)) {
+      alert("empty curr_rsmc_temp_address_pub_key");
+      return;
+    }
+    if (this.isNotString(info.curr_rsmc_temp_address_private_key)) {
+      alert("empty curr_rsmc_temp_address_private_key");
+      return;
+    }
+    if (this.isNotString(info.curr_htlc_temp_address_pub_key)) {
+      alert("empty curr_htlc_temp_address_pub_key");
+      return;
+    }
+    if (this.isNotString(info.curr_htlc_temp_address_private_key)) {
+      alert("empty curr_htlc_temp_address_private_key");
+      return;
+    }
 
     let msg = new Message();
     msg.type = this.messageType.MsgType_HTLC_SendAddHTLCSigned_41;

@@ -406,3 +406,16 @@ const kStatusAtomicSwap = 26;
  * acceptSwap done
  */
 const kStatusAcceptSwap = 27;
+
+//----------------------------------------------------------------
+// Const
+
+/**
+ * page_size
+ */
+const kPageSize = 5;
+
+/**
+ * page_index
+ */
+const kPageIndex = 1;
