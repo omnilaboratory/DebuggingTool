@@ -49,6 +49,7 @@ function addHTLC(myUserID, nodeID, userID, info, isFunder) {
 
             //
             saveChannelStatus(myUserID, e.channel_id, isFunder, kStatusAddHTLC);
+            saveSenderRole(kIsSender);
             resolve(true);
         });
     })
@@ -130,6 +131,7 @@ function closeHTLC(myUserID, nodeID, userID, info, isFunder) {
             saveTempPrivKey(myUserID, kTempPrivKey, e.channel_id, 
                 info.curr_rsmc_temp_address_private_key);
             saveChannelStatus(myUserID, e.channel_id, isFunder, kStatusCloseHTLC);
+            saveSenderRole(kIsSender);
             resolve(true);
         });
     })

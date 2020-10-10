@@ -419,3 +419,13 @@ const kPageSize = 5;
  * page_index
  */
 const kPageIndex = 1;
+
+/**
+ * 
+ */
+const kIsSender = '0';
+
+/**
+ * 
+ */
+const kIsReceiver = '1';

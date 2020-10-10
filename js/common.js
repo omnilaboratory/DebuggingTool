@@ -155,6 +155,7 @@ async function sdkAcceptChannel() {
     displaySentMessage100033(nodeID, userID, info);
     await acceptChannel($("#logined").text(), nodeID, userID, info);
     afterAcceptChannel();
+    displayMyChannelListAtTopRight(kPageSize, kPageIndex);
 }
 
 /** 
@@ -4608,6 +4609,7 @@ function listening110032ForGUITool(e) {
  */
 function listening110033ForGUITool(e) {
     tipsOnTop(e.temporary_channel_id, kTips110033, 'Funding Bitcoin', 'fundingBitcoin');
+    displayMyChannelListAtTopRight(kPageSize, kPageIndex);
 }
 
 /**
@@ -4704,6 +4706,9 @@ function listening110352ForGUITool(e) {
     let api_name = $("#api_name").text();
     if (api_name === 'commitmentTransactionCreated') {
         enableInvokeAPI();
+        fillCounterparty($("#logined").text(), e.channel_id);
+        fillChannelFundingLastTempKeys($("#logined").text(), e.channel_id);
+        fillCurrTempAddrKey();
     }
 }
 
@@ -4729,6 +4734,7 @@ function listening110034ForGUITool(e) {
  */
 function listening110035ForGUITool(e) {
     tipsOnTop(e.channel_id, kTips110035, 'RSMC Transfer', 'commitmentTransactionCreated');
+    displayMyChannelListAtTopRight(kPageSize, kPageIndex);
 }
 
 /**
@@ -5563,6 +5569,7 @@ function getChannelIDFromTopRight(obj) {
  */
 async function switchChannel(myUserID, channel_id) {
 
+    let isSender = getSenderRole();
     let isFunder = await getIsFunder(myUserID, channel_id);
     let status   = await getChannelStatus(channel_id, isFunder);
     
@@ -5648,14 +5655,14 @@ async function switchChannel(myUserID, channel_id) {
             }
             break;
         case kStatusCommitmentTransactionCreated:
-            if (isFunder === true) {
+            if (isSender === kIsSender) {
                 tipsOnTop('', kTipsAfterCommitmentTransactionCreated);
             } else {
                 tipsOnTop('', kTips110351, 'Confirm', 'commitmentTransactionAccepted');
             }
             break;
         case kStatusCommitmentTransactionAccepted:
-            if (isFunder === true) {
+            if (isSender === kIsSender) {
                 tipsOnTop('', kTips110352, 'RSMC Transfer', 'commitmentTransactionCreated');
             } else {
                 tipsOnTop('', kTipsAfterCommitmentTransactionAccepted, 'RSMC Transfer', 'commitmentTransactionCreated');
@@ -5667,70 +5674,70 @@ async function switchChannel(myUserID, channel_id) {
             }
             break;
         case kStatusAddHTLC:
-            if (isFunder === true) {
+            if (isSender === kIsSender) {
                 tipsOnTop('', kTipsAfterAddHTLC);
             } else {
                 tipsOnTop('', kTips110040, 'Accept', 'HTLCSigned');
             }
             break;
         case kStatusHTLCSigned:
-            if (isFunder === true) {
+            if (isSender === kIsSender) {
                 tipsOnTop('', kTips110041);
             } else {
                 tipsOnTop('', kTipsAfterHTLCSigned, 'Forward R', 'forwardR');
             }
             break;
         case kStatusForwardR:
-            if (isFunder === true) {
+            if (isSender === kIsSender) {
                 tipsOnTop('', kTips110045, 'Sign R', 'signR');
             } else {
                 tipsOnTop('', kTipsAfterForwardR);
             }
             break;
         case kStatusSignR:
-            if (isFunder === true) {
+            if (isSender === kIsSender) {
                 tipsOnTop('', kTipsAfterSignR, 'Close HTLC', 'closeHTLC');
             } else {
                 tipsOnTop('', kTips110046, 'Close HTLC', 'closeHTLC');
             }
             break;
         case kStatusCloseHTLC:
-            if (isFunder === true) {
+            if (isSender === kIsSender) {
                 tipsOnTop('', kTipsAfterCloseHTLC);
             } else {
                 tipsOnTop('', kTips110049, 'Accept', 'closeHTLCSigned');
             }
             break;
         case kStatusCloseHTLCSigned:
-            if (isFunder === true) {
+            if (isSender === kIsSender) {
                 tipsOnTop('', kTips110050);
             } else {
                 tipsOnTop('', kTipsAfterCloseHTLCSigned);
             }
             break;
         case kStatusCloseChannel:
-            if (isFunder === true) {
+            if (isSender === kIsSender) {
                 tipsOnTop('', kTipsAfterCloseChannel);
             } else {
                 tipsOnTop('', kTips110038, 'Accept', 'closeChannelSigned');
             }
             break;
         case kStatusCloseChannelSigned:
-            if (isFunder === true) {
+            if (isSender === kIsSender) {
                 tipsOnTop('', kTips110039, 'Open Channel', 'openChannel');
             } else {
                 tipsOnTop('', kTipsAfterCloseChannelSigned, 'Open Channel', 'openChannel');
             }
             break;
         case kStatusAtomicSwap:
-            if (isFunder === true) {
+            if (isSender === kIsSender) {
                 tipsOnTop('', kTipsAfterAtomicSwap);
             } else {
                 tipsOnTop('', kTips110080, 'Accept', 'acceptSwap');
             }
             break;
         case kStatusAcceptSwap:
-            if (isFunder === true) {
+            if (isSender === kIsSender) {
                 tipsOnTop('', kTips110081);
             } else {
                 tipsOnTop('', kTipsAfterAcceptSwap);

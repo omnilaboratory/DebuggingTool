@@ -120,6 +120,11 @@ const kTbInvoiceR = 'tb_invoice_r';
 const kInvoiceH = 'invoice_h';
 
 /**
+ * 
+ */
+const kSenderRole = 'sender_role';
+
+/**
  * Object Store (table) name of IndexedDB.
  * temp private key
  */
@@ -1349,4 +1354,18 @@ function saveChannelStatus(myUserID, channel_id, funder, status) {
     request.onerror = function (e) {
         console.log('saveChannelStatus Data write false.');
     }
+}
+
+/**
+ * @param val  kIsSender: is sender  kIsReceiver: is receiver
+ */
+function saveSenderRole(val) {
+    localStorage.setItem(kSenderRole, val);
+}
+
+/**
+ * 
+ */
+function getSenderRole() {
+    return localStorage.getItem(kSenderRole);
 }

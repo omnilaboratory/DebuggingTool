@@ -17,6 +17,7 @@ function atomicSwap(myUserID, nodeID, userID, info, isFunder) {
         obdApi.atomicSwap(nodeID, userID, info, function(e) {
             console.info('SDK: -100080 atomicSwap = ' + JSON.stringify(e));
             saveChannelStatus(myUserID, e.channel_id, isFunder, kStatusAtomicSwap);
+            saveSenderRole(kIsSender);
             resolve(true);
         });
     })

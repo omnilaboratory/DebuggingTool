@@ -45,10 +45,12 @@ async function listening110032(e, netType) {
     info.fundee_address_index = Number(getIndexFromPubKey(info.funding_pubkey));
 
     // SDK API send -100033 acceptChannel
-    acceptChannel(myUserID, nodeID, userID, info);
+    await acceptChannel(myUserID, nodeID, userID, info);
 
     // NOT SDK API. This a client function, just for Debugging Tool.
     displaySentMessage100033(nodeID, userID, info);
+    afterAcceptChannel();
+    displayMyChannelListAtTopRight(kPageSize, kPageIndex);
 }
 
 /**
@@ -87,10 +89,12 @@ async function listening110034(e) {
     info.channel_address_private_key = await getFundingPrivKey(myUserID, channel_id);
 
     // SDK API
-    assetFundingSigned(myUserID, nodeID, userID, info);
+    let resp = await assetFundingSigned(myUserID, nodeID, userID, info);
 
     // NOT SDK API. This a client function, just for Debugging Tool.
     displaySentMessage100035(nodeID, userID, info);
+    afterAssetFundingSigned(resp);
+    displayMyChannelListAtTopRight(kPageSize, kPageIndex);
 }
 
 /**
@@ -136,6 +140,7 @@ async function listening110038(e) {
     saveTempData(e.to_peer_id, e.channel_id, e.request_close_channel_hash);
     let isFunder = await getIsFunder(e.to_peer_id, e.channel_id);
     saveChannelStatus(e.to_peer_id, e.channel_id, isFunder, kStatusCloseChannel);
+    saveSenderRole(kIsReceiver);
 }
 
 /**
@@ -165,6 +170,7 @@ async function listening110040(e, netType) {
 
     let isFunder = await getIsFunder(myUserID, e.channel_id);
     saveChannelStatus(myUserID, e.channel_id, isFunder, kStatusAddHTLC);
+    saveSenderRole(kIsReceiver);
 
     if (isAutoMode != 'Yes') return;
 
@@ -199,6 +205,7 @@ async function listening110040(e, netType) {
 
     // NOT SDK API. This a client function, just for Debugging Tool.
     displaySentMessage100041(nodeID, userID, info);
+    afterHTLCSigned();
 
     //------------------------
     // If Bob has R, will send -100045 forwardR
@@ -306,9 +313,11 @@ async function listening110045(e) {
 
     // NOT SDK API. This a client function, just for Debugging Tool.
     displaySentMessage100046(nodeID, userID, info);
+    afterSignR();
 
     //------------------------
-    // If is payInvoice case, Alice will send -100049 closeHTLC
+    // ////// If is payInvoice case, Alice will send -100049 closeHTLC
+    // Alice will send -100049 closeHTLC
     let fundingPrivKey = info.channel_address_private_key;
     payInvoiceStep6(myUserID, resp, nodeID, userID, e.channel_id, fundingPrivKey);
 }
@@ -329,17 +338,17 @@ async function payInvoiceStep6(myUserID, e, nodeID, userID, channel_id, fundingP
         return;
     }
 
-    let isInPayInvoice = getPayInvoiceCase();
-    console.info('payInvoiceStep6 isInPayInvoice = ' + isInPayInvoice);
+    // let isInPayInvoice = getPayInvoiceCase();
+    // console.info('payInvoiceStep6 isInPayInvoice = ' + isInPayInvoice);
 
     // Not in pay invoice case
-    if (isInPayInvoice != 'Yes') return;
+    // if (isInPayInvoice != 'Yes') return;
 
     // Alice will send -100049 closeHTLC
 
-    let info                                         = new CloseHtlcTxInfo();
-    info.channel_id                                  = channel_id;
-    info.channel_address_private_key                 = fundingPrivKey;
+    let info                         = new CloseHtlcTxInfo();
+    info.channel_id                  = channel_id;
+    info.channel_address_private_key = fundingPrivKey;
 
     let privkey_1 = getTempPrivKey(myUserID, kRsmcTempPrivKey, channel_id);
     let privkey_2 = getTempPrivKey(myUserID, kHtlcTempPrivKey, channel_id);
@@ -358,6 +367,7 @@ async function payInvoiceStep6(myUserID, e, nodeID, userID, channel_id, fundingP
     // Save address index to OBD and can get private key back if lose it.
     info.curr_rsmc_temp_address_index = Number(getIndexFromPubKey(result.result.pubkey));
 
+    // NOT SDK API. This a client function, just for Debugging Tool.
     displaySentMessage100049(nodeID, userID, info);
 
     let isFunder = await getIsFunder(myUserID, channel_id);
@@ -390,6 +400,7 @@ async function listening110049(e, netType) {
 
     let isFunder = await getIsFunder(myUserID, e.channel_id);
     saveChannelStatus(myUserID, e.channel_id, isFunder, kStatusCloseHTLC);
+    saveSenderRole(kIsReceiver);
 
     if (isAutoMode != 'Yes') {  // auto mode closed
         let r = getPrivKeyFromPubKey(myUserID, getInvoiceH());
@@ -420,12 +431,13 @@ async function listening110049(e, netType) {
     // Save address index to OBD and can get private key back if lose it.
     info.curr_rsmc_temp_address_index = Number(getIndexFromPubKey(addr.result.pubkey));
     
-    // NOT SDK API. This a client function, just for Debugging Tool.
-    displaySentMessage100050(nodeID, userID, info);
-    tipsOnTop('', kTipsAfterCloseHTLCSigned);
-
     // SDK API
     await closeHTLCSigned(myUserID, nodeID, userID, info, isFunder);
+
+    // NOT SDK API. This a client function, just for Debugging Tool.
+    displaySentMessage100050(nodeID, userID, info);
+    afterCloseHTLCSigned();
+    displayMyChannelListAtTopRight(kPageSize, kPageIndex);
 
     // Clear H at Bob side
     saveInvoiceH('');
@@ -448,6 +460,7 @@ async function listening110050(e) {
 async function listening110080(e) {
     let isFunder = await getIsFunder(e.to_peer_id, e.channel_id);
     saveChannelStatus(e.to_peer_id, e.channel_id, isFunder, kStatusAtomicSwap);
+    saveSenderRole(kIsReceiver);
 }
 
 /**
@@ -502,10 +515,11 @@ async function listening110340(e) {
     info.approval                     = true;
 
     // SDK API
-    bitcoinFundingSigned(nodeID, userID, info);
+    await bitcoinFundingSigned(myUserID, nodeID, userID, info);
 
     // NOT SDK API. This a client function, just for Debugging Tool.
     displaySentMessage100350(nodeID, userID, info);
+    afterBitcoinFundingSigned(channel_id);
 }
 
 /**
@@ -549,6 +563,7 @@ async function listening110351(e, netType) {
 
     let isFunder = await getIsFunder(myUserID, e.channel_id);
     saveChannelStatus(myUserID, e.channel_id, isFunder, kStatusCommitmentTransactionCreated);
+    saveSenderRole(kIsReceiver);
 
     if (isAutoMode != 'Yes') return;
 
@@ -574,10 +589,12 @@ async function listening110351(e, netType) {
     info.curr_temp_address_index = Number(getIndexFromPubKey(addr.result.pubkey));
 
     // SDK API
-    commitmentTransactionAccepted(myUserID, nodeID, userID, info, isFunder);
+    await commitmentTransactionAccepted(myUserID, nodeID, userID, info, isFunder);
 
     // NOT SDK API. This a client function, just for Debugging Tool.
     displaySentMessage100352(nodeID, userID, info);
+    afterCommitmentTransactionAccepted();
+    displayMyChannelListAtTopRight(kPageSize, kPageIndex);
 }
 
 /**

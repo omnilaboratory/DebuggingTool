@@ -254,6 +254,7 @@ function commitmentTransactionCreated(myUserID, nodeID, userID, info, isFunder) 
             console.info('SDK: -100351 commitmentTransactionCreated = ' + JSON.stringify(e));
             saveTempPrivKey(myUserID, kTempPrivKey, e.channel_id, info.curr_temp_address_private_key);
             saveChannelStatus(myUserID, e.channel_id, isFunder, kStatusCommitmentTransactionCreated);
+            saveSenderRole(kIsSender);
             resolve(true);
         });
     })
@@ -294,6 +295,7 @@ function closeChannel(myUserID, nodeID, userID, channel_id, isFunder) {
         obdApi.closeChannel(nodeID, userID, channel_id, function(e) {
             console.info('SDK: -100038 closeChannel = ' + JSON.stringify(e));
             saveChannelStatus(myUserID, channel_id, isFunder, kStatusCloseChannel);
+            saveSenderRole(kIsSender);
             resolve(true);
         });
     })
