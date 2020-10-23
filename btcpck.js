@@ -1,5 +1,6 @@
 var bitcoin = require('bitcoinjs-lib')
 var bip39 = require('bip39')
+var buffer = require('buffer')
 const bip32 = require('bip32')
 
 
@@ -50,6 +51,7 @@ function generateWalletInfo(mnemonic, index, isTestNet = false) {
 }
 
 module.exports = {
+    buffer,
     bitcoin,
     bip39,
     bip32,

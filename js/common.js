@@ -47,15 +47,96 @@ var channelHadBtcData = '';
 // Functions are here
 
 /**
+ * TEMP CODE
+ * TransactionBuilder way
+ */
+function signByTB() {
+    // testing code...
+    // let network = btctool.bitcoin.networks.bitcoin;
+
+    // TransactionBuilder way
+    let txhex = '02000000018e8851d0f15175cf97819d66c830907672c95e6481aff8b77d349430e341eb9a0000000000ffffffff03504600000000000017a9145761a1d45b8a6e7caa10a4bcecca97630c67af46870000000000000000166a146f6d6e6900000000000000790000000005f5e10022020000000000001976a9144ff2611bf373454410ba5fe61d258544aab681f088ac00000000';
+    const BTC_TESTNET = btctool.bitcoin.networks.testnet;
+
+    let txb = btctool.bitcoin.TransactionBuilder.fromTransaction (
+        btctool.bitcoin.Transaction.fromHex (txhex), BTC_TESTNET);
+
+    const alice  = btctool.bitcoin.ECPair.fromWIF('cUAdadTkjeVFsNz5ifhkETfAzk5PvhnLWtmdSKgbyTTjSCE4MYWy',BTC_TESTNET);
+    const p2wpkh = btctool.bitcoin.payments.p2wpkh({ pubkey: alice.publicKey, network: BTC_TESTNET });
+    const p2sh   = btctool.bitcoin.payments.p2sh({ redeem: p2wpkh, network: BTC_TESTNET });
+
+    // txb.sign({
+    //     prevOutScriptType: 'p2sh-p2wpkh',
+    //     vin: 0,
+    //     keyPair: alice,
+    //     redeemScript: p2sh.redeem.output,
+    //     witnessValue: 109896990,
+    // });
+
+    txb.sign({
+        prevOutScriptType: 'p2pkh',
+        vin: 0,
+        keyPair: alice,
+    });
+
+    let sig = txb.build().toHex();
+    console.info('sig = ' + sig);
+}
+
+/**
+ * TEMP CODE
+ * TransactionBuilder way for 2-2 multi-sig address
+ */
+function signMultisigByTB() {
+
+    // TransactionBuilder way
+    let txhex = '02000000018e8851d0f15175cf97819d66c830907672c95e6481aff8b77d349430e341eb9a0000000000ffffffff03504600000000000017a9145761a1d45b8a6e7caa10a4bcecca97630c67af46870000000000000000166a146f6d6e6900000000000000790000000005f5e10022020000000000001976a9144ff2611bf373454410ba5fe61d258544aab681f088ac00000000';
+    const BTC_TESTNET = btctool.bitcoin.networks.testnet;
+
+    let txb = btctool.bitcoin.TransactionBuilder.fromTransaction (
+        btctool.bitcoin.Transaction.fromHex (txhex), BTC_TESTNET);
+
+    const pubkeys = [
+        '021d475729c52f86df24b36aa231945bd090f9c23ccbfb91e4ade6813b2419d32d',
+        '03efd8923f1829ece87202892d31cd75c20b7a7b5adf888f7ba04fa2c1bc931ce9',
+    ].map(hex => btctool.buffer.Buffer.from(hex, 'hex'));
+
+    const p2ms  = btctool.bitcoin.payments.p2ms({ m: 2, pubkeys, network: BTC_TESTNET });
+    // const p2wsh = btctool.bitcoin.payments.p2wsh({ redeem: p2ms, network: BTC_TESTNET });
+    const p2sh  = btctool.bitcoin.payments.p2sh({ redeem: p2ms, network: BTC_TESTNET });
+
+    const wifs = [
+        'cUAdadTkjeVFsNz5ifhkETfAzk5PvhnLWtmdSKgbyTTjSCE4MYWy',
+        'cV6dif91LHD8Czk8BTgvYZR3ipUrqyMDMtUXSWsThqpHaQJUuHKA',
+    ].map((wif) => btctool.bitcoin.ECPair.fromWIF(wif, BTC_TESTNET));
+
+    // Alice Sign
+    txb.sign(0, wifs[0], p2sh.redeem.output, undefined, 20000, undefined);
+    let txRaw = txb.buildIncomplete();
+    // console.info('txId from Alice signed = ', txRaw.getId());
+    console.info('aliceHex => ' + txRaw.toHex());
+
+    // Bob Sign
+    txb = btctool.bitcoin.TransactionBuilder.fromTransaction (
+        btctool.bitcoin.Transaction.fromHex (txRaw.toHex()), BTC_TESTNET);
+
+    txb.sign(0, wifs[1], p2sh.redeem.output, undefined, 20000, undefined);
+
+    // Export hex
+    let sig = txb.build().toHex();
+    console.info('sig multisig => ' + sig);
+}
+
+/**
  * 
  */
 async function sdkLogIn() {
 
-    // testing code...
-    // let sig = ecc.sign("hash", "priv");
-    // console.info('sig = ' + sig);
+    // signMultisigByTB();
     // return;
 
+
+    // Normal code
     let mnemonic = $("#mnemonic").val();
     let e = await logIn(mnemonic);
 
