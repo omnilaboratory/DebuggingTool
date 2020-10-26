@@ -77,7 +77,7 @@
                         },
                         {
                             "innerText": "Create",
-                            "onclick": "autoCreateFundingPubkey()"
+                            "onclick": "autoCreateAddress()"
                         }
                     ]
                 }
@@ -127,7 +127,7 @@
                         },
                         {
                             "innerText": "Create",
-                            "onclick": "autoCreateFundingPubkey()"
+                            "onclick": "autoCreateAddress()"
                         }
                     ]
                 }
@@ -148,7 +148,7 @@
                         },
                         {
                             "innerText": "Create",
-                            "onclick": "autoCreateFundingPubkey(-102109)"
+                            "onclick": "autoCreateAddress(-102109)"
                         },
                         {
                             "innerText": "Bitcoin Faucet",
@@ -314,7 +314,7 @@
                         },
                         {
                             "innerText": "Create",
-                            "onclick": "autoCreateFundingPubkey(-102120)"
+                            "onclick": "autoCreateAddress(-102120)"
                         },
                         {
                             "innerText": "Omni Faucet",
@@ -402,7 +402,7 @@
                         },
                         {
                             "innerText": "Create",
-                            "onclick": "autoCreateFundingPubkey(-100034)"
+                            "onclick": "autoCreateAddress(-100034)"
                         }
                     ]
                 },
@@ -541,7 +541,7 @@
                         },
                         {
                             "innerText": "Create",
-                            "onclick": "autoCreateFundingPubkey(-100351)"
+                            "onclick": "autoCreateAddress(-100351)"
                         }
                     ]
                 },
@@ -630,7 +630,7 @@
                         },
                         {
                             "innerText": "Create",
-                            "onclick": "autoCreateFundingPubkey(-100352)"
+                            "onclick": "autoCreateAddress(-100352)"
                         }
                     ]
                 },
@@ -681,8 +681,8 @@
                     "help": "The H (Hash of a Preimage R) currently is Public Key of a wallet address, and the R (Preimage R) is Private Key of a wallet address. This is a temporary solution.",
                     "buttons": [
                         {
-                            "innerText": "Display",
-                            "onclick": "displayUserDataInNewHtml('MyAddresses')"
+                            "innerText": "Create",
+                            "onclick": "autoCreateAddress(-100402)"
                         }
                     ]
                 },
@@ -816,10 +816,6 @@
                     "name": "h",
                     "help": "The H (Hash of a Preimage R) currently is Public Key of a wallet address, and the R (Preimage R) is Private Key of a wallet address. This is a temporary solution.",
                     "buttons": [
-                        {
-                            "innerText": "Display",
-                            "onclick": "displayUserDataInNewHtml('MyAddresses')"
-                        }
                     ]
                 },
                 {
@@ -855,7 +851,7 @@
                         },
                         {
                             "innerText": "Create",
-                            "onclick": "autoCreateFundingPubkey(-401)"
+                            "onclick": "autoCreateAddress(-401)"
                         }
                     ]
                 },
@@ -881,7 +877,7 @@
                         },
                         {
                             "innerText": "Create",
-                            "onclick": "autoCreateFundingPubkey(-402)"
+                            "onclick": "autoCreateAddress(-402)"
                         }
                     ]
                 },
@@ -907,7 +903,7 @@
                         },
                         {
                             "innerText": "Create",
-                            "onclick": "autoCreateFundingPubkey(-403)"
+                            "onclick": "autoCreateAddress(-403)"
                         }
                     ]
                 },
@@ -986,7 +982,7 @@
                         },
                         {
                             "innerText": "Create",
-                            "onclick": "autoCreateFundingPubkey(-411)"
+                            "onclick": "autoCreateAddress(-411)"
                         }
                     ]
                 },
@@ -1012,7 +1008,7 @@
                         },
                         {
                             "innerText": "Create",
-                            "onclick": "autoCreateFundingPubkey(-412)"
+                            "onclick": "autoCreateAddress(-412)"
                         }
                     ]
                 },
@@ -1104,7 +1100,7 @@
                         },
                         {
                             "innerText": "Create",
-                            "onclick": "autoCreateFundingPubkey(-45)"
+                            "onclick": "autoCreateAddress(-45)"
                         }
                     ]
                 },
@@ -1163,10 +1159,6 @@
                     "name": "r",
                     "help": "The R (a Preimage R) currently is Private Key of a wallet address, and the H (Hash of a Preimage R) is Public Key of a wallet address. This is a temporary solution.",
                     "buttons": [
-                        {
-                            "innerText": "Display",
-                            "onclick": "displayUserDataInNewHtml('MyAddresses')"
-                        }
                     ]
                 },
                 {
@@ -1265,7 +1257,7 @@
                         },
                         {
                             "innerText": "Create",
-                            "onclick": "autoCreateFundingPubkey(-49)"
+                            "onclick": "autoCreateAddress(-49)"
                         }
                     ]
                 },
@@ -1361,7 +1353,7 @@
                         },
                         {
                             "innerText": "Create",
-                            "onclick": "autoCreateFundingPubkey(-50)"
+                            "onclick": "autoCreateAddress(-50)"
                         }
                     ]
                 },

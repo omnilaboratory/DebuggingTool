@@ -540,6 +540,7 @@ async function listening110350(e) {
         case kStatusSecondBitcoinFundingCreated:
             saveChannelStatus(myUserID, channel_id, true, kStatusSecondBitcoinFundingSigned);
             break;
+        case kStatusThirdFundingBitcoin:
         case kStatusThirdBitcoinFundingCreated:
             saveChannelStatus(myUserID, channel_id, true, kStatusThirdBitcoinFundingSigned);
             break;

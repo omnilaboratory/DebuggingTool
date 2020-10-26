@@ -2931,12 +2931,15 @@ function autoCreateMnemonic() {
 }
 
 // Generate a new pub key of an address.
-function autoCreateFundingPubkey(param) {
+function autoCreateAddress(param) {
     // Generate address by local js library.
     let result = sdkGenAddressFromMnemonic();
     if (result === '') return;
 
     switch (param) {
+        case -100402:
+            $("#h").val(result.result.pubkey);
+            break;
         case -102109:
         case -102120:
             $("#from_address").val(result.result.address);
@@ -4748,6 +4751,7 @@ async function listening110350ForGUITool(e) {
                 enableInvokeAPI();
             }
             break;
+        case kStatusThirdFundingBitcoin:
         case kStatusThirdBitcoinFundingCreated:
             tipsOnTop(channel_id, kTipsThird110350, 'Funding Asset', 'fundingAsset');
             if (api_name === 'fundingAsset') {
