@@ -78,10 +78,10 @@ function fundingBitcoin(myUserID, info) {
                     break;
             }
 
-            saveFundingPrivKey(myUserID, channel_id, info.from_address_private_key);
+            // saveFundingPrivKey(myUserID, channel_id, info.from_address_private_key);
             saveFundingBtcData(myUserID, channel_id, info);
             saveTempData(myUserID, channel_id, e.hex);
-            resolve(true);
+            resolve(e);
         });
     })
 }

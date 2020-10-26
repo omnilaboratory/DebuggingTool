@@ -55,15 +55,15 @@ function signByTB() {
     // let network = btctool.bitcoin.networks.bitcoin;
 
     // TransactionBuilder way
-    let txhex = '02000000018e8851d0f15175cf97819d66c830907672c95e6481aff8b77d349430e341eb9a0000000000ffffffff03504600000000000017a9145761a1d45b8a6e7caa10a4bcecca97630c67af46870000000000000000166a146f6d6e6900000000000000790000000005f5e10022020000000000001976a9144ff2611bf373454410ba5fe61d258544aab681f088ac00000000';
+    let txhex = '0200000001367d440085ab142c1f5687c6b9376ef48af3041cb33f83516b415cc5c01e61490000000000ffffffff02409c00000000000017a9141d171331ff123a8d86037821c29fcdac760722f587e2161200000000001976a9147a019f584f6a65d114d5f17264c9eb32f763d72c88ac00000000';
     const BTC_TESTNET = btctool.bitcoin.networks.testnet;
 
     let txb = btctool.bitcoin.TransactionBuilder.fromTransaction (
         btctool.bitcoin.Transaction.fromHex (txhex), BTC_TESTNET);
 
-    const alice  = btctool.bitcoin.ECPair.fromWIF('cUAdadTkjeVFsNz5ifhkETfAzk5PvhnLWtmdSKgbyTTjSCE4MYWy',BTC_TESTNET);
-    const p2wpkh = btctool.bitcoin.payments.p2wpkh({ pubkey: alice.publicKey, network: BTC_TESTNET });
-    const p2sh   = btctool.bitcoin.payments.p2sh({ redeem: p2wpkh, network: BTC_TESTNET });
+    const alice  = btctool.bitcoin.ECPair.fromWIF('cVV22tLgBbLv1K1uW6z2doR4Copat1mejjND1jtW8CVkRLUSpPxf',BTC_TESTNET);
+    // const p2wpkh = btctool.bitcoin.payments.p2wpkh({ pubkey: alice.publicKey, network: BTC_TESTNET });
+    // const p2sh   = btctool.bitcoin.payments.p2sh({ redeem: p2wpkh, network: BTC_TESTNET });
 
     // txb.sign({
     //     prevOutScriptType: 'p2sh-p2wpkh',
@@ -133,6 +133,7 @@ function signMultisigByTB() {
 async function sdkLogIn() {
 
     // signMultisigByTB();
+    // signByTB();
     // return;
 
 
@@ -690,7 +691,7 @@ async function sdkFundingBitcoin() {
 
     let info                      = new BtcFundingInfo();
     info.from_address             = $("#from_address").val();
-    info.from_address_private_key = $("#from_address_private_key").val();
+    // info.from_address_private_key = $("#from_address_private_key").val();
     info.to_address               = $("#to_address").val();
     info.amount                   = Number($("#amount").val());
     info.miner_fee                = Number($("#miner_fee").val());
@@ -2943,7 +2944,7 @@ function autoCreateAddress(param) {
         case -102109:
         case -102120:
             $("#from_address").val(result.result.address);
-            $("#from_address_private_key").val(result.result.wif);
+            // $("#from_address_private_key").val(result.result.wif);
             break;
         case -100034:
             $("#temp_address_pub_key").val(result.result.pubkey);
@@ -4124,7 +4125,7 @@ function displaySentMessage102109(info) {
         type: -102109,
         data: {
             from_address:             info.from_address,
-            from_address_private_key: info.from_address_private_key,
+            // from_address_private_key: info.from_address_private_key,
             to_address:               info.to_address,
             amount:                   info.amount,
             miner_fee:                info.miner_fee,

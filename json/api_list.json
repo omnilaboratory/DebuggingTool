@@ -157,16 +157,6 @@
                     ]
                 },
                 {
-                    "name": "from_address_private_key",
-                    "help": "OBD create a transfer commitment transaction and use this private key to sign it but not broadcast.",
-                    "buttons": [
-                        {
-                            "innerText": "Select",
-                            "onclick": "displayUserDataInNewHtml('MyAddresses')"
-                        }
-                    ]
-                },
-                {
                     "name": "to_address",
                     "help": "This is channel 2-2 multi-sig address generated after AcceptChannel API invoked with counterparty.",
                     "buttons": [

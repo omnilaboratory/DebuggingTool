@@ -324,10 +324,10 @@ class ObdApi {
             alert("empty from_address");
             return;
         }
-        if (this.isNotString(info.from_address_private_key)) {
-            alert("empty from_address_private_key");
-            return;
-        }
+        // if (this.isNotString(info.from_address_private_key)) {
+        //   alert("empty from_address_private_key");
+        //   return;
+        // }
         if (this.isNotString(info.to_address)) {
             alert("empty to_address");
             return;
