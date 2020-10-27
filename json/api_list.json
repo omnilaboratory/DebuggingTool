@@ -220,16 +220,6 @@
                     ]
                 },
                 {
-                    "name": "channel_address_private_key",
-                    "help": "OBD create a revockable delivery transaction (RD Transaction). This private key used to sign the RD transaction. The RD transaction get bitcoin of deposit to channel (type 1009) back to sender if counterparty always does not response.",
-                    "buttons": [
-                        {
-                            "innerText": "Display",
-                            "onclick": "displayUserDataInNewHtml('MyAddresses')"
-                        }
-                    ]
-                },
-                {
                     "name": "funding_tx_hex",
                     "help": "The commitment transaction hex created in fundingBitcoin api (type 1009).",
                     "imgPath": "doc/tooltip/3400-3500.png",
@@ -271,21 +261,14 @@
                     ]
                 },
                 {
-                    "name": "channel_address_private_key",
-                    "help": "This key is the private key of the Bob's address used to create the Channel Address. OBD use the private key to sign the RD transaction created by bitcoinFundingCreated (Alice sent type -3400). This RD transaction get bitcoin of deposit to channel (type 1009) back to Alice if Bob always does not response.",
-                    "buttons": [
-                        {
-                            "innerText": "Display",
-                            "onclick": "displayUserDataInNewHtml('MyAddresses')"
-                        }
-                    ]
-                },
-                {
                     "name": "funding_txid",
                     "help": "The commitment transaction txid created in fundingBitcoin api (type 1009).",
                     "imgPath": "doc/tooltip/3400-3500.png",
-                    "buttons": [
-                    ]
+                    "buttons": []
+                },
+                {
+                    "name": "signed_miner_redeem_transaction_hex",
+                    "buttons": []
                 }
             ]
         },

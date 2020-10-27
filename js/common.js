@@ -47,97 +47,10 @@ var channelHadBtcData = '';
 // Functions are here
 
 /**
- * TEMP CODE
- * TransactionBuilder way
- */
-function signByTB() {
-    // testing code...
-    // let network = btctool.bitcoin.networks.bitcoin;
-
-    // TransactionBuilder way
-    let txhex = '0200000001367d440085ab142c1f5687c6b9376ef48af3041cb33f83516b415cc5c01e61490000000000ffffffff02409c00000000000017a9141d171331ff123a8d86037821c29fcdac760722f587e2161200000000001976a9147a019f584f6a65d114d5f17264c9eb32f763d72c88ac00000000';
-    const BTC_TESTNET = btctool.bitcoin.networks.testnet;
-
-    let txb = btctool.bitcoin.TransactionBuilder.fromTransaction (
-        btctool.bitcoin.Transaction.fromHex (txhex), BTC_TESTNET);
-
-    const alice  = btctool.bitcoin.ECPair.fromWIF('cVV22tLgBbLv1K1uW6z2doR4Copat1mejjND1jtW8CVkRLUSpPxf',BTC_TESTNET);
-    // const p2wpkh = btctool.bitcoin.payments.p2wpkh({ pubkey: alice.publicKey, network: BTC_TESTNET });
-    // const p2sh   = btctool.bitcoin.payments.p2sh({ redeem: p2wpkh, network: BTC_TESTNET });
-
-    // txb.sign({
-    //     prevOutScriptType: 'p2sh-p2wpkh',
-    //     vin: 0,
-    //     keyPair: alice,
-    //     redeemScript: p2sh.redeem.output,
-    //     witnessValue: 109896990,
-    // });
-
-    txb.sign({
-        prevOutScriptType: 'p2pkh',
-        vin: 0,
-        keyPair: alice,
-    });
-
-    let sig = txb.build().toHex();
-    console.info('sig = ' + sig);
-}
-
-/**
- * TEMP CODE
- * TransactionBuilder way for 2-2 multi-sig address
- */
-function signMultisigByTB() {
-
-    // TransactionBuilder way
-    let txhex = '02000000018e8851d0f15175cf97819d66c830907672c95e6481aff8b77d349430e341eb9a0000000000ffffffff03504600000000000017a9145761a1d45b8a6e7caa10a4bcecca97630c67af46870000000000000000166a146f6d6e6900000000000000790000000005f5e10022020000000000001976a9144ff2611bf373454410ba5fe61d258544aab681f088ac00000000';
-    const BTC_TESTNET = btctool.bitcoin.networks.testnet;
-
-    let txb = btctool.bitcoin.TransactionBuilder.fromTransaction (
-        btctool.bitcoin.Transaction.fromHex (txhex), BTC_TESTNET);
-
-    const pubkeys = [
-        '021d475729c52f86df24b36aa231945bd090f9c23ccbfb91e4ade6813b2419d32d',
-        '03efd8923f1829ece87202892d31cd75c20b7a7b5adf888f7ba04fa2c1bc931ce9',
-    ].map(hex => btctool.buffer.Buffer.from(hex, 'hex'));
-
-    const p2ms  = btctool.bitcoin.payments.p2ms({ m: 2, pubkeys, network: BTC_TESTNET });
-    // const p2wsh = btctool.bitcoin.payments.p2wsh({ redeem: p2ms, network: BTC_TESTNET });
-    const p2sh  = btctool.bitcoin.payments.p2sh({ redeem: p2ms, network: BTC_TESTNET });
-
-    const wifs = [
-        'cUAdadTkjeVFsNz5ifhkETfAzk5PvhnLWtmdSKgbyTTjSCE4MYWy',
-        'cV6dif91LHD8Czk8BTgvYZR3ipUrqyMDMtUXSWsThqpHaQJUuHKA',
-    ].map((wif) => btctool.bitcoin.ECPair.fromWIF(wif, BTC_TESTNET));
-
-    // Alice Sign
-    txb.sign(0, wifs[0], p2sh.redeem.output, undefined, 20000, undefined);
-    let txRaw = txb.buildIncomplete();
-    // console.info('txId from Alice signed = ', txRaw.getId());
-    console.info('aliceHex => ' + txRaw.toHex());
-
-    // Bob Sign
-    txb = btctool.bitcoin.TransactionBuilder.fromTransaction (
-        btctool.bitcoin.Transaction.fromHex (txRaw.toHex()), BTC_TESTNET);
-
-    txb.sign(0, wifs[1], p2sh.redeem.output, undefined, 20000, undefined);
-
-    // Export hex
-    let sig = txb.build().toHex();
-    console.info('sig multisig => ' + sig);
-}
-
-/**
  * 
  */
 async function sdkLogIn() {
 
-    // signMultisigByTB();
-    // signByTB();
-    // return;
-
-
-    // Normal code
     let mnemonic = $("#mnemonic").val();
     let e = await logIn(mnemonic);
 
@@ -618,13 +531,17 @@ async function sdkBitcoinFundingCreated() {
     let nodeID = $("#recipient_node_peer_id").val();
     let userID = $("#recipient_user_peer_id").val();
 
-    let info                         = new FundingBtcCreated();
-    info.temporary_channel_id        = $("#temporary_channel_id").val();
-    info.channel_address_private_key = $("#channel_address_private_key").val();
-    info.funding_tx_hex              = $("#funding_tx_hex").val();
+    let info                  = new FundingBtcCreated();
+    info.temporary_channel_id = $("#temporary_channel_id").val();
+    info.funding_tx_hex       = $("#funding_tx_hex").val();
 
     displaySentMessage100340(nodeID, userID, info);
-    await bitcoinFundingCreated($("#logined").text(), nodeID, userID, info);
+    
+    let signed_hex = await bitcoinFundingCreated($("#logined").text(), nodeID, userID, info);
+    if (signed_hex != true) {
+        await sendSignedHex100341(nodeID, userID, signed_hex);
+    }
+
     afterBitcoinFundingCreated();
 }
 
@@ -634,11 +551,11 @@ async function sdkBitcoinFundingSigned() {
     let nodeID = $("#recipient_node_peer_id").val();
     let userID = $("#recipient_user_peer_id").val();
 
-    let info                         = new FundingBtcSigned();
-    info.temporary_channel_id        = $("#temporary_channel_id").val();
-    info.channel_address_private_key = $("#channel_address_private_key").val();
-    info.funding_txid                = $("#funding_txid").val();
-    info.approval                    = $("#checkbox_n3500").prop("checked");
+    let info                  = new FundingBtcSigned();
+    info.temporary_channel_id = $("#temporary_channel_id").val();
+    info.funding_txid         = $("#funding_txid").val();
+    info.signed_miner_redeem_transaction_hex = $("#signed_miner_redeem_transaction_hex").val();
+    info.approval             = $("#checkbox_n3500").prop("checked");
 
     displaySentMessage100350(nodeID, userID, info);
     await bitcoinFundingSigned($("#logined").text(), nodeID, userID, info);
@@ -655,7 +572,7 @@ async function sdkAssetFundingCreated() {
     info.temporary_channel_id        = $("#temporary_channel_id").val();
     info.temp_address_pub_key        = $("#temp_address_pub_key").val();
     info.temp_address_private_key    = $("#temp_address_private_key").val();
-    info.channel_address_private_key = $("#channel_address_private_key").val();
+    // info.channel_address_private_key = $("#channel_address_private_key").val();
     info.funding_tx_hex              = $("#funding_tx_hex").val();
 
     // Save address index to OBD and can get private key back if lose it.
@@ -672,12 +589,12 @@ async function sdkAssetFundingSigned() {
     let nodeID    = $("#recipient_node_peer_id").val();
     let userID    = $("#recipient_user_peer_id").val();
     let temp_cid  = $("#temporary_channel_id").val();
-    let privkey   = $("#channel_address_private_key").val();
+    // let privkey   = $("#channel_address_private_key").val();
     // let approval   = $("#checkbox_n35").prop("checked");
 
     let info                                = new AssetFundingSignedInfo();
     info.temporary_channel_id               = temp_cid;
-    info.channel_address_private_key = privkey;
+    // info.channel_address_private_key = privkey;
     // info.approval = approval;
 
     displaySentMessage100035(nodeID, userID, info);
@@ -691,7 +608,6 @@ async function sdkFundingBitcoin() {
 
     let info                      = new BtcFundingInfo();
     info.from_address             = $("#from_address").val();
-    // info.from_address_private_key = $("#from_address_private_key").val();
     info.to_address               = $("#to_address").val();
     info.amount                   = Number($("#amount").val());
     info.miner_fee                = Number($("#miner_fee").val());
@@ -1622,7 +1538,7 @@ async function fillHTLCPathData(myUserID, channel_id) {
  */
 async function fillChannelIDAndFundingPrivKey(myUserID, channel_id) {
     let fundingPrivKey = await getFundingPrivKey(myUserID, channel_id);
-    $("#channel_address_private_key").val(fundingPrivKey);
+    // $("#channel_address_private_key").val(fundingPrivKey);
     $("#channel_id").val(channel_id);
 }
 
@@ -1641,8 +1557,8 @@ function fillChannelFundingLastTempKeys(myUserID, channel_id) {
 async function fillTempChannelIDAndFundingPrivKey(myUserID, channel_id) {
 
     $("#temporary_channel_id").val(channel_id);
-    let fundingPrivKey = await getFundingPrivKey(myUserID, channel_id);
-    $("#channel_address_private_key").val(fundingPrivKey);
+    // let fundingPrivKey = await getFundingPrivKey(myUserID, channel_id);
+    // $("#channel_address_private_key").val(fundingPrivKey);
 }
 
 //
@@ -1716,7 +1632,7 @@ async function fillFundingBtcData(myUserID, channel_id, status) {
 
     let result = await getFundingBtcData(myUserID, channel_id);
     $("#from_address").val(result.from_address);
-    $("#from_address_private_key").val(result.from_address_private_key);
+    // $("#from_address_private_key").val(result.from_address_private_key);
     $("#amount").val(result.amount);
     $("#miner_fee").val(result.miner_fee);
     
@@ -2329,13 +2245,13 @@ function clickApproval(obj) {
 
         case 'checkbox_n3500':
             if (obj.checked) {
-                $("#channel_address_private_key").show();
-                $("#channel_address_private_keyDis").show();
+                // $("#channel_address_private_key").show();
+                // $("#channel_address_private_keyDis").show();
                 // $("#funding_txid").show();
                 // $("#funding_txidGet").show();
             } else {
-                $("#channel_address_private_key").hide();
-                $("#channel_address_private_keyDis").hide();
+                // $("#channel_address_private_key").hide();
+                // $("#channel_address_private_keyDis").hide();
                 // $("#funding_txid").hide();
                 // $("#funding_txidGet").hide();
             }
@@ -2359,8 +2275,8 @@ function clickApproval(obj) {
                 $("#curr_temp_address_private_keySel").show();
                 $("#last_temp_address_private_key").show();
                 $("#last_temp_address_private_keyDis").show();
-                $("#channel_address_private_key").show();
-                $("#channel_address_private_keyDis").show();
+                // $("#channel_address_private_key").show();
+                // $("#channel_address_private_keyDis").show();
             } else {
                 $("#curr_temp_address_pub_key").hide();
                 $("#curr_temp_address_pub_keySel").hide();
@@ -2368,40 +2284,10 @@ function clickApproval(obj) {
                 $("#curr_temp_address_private_keySel").hide();
                 $("#last_temp_address_private_key").hide();
                 $("#last_temp_address_private_keyDis").hide();
-                $("#channel_address_private_key").hide();
-                $("#channel_address_private_keyDis").hide();
+                // $("#channel_address_private_key").hide();
+                // $("#channel_address_private_keyDis").hide();
             }
             break;
-
-        // case 'checkbox_n41':
-        //     if (obj.checked) {
-        //         $("#curr_rsmc_temp_address_pub_key").show();
-        //         $("#curr_rsmc_temp_address_pub_keySel").show();
-        //         $("#curr_rsmc_temp_address_private_key").show();
-        //         $("#curr_rsmc_temp_address_private_keySel").show();
-        //         $("#curr_htlc_temp_address_pub_key").show();
-        //         $("#curr_htlc_temp_address_pub_keySel").show();
-        //         $("#curr_htlc_temp_address_private_key").show();
-        //         $("#curr_htlc_temp_address_private_keySel").show();
-        //         $("#last_temp_address_private_key").show();
-        //         $("#last_temp_address_private_keyDis").show();
-        //         $("#channel_address_private_key").show();
-        //         $("#channel_address_private_keyDis").show();
-        //     } else {
-        //         $("#curr_rsmc_temp_address_pub_key").hide();
-        //         $("#curr_rsmc_temp_address_pub_keySel").hide();
-        //         $("#curr_rsmc_temp_address_private_key").hide();
-        //         $("#curr_rsmc_temp_address_private_keySel").hide();
-        //         $("#curr_htlc_temp_address_pub_key").hide();
-        //         $("#curr_htlc_temp_address_pub_keySel").hide();
-        //         $("#curr_htlc_temp_address_private_key").hide();
-        //         $("#curr_htlc_temp_address_private_keySel").hide();
-        //         $("#last_temp_address_private_key").hide();
-        //         $("#last_temp_address_private_keyDis").hide();
-        //         $("#channel_address_private_key").hide();
-        //         $("#channel_address_private_keyDis").hide();
-        //     }
-        //     break;
 
         case 'checkbox_n39':
             if (obj.checked) {
@@ -3976,7 +3862,7 @@ function displaySentMessage100350(nodeID, userID, info) {
         recipient_user_peer_id: userID,
         data: {
             temporary_channel_id:        info.temporary_channel_id,
-            channel_address_private_key: info.channel_address_private_key,
+            // channel_address_private_key: info.channel_address_private_key,
             funding_txid:                info.funding_txid,
             approval:                    info.approval,
         }
@@ -3998,7 +3884,7 @@ function displaySentMessage100035(nodeID, userID, info) {
         recipient_user_peer_id: userID,
         data: {
             temporary_channel_id:               info.temporary_channel_id,
-            channel_address_private_key: info.channel_address_private_key,
+            // channel_address_private_key: info.channel_address_private_key,
         }
     }
 
@@ -4165,7 +4051,7 @@ function displaySentMessage100340(nodeID, userID, info) {
         recipient_user_peer_id: userID,
         data: {
             temporary_channel_id:        info.temporary_channel_id,
-            channel_address_private_key: info.channel_address_private_key,
+            // channel_address_private_key: info.channel_address_private_key,
             funding_tx_hex:              info.funding_tx_hex,
         }
     }

@@ -381,6 +381,33 @@ class ObdApi {
         this.sendData(msg, callback);
     }
     /**
+     * MsgType_FundingCreate_BtcFundingMinerRDTxToClient_341
+     * @param recipient_node_peer_id string
+     * @param recipient_user_peer_id string
+     * @param signed_hex  string
+     * @param callback  Function
+     */
+    sendSignedHex100341(recipient_node_peer_id, recipient_user_peer_id, signed_hex, callback) {
+        if (this.isNotString(recipient_node_peer_id)) {
+            alert("error recipient_node_peer_id");
+            return;
+        }
+        if (this.isNotString(recipient_user_peer_id)) {
+            alert("error recipient_user_peer_id");
+            return;
+        }
+        if (this.isNotString(signed_hex)) {
+            alert("empty signed_hex");
+            return;
+        }
+        let msg = new Message();
+        msg.type = this.messageType.MsgType_FundingCreate_BtcFundingMinerRDTxToClient_341;
+        msg.recipient_user_peer_id = recipient_user_peer_id;
+        msg.recipient_node_peer_id = recipient_node_peer_id;
+        msg.data["hex"] = signed_hex;
+        this.sendData(msg, callback);
+    }
+    /**
      * MsgType_FundingSign_SendBtcSign_350
      * @param recipient_node_peer_id string
      * @param recipient_user_peer_id string
@@ -403,12 +430,6 @@ class ObdApi {
         if (this.isNotString(info.funding_txid)) {
             alert("empty funding_txid");
             return;
-        }
-        if (info.approval == true) {
-            if (this.isNotString(info.channel_address_private_key)) {
-                alert("empty channel_address_private_key");
-                return;
-            }
         }
         let msg = new Message();
         msg.type = this.messageType.MsgType_FundingSign_SendBtcSign_350;

@@ -1369,3 +1369,71 @@ function saveSenderRole(val) {
 function getSenderRole() {
     return localStorage.getItem(kSenderRole);
 }
+
+/**
+ * Sign P2PKH address with TransactionBuilder way
+ * main network: btctool.bitcoin.networks.bitcoin;
+ * @param txhex
+ * @param privkey
+ */
+function signP2PKH(txhex, privkey) {
+
+    const network = btctool.bitcoin.networks.testnet;
+    const tx      = btctool.bitcoin.Transaction.fromHex(txhex);
+    const txb     = btctool.bitcoin.TransactionBuilder.fromTransaction(tx, network);
+    const key     = btctool.bitcoin.ECPair.fromWIF(privkey, network);
+
+    txb.sign({
+        prevOutScriptType: 'p2pkh',
+        vin: 0,
+        keyPair: key,
+    });
+
+    // Export hex
+    let toHex = txb.build().toHex();
+    console.info('signP2PKH - toHex = ' + toHex);
+    return toHex;
+}
+
+/**
+ * Sign P2SH address with TransactionBuilder way for 2-2 multi-sig address
+ * @param is_alice
+ * @param txhex
+ * @param pubkey_1
+ * @param pubkey_2
+ * @param privkey
+ * @param amount    amount in input
+ */
+function signP2SH(is_alice, txhex, pubkey_1, pubkey_2, privkey, amount) {
+
+    const network = btctool.bitcoin.networks.testnet;
+    const tx      = btctool.bitcoin.Transaction.fromHex(txhex);
+    const txb     = btctool.bitcoin.TransactionBuilder.fromTransaction(tx, network);
+    const pubkeys = [pubkey_1, pubkey_2].map(hex => btctool.buffer.Buffer.from(hex, 'hex'));
+    const p2ms    = btctool.bitcoin.payments.p2ms({ m: 2, pubkeys, network: network });
+    const p2sh    = btctool.bitcoin.payments.p2sh({ redeem: p2ms,  network: network });
+
+    // const wifs = [
+    //     'cUAdadTkjeVFsNz5ifhkETfAzk5PvhnLWtmdSKgbyTTjSCE4MYWy',
+    //     'cV6dif91LHD8Czk8BTgvYZR3ipUrqyMDMtUXSWsThqpHaQJUuHKA',
+    // ].map((wif) => btctool.bitcoin.ECPair.fromWIF(wif, network));
+
+    // testing
+    const key     = btctool.bitcoin.ECPair.fromWIF(privkey, network);
+
+    // Sign
+    if (is_alice === true) { // Alice sign the transaction first
+        // txb.sign(0, wifs[0], p2sh.redeem.output, undefined, amount, undefined);
+        txb.sign(0, key, p2sh.redeem.output, undefined, amount, undefined);
+        let aliceHex = txb.buildIncomplete().toHex();
+        console.info('aliceHex => ' + aliceHex);
+        return aliceHex;
+
+    } else { // Bob sign the transaction
+        // txb.sign(0, wifs[1], p2sh.redeem.output, undefined, amount, undefined);
+        txb.sign(0, key, p2sh.redeem.output, undefined, amount, undefined);
+        let toHex = txb.build().toHex();
+        console.info('signP2SH - toHex = ' + toHex);
+        return toHex;
+    }
+}

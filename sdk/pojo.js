@@ -25,7 +25,7 @@ class FundingBtcSigned {
     constructor() {
         this.temporary_channel_id = "";
         this.funding_txid = "";
-        this.channel_address_private_key = "";
+        this.signed_miner_redeem_transaction_hex = "";
         this.approval = false;
     }
 }
@@ -332,6 +332,7 @@ class MessageType {
         this.MsgType_FundingSign_SendAssetFundingSigned_35 = -100035;
         this.MsgType_FundingSign_RecvAssetFundingSigned_35 = -110035;
         this.MsgType_FundingCreate_SendBtcFundingCreated_340 = -100340;
+        this.MsgType_FundingCreate_BtcFundingMinerRDTxToClient_341 = -100341;
         this.MsgType_FundingCreate_RecvBtcFundingCreated_340 = -110340;
         this.MsgType_FundingSign_SendBtcSign_350 = -100350;
         this.MsgType_FundingSign_RecvBtcSign_350 = -110350;

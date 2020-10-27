@@ -78,9 +78,13 @@ function fundingBitcoin(myUserID, info) {
                     break;
             }
 
+            // Sign the tx on client
+            let privkey    = getPrivKeyFromAddress(info.from_address);
+            let signed_hex = signP2PKH(e.hex, privkey);
+
             // saveFundingPrivKey(myUserID, channel_id, info.from_address_private_key);
             saveFundingBtcData(myUserID, channel_id, info);
-            saveTempData(myUserID, channel_id, e.hex);
+            saveTempData(myUserID, channel_id, signed_hex);
             resolve(e);
         });
     })
@@ -114,6 +118,33 @@ function bitcoinFundingCreated(myUserID, nodeID, userID, info) {
                     saveChannelStatus(myUserID, channel_id, true, kStatusThirdBitcoinFundingCreated);
                     break;
             }
+
+            // Sign tx
+            console.info('bitcoinFundingCreated e.hex = ' + e.hex);
+            if (e.hex) {
+                // Alice sign the tx on client
+                let privkey    = await getFundingPrivKey(myUserID, channel_id);
+                let signed_hex = signP2SH(true, e.hex, e.pub_key_a, 
+                    e.pub_key_b, privkey, e.inputs[0].amount);
+                resolve(signed_hex);
+            }
+
+            resolve(true);
+        });
+    })
+}
+
+/**
+ * Type -100341 Protocol is used to send hex by Alice signing in 100340.
+ * 
+ * @param nodeID peer id of the obd node where the fundee logged in.
+ * @param userID the user id of the fundee.
+ * @param signed_hex 
+ */
+function sendSignedHex100341(nodeID, userID, signed_hex) {
+    return new Promise((resolve, reject) => {
+        obdApi.sendSignedHex100341(nodeID, userID, signed_hex, function(e) {
+            console.info('SDK: -100341 sendSignedHex100341 = ' + JSON.stringify(e));
             resolve(true);
         });
     })
@@ -148,7 +179,7 @@ function bitcoinFundingSigned(myUserID, nodeID, userID, info) {
                     break;
             }
 
-            saveFundingPrivKey(myUserID, channel_id, info.channel_address_private_key);
+            // saveFundingPrivKey(myUserID, channel_id, info.channel_address_private_key);
             resolve(true);
         });
     })

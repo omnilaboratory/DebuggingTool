@@ -21,7 +21,7 @@ class FundingBtcCreated {
 class FundingBtcSigned {
   temporary_channel_id: string = "";
   funding_txid: string = "";
-  channel_address_private_key: string = "";
+  signed_miner_redeem_transaction_hex: string = "";
   approval: boolean = false;
 }
 
@@ -304,10 +304,12 @@ class MessageType {
 	MsgType_FundingSign_SendAssetFundingSigned_35     = -100035;
   MsgType_FundingSign_RecvAssetFundingSigned_35     = -110035;
 
-  MsgType_FundingCreate_SendBtcFundingCreated_340  = -100340;
-	MsgType_FundingCreate_RecvBtcFundingCreated_340  = -110340;
-  MsgType_FundingSign_SendBtcSign_350              = -100350;
-  MsgType_FundingSign_RecvBtcSign_350              = -110350;
+  MsgType_FundingCreate_SendBtcFundingCreated_340            = -100340;
+  MsgType_FundingCreate_BtcFundingMinerRDTxToClient_341      = -100341;
+	MsgType_FundingCreate_RecvBtcFundingCreated_340            = -110340;
+  MsgType_FundingSign_SendBtcSign_350                        = -100350;
+  MsgType_FundingSign_RecvBtcSign_350                        = -110350;
+
   MsgType_CommitmentTx_SendCommitmentTransactionCreated_351  = -100351;
   MsgType_CommitmentTx_RecvCommitmentTransactionCreated_351  = -110351;
   MsgType_CommitmentTxSigned_SendRevokeAndAcknowledgeCommitmentTransaction_352  = -100352;
