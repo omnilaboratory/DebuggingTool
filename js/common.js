@@ -46,10 +46,54 @@ var channelHadBtcData = '';
 ////////////////////////////////
 // Functions are here
 
+// FOR TESTING , WILL BE DELETED.
+function testSignP2SH() {
+
+    let txhex    = '0200000001956ac7932f35d573bb1f7c7080c6afc157ea201181967af6ffc3380acabcfdad0000000000ffffffff01501f0000000000001976a9140b060fcf9c573c6290c1e5a9de315b8eda2c3a5388ac00000000';
+    let pubkey_1 = '020cbd54b5d0cd602a161beb99fe1a8f2ed9aaaf66eec054d26a617d7df67e9ae1';
+    let pubkey_2 = '03d30073909bd072c070ac7c9b2d75084db079f32929fd00010c20d976389dffdf';
+
+    const network = btctool.bitcoin.networks.testnet;
+    const tx      = btctool.bitcoin.Transaction.fromHex(txhex);
+    const txb     = btctool.bitcoin.TransactionBuilder.fromTransaction(tx, network);
+    const pubkeys = [pubkey_1, pubkey_2].map(hex => btctool.buffer.Buffer.from(hex, 'hex'));
+    const p2ms    = btctool.bitcoin.payments.p2ms({ m: 2, pubkeys, network: network });
+    const p2sh    = btctool.bitcoin.payments.p2sh({ redeem: p2ms,  network: network });
+
+    // const wifs = [
+    //     'cUAdadTkjeVFsNz5ifhkETfAzk5PvhnLWtmdSKgbyTTjSCE4MYWy',
+    //     'cV6dif91LHD8Czk8BTgvYZR3ipUrqyMDMtUXSWsThqpHaQJUuHKA',
+    // ].map((wif) => btctool.bitcoin.ECPair.fromWIF(wif, network));
+
+    // testing
+    let alicePrivkey = 'cSFJQshaUe7wJxAuNSib1HjNQSpLRq7z7eCqrRueo2eB4otAitng';
+    let bobPrivkey   = 'cSZyhSTKfXFLY42t9oBrrgxs2DQdoMsJu44inLk4ToNhFNLr9QWP';
+    const key        = btctool.bitcoin.ECPair.fromWIF(bobPrivkey, network);
+
+    // change to satoshi
+    amount = 9248;
+
+    // Alice sign the transaction first
+    // txb.sign(0, wifs[0], p2sh.redeem.output, undefined, amount, undefined);
+    // txb.sign(0, key, p2sh.redeem.output, undefined, amount, undefined);
+    // let aliceHex = txb.buildIncomplete().toHex();
+    // console.info('aliceHex => ' + aliceHex);
+
+    //----------------------------
+    // Bob sign the transaction
+    // txb.sign(0, wifs[1], p2sh.redeem.output, undefined, amount, undefined);
+    txb.sign(0, key, p2sh.redeem.output, undefined, amount, undefined);
+    let toHex = txb.build().toHex();
+    console.info('testSignP2SH - toHex = ' + toHex);
+}
+
 /**
  * 
  */
 async function sdkLogIn() {
+
+    testSignP2SH();
+    return;
 
     let mnemonic = $("#mnemonic").val();
     let e = await logIn(mnemonic);
@@ -1557,8 +1601,8 @@ function fillChannelFundingLastTempKeys(myUserID, channel_id) {
 async function fillTempChannelIDAndFundingPrivKey(myUserID, channel_id) {
 
     $("#temporary_channel_id").val(channel_id);
-    // let fundingPrivKey = await getFundingPrivKey(myUserID, channel_id);
-    // $("#channel_address_private_key").val(fundingPrivKey);
+    let fundingPrivKey = await getFundingPrivKey(myUserID, channel_id);
+    $("#channel_address_private_key").val(fundingPrivKey);
 }
 
 //
@@ -1632,7 +1676,7 @@ async function fillFundingBtcData(myUserID, channel_id, status) {
 
     let result = await getFundingBtcData(myUserID, channel_id);
     $("#from_address").val(result.from_address);
-    // $("#from_address_private_key").val(result.from_address_private_key);
+    $("#from_address_private_key").val(result.from_address_private_key);
     $("#amount").val(result.amount);
     $("#miner_fee").val(result.miner_fee);
     
@@ -2362,6 +2406,12 @@ function createParamOfAPI(arrParams, content_div) {
             input_box.setAttribute('class', 'input_node_url');
         } else {
             input_box.setAttribute('class', 'input');
+        }
+
+        // disable the parameter.
+        if (arrParams[i].disable) {
+            input_box.setAttribute('class', 'input disabled');
+            input_box.setAttribute('disabled', 'disabled');
         }
 
         div_other.append(input_box);

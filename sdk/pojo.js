@@ -8,7 +8,7 @@ class Message {
 class BtcFundingInfo {
     constructor() {
         this.from_address = "";
-        // from_address_private_key: string = "";
+        this.from_address_private_key = "";
         this.to_address = "";
         this.amount = 0.0;
         this.miner_fee = 0.0;
@@ -18,7 +18,6 @@ class FundingBtcCreated {
     constructor() {
         this.temporary_channel_id = "";
         this.funding_tx_hex = "";
-        this.channel_address_private_key = "";
     }
 }
 class FundingBtcSigned {

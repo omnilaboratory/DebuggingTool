@@ -369,10 +369,6 @@ class ObdApi {
             alert("empty funding_tx_hex");
             return;
         }
-        if (this.isNotString(info.channel_address_private_key)) {
-            alert("empty channel_address_private_key");
-            return;
-        }
         let msg = new Message();
         msg.type = this.messageType.MsgType_FundingCreate_SendBtcFundingCreated_340;
         msg.recipient_user_peer_id = recipient_user_peer_id;

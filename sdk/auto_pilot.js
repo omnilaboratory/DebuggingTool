@@ -483,6 +483,8 @@ async function listening110340(e) {
     console.info('SDK: NOW isAutoMode = ' + isAutoMode);
 
     let myUserID     = e.to_peer_id;
+    console.info('myUserID = ' + e.to_peer_id);
+
     let channel_id   = e.temporary_channel_id;
     let status       = await getChannelStatus(channel_id, false);
     console.info('listening110340 status = ' + status);
@@ -500,6 +502,14 @@ async function listening110340(e) {
             
     saveTempData(myUserID, channel_id, e.funding_txid);
 
+    // Bob sign the tx on client
+    let privkey    = await getFundingPrivKey(myUserID, channel_id);
+    let data  = e.sign_data;
+    console.info('e.sign_data = ' + JSON.stringify(e.sign_data));
+    let signed_hex = signP2SH(false, data.hex, data.pub_key_a, 
+        data.pub_key_b, privkey, data.inputs[0].amount);
+
+    // Not in auto mode
     if (isAutoMode != 'Yes') return;
 
     console.info('listening110340 = ' + JSON.stringify(e));

@@ -157,6 +157,12 @@
                     ]
                 },
                 {
+                    "name": "from_address_private_key",
+                    "help": "Client sign the transaction with this private key.",
+                    "disable": "yes",
+                    "buttons": []
+                },
+                {
                     "name": "to_address",
                     "help": "This is channel 2-2 multi-sig address generated after AcceptChannel API invoked with counterparty.",
                     "buttons": [
@@ -225,6 +231,12 @@
                     "imgPath": "doc/tooltip/3400-3500.png",
                     "buttons": [
                     ]
+                },
+                {
+                    "name": "channel_address_private_key",
+                    "help": "OBD create a revockable delivery transaction (RD Tx). Client sign the transaction with this private key. The RD tx get bitcoin of deposit to channel (type 2109) back to sender if counterparty always does not response.",
+                    "disable": "yes",
+                    "buttons": []
                 }
             ]
         },
@@ -268,6 +280,12 @@
                 },
                 {
                     "name": "signed_miner_redeem_transaction_hex",
+                    "buttons": []
+                },
+                {
+                    "name": "channel_address_private_key",
+                    "help": "This key is the private key of the Bob's address used to create the Channel Address. Client sign the transaction with it. This RD transaction get bitcoin of deposit to channel (type 2109) back to Alice if Bob always does not response.",
+                    "disable": "yes",
                     "buttons": []
                 }
             ]

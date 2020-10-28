@@ -83,6 +83,8 @@ function fundingBitcoin(myUserID, info) {
             let signed_hex = signP2PKH(e.hex, privkey);
 
             // saveFundingPrivKey(myUserID, channel_id, info.from_address_private_key);
+
+            info.from_address_private_key = privkey;
             saveFundingBtcData(myUserID, channel_id, info);
             saveTempData(myUserID, channel_id, signed_hex);
             resolve(e);

@@ -7,18 +7,6 @@ const kAddress = 'address';
 //
 const kMnemonic = 'mnemonic';
 
-//
-// const kRoutingPacket = 'routing_packet';
-
-//
-// const kCltvExpiry = 'cltv_expiry';
-
-//
-// const kHtlcH = 'htlc_h';
-
-//
-// const kHtlcR = 'htlc_r';
-
 /**
  * Save RSMC tx temporary private key to local storage
  */
@@ -374,7 +362,7 @@ function getChannelStatus(channel_id, funder) {
     
         request.onsuccess = function (e) {
             if (request.result) {
-                console.log('channel status = ' + request.result.status);
+                // console.log('channel status = ' + request.result.status);
                 resolve(request.result.status);
             } else {
                 console.log('channel status = No Data.');
@@ -691,51 +679,6 @@ function getFundingBtcData(myUserID, channel_id) {
 }
 
 /**
- * Save Htlc H
- * @param value
- */
-// function saveHtlcH(value) {
-//     localStorage.setItem(kHtlcH, value);
-// }
-
-/**
- * Get Htlc H
- */
-// function getHtlcH() {
-//     return localStorage.getItem(kHtlcH);
-// }
-
-/**
- * Save Routing Packet
- * @param value
- */
-// function saveRoutingPacket(value) {
-//     localStorage.setItem(kRoutingPacket, value);
-// }
-
-/**
- * Get Routing Packet
- */
-// function getRoutingPacket() {
-//     return localStorage.getItem(kRoutingPacket);
-// }
-
-/**
- * Save Cltv Expiry
- * @param value
- */
-// function saveCltvExpiry(value) {
-//     localStorage.setItem(kCltvExpiry, value);
-// }
-
-/**
- * Get Cltv Expiry
- */
-// function getCltvExpiry() {
-//     return localStorage.getItem(kCltvExpiry);
-// }
-
-/**
  * Save temporary private key to local storage
  * @param myUserID
  * @param saveKey
@@ -921,112 +864,6 @@ function getInvoiceH() {
 }
 
 /**
- * save r from addInvoice type ( -100402 )
- * @param myUserID
- * @param channel_id
- * @param r
- */
-// function OLDsaveInvoiceR(myUserID, channel_id, r) {
-
-//     let key     = myUserID + channel_id;
-//     let request = db.transaction([kTbInvoiceR], 'readwrite')
-//         .objectStore(kTbInvoiceR)
-//         .put({ key: key, r: r });
-  
-//     request.onsuccess = function (e) {
-//         // console.log('Data write success.');
-//     };
-  
-//     request.onerror = function (e) {
-//         // console.log('Data write false.');
-//     }
-// }
-
-/**
- * get r from addInvoice type ( -100402 )
- * @param myUserID 
- * @param channel_id
- */
-// function OLDgetInvoiceR(myUserID, channel_id) {
-
-//     return new Promise((resolve, reject) => {
-
-//         let key         = myUserID + channel_id;
-//         let transaction = db.transaction([kTbInvoiceR], 'readonly');
-//         let store       = transaction.objectStore(kTbInvoiceR);
-//         let request     = store.get(key);
-    
-//         request.onerror = function(e) {
-//             console.log('Read data false.');
-//             reject('Read data false.');
-//         };
-    
-//         request.onsuccess = function (e) {
-//             if (request.result) {
-//                 console.log('getInvoiceR = ' + request.result.r);
-//                 resolve(request.result.r);
-//             } else {
-//                 console.log('getInvoiceR = No Data.');
-//                 resolve('');
-//             }
-//         }
-//     })
-// }
-
-/**
- * save r from forwardR type ( -100045 ) return
- * @param myUserID
- * @param channel_id
- * @param r
- */
-// function saveForwardR(myUserID, channel_id, r) {
-
-//     let key     = myUserID + channel_id;
-//     let request = db.transaction([kTbForwardR], 'readwrite')
-//         .objectStore(kTbForwardR)
-//         .put({ key: key, r: r });
-  
-//     request.onsuccess = function (e) {
-//         // console.log('Data write success.');
-//     };
-  
-//     request.onerror = function (e) {
-//         // console.log('Data write false.');
-//     }
-// }
-
-/**
- * get r from forwardR type ( -100045 ) return
- * @param myUserID 
- * @param channel_id
- */
-// function getForwardR(myUserID, channel_id) {
-
-//     return new Promise((resolve, reject) => {
-
-//         let key         = myUserID + channel_id;
-//         let transaction = db.transaction([kTbForwardR], 'readonly');
-//         let store       = transaction.objectStore(kTbForwardR);
-//         let request     = store.get(key);
-    
-//         request.onerror = function(e) {
-//             console.log('Read data false.');
-//             reject('Read data false.');
-//         };
-    
-//         request.onsuccess = function (e) {
-//             if (request.result) {
-//                 console.log('getForwardR = ' + request.result.r);
-//                 resolve(request.result.r);
-//             } else {
-//                 console.log('getForwardR = No Data.');
-//                 resolve('');
-//             }
-//         }
-//     })
-// }
-
-/**
  * Save auto pilot status
  * @param value Yes or No
  */
@@ -1123,54 +960,6 @@ function saveHTLCPathData(e) {
 function getHTLCPathData() {
     return JSON.parse(localStorage.getItem(kTbHTLCPathData));
 }
-
-/**
- * Save HTLC Path Data
- * @param e
- */
-// function OLDsaveHTLCPathData(e) {
-    
-//     let key     = myUserID + channel_id;
-//     let request = db.transaction([kTbHTLCPathData], 'readwrite')
-//         .objectStore(kTbHTLCPathData)
-//         .put({ key: key, e: e});
-  
-//     request.onsuccess = function (e) {
-//     };
-  
-//     request.onerror = function (e) {
-//     }
-// }
-
-/**
- * 
- */
-// function OLDgetHTLCPathData() {
-
-//     return new Promise((resolve, reject) => {
-
-//         let key         = myUserID + channel_id;
-//         let transaction = db.transaction([kTbHTLCPathData], 'readonly');
-//         let store       = transaction.objectStore(kTbHTLCPathData);
-//         let request     = store.get(key);
-    
-//         request.onerror = function(e) {
-//             console.log('Read data false.');
-//             reject('Read data false.');
-//         };
-    
-//         request.onsuccess = function (e) {
-//             if (request.result) {
-//                 console.log('getHTLCPathData = ' + JSON.stringify(request.result.e));
-//                 resolve(request.result.e);
-//                 // resolve(data);
-//             } else {
-//                 console.log('getHTLCPathData = No Data.');
-//                 resolve('');
-//             }
-//         }
-//     })
-// }
 
 /**
  * Save Funding private key
@@ -1420,6 +1209,10 @@ function signP2SH(is_alice, txhex, pubkey_1, pubkey_2, privkey, amount) {
 
     // testing
     const key     = btctool.bitcoin.ECPair.fromWIF(privkey, network);
+
+    // change to satoshi
+    amount = amount * 100000000;
+    console.info('amount => ' + amount);
 
     // Sign
     if (is_alice === true) { // Alice sign the transaction first

@@ -7,7 +7,7 @@ class Message {
 
 class BtcFundingInfo {
   from_address: string = "";
-  // from_address_private_key: string = "";
+  from_address_private_key: string = "";
   to_address: string = "";
   amount: number = 0.0;
   miner_fee: number = 0.0;
@@ -16,7 +16,6 @@ class BtcFundingInfo {
 class FundingBtcCreated {
   temporary_channel_id: string = "";
   funding_tx_hex: string = "";
-  channel_address_private_key: string = "";
 }
 class FundingBtcSigned {
   temporary_channel_id: string = "";
