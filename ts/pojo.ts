@@ -63,8 +63,8 @@ class AssetFundingCreatedInfo {
 
 class AssetFundingSignedInfo {
   temporary_channel_id: string = "";
-  channel_address_private_key: string = "";
-  // approval: boolean = false;
+  signed_miner_redeem_transaction_hex: string = "";
+  // channel_address_private_key: string = "";
 }
 
 class CommitmentTx {

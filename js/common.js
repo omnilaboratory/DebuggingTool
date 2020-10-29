@@ -637,17 +637,13 @@ async function sdkAssetFundingCreated() {
 // -100035 Omni Asset Funding Signed API at local.
 async function sdkAssetFundingSigned() {
 
-    let nodeID    = $("#recipient_node_peer_id").val();
-    let userID    = $("#recipient_user_peer_id").val();
-    let temp_cid  = $("#temporary_channel_id").val();
-    // let privkey   = $("#channel_address_private_key").val();
-    // let approval   = $("#checkbox_n35").prop("checked");
+    let nodeID = $("#recipient_node_peer_id").val();
+    let userID = $("#recipient_user_peer_id").val();
 
-    let info                                = new AssetFundingSignedInfo();
-    info.temporary_channel_id               = temp_cid;
-    // info.channel_address_private_key = privkey;
-    // info.approval = approval;
-
+    let info                  = new AssetFundingSignedInfo();
+    info.temporary_channel_id = $("#temporary_channel_id").val();
+    info.signed_miner_redeem_transaction_hex = $("#signed_miner_redeem_transaction_hex").val();
+    
     displaySentMessage100035(nodeID, userID, info);
     let e = await assetFundingSigned($("#logined").text(), nodeID, userID, info);
     afterAssetFundingSigned(e);
@@ -3930,8 +3926,8 @@ function displaySentMessage100035(nodeID, userID, info) {
         recipient_node_peer_id: nodeID,
         recipient_user_peer_id: userID,
         data: {
-            temporary_channel_id:               info.temporary_channel_id,
-            // channel_address_private_key: info.channel_address_private_key,
+            temporary_channel_id:        info.temporary_channel_id,
+            channel_address_private_key: $("#channel_address_private_key").val(),
         }
     }
 

@@ -73,8 +73,8 @@ class AssetFundingCreatedInfo {
 class AssetFundingSignedInfo {
     constructor() {
         this.temporary_channel_id = "";
-        this.channel_address_private_key = "";
-        // approval: boolean = false;
+        this.signed_miner_redeem_transaction_hex = "";
+        // channel_address_private_key: string = "";
     }
 }
 class CommitmentTx {

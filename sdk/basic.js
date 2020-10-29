@@ -277,6 +277,17 @@ function assetFundingSigned(myUserID, nodeID, userID, info) {
         obdApi.assetFundingSigned(nodeID, userID, info, async function(e) {
             console.info('SDK: -100035 - assetFundingSigned = ' + JSON.stringify(e));
             
+            // Bob sign the tx on client side
+            // console.info('bitcoinFundingCreated e.hex = ' + e.hex);
+            if (e.hex) {
+                let privkey    = await getFundingPrivKey(myUserID, channel_id);
+                let signed_hex = signP2SH(false, e.hex, e.pub_key_a, 
+                    e.pub_key_b, privkey, e.inputs[0].amount);
+                    
+                // resolve(signed_hex);
+            }
+
+
             // Once sent -100035 AssetFundingSigned , the final channel_id has generated.
             // So need update the local saved data for funding private key and channel_id.
 

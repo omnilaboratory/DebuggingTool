@@ -76,6 +76,16 @@ async function listening110034(e) {
     let channel_id = e.temporary_channel_id;
     saveChannelStatus(myUserID, channel_id, false, kStatusAssetFundingCreated);
 
+    // Bob sign the tx on client
+    let privkey = await getFundingPrivKey(myUserID, channel_id);
+    let data    = e.sign_data;
+    // console.info('e.sign_data = ' + JSON.stringify(e.sign_data));
+    let signed_hex = signP2SH(false, data.hex, data.pub_key_a, 
+        data.pub_key_b, privkey, data.inputs[0].amount);
+    saveSignedHex(myUserID, channel_id, signed_hex);
+
+
+    // auto mode is closed
     if (isAutoMode != 'Yes') return;
 
     console.info('listening110034 = ' + JSON.stringify(e));
@@ -509,7 +519,7 @@ async function listening110340(e) {
     saveSignedHex(myUserID, channel_id, signed_hex);
 
 
-    // Not in auto mode
+    // auto mode is closed
     if (isAutoMode != 'Yes') return;
 
     console.info('listening110340 = ' + JSON.stringify(e));
