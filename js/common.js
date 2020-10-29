@@ -61,8 +61,8 @@ function testSignP2SH() {
     const p2sh    = btctool.bitcoin.payments.p2sh({ redeem: p2ms,  network: network });
 
     // const wifs = [
-    //     'cUAdadTkjeVFsNz5ifhkETfAzk5PvhnLWtmdSKgbyTTjSCE4MYWy',
-    //     'cV6dif91LHD8Czk8BTgvYZR3ipUrqyMDMtUXSWsThqpHaQJUuHKA',
+    //     'cSFJQshaUe7wJxAuNSib1HjNQSpLRq7z7eCqrRueo2eB4otAitng',
+    //     'cSZyhSTKfXFLY42t9oBrrgxs2DQdoMsJu44inLk4ToNhFNLr9QWP',
     // ].map((wif) => btctool.bitcoin.ECPair.fromWIF(wif, network));
 
     // testing
@@ -75,16 +75,16 @@ function testSignP2SH() {
 
     // Alice sign the transaction first
     // txb.sign(0, wifs[0], p2sh.redeem.output, undefined, amount, undefined);
-    // txb.sign(0, key, p2sh.redeem.output, undefined, amount, undefined);
-    // let aliceHex = txb.buildIncomplete().toHex();
-    // console.info('aliceHex => ' + aliceHex);
+    txb.sign(0, key, p2sh.redeem.output, undefined, amount, undefined);
+    let aliceHex = txb.buildIncomplete().toHex();
+    console.info('aliceHex => ' + aliceHex);
 
     //----------------------------
     // Bob sign the transaction
     // txb.sign(0, wifs[1], p2sh.redeem.output, undefined, amount, undefined);
-    txb.sign(0, key, p2sh.redeem.output, undefined, amount, undefined);
-    let toHex = txb.build().toHex();
-    console.info('testSignP2SH - toHex = ' + toHex);
+    // // txb.sign(0, key, p2sh.redeem.output, undefined, amount, undefined);
+    // let toHex = txb.build().toHex();
+    // console.info('testSignP2SH - toHex = ' + toHex);
 }
 
 /**
@@ -92,8 +92,8 @@ function testSignP2SH() {
  */
 async function sdkLogIn() {
 
-    testSignP2SH();
-    return;
+    // testSignP2SH();
+    // return;
 
     let mnemonic = $("#mnemonic").val();
     let e = await logIn(mnemonic);
@@ -582,6 +582,7 @@ async function sdkBitcoinFundingCreated() {
     displaySentMessage100340(nodeID, userID, info);
     
     let signed_hex = await bitcoinFundingCreated($("#logined").text(), nodeID, userID, info);
+    // console.info('alice signed_hex => ' + signed_hex);
     if (signed_hex != true) {
         await sendSignedHex100341(nodeID, userID, signed_hex);
     }
@@ -609,21 +610,27 @@ async function sdkBitcoinFundingSigned() {
 // -100034 Omni Asset Funding Created API at local.
 async function sdkAssetFundingCreated() {
 
-    let nodeID   = $("#recipient_node_peer_id").val();
-    let userID   = $("#recipient_user_peer_id").val();
+    let nodeID = $("#recipient_node_peer_id").val();
+    let userID = $("#recipient_user_peer_id").val();
 
-    let info                         = new AssetFundingCreatedInfo();
-    info.temporary_channel_id        = $("#temporary_channel_id").val();
-    info.temp_address_pub_key        = $("#temp_address_pub_key").val();
-    info.temp_address_private_key    = $("#temp_address_private_key").val();
+    let info                  = new AssetFundingCreatedInfo();
+    info.temporary_channel_id = $("#temporary_channel_id").val();
+    info.funding_tx_hex       = $("#funding_tx_hex").val();
+    info.temp_address_pub_key = $("#temp_address_pub_key").val();
+
+    // info.temp_address_private_key    = $("#temp_address_private_key").val();
     // info.channel_address_private_key = $("#channel_address_private_key").val();
-    info.funding_tx_hex              = $("#funding_tx_hex").val();
 
     // Save address index to OBD and can get private key back if lose it.
     info.temp_address_index = Number(getIndexFromPubKey(info.temp_address_pub_key));
 
     displaySentMessage100034(nodeID, userID, info);
-    await assetFundingCreated($("#logined").text(), nodeID, userID, info);
+
+    let signed_hex = await assetFundingCreated($("#logined").text(), nodeID, userID, info);
+    if (signed_hex != true) {
+        await sendSignedHex101034(nodeID, userID, signed_hex);
+    }
+
     afterAssetFundingCreated();
 }
 
@@ -666,7 +673,6 @@ async function sdkFundingAsset() {
 
     let info                      = new OmniFundingAssetInfo();
     info.from_address             = $("#from_address").val();
-    info.from_address_private_key = $("#from_address_private_key").val();
     info.to_address               = $("#to_address").val();
     info.amount                   = Number($("#amount").val());
     info.property_id              = Number($("#property_id").val());
@@ -1611,8 +1617,6 @@ function fillTempAddrKey() {
     if (result === '') return;
     $("#temp_address_pub_key").val(result.result.pubkey);
     $("#temp_address_private_key").val(result.result.wif);
-    $("#temp_address_pub_key").attr("class", "input input_color");
-    $("#temp_address_private_key").attr("class", "input input_color");
     saveAddress($("#logined").text(), result);
 }
 
@@ -1622,8 +1626,6 @@ function fillCurrTempAddrKey() {
     if (result === '') return;
     $("#curr_temp_address_pub_key").val(result.result.pubkey);
     $("#curr_temp_address_private_key").val(result.result.wif);
-    $("#curr_temp_address_pub_key").attr("class", "input input_color");
-    $("#curr_temp_address_private_key").attr("class", "input input_color");
     saveAddress($("#logined").text(), result);
 }
 
@@ -1633,8 +1635,6 @@ function fillCurrRsmcTempKey() {
     if (result === '') return;
     $("#curr_rsmc_temp_address_pub_key").val(result.result.pubkey);
     $("#curr_rsmc_temp_address_private_key").val(result.result.wif);
-    $("#curr_rsmc_temp_address_pub_key").attr("class", "input input_color");
-    $("#curr_rsmc_temp_address_private_key").attr("class", "input input_color");
     saveAddress($("#logined").text(), result);
 }
 
@@ -1644,8 +1644,6 @@ function fillCurrHtlcTempKey() {
     if (result === '') return;
     $("#curr_htlc_temp_address_pub_key").val(result.result.pubkey);
     $("#curr_htlc_temp_address_private_key").val(result.result.wif);
-    $("#curr_htlc_temp_address_pub_key").attr("class", "input input_color");
-    $("#curr_htlc_temp_address_private_key").attr("class", "input input_color");
     saveAddress($("#logined").text(), result);
 }
 
@@ -1655,8 +1653,6 @@ function fillCurrHtlcHe1bTempKey() {
     if (result === '') return;
     $("#curr_htlc_temp_address_for_he1b_pub_key").val(result.result.pubkey);
     $("#curr_htlc_temp_address_for_he1b_private_key").val(result.result.wif);
-    $("#curr_htlc_temp_address_for_he1b_pub_key").attr("class", "input input_color");
-    $("#curr_htlc_temp_address_for_he1b_private_key").attr("class", "input input_color");
     saveAddress($("#logined").text(), result);
 }
 
@@ -1666,8 +1662,6 @@ function fillCurrHtlcHt1aTempKey() {
     if (result === '') return;
     $("#curr_htlc_temp_address_for_ht1a_pub_key").val(result.result.pubkey);
     $("#curr_htlc_temp_address_for_ht1a_private_key").val(result.result.wif);
-    $("#curr_htlc_temp_address_for_ht1a_pub_key").attr("class", "input input_color");
-    $("#curr_htlc_temp_address_for_ht1a_private_key").attr("class", "input input_color");
     saveAddress($("#logined").text(), result);
 }
 
@@ -1811,6 +1805,8 @@ async function changeInvokeAPIEnable(status, isFunder, myUserID, channel_id) {
                 fillTempChannelIDAndFundingPrivKey(myUserID, channel_id);
                 data = await getTempData(myUserID, channel_id);
                 $("#funding_txid").val(data);
+                data = await getSignedHex(myUserID, channel_id);
+                $("#signed_miner_redeem_transaction_hex").val(data);
             }
             break;
 
@@ -3912,8 +3908,9 @@ function displaySentMessage100350(nodeID, userID, info) {
         recipient_user_peer_id: userID,
         data: {
             temporary_channel_id:        info.temporary_channel_id,
-            // channel_address_private_key: info.channel_address_private_key,
+            channel_address_private_key: $("#channel_address_private_key").val(),
             funding_txid:                info.funding_txid,
+            signed_miner_redeem_transaction_hex: info.signed_miner_redeem_transaction_hex,
             approval:                    info.approval,
         }
     }
@@ -4061,7 +4058,7 @@ function displaySentMessage102109(info) {
         type: -102109,
         data: {
             from_address:             info.from_address,
-            // from_address_private_key: info.from_address_private_key,
+            from_address_private_key: $("#from_address_private_key").val(),
             to_address:               info.to_address,
             amount:                   info.amount,
             miner_fee:                info.miner_fee,
@@ -4079,7 +4076,7 @@ function displaySentMessage102120(info) {
         type: -102120,
         data: {
             from_address:             info.from_address,
-            from_address_private_key: info.from_address_private_key,
+            from_address_private_key: $("#from_address_private_key").val(),
             to_address:               info.to_address,
             amount:                   info.amount,
             property_id:              info.property_id,
@@ -4101,7 +4098,7 @@ function displaySentMessage100340(nodeID, userID, info) {
         recipient_user_peer_id: userID,
         data: {
             temporary_channel_id:        info.temporary_channel_id,
-            // channel_address_private_key: info.channel_address_private_key,
+            channel_address_private_key: $("#channel_address_private_key").val(),
             funding_tx_hex:              info.funding_tx_hex,
         }
     }
@@ -4123,8 +4120,8 @@ function displaySentMessage100034(nodeID, userID, info) {
         data: {
             temporary_channel_id:        info.temporary_channel_id,
             temp_address_pub_key:        info.temp_address_pub_key,
-            temp_address_private_key:    info.temp_address_private_key,
-            channel_address_private_key: info.channel_address_private_key,
+            temp_address_private_key:    $("#temp_address_private_key").val(),
+            channel_address_private_key: $("#channel_address_private_key").val(),
             funding_tx_hex:              info.funding_tx_hex,
         }
     }

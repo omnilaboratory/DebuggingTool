@@ -482,11 +482,9 @@ async function listening110340(e) {
     let isAutoMode = getAutoPilot();
     console.info('SDK: NOW isAutoMode = ' + isAutoMode);
 
-    let myUserID     = e.to_peer_id;
-    console.info('myUserID = ' + e.to_peer_id);
-
-    let channel_id   = e.temporary_channel_id;
-    let status       = await getChannelStatus(channel_id, false);
+    let myUserID   = e.to_peer_id;
+    let channel_id = e.temporary_channel_id;
+    let status     = await getChannelStatus(channel_id, false);
     console.info('listening110340 status = ' + status);
     switch (Number(status)) {
         case kStatusAcceptChannel:
@@ -503,11 +501,13 @@ async function listening110340(e) {
     saveTempData(myUserID, channel_id, e.funding_txid);
 
     // Bob sign the tx on client
-    let privkey    = await getFundingPrivKey(myUserID, channel_id);
-    let data  = e.sign_data;
-    console.info('e.sign_data = ' + JSON.stringify(e.sign_data));
+    let privkey = await getFundingPrivKey(myUserID, channel_id);
+    let data    = e.sign_data;
+    // console.info('e.sign_data = ' + JSON.stringify(e.sign_data));
     let signed_hex = signP2SH(false, data.hex, data.pub_key_a, 
         data.pub_key_b, privkey, data.inputs[0].amount);
+    saveSignedHex(myUserID, channel_id, signed_hex);
+
 
     // Not in auto mode
     if (isAutoMode != 'Yes') return;
@@ -520,9 +520,9 @@ async function listening110340(e) {
     // will send -100350 bitcoinFundingSigned
     let info                          = new FundingBtcSigned();
     info.temporary_channel_id         = channel_id;
-    info.channel_address_private_key  = await getFundingPrivKey(myUserID, channel_id);
     info.funding_txid                 = e.funding_txid;
     info.approval                     = true;
+    info.signed_miner_redeem_transaction_hex = signed_hex;
 
     // SDK API
     await bitcoinFundingSigned(myUserID, nodeID, userID, info);

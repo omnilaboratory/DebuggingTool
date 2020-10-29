@@ -315,14 +315,10 @@
                 },
                 {
                     "name": "from_address_private_key",
-                    "help": "OBD create a transfer commitment transaction and use this private key to sign it but not broadcast.",
+                    "help": "OBD create a transfer commitment transaction. Client sign it with this private key.",
                     "imgPath": "doc/tooltip/FundingAsset.png",
-                    "buttons": [
-                        {
-                            "innerText": "Select",
-                            "onclick": "displayUserDataInNewHtml('MyAddresses')"
-                        }
-                    ]
+                    "disable": "yes",
+                    "buttons": []
                 },
                 {
                     "name": "to_address",
@@ -383,48 +379,32 @@
                     ]
                 },
                 {
-                    "name": "temp_address_pub_key",
-                    "help": "This public key of an address (Alice2 in picture below) will be used to create a temp 2-2 multi-sig address as output 0 of C1a transaction.",
-                    "imgPath": "doc/tooltip/Cx-RDx.png",
-                    "buttons": [
-                        {
-                            "innerText": "Select",
-                            "onclick": "displayUserDataInNewHtml('MyAddresses')"
-                        },
-                        {
-                            "innerText": "Create",
-                            "onclick": "autoCreateAddress(-100034)"
-                        }
-                    ]
-                },
-                {
-                    "name": "temp_address_private_key",
-                    "help": "This private key of an address (Alice2 in picture below) will be used to sign RD1a transaction. The RD1a transaction get omni asset in channel back to Alice after a certain time (like seq = 1000 blocks) if Alice forced to close channel (broadcast C1a transaction).",
-                    "imgPath": "doc/tooltip/Cx-RDx.png",
-                    "buttons": [
-                        {
-                            "innerText": "Select",
-                            "onclick": "displayUserDataInNewHtml('MyAddresses')"
-                        }
-                    ]
-                },
-                {
-                    "name": "channel_address_private_key",
-                    "help": "This private key of the address used to create the Channel Address. OBD create C1a transaction and use the private key to sign it. The C1a transaction represents the balance distribution in the channel.",
-                    "imgPath": "doc/tooltip/Cx-RDx.png",
-                    "buttons": [
-                        {
-                            "innerText": "Display",
-                            "onclick": "displayUserDataInNewHtml('MyAddresses')"
-                        }
-                    ]
-                },
-                {
                     "name": "funding_tx_hex",
                     "help": "The commitment transaction hex created in FundingAsset api (type 2001).",
                     "imgPath": "doc/tooltip/FundingAsset.png",
                     "buttons": [
                     ]
+                },
+                {
+                    "name": "temp_address_pub_key",
+                    "help": "This public key of an address (Alice2 in picture below) will be used to create a temp 2-2 multi-sig address as output 0 of C1a transaction.",
+                    "imgPath": "doc/tooltip/Cx-RDx.png",
+                    "disable": "yes",
+                    "buttons": []
+                },
+                {
+                    "name": "temp_address_private_key",
+                    "help": "This private key of an address (Alice2 in picture below) will be used to sign RD1a transaction. The RD1a transaction get omni asset in channel back to Alice after a certain time (like seq = 1000 blocks) if Alice forced to close channel (broadcast C1a transaction).",
+                    "imgPath": "doc/tooltip/Cx-RDx.png",
+                    "disable": "yes",
+                    "buttons": []
+                },
+                {
+                    "name": "channel_address_private_key",
+                    "help": "OBD create C1a transaction. Client sign it with this private key. The C1a transaction represents the balance distribution in the channel.",
+                    "imgPath": "doc/tooltip/Cx-RDx.png",
+                    "disable": "yes",
+                    "buttons": []
                 }
             ]
         },
@@ -463,14 +443,10 @@
                 },
                 {
                     "name": "channel_address_private_key",
-                    "help": "This private key of the counterparty (Bob) address used to create the Channel Address. OBD use the private key to sign the C1a and RD1a transactions created by AssetFundingCreated (type -34).",
+                    "help": "Client use the private key to sign the C1a and RD1a transactions created by AssetFundingCreated (type -100034).",
                     "imgPath": "doc/tooltip/34-35.png",
-                    "buttons": [
-                        {
-                            "innerText": "Display",
-                            "onclick": "displayUserDataInNewHtml('MyAddresses')"
-                        }
-                    ]
+                    "disable": "yes",
+                    "buttons": []
                 }
             ]
         },

@@ -378,10 +378,6 @@ class ObdApi {
       alert("empty from_address");
       return;
     }
-    // if (this.isNotString(info.from_address_private_key)) {
-    //   alert("empty from_address_private_key");
-    //   return;
-    // }
     if (this.isNotString(info.to_address)) {
       alert("empty to_address");
       return;
@@ -536,10 +532,6 @@ class ObdApi {
   public fundingAsset(info: OmniFundingAssetInfo, callback: Function) {
     if (this.isNotString(info.from_address)) {
       alert("empty from_address");
-      return;
-    }
-    if (this.isNotString(info.from_address_private_key)) {
-      alert("empty from_address_private_key");
       return;
     }
     if (this.isNotString(info.to_address)) {
@@ -805,14 +797,6 @@ class ObdApi {
       alert("empty temp_address_pub_key");
       return;
     }
-    if (this.isNotString(info.temp_address_private_key)) {
-      alert("empty temp_address_private_key");
-      return;
-    }
-    if (this.isNotString(info.channel_address_private_key)) {
-      alert("empty channel_address_private_key");
-      return;
-    }
 
     let msg = new Message();
     msg.type = this.messageType.MsgType_FundingCreate_SendAssetFundingCreated_34;
@@ -822,6 +806,43 @@ class ObdApi {
     this.sendData(msg, callback);
   }
   public onAssetFundingCreated(jsonData: any) {}
+
+
+  /**
+   * MsgType_ClientSign_Duplex_AssetFunding_ChannelAddressSignC1a_1034
+   * @param recipient_node_peer_id string
+   * @param recipient_user_peer_id string
+   * @param signed_hex  string
+   * @param callback  Function
+   */
+  public sendSignedHex101034(
+    recipient_node_peer_id: string,
+    recipient_user_peer_id: string,
+    signed_hex: string,
+    callback: Function ) {
+      
+    if (this.isNotString(recipient_node_peer_id)) {
+      alert("error recipient_node_peer_id");
+      return;
+    }
+
+    if (this.isNotString(recipient_user_peer_id)) {
+      alert("error recipient_user_peer_id");
+      return;
+    }
+
+    if (this.isNotString(signed_hex)) {
+      alert("empty signed_hex");
+      return;
+    }
+
+    let msg  = new Message();
+    msg.type = this.messageType.MsgType_ClientSign_Duplex_AssetFunding_ChannelAddressSignC1a_1034;
+    msg.recipient_user_peer_id = recipient_user_peer_id;
+    msg.recipient_node_peer_id = recipient_node_peer_id;
+    msg.data["hex"] = signed_hex;
+    this.sendData(msg, callback);
+  }
 
   /**
    * MsgType_FundingSign_SendAssetFundingSigned_35

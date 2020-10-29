@@ -26,7 +26,6 @@ class FundingBtcSigned {
 
 class OmniFundingAssetInfo {
   from_address: string = "";
-  from_address_private_key: string = "";
   to_address: string = "";
   property_id: number = 0;
   amount: number = 0;
@@ -57,9 +56,9 @@ class AssetFundingCreatedInfo {
   temporary_channel_id: string = "";
   funding_tx_hex: string = "";
   temp_address_pub_key: string = "";
-  temp_address_private_key: string = "";
   temp_address_index: number = 0;
-  channel_address_private_key: string = "";
+  // temp_address_private_key: string = "";
+  // channel_address_private_key: string = "";
 }
 
 class AssetFundingSignedInfo {
@@ -302,6 +301,8 @@ class MessageType {
 	MsgType_FundingCreate_RecvAssetFundingCreated_34  = -110034;
 	MsgType_FundingSign_SendAssetFundingSigned_35     = -100035;
   MsgType_FundingSign_RecvAssetFundingSigned_35     = -110035;
+
+  MsgType_ClientSign_Duplex_AssetFunding_ChannelAddressSignC1a_1034 = -101034;
 
   MsgType_FundingCreate_SendBtcFundingCreated_340            = -100340;
   MsgType_FundingCreate_BtcFundingMinerRDTxToClient_341      = -100341;

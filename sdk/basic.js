@@ -122,7 +122,7 @@ function bitcoinFundingCreated(myUserID, nodeID, userID, info) {
             }
 
             // Sign tx
-            console.info('bitcoinFundingCreated e.hex = ' + e.hex);
+            // console.info('bitcoinFundingCreated e.hex = ' + e.hex);
             if (e.hex) {
                 // Alice sign the tx on client
                 let privkey    = await getFundingPrivKey(myUserID, channel_id);
@@ -137,7 +137,7 @@ function bitcoinFundingCreated(myUserID, nodeID, userID, info) {
 }
 
 /**
- * Type -100341 Protocol is used to send hex by Alice signing in 100340.
+ * Type -100341 Protocol send signed_hex that Alice signed in 100340 to OBD.
  * 
  * @param nodeID peer id of the obd node where the fundee logged in.
  * @param userID the user id of the fundee.
@@ -197,11 +197,15 @@ function bitcoinFundingSigned(myUserID, nodeID, userID, info) {
 function fundingAsset(myUserID, info) {
     return new Promise((resolve, reject) => {
         obdApi.fundingAsset(info, async function(e) {
-            console.info('SDK: -102120 fundingAssetOfOmni = ' + JSON.stringify(e));
+            console.info('SDK: -102120 fundingAsset = ' + JSON.stringify(e));
             
+            // Sign the tx on client
+            let privkey    = getPrivKeyFromAddress(info.from_address);
+            let signed_hex = signP2PKH(e.hex, privkey);
+
             let channel_id = await getChannelIDFromAddr(info.to_address);
             saveChannelStatus(myUserID, channel_id, true, kStatusFundingAsset);
-            saveTempData(myUserID, channel_id, e.hex);
+            saveTempData(myUserID, channel_id, signed_hex);
             resolve(true);
         });
     })
@@ -218,12 +222,41 @@ function fundingAsset(myUserID, info) {
  */
 function assetFundingCreated(myUserID, nodeID, userID, info) {
     return new Promise((resolve, reject) => {
-        obdApi.assetFundingCreated(nodeID, userID, info, function(e) {
+        obdApi.assetFundingCreated(nodeID, userID, info, async function(e) {
             console.info('SDK: -100034 - assetFundingCreated = ' + JSON.stringify(e));
+
             // Save temporary private key to local storage
-            saveTempPrivKey(myUserID, kTempPrivKey, info.temporary_channel_id, 
-                info.temp_address_private_key);
+            let tempKey = getPrivKeyFromPubKey(myUserID, info.temp_address_pub_key);
+            console.info('tempKey = ' + tempKey);
+            saveTempPrivKey(myUserID, kTempPrivKey, info.temporary_channel_id, tempKey);
             saveChannelStatus(myUserID, info.temporary_channel_id, true, kStatusAssetFundingCreated);
+
+            // Sign tx
+            // console.info('bitcoinFundingCreated e.hex = ' + e.hex);
+            if (e.hex) {
+                // Alice sign the tx on client
+                let privkey    = await getFundingPrivKey(myUserID, channel_id);
+                let signed_hex = signP2SH(true, e.hex, e.pub_key_a, 
+                    e.pub_key_b, privkey, e.inputs[0].amount);
+                resolve(signed_hex);
+            }
+
+            resolve(true);
+        });
+    })
+}
+
+/**
+ * Type -101034 Protocol send signed_hex that Alice signed in 100034 to OBD.
+ * 
+ * @param nodeID peer id of the obd node where the fundee logged in.
+ * @param userID the user id of the fundee.
+ * @param signed_hex 
+ */
+function sendSignedHex101034(nodeID, userID, signed_hex) {
+    return new Promise((resolve, reject) => {
+        obdApi.sendSignedHex101034(nodeID, userID, signed_hex, function(e) {
+            console.info('sendSignedHex101034 = ' + JSON.stringify(e));
             resolve(true);
         });
     })

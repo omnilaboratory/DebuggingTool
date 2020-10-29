@@ -119,6 +119,12 @@ const kSenderRole = 'sender_role';
 // const kTbTempPrivKey = 'tb_temp_priv_key';
 
 /**
+ * Object Store (table) name of IndexedDB.
+ * Signed Hex
+ */
+const kTbSignedHex = 'tb_signed_hex';
+
+/**
  *  List of Counterparties who have interacted
  *  @param myUserID The user id of logged in
  *  @param channel_id 
@@ -626,6 +632,61 @@ function getTempData(myUserID, channel_id) {
 }
 
 /**
+ * save signed hex
+ * 
+ * @param myUserID
+ * @param channel_id
+ * @param value
+ */
+function saveSignedHex(myUserID, channel_id, value) {
+
+    let key     = myUserID + channel_id;
+    let request = db.transaction([kTbSignedHex], 'readwrite')
+        .objectStore(kTbSignedHex)
+        .put({ key: key, value: value });
+  
+    request.onsuccess = function (e) {
+        // console.log('Data write success.');
+    };
+  
+    request.onerror = function (e) {
+        // console.log('Data write false.');
+    }
+}
+
+/**
+ * get signed hex
+ * 
+ * @param myUserID
+ * @param channel_id
+ */
+function getSignedHex(myUserID, channel_id) {
+
+    return new Promise((resolve, reject) => {
+
+        let key         = myUserID + channel_id;
+        let transaction = db.transaction([kTbSignedHex], 'readonly');
+        let store       = transaction.objectStore(kTbSignedHex);
+        let request     = store.get(key);
+    
+        request.onerror = function(e) {
+            console.log('Read data false.');
+            reject('Read data false.');
+        };
+    
+        request.onsuccess = function (e) {
+            if (request.result) {
+                console.log('getSignedHex = ' + request.result.value);
+                resolve(request.result.value);
+            } else {
+                console.log('getSignedHex = No Data.');
+                resolve('');
+            }
+        }
+    })
+}
+
+/**
  * 
  * @param {*} myUserID 
  * @param {*} channel_id 
@@ -1113,6 +1174,11 @@ function openDB() {
         if (!db.objectStoreNames.contains(kTbInvoiceR)) {
             os10 = db.createObjectStore(kTbInvoiceR, { keyPath: 'key' });
         }
+
+        let os11;
+        if (!db.objectStoreNames.contains(kTbSignedHex)) {
+            os11 = db.createObjectStore(kTbSignedHex, { keyPath: 'key' });
+        }
     }
 }
 
@@ -1212,7 +1278,7 @@ function signP2SH(is_alice, txhex, pubkey_1, pubkey_2, privkey, amount) {
 
     // change to satoshi
     amount = amount * 100000000;
-    console.info('amount => ' + amount);
+    // console.info('amount => ' + amount);
 
     // Sign
     if (is_alice === true) { // Alice sign the transaction first
