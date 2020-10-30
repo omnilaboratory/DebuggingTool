@@ -625,11 +625,12 @@ async function sdkAssetFundingCreated() {
     info.temp_address_index = Number(getIndexFromPubKey(info.temp_address_pub_key));
 
     displaySentMessage100034(nodeID, userID, info);
+    await assetFundingCreated($("#logined").text(), nodeID, userID, info);
 
-    let signed_hex = await assetFundingCreated($("#logined").text(), nodeID, userID, info);
-    if (signed_hex != true) {
-        await sendSignedHex101034(nodeID, userID, signed_hex);
-    }
+    // let signed_hex = await assetFundingCreated($("#logined").text(), nodeID, userID, info);
+    // if (signed_hex != true) {
+    //     await sendSignedHex101034(nodeID, userID, signed_hex);
+    // }
 
     afterAssetFundingCreated();
 }
@@ -640,13 +641,19 @@ async function sdkAssetFundingSigned() {
     let nodeID = $("#recipient_node_peer_id").val();
     let userID = $("#recipient_user_peer_id").val();
 
-    let info                  = new AssetFundingSignedInfo();
-    info.temporary_channel_id = $("#temporary_channel_id").val();
-    info.signed_miner_redeem_transaction_hex = $("#signed_miner_redeem_transaction_hex").val();
+    let info                   = new AssetFundingSignedInfo();
+    info.temporary_channel_id  = $("#temporary_channel_id").val();
+    info.signed_alice_rsmc_hex = $("#signed_alice_rsmc_hex").val();
+
+    let resp = await assetFundingSigned($("#logined").text(), nodeID, userID, info);
     
+    // let resp = await assetFundingSigned($("#logined").text(), nodeID, userID, info);
+    // if (resp) {
+    //     await sendSignedHex101035(nodeID, userID, resp);
+    // }
+        
     displaySentMessage100035(nodeID, userID, info);
-    let e = await assetFundingSigned($("#logined").text(), nodeID, userID, info);
-    afterAssetFundingSigned(e);
+    afterAssetFundingSigned(resp);
     displayMyChannelListAtTopRight(kPageSize, kPageIndex);
 }
 
@@ -1861,6 +1868,8 @@ async function changeInvokeAPIEnable(status, isFunder, myUserID, channel_id) {
                 enableInvokeAPI();
                 fillCounterparty(myUserID, channel_id);
                 fillTempChannelIDAndFundingPrivKey(myUserID, channel_id);
+                data = await getSignedHex(myUserID, channel_id);
+                $("#signed_alice_rsmc_hex").val(data);
             }
             break;
 
@@ -3927,6 +3936,7 @@ function displaySentMessage100035(nodeID, userID, info) {
         recipient_user_peer_id: userID,
         data: {
             temporary_channel_id:        info.temporary_channel_id,
+            signed_alice_rsmc_hex:       $("#signed_alice_rsmc_hex").val(),
             channel_address_private_key: $("#channel_address_private_key").val(),
         }
     }

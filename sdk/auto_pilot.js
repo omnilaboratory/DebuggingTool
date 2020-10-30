@@ -90,13 +90,13 @@ async function listening110034(e) {
 
     console.info('listening110034 = ' + JSON.stringify(e));
 
-    let nodeID   = e.funder_node_address;
-    let userID   = e.funder_peer_id;
+    let nodeID = e.funder_node_address;
+    let userID = e.funder_peer_id;
 
     // will send -100035 AssetFundingSigned
-    let info                                = new AssetFundingSignedInfo();
-    info.temporary_channel_id               = channel_id;
-    info.channel_address_private_key = await getFundingPrivKey(myUserID, channel_id);
+    let info                   = new AssetFundingSignedInfo();
+    info.temporary_channel_id  = channel_id;
+    info.signed_alice_rsmc_hex = signed_hex;
 
     // SDK API
     let resp = await assetFundingSigned(myUserID, nodeID, userID, info);
@@ -140,6 +140,17 @@ async function listening110035(e) {
     let result = await getCounterparty(myUserID, tempCID);
     saveCounterparty(myUserID, channel_id, result.toNodeID, result.toUserID);
     delCounterparty(myUserID, tempCID);
+
+
+    // Alice sign the tx on client
+    let signed_hex = signP2SH(false, e.hex, e.pub_key_a, e.pub_key_b, 
+        fundingPrivKey, e.inputs[0].amount);
+
+    // will send -101134
+    let info           = new SignedInfo101134();
+    info.channel_id    = channel_id;
+    info.rd_signed_hex = signed_hex;
+    await sendSignedHex101134(info);
 }
 
 /**

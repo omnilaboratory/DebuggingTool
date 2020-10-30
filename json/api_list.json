@@ -442,6 +442,10 @@
                     ]
                 },
                 {
+                    "name": "signed_alice_rsmc_hex",
+                    "buttons": []
+                },
+                {
                     "name": "channel_address_private_key",
                     "help": "Client use the private key to sign the C1a and RD1a transactions created by AssetFundingCreated (type -100034).",
                     "imgPath": "doc/tooltip/34-35.png",

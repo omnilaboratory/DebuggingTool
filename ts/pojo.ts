@@ -63,8 +63,19 @@ class AssetFundingCreatedInfo {
 
 class AssetFundingSignedInfo {
   temporary_channel_id: string = "";
-  signed_miner_redeem_transaction_hex: string = "";
-  // channel_address_private_key: string = "";
+  signed_alice_rsmc_hex: string = "";
+}
+
+class SignedInfo101035 {
+  temporary_channel_id: string = "";
+  rd_signed_hex: string = "";
+  br_signed_hex: string = "";
+  br_id: string = "";
+}
+
+class SignedInfo101134 {
+  channel_id: string = "";
+  rd_signed_hex: string = "";
 }
 
 class CommitmentTx {
@@ -302,7 +313,9 @@ class MessageType {
 	MsgType_FundingSign_SendAssetFundingSigned_35     = -100035;
   MsgType_FundingSign_RecvAssetFundingSigned_35     = -110035;
 
-  MsgType_ClientSign_Duplex_AssetFunding_ChannelAddressSignC1a_1034 = -101034;
+  MsgType_ClientSign_AssetFunding_AliceSignC1a_1034   = -101034;
+  MsgType_ClientSign_AssetFunding_AliceSignRD_1134    = -101134;
+  MsgType_ClientSign_Duplex_AssetFunding_RdAndBr_1035 = -101035;
 
   MsgType_FundingCreate_SendBtcFundingCreated_340            = -100340;
   MsgType_FundingCreate_BtcFundingMinerRDTxToClient_341      = -100341;

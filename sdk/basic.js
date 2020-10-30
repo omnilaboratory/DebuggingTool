@@ -225,20 +225,22 @@ function assetFundingCreated(myUserID, nodeID, userID, info) {
         obdApi.assetFundingCreated(nodeID, userID, info, async function(e) {
             console.info('SDK: -100034 - assetFundingCreated = ' + JSON.stringify(e));
 
+            let channel_id = info.temporary_channel_id;
+
             // Save temporary private key to local storage
             let tempKey = getPrivKeyFromPubKey(myUserID, info.temp_address_pub_key);
             console.info('tempKey = ' + tempKey);
-            saveTempPrivKey(myUserID, kTempPrivKey, info.temporary_channel_id, tempKey);
-            saveChannelStatus(myUserID, info.temporary_channel_id, true, kStatusAssetFundingCreated);
+            saveTempPrivKey(myUserID, kTempPrivKey, channel_id, tempKey);
+            saveChannelStatus(myUserID, channel_id, true, kStatusAssetFundingCreated);
 
-            // Sign tx
+            // Alice sign the tx on client
             // console.info('bitcoinFundingCreated e.hex = ' + e.hex);
             if (e.hex) {
-                // Alice sign the tx on client
                 let privkey    = await getFundingPrivKey(myUserID, channel_id);
                 let signed_hex = signP2SH(true, e.hex, e.pub_key_a, 
                     e.pub_key_b, privkey, e.inputs[0].amount);
-                resolve(signed_hex);
+                // resolve(signed_hex);
+                await sendSignedHex101034(nodeID, userID, signed_hex);
             }
 
             resolve(true);
@@ -263,6 +265,19 @@ function sendSignedHex101034(nodeID, userID, signed_hex) {
 }
 
 /**
+ * Type -101134 Protocol send signed_hex that Alice signed in 110035 to OBD.
+ * @param info SignedInfo101134
+ */
+function sendSignedHex101134(info) {
+    return new Promise((resolve, reject) => {
+        obdApi.sendSignedHex101134(info, function(e) {
+            console.info('sendSignedHex101134 = ' + JSON.stringify(e));
+            resolve(true);
+        });
+    })
+}
+
+/**
  * Type -100035 Protocol is used to Bob tells his OBD to reply Alice 
  * that he knows the asset funding transaction by message -100035, 
  * and Alice's OBD will creat commitment transactions (C1a & RD1a).
@@ -277,22 +292,54 @@ function assetFundingSigned(myUserID, nodeID, userID, info) {
         obdApi.assetFundingSigned(nodeID, userID, info, async function(e) {
             console.info('SDK: -100035 - assetFundingSigned = ' + JSON.stringify(e));
             
+            let channel_id = info.temporary_channel_id;
+            
             // Bob sign the tx on client side
             // console.info('bitcoinFundingCreated e.hex = ' + e.hex);
-            if (e.hex) {
-                let privkey    = await getFundingPrivKey(myUserID, channel_id);
-                let signed_hex = signP2SH(false, e.hex, e.pub_key_a, 
-                    e.pub_key_b, privkey, e.inputs[0].amount);
-                    
-                // resolve(signed_hex);
-            }
 
+            // NO.1 alice_br_sign_data
+            let br      = e.alice_br_sign_data;
+            let privkey = await getFundingPrivKey(myUserID, channel_id);
+            let br_hex  = signP2SH(true, br.hex, br.pub_key_a, br.pub_key_b, 
+                privkey, br.inputs[0].amount);
+
+            // NO.2 alice_rd_sign_data
+            let rd     = e.alice_rd_sign_data;
+            let rd_hex = signP2SH(true, rd.hex, rd.pub_key_a, rd.pub_key_b, 
+                privkey, rd.inputs[0].amount);
+
+            // will send 101035
+            let signedInfo                  = new SignedInfo101035();
+            signedInfo.temporary_channel_id = channel_id;
+            signedInfo.br_signed_hex        = br_hex;
+            signedInfo.rd_signed_hex        = rd_hex;
+            signedInfo.br_id                = br.br_id;
+
+            let resp = await sendSignedHex101035(nodeID, userID, signedInfo, 
+                myUserID, channel_id, privkey);
+            resolve(resp);
+        });
+    })
+}
+
+/**
+ * Type -101035 Protocol send signed info that Bob signed in 100035 to OBD.
+ * 
+ * @param nodeID peer id of the obd node where the fundee logged in.
+ * @param userID the user id of the fundee.
+ * @param signedInfo 
+ * @param myUserID The user id of logged in
+ * @param tempCID temporary_channel_id
+ * @param priv_key channel_address_private_key
+ */
+function sendSignedHex101035(nodeID, userID, signedInfo, myUserID, tempCID, priv_key) {
+    return new Promise((resolve, reject) => {
+        obdApi.sendSignedHex101035(nodeID, userID, signedInfo, async function(e) {
+            console.info('sendSignedHex101035 = ' + JSON.stringify(e));
 
             // Once sent -100035 AssetFundingSigned , the final channel_id has generated.
-            // So need update the local saved data for funding private key and channel_id.
+            // So need update the local saved data of funding private key and channel_id.
 
-            let priv_key     = info.channel_address_private_key;
-            let tempCID      = info.temporary_channel_id;
             let channel_id   = e.channel_id;
             let channel_addr = await getChannelAddr(tempCID);
 

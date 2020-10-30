@@ -1252,14 +1252,14 @@ function signP2PKH(txhex, privkey) {
 
 /**
  * Sign P2SH address with TransactionBuilder way for 2-2 multi-sig address
- * @param is_alice
+ * @param is_first_sign  Is the first person to sign this transaction?
  * @param txhex
  * @param pubkey_1
  * @param pubkey_2
  * @param privkey
  * @param amount    amount in input
  */
-function signP2SH(is_alice, txhex, pubkey_1, pubkey_2, privkey, amount) {
+function signP2SH(is_first_sign, txhex, pubkey_1, pubkey_2, privkey, amount) {
 
     const network = btctool.bitcoin.networks.testnet;
     const tx      = btctool.bitcoin.Transaction.fromHex(txhex);
@@ -1281,14 +1281,14 @@ function signP2SH(is_alice, txhex, pubkey_1, pubkey_2, privkey, amount) {
     // console.info('amount => ' + amount);
 
     // Sign
-    if (is_alice === true) { // Alice sign the transaction first
+    if (is_first_sign === true) { // The first person to sign this transaction
         // txb.sign(0, wifs[0], p2sh.redeem.output, undefined, amount, undefined);
         txb.sign(0, key, p2sh.redeem.output, undefined, amount, undefined);
         let aliceHex = txb.buildIncomplete().toHex();
         console.info('aliceHex => ' + aliceHex);
         return aliceHex;
 
-    } else { // Bob sign the transaction
+    } else { // The second person to sign this transaction
         // txb.sign(0, wifs[1], p2sh.redeem.output, undefined, amount, undefined);
         txb.sign(0, key, p2sh.redeem.output, undefined, amount, undefined);
         let toHex = txb.build().toHex();

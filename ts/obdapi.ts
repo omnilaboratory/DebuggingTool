@@ -504,6 +504,10 @@ class ObdApi {
       alert("empty funding_txid");
       return;
     }
+    if (this.isNotString(info.signed_miner_redeem_transaction_hex)) {
+      alert("empty signed_miner_redeem_transaction_hex");
+      return;
+    }
 
     let msg = new Message();
     msg.type = this.messageType.MsgType_FundingSign_SendBtcSign_350;
@@ -807,9 +811,8 @@ class ObdApi {
   }
   public onAssetFundingCreated(jsonData: any) {}
 
-
   /**
-   * MsgType_ClientSign_Duplex_AssetFunding_ChannelAddressSignC1a_1034
+   * MsgType_ClientSign_AssetFunding_AliceSignC1a_1034
    * @param recipient_node_peer_id string
    * @param recipient_user_peer_id string
    * @param signed_hex  string
@@ -837,10 +840,35 @@ class ObdApi {
     }
 
     let msg  = new Message();
-    msg.type = this.messageType.MsgType_ClientSign_Duplex_AssetFunding_ChannelAddressSignC1a_1034;
+    msg.type = this.messageType.MsgType_ClientSign_AssetFunding_AliceSignC1a_1034;
     msg.recipient_user_peer_id = recipient_user_peer_id;
     msg.recipient_node_peer_id = recipient_node_peer_id;
-    msg.data["hex"] = signed_hex;
+    msg.data["signed_c1a_hex"] = signed_hex;
+    this.sendData(msg, callback);
+  }
+
+  /**
+   * MsgType_ClientSign_AssetFunding_AliceSignRD_1134
+   * @param info      SignedInfo101134
+   * @param callback  Function
+   */
+  public sendSignedHex101134(
+    info: SignedInfo101134,
+    callback: Function ) {
+      
+    if (this.isNotString(info.channel_id)) {
+      alert("empty channel_id");
+      return;
+    }
+      
+    if (this.isNotString(info.rd_signed_hex)) {
+      alert("empty rd_signed_hex");
+      return;
+    }
+
+    let msg  = new Message();
+    msg.type = this.messageType.MsgType_ClientSign_AssetFunding_AliceSignRD_1134;
+    msg.data = info;
     this.sendData(msg, callback);
   }
 
@@ -871,15 +899,11 @@ class ObdApi {
       alert("empty temporary_channel_id");
       return;
     }
-    // if (info.approval == null) {
-    //   info.approval = false;
-    // }
-    // if (info.approval == true) {
-    //   if (this.isNotString(info.channel_address_private_key)) {
-    //     alert("empty channel_address_private_key");
-    //     return;
-    //   }
-    // }
+
+    if (this.isNotString(info.signed_alice_rsmc_hex)) {
+      alert("empty signed_alice_rsmc_hex");
+      return;
+    }
 
     let msg = new Message();
     msg.type = this.messageType.MsgType_FundingSign_SendAssetFundingSigned_35;
@@ -889,6 +913,57 @@ class ObdApi {
     this.sendData(msg, callback);
   }
   public onAssetFundingSigned(jsonData: any) {}
+
+  /**
+   * MsgType_ClientSign_Duplex_AssetFunding_RdAndBr_1035
+   * @param recipient_node_peer_id string
+   * @param recipient_user_peer_id string
+   * @param info  SignedInfo101035
+   * @param callback  Function
+   */
+  public sendSignedHex101035(
+    recipient_node_peer_id: string,
+    recipient_user_peer_id: string,
+    info: SignedInfo101035,
+    callback: Function ) {
+      
+    if (this.isNotString(recipient_node_peer_id)) {
+      alert("error recipient_node_peer_id");
+      return;
+    }
+
+    if (this.isNotString(recipient_user_peer_id)) {
+      alert("error recipient_user_peer_id");
+      return;
+    }
+
+    if (this.isNotString(info.temporary_channel_id)) {
+      alert("empty temporary_channel_id");
+      return;
+    }
+
+    if (this.isNotString(info.br_signed_hex)) {
+      alert("empty br_signed_hex");
+      return;
+    }
+
+    if (this.isNotString(info.rd_signed_hex)) {
+      alert("empty rd_signed_hex");
+      return;
+    }
+
+    if (this.isNotString(info.br_id)) {
+      alert("empty br_id");
+      return;
+    }
+
+    let msg  = new Message();
+    msg.type = this.messageType.MsgType_ClientSign_Duplex_AssetFunding_RdAndBr_1035;
+    msg.recipient_user_peer_id = recipient_user_peer_id;
+    msg.recipient_node_peer_id = recipient_node_peer_id;
+    msg.data = info;
+    this.sendData(msg, callback);
+  }
 
   /**
    * MsgType_CommitmentTx_SendCommitmentTransactionCreated_351
