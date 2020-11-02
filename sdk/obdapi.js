@@ -778,8 +778,8 @@ class ObdApi {
             alert("empty rd_signed_hex");
             return;
         }
-        if (this.isNotString(info.br_id)) {
-            alert("empty br_id");
+        if (info.br_id == null || info.br_id <= 0) {
+            alert("wrong br_id");
             return;
         }
         let msg = new Message();

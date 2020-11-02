@@ -81,7 +81,7 @@ class SignedInfo101035 {
         this.temporary_channel_id = "";
         this.rd_signed_hex = "";
         this.br_signed_hex = "";
-        this.br_id = "";
+        this.br_id = 0;
     }
 }
 class SignedInfo101134 {

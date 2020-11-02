@@ -224,7 +224,7 @@ function getAllCounterpartyFromUserID(myUserID) {
                 result.continue();
 
             } else {
-                console.log('getAllCounterpartyFromUserID No More Data.');
+                // console.log('getAllCounterpartyFromUserID No More Data.');
                 console.log('getAllCounterpartyFromUserID = ' + JSON.stringify(data));
                 resolve(data);
             }
@@ -1284,15 +1284,15 @@ function signP2SH(is_first_sign, txhex, pubkey_1, pubkey_2, privkey, amount) {
     if (is_first_sign === true) { // The first person to sign this transaction
         // txb.sign(0, wifs[0], p2sh.redeem.output, undefined, amount, undefined);
         txb.sign(0, key, p2sh.redeem.output, undefined, amount, undefined);
-        let aliceHex = txb.buildIncomplete().toHex();
-        console.info('aliceHex => ' + aliceHex);
-        return aliceHex;
+        let firstHex = txb.buildIncomplete().toHex();
+        console.info('First signed - Hex => ' + firstHex);
+        return firstHex;
 
     } else { // The second person to sign this transaction
         // txb.sign(0, wifs[1], p2sh.redeem.output, undefined, amount, undefined);
         txb.sign(0, key, p2sh.redeem.output, undefined, amount, undefined);
-        let toHex = txb.build().toHex();
-        console.info('signP2SH - toHex = ' + toHex);
-        return toHex;
+        let finalHex = txb.build().toHex();
+        console.info('signP2SH - Second signed - Hex = ' + finalHex);
+        return finalHex;
     }
 }

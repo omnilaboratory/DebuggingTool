@@ -70,7 +70,7 @@ class SignedInfo101035 {
   temporary_channel_id: string = "";
   rd_signed_hex: string = "";
   br_signed_hex: string = "";
-  br_id: string = "";
+  br_id: number = 0;
 }
 
 class SignedInfo101134 {

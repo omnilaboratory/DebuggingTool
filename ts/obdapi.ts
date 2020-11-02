@@ -952,8 +952,8 @@ class ObdApi {
       return;
     }
 
-    if (this.isNotString(info.br_id)) {
-      alert("empty br_id");
+    if (info.br_id == null || info.br_id <= 0) {
+      alert("wrong br_id");
       return;
     }
 
