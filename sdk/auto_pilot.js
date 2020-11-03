@@ -79,9 +79,12 @@ async function listening110034(e) {
     // Bob sign the tx on client
     let privkey = await getFundingPrivKey(myUserID, channel_id);
     let data    = e.sign_data;
+    let inputs  = data.inputs;
     // console.info('e.sign_data = ' + JSON.stringify(e.sign_data));
     let signed_hex = signP2SH(false, data.hex, data.pub_key_a, 
-        data.pub_key_b, privkey, data.inputs[0].amount);
+        data.pub_key_b, privkey, inputs);
+    // let signed_hex = signP2SH(false, data.hex, data.pub_key_a, 
+    //     data.pub_key_b, privkey, data.inputs[0].amount);
     saveSignedHex(myUserID, channel_id, signed_hex);
 
 
@@ -144,7 +147,9 @@ async function listening110035(e) {
 
     // Alice sign the tx on client
     let signed_hex = signP2SH(false, e.hex, e.pub_key_a, e.pub_key_b, 
-        fundingPrivKey, e.inputs[0].amount);
+        tempPrivKey, e.inputs);
+    // let signed_hex = signP2SH(false, e.hex, e.pub_key_a, e.pub_key_b, 
+    //     fundingPrivKey, e.inputs[0].amount);
 
     // will send -101134
     let info           = new SignedInfo101134();
@@ -524,9 +529,12 @@ async function listening110340(e) {
     // Bob sign the tx on client
     let privkey = await getFundingPrivKey(myUserID, channel_id);
     let data    = e.sign_data;
+    let inputs  = data.inputs;
     // console.info('e.sign_data = ' + JSON.stringify(e.sign_data));
     let signed_hex = signP2SH(false, data.hex, data.pub_key_a, 
-        data.pub_key_b, privkey, data.inputs[0].amount);
+        data.pub_key_b, privkey, inputs);
+    // let signed_hex = signP2SH(false, data.hex, data.pub_key_a, 
+    //     data.pub_key_b, privkey, data.inputs[0].amount);
     saveSignedHex(myUserID, channel_id, signed_hex);
 
 

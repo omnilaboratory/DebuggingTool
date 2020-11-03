@@ -49,9 +49,9 @@ var channelHadBtcData = '';
 // FOR TESTING , WILL BE DELETED.
 function testSignP2SH() {
 
-    let txhex    = '0200000001956ac7932f35d573bb1f7c7080c6afc157ea201181967af6ffc3380acabcfdad0000000000ffffffff01501f0000000000001976a9140b060fcf9c573c6290c1e5a9de315b8eda2c3a5388ac00000000';
+    let txhex    = '0200000002922eb906431e0920ad1b40d1bbc877cc10a9e366d18f1a0eefe035ec877f49c800000000930000483045022100b10b4e4290426b72a40e0cdd70bded855331fbe4d4f6b7e4449b7dd019a0814d022017280b6e50bc9ae5b2b5c370593ea75ac58d34efed7e51fecfb3528a62af2daa0147522102212af74a0c82d640fdf32ac045a04b4f0d35bbb2245a6ab27babdfe7a2dfcbb021027a6f5270e8fb897f70b35f15bfb648deabbc5b92af2c2d023aaecea5fef0c6d952aee8030000922eb906431e0920ad1b40d1bbc877cc10a9e366d18f1a0eefe035ec877f49c802000000930000483045022100d617d51fd957fb3ad9a414cfe11ef0a20f3e0f38e491da09372ddde66cc62c9d0220650e127059386ca9395c4d362176cd2c94377bc6004f0793e0a93ff464e8bd4f0147522102212af74a0c82d640fdf32ac045a04b4f0d35bbb2245a6ab27babdfe7a2dfcbb021027a6f5270e8fb897f70b35f15bfb648deabbc5b92af2c2d023aaecea5fef0c6d952aee80300000326140000000000001976a9140b060fcf9c573c6290c1e5a9de315b8eda2c3a5388ac0000000000000000166a146f6d6e6900000000000000890000000005f5e10022020000000000001976a9140b060fcf9c573c6290c1e5a9de315b8eda2c3a5388ac00000000';
     let pubkey_1 = '020cbd54b5d0cd602a161beb99fe1a8f2ed9aaaf66eec054d26a617d7df67e9ae1';
-    let pubkey_2 = '03d30073909bd072c070ac7c9b2d75084db079f32929fd00010c20d976389dffdf';
+    let pubkey_2 = '027a6f5270e8fb897f70b35f15bfb648deabbc5b92af2c2d023aaecea5fef0c6d9';
 
     const network = btctool.bitcoin.networks.testnet;
     const tx      = btctool.bitcoin.Transaction.fromHex(txhex);
@@ -67,7 +67,7 @@ function testSignP2SH() {
 
     // testing
     let alicePrivkey = 'cSFJQshaUe7wJxAuNSib1HjNQSpLRq7z7eCqrRueo2eB4otAitng';
-    let bobPrivkey   = 'cSZyhSTKfXFLY42t9oBrrgxs2DQdoMsJu44inLk4ToNhFNLr9QWP';
+    let bobPrivkey   = 'cPRPRKNr7iwSCJ5d44x5kzc2xbLmsxxwRqsePrmakrrZAWRf9hkf';
     const key        = btctool.bitcoin.ECPair.fromWIF(bobPrivkey, network);
 
     // change to satoshi

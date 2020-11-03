@@ -1259,7 +1259,8 @@ function signP2PKH(txhex, privkey) {
  * @param privkey
  * @param amount    amount in input
  */
-function signP2SH(is_first_sign, txhex, pubkey_1, pubkey_2, privkey, amount) {
+function signP2SH(is_first_sign, txhex, pubkey_1, pubkey_2, privkey, inputs) {
+// function signP2SH(is_first_sign, txhex, pubkey_1, pubkey_2, privkey, amount) {
 
     const network = btctool.bitcoin.networks.testnet;
     const tx      = btctool.bitcoin.Transaction.fromHex(txhex);
@@ -1276,21 +1277,23 @@ function signP2SH(is_first_sign, txhex, pubkey_1, pubkey_2, privkey, amount) {
     // testing
     const key     = btctool.bitcoin.ECPair.fromWIF(privkey, network);
 
-    // change to satoshi
-    amount = amount * 100000000;
-    // console.info('amount => ' + amount);
+    // Sign all inputs
+    console.info('inputs = ' + JSON.stringify(inputs));
+    for (let i = 0; i < inputs.length; i++) {
+        txb.sign(i, key, p2sh.redeem.output, undefined, 
+            inputs[i].amount * 100000000, undefined);
+    }
 
-    // Sign
     if (is_first_sign === true) { // The first person to sign this transaction
         // txb.sign(0, wifs[0], p2sh.redeem.output, undefined, amount, undefined);
-        txb.sign(0, key, p2sh.redeem.output, undefined, amount, undefined);
+        // txb.sign(0, key, p2sh.redeem.output, undefined, amount, undefined);
         let firstHex = txb.buildIncomplete().toHex();
         console.info('First signed - Hex => ' + firstHex);
         return firstHex;
 
     } else { // The second person to sign this transaction
         // txb.sign(0, wifs[1], p2sh.redeem.output, undefined, amount, undefined);
-        txb.sign(0, key, p2sh.redeem.output, undefined, amount, undefined);
+        // txb.sign(0, key, p2sh.redeem.output, undefined, amount, undefined);
         let finalHex = txb.build().toHex();
         console.info('signP2SH - Second signed - Hex = ' + finalHex);
         return finalHex;

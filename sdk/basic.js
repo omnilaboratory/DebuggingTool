@@ -127,7 +127,9 @@ function bitcoinFundingCreated(myUserID, nodeID, userID, info) {
                 // Alice sign the tx on client
                 let privkey    = await getFundingPrivKey(myUserID, channel_id);
                 let signed_hex = signP2SH(true, e.hex, e.pub_key_a, 
-                    e.pub_key_b, privkey, e.inputs[0].amount);
+                    e.pub_key_b, privkey, e.inputs);
+                // let signed_hex = signP2SH(true, e.hex, e.pub_key_a, 
+                //     e.pub_key_b, privkey, e.inputs[0].amount);
                 resolve(signed_hex);
             }
 
@@ -238,7 +240,9 @@ function assetFundingCreated(myUserID, nodeID, userID, info) {
             if (e.hex) {
                 let privkey    = await getFundingPrivKey(myUserID, channel_id);
                 let signed_hex = signP2SH(true, e.hex, e.pub_key_a, 
-                    e.pub_key_b, privkey, e.inputs[0].amount);
+                    e.pub_key_b, privkey, e.inputs);
+                // let signed_hex = signP2SH(true, e.hex, e.pub_key_a, 
+                //     e.pub_key_b, privkey, e.inputs[0].amount);
                 // resolve(signed_hex);
                 await sendSignedHex101034(nodeID, userID, signed_hex);
             }
@@ -299,14 +303,20 @@ function assetFundingSigned(myUserID, nodeID, userID, info) {
 
             // NO.1 alice_br_sign_data
             let br      = e.alice_br_sign_data;
+            let inputs  = br.inputs;
             let privkey = await getFundingPrivKey(myUserID, channel_id);
             let br_hex  = signP2SH(true, br.hex, br.pub_key_a, br.pub_key_b, 
-                privkey, br.inputs[0].amount);
+                privkey, inputs);
+            // let br_hex  = signP2SH(true, br.hex, br.pub_key_a, br.pub_key_b, 
+            //     privkey, br.inputs[0].amount);
 
             // NO.2 alice_rd_sign_data
             let rd     = e.alice_rd_sign_data;
+            inputs     = rd.inputs;
             let rd_hex = signP2SH(true, rd.hex, rd.pub_key_a, rd.pub_key_b, 
-                privkey, rd.inputs[0].amount);
+                privkey, inputs);
+            // let rd_hex = signP2SH(true, rd.hex, rd.pub_key_a, rd.pub_key_b, 
+            //     privkey, rd.inputs[0].amount);
 
             // will send 101035
             let signedInfo                  = new SignedInfo101035();
