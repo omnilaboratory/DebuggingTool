@@ -90,6 +90,23 @@ class SignedInfo101134 {
         this.rd_signed_hex = "";
     }
 }
+class SignedInfo100360 {
+    constructor() {
+        this.channel_id = "";
+        this.rsmc_signed_hex = "";
+        this.counterparty_signed_hex = "";
+    }
+}
+class SignedInfo100361 {
+    constructor() {
+        this.channel_id = "";
+        this.c2b_rsmc_signed_hex = "";
+        this.c2b_counterparty_signed_hex = "";
+        this.c2a_rd_signed_hex = "";
+        this.c2a_br_signed_hex = "";
+        this.c2a_br_id = 0;
+    }
+}
 class CommitmentTx {
     constructor() {
         this.channel_id = "";
@@ -104,12 +121,12 @@ class CommitmentTx {
 class CommitmentTxSigned {
     constructor() {
         this.channel_id = "";
+        this.msg_hash = "";
+        this.c2a_rsmc_signed_hex = "";
+        this.c2a_counterparty_signed_hex = "";
         this.curr_temp_address_pub_key = "";
-        this.curr_temp_address_private_key = "";
         this.curr_temp_address_index = 0;
         this.last_temp_address_private_key = "";
-        this.msg_hash = "";
-        this.channel_address_private_key = "";
         this.approval = false;
     }
 }
@@ -354,6 +371,12 @@ class MessageType {
         this.MsgType_CommitmentTx_RecvCommitmentTransactionCreated_351 = -110351;
         this.MsgType_CommitmentTxSigned_SendRevokeAndAcknowledgeCommitmentTransaction_352 = -100352;
         this.MsgType_CommitmentTxSigned_RecvRevokeAndAcknowledgeCommitmentTransaction_352 = -110352;
+        this.MsgType_ClientSign_BobC2b_Rd_353 = -110353;
+        this.MsgType_ClientSign_CommitmentTx_AliceSignC2a_360 = -100360;
+        this.MsgType_ClientSign_CommitmentTx_BobSignC2b_361 = -100361;
+        this.MsgType_ClientSign_CommitmentTx_AliceSignC2b_362 = -100362;
+        this.MsgType_ClientSign_CommitmentTx_AliceSignC2b_Rd_363 = -100363;
+        this.MsgType_ClientSign_CommitmentTx_BobSignC2b_Rd_364 = -100364;
         this.MsgType_ChannelOpen_AllItem_3150 = -103150;
         this.MsgType_ChannelOpen_ItemByTempId_3151 = -103151;
         this.MsgType_ChannelOpen_Count_3152 = -103152;

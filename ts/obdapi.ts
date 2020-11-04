@@ -169,9 +169,11 @@ class ObdApi {
         }
         return;
       }
+      
       if (jsonData.type != this.messageType.MsgType_Error_0) {
         alert(jsonData.result);
       }
+
       return;
     }
 
@@ -1023,6 +1025,50 @@ class ObdApi {
   public onCommitmentTransactionCreated(jsonData: any) {}
 
   /**
+   * MsgType_ClientSign_CommitmentTx_AliceSignC2a_360
+   * @param recipient_node_peer_id string
+   * @param recipient_user_peer_id string
+   * @param info      SignedInfo100360
+   * @param callback  Function
+   */
+  public sendSignedHex100360(
+    recipient_node_peer_id: string,
+    recipient_user_peer_id: string,
+    info: SignedInfo100360,
+    callback: Function ) {
+      
+    if (this.isNotString(recipient_node_peer_id)) {
+      alert("error recipient_node_peer_id");
+      return;
+    }
+
+    if (this.isNotString(recipient_user_peer_id)) {
+      alert("error recipient_user_peer_id");
+      return;
+    }
+
+    if (this.isNotString(info.channel_id)) {
+      alert("empty channel_id");
+      return;
+    }
+      
+    if (this.isNotString(info.counterparty_signed_hex)) {
+      alert("empty counterparty_signed_hex");
+      return;
+    }
+      
+    if (this.isNotString(info.rsmc_signed_hex)) {
+      alert("empty rsmc_signed_hex");
+      return;
+    }
+
+    let msg  = new Message();
+    msg.type = this.messageType.MsgType_ClientSign_CommitmentTx_AliceSignC2a_360;
+    msg.data = info;
+    this.sendData(msg, callback);
+  }
+
+  /**
    * MsgType_CommitmentTxSigned_SendRevokeAndAcknowledgeCommitmentTransaction_352
    * @param recipient_node_peer_id string
    * @param recipient_user_peer_id string
@@ -1063,14 +1109,6 @@ class ObdApi {
         alert("empty curr_temp_address_pub_key");
         return;
       }
-      if (this.isNotString(info.curr_temp_address_private_key)) {
-        alert("empty curr_temp_address_private_key");
-        return;
-      }
-      if (this.isNotString(info.channel_address_private_key)) {
-        alert("empty channel_address_private_key");
-        return;
-      }
     }
 
     let msg = new Message();
@@ -1081,6 +1119,66 @@ class ObdApi {
     this.sendData(msg, callback);
   }
   public onCommitmentTransactionAccepted(jsonData: any) {}
+
+
+  /**
+   * MsgType_ClientSign_CommitmentTx_BobSignC2b_361
+   * @param recipient_node_peer_id string
+   * @param recipient_user_peer_id string
+   * @param info      SignedInfo100361
+   * @param callback  Function
+   */
+  public sendSignedHex100361(
+    recipient_node_peer_id: string,
+    recipient_user_peer_id: string,
+    info: SignedInfo100361,
+    callback: Function ) {
+      
+    if (this.isNotString(recipient_node_peer_id)) {
+      alert("error recipient_node_peer_id");
+      return;
+    }
+
+    if (this.isNotString(recipient_user_peer_id)) {
+      alert("error recipient_user_peer_id");
+      return;
+    }
+
+    if (this.isNotString(info.channel_id)) {
+      alert("empty channel_id");
+      return;
+    }
+      
+    if (this.isNotString(info.c2b_rsmc_signed_hex)) {
+      alert("empty c2b_rsmc_signed_hex");
+      return;
+    }
+      
+    if (this.isNotString(info.c2b_counterparty_signed_hex)) {
+      alert("empty c2b_counterparty_signed_hex");
+      return;
+    }
+      
+    if (this.isNotString(info.c2a_rd_signed_hex)) {
+      alert("empty c2a_rd_signed_hex");
+      return;
+    }
+      
+    if (this.isNotString(info.c2a_br_signed_hex)) {
+      alert("empty c2a_br_signed_hex");
+      return;
+    }
+
+    if (info.c2a_br_id == null || info.c2a_br_id <= 0) {
+      alert("wrong c2a_br_id");
+      return;
+    }
+
+    let msg  = new Message();
+    msg.type = this.messageType.MsgType_ClientSign_CommitmentTx_BobSignC2b_361;
+    msg.data = info;
+    this.sendData(msg, callback);
+  }
 
   /**
    * MsgType_HTLC_Invoice_402

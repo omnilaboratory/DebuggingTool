@@ -97,7 +97,7 @@ async function sdkLogIn() {
 
     let mnemonic = $("#mnemonic").val();
     let e = await logIn(mnemonic);
-
+    
     // Register event needed for listening.
     registerEvent(true);
 
@@ -610,8 +610,9 @@ async function sdkBitcoinFundingSigned() {
 // -100034 Omni Asset Funding Created API at local.
 async function sdkAssetFundingCreated() {
 
-    let nodeID = $("#recipient_node_peer_id").val();
-    let userID = $("#recipient_user_peer_id").val();
+    let nodeID  = $("#recipient_node_peer_id").val();
+    let userID  = $("#recipient_user_peer_id").val();
+    let tempKey = $("#temp_address_private_key").val();
 
     let info                  = new AssetFundingCreatedInfo();
     info.temporary_channel_id = $("#temporary_channel_id").val();
@@ -625,13 +626,7 @@ async function sdkAssetFundingCreated() {
     info.temp_address_index = Number(getIndexFromPubKey(info.temp_address_pub_key));
 
     displaySentMessage100034(nodeID, userID, info);
-    await assetFundingCreated($("#logined").text(), nodeID, userID, info);
-
-    // let signed_hex = await assetFundingCreated($("#logined").text(), nodeID, userID, info);
-    // if (signed_hex != true) {
-    //     await sendSignedHex101034(nodeID, userID, signed_hex);
-    // }
-
+    await assetFundingCreated($("#logined").text(), nodeID, userID, info, tempKey);
     afterAssetFundingCreated();
 }
 
@@ -646,12 +641,6 @@ async function sdkAssetFundingSigned() {
     info.signed_alice_rsmc_hex = $("#signed_alice_rsmc_hex").val();
 
     let resp = await assetFundingSigned($("#logined").text(), nodeID, userID, info);
-    
-    // let resp = await assetFundingSigned($("#logined").text(), nodeID, userID, info);
-    // if (resp) {
-    //     await sendSignedHex101035(nodeID, userID, resp);
-    // }
-        
     displaySentMessage100035(nodeID, userID, info);
     afterAssetFundingSigned(resp);
     displayMyChannelListAtTopRight(kPageSize, kPageIndex);
@@ -937,43 +926,47 @@ async function sdkHTLCFindPath() {
 // -100351 Commitment Transaction Created API at local.
 async function sdkCommitmentTransactionCreated() {
 
-    let nodeID = $("#recipient_node_peer_id").val();
-    let userID = $("#recipient_user_peer_id").val();
-    
+    let nodeID  = $("#recipient_node_peer_id").val();
+    let userID  = $("#recipient_user_peer_id").val();
+    let tempKey = $("#curr_temp_address_private_key").val();
+
     let info                           = new CommitmentTx();
     info.channel_id                    = $("#channel_id").val();
     info.amount                        = Number($("#amount").val());
-    info.channel_address_private_key   = $("#channel_address_private_key").val();
     info.curr_temp_address_pub_key     = $("#curr_temp_address_pub_key").val();
-    info.curr_temp_address_private_key = $("#curr_temp_address_private_key").val();
     info.last_temp_address_private_key = $("#last_temp_address_private_key").val();
+    // info.channel_address_private_key   = $("#channel_address_private_key").val();
+    // info.curr_temp_address_private_key = $("#curr_temp_address_private_key").val();
 
     // Save address index to OBD and can get private key back if lose it.
     info.curr_temp_address_index = Number(getIndexFromPubKey(info.curr_temp_address_pub_key));
-
-    displaySentMessage100351(nodeID, userID, info);
-
+    
     let myUserID = $("#logined").text();
     let isFunder = await getIsFunder(myUserID, info.channel_id);
-    await commitmentTransactionCreated(myUserID, nodeID, userID, info, isFunder);
-
+    await commitmentTransactionCreated(myUserID, nodeID, userID, info, isFunder, tempKey);
+    
+    displaySentMessage100351(nodeID, userID, info);
     afterCommitmentTransactionCreated();
 }
 
 // -100352 Revoke and Acknowledge Commitment Transaction API at local.
 async function sdkCommitmentTransactionAccepted() {
 
-    let nodeID = $("#recipient_node_peer_id").val();
-    let userID = $("#recipient_user_peer_id").val();
+    let nodeID  = $("#recipient_node_peer_id").val();
+    let userID  = $("#recipient_user_peer_id").val();
+    let tempKey = $("#curr_temp_address_private_key").val();
 
     let info                           = new CommitmentTxSigned();
     info.channel_id                    = $("#channel_id").val();
-    info.channel_address_private_key   = $("#channel_address_private_key").val();
-    info.curr_temp_address_pub_key     = $("#curr_temp_address_pub_key").val();
-    info.curr_temp_address_private_key = $("#curr_temp_address_private_key").val();
-    info.last_temp_address_private_key = $("#last_temp_address_private_key").val();
     info.msg_hash                      = $("#msg_hash").val();
+    info.c2a_rsmc_signed_hex           = $("#c2a_rsmc_signed_hex").val();
+    info.c2a_counterparty_signed_hex   = $("#c2a_counterparty_signed_hex").val();
+    info.curr_temp_address_pub_key     = $("#curr_temp_address_pub_key").val();
+    info.last_temp_address_private_key = $("#last_temp_address_private_key").val();
     info.approval                      = $("#checkbox_n352").prop("checked");
+
+    // info.channel_address_private_key   = $("#channel_address_private_key").val();
+    // info.curr_temp_address_private_key = $("#curr_temp_address_private_key").val();
 
     // Save address index to OBD and can get private key back if lose it.
     info.curr_temp_address_index = Number(getIndexFromPubKey(info.curr_temp_address_pub_key));
@@ -982,7 +975,7 @@ async function sdkCommitmentTransactionAccepted() {
 
     let myUserID = $("#logined").text();
     let isFunder = await getIsFunder(myUserID, info.channel_id);
-    await commitmentTransactionAccepted(myUserID, nodeID, userID, info, isFunder);
+    await commitmentTransactionAccepted(myUserID, nodeID, userID, info, isFunder, tempKey);
 
     afterCommitmentTransactionAccepted();
     displayMyChannelListAtTopRight(kPageSize, kPageIndex);
@@ -3958,9 +3951,11 @@ function displaySentMessage100352(nodeID, userID, info) {
         data: {
             channel_id:                    info.channel_id,
             msg_hash:                      info.msg_hash,
-            channel_address_private_key:   info.channel_address_private_key,
+            c2a_rsmc_signed_hex:           info.c2a_rsmc_signed_hex,
+            c2a_counterparty_signed_hex:   info.c2a_counterparty_signed_hex,
+            channel_address_private_key:   $("#channel_address_private_key").val(),
             curr_temp_address_pub_key:     info.curr_temp_address_pub_key,
-            curr_temp_address_private_key: info.curr_temp_address_private_key,
+            curr_temp_address_private_key: $("#curr_temp_address_private_key").val(),
             last_temp_address_private_key: info.last_temp_address_private_key,
             approval:                      info.approval,
         }
@@ -4149,9 +4144,9 @@ function displaySentMessage100351(nodeID, userID, info) {
         data: {
             channel_id:                    info.channel_id,
             amount:                        info.amount,
-            channel_address_private_key:   info.channel_address_private_key,
+            channel_address_private_key:   $("#channel_address_private_key").val(),
             curr_temp_address_pub_key:     info.curr_temp_address_pub_key,
-            curr_temp_address_private_key: info.curr_temp_address_private_key,
+            curr_temp_address_private_key: $("#curr_temp_address_private_key").val(),
             last_temp_address_private_key: info.last_temp_address_private_key,
         }
     }

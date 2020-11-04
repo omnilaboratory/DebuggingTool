@@ -125,6 +125,18 @@ const kSenderRole = 'sender_role';
 const kTbSignedHex = 'tb_signed_hex';
 
 /**
+ * Object Store (table) name of IndexedDB.
+ * Signed Hex CR110351
+ */
+const kTbSignedHexCR110351 = 'tb_signed_hex_CR110351';
+
+/**
+ * Object Store (table) name of IndexedDB.
+ * Signed Hex RR110351
+ */
+const kTbSignedHexRR110351 = 'tb_signed_hex_RR110351';
+
+/**
  *  List of Counterparties who have interacted
  *  @param myUserID The user id of logged in
  *  @param channel_id 
@@ -686,6 +698,118 @@ function getSignedHex(myUserID, channel_id) {
     })
 }
 
+
+/**
+ * save signed hex RR110351
+ * 
+ * @param myUserID
+ * @param channel_id
+ * @param value
+ */
+function saveSignedHexRR110351(myUserID, channel_id, value) {
+
+    let key     = myUserID + channel_id;
+    let request = db.transaction([kTbSignedHexRR110351], 'readwrite')
+        .objectStore(kTbSignedHexRR110351)
+        .put({ key: key, value: value });
+  
+    request.onsuccess = function (e) {
+        // console.log('Data write success.');
+    };
+  
+    request.onerror = function (e) {
+        // console.log('Data write false.');
+    }
+}
+
+/**
+ * get signed hex RR110351
+ * 
+ * @param myUserID
+ * @param channel_id
+ */
+function getSignedHexRR110351(myUserID, channel_id) {
+
+    return new Promise((resolve, reject) => {
+
+        let key         = myUserID + channel_id;
+        let transaction = db.transaction([kTbSignedHexRR110351], 'readonly');
+        let store       = transaction.objectStore(kTbSignedHexRR110351);
+        let request     = store.get(key);
+    
+        request.onerror = function(e) {
+            console.log('Read data false.');
+            reject('Read data false.');
+        };
+    
+        request.onsuccess = function (e) {
+            if (request.result) {
+                console.log('getSignedHexRR110351 = ' + request.result.value);
+                resolve(request.result.value);
+            } else {
+                console.log('getSignedHexRR110351 = No Data.');
+                resolve('');
+            }
+        }
+    })
+}
+
+
+/**
+ * save signed hex CR110351
+ * 
+ * @param myUserID
+ * @param channel_id
+ * @param value
+ */
+function saveSignedHexCR110351(myUserID, channel_id, value) {
+
+    let key     = myUserID + channel_id;
+    let request = db.transaction([kTbSignedHexCR110351], 'readwrite')
+        .objectStore(kTbSignedHexCR110351)
+        .put({ key: key, value: value });
+  
+    request.onsuccess = function (e) {
+        // console.log('Data write success.');
+    };
+  
+    request.onerror = function (e) {
+        // console.log('Data write false.');
+    }
+}
+
+/**
+ * get signed hex CR110351
+ * 
+ * @param myUserID
+ * @param channel_id
+ */
+function getSignedHexCR110351(myUserID, channel_id) {
+
+    return new Promise((resolve, reject) => {
+
+        let key         = myUserID + channel_id;
+        let transaction = db.transaction([kTbSignedHexCR110351], 'readonly');
+        let store       = transaction.objectStore(kTbSignedHexCR110351);
+        let request     = store.get(key);
+    
+        request.onerror = function(e) {
+            console.log('Read data false.');
+            reject('Read data false.');
+        };
+    
+        request.onsuccess = function (e) {
+            if (request.result) {
+                console.log('getSignedHexCR110351 = ' + request.result.value);
+                resolve(request.result.value);
+            } else {
+                console.log('getSignedHexCR110351 = No Data.');
+                resolve('');
+            }
+        }
+    })
+}
+
 /**
  * 
  * @param {*} myUserID 
@@ -1179,6 +1303,16 @@ function openDB() {
         if (!db.objectStoreNames.contains(kTbSignedHex)) {
             os11 = db.createObjectStore(kTbSignedHex, { keyPath: 'key' });
         }
+
+        let os12;
+        if (!db.objectStoreNames.contains(kTbSignedHexCR110351)) {
+            os12 = db.createObjectStore(kTbSignedHexCR110351, { keyPath: 'key' });
+        }
+
+        let os13;
+        if (!db.objectStoreNames.contains(kTbSignedHexRR110351)) {
+            os13 = db.createObjectStore(kTbSignedHexRR110351, { keyPath: 'key' });
+        }
     }
 }
 
@@ -1257,10 +1391,9 @@ function signP2PKH(txhex, privkey) {
  * @param pubkey_1
  * @param pubkey_2
  * @param privkey
- * @param amount    amount in input
+ * @param inputs    all of inputs
  */
 function signP2SH(is_first_sign, txhex, pubkey_1, pubkey_2, privkey, inputs) {
-// function signP2SH(is_first_sign, txhex, pubkey_1, pubkey_2, privkey, amount) {
 
     const network = btctool.bitcoin.networks.testnet;
     const tx      = btctool.bitcoin.Transaction.fromHex(txhex);
@@ -1269,12 +1402,7 @@ function signP2SH(is_first_sign, txhex, pubkey_1, pubkey_2, privkey, inputs) {
     const p2ms    = btctool.bitcoin.payments.p2ms({ m: 2, pubkeys, network: network });
     const p2sh    = btctool.bitcoin.payments.p2sh({ redeem: p2ms,  network: network });
 
-    // const wifs = [
-    //     'cUAdadTkjeVFsNz5ifhkETfAzk5PvhnLWtmdSKgbyTTjSCE4MYWy',
-    //     'cV6dif91LHD8Czk8BTgvYZR3ipUrqyMDMtUXSWsThqpHaQJUuHKA',
-    // ].map((wif) => btctool.bitcoin.ECPair.fromWIF(wif, network));
-
-    // testing
+    // private key
     const key     = btctool.bitcoin.ECPair.fromWIF(privkey, network);
 
     // Sign all inputs
@@ -1285,15 +1413,11 @@ function signP2SH(is_first_sign, txhex, pubkey_1, pubkey_2, privkey, inputs) {
     }
 
     if (is_first_sign === true) { // The first person to sign this transaction
-        // txb.sign(0, wifs[0], p2sh.redeem.output, undefined, amount, undefined);
-        // txb.sign(0, key, p2sh.redeem.output, undefined, amount, undefined);
         let firstHex = txb.buildIncomplete().toHex();
         console.info('First signed - Hex => ' + firstHex);
         return firstHex;
 
     } else { // The second person to sign this transaction
-        // txb.sign(0, wifs[1], p2sh.redeem.output, undefined, amount, undefined);
-        // txb.sign(0, key, p2sh.redeem.output, undefined, amount, undefined);
         let finalHex = txb.build().toHex();
         console.info('signP2SH - Second signed - Hex = ' + finalHex);
         return finalHex;

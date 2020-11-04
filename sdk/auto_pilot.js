@@ -83,8 +83,6 @@ async function listening110034(e) {
     // console.info('e.sign_data = ' + JSON.stringify(e.sign_data));
     let signed_hex = signP2SH(false, data.hex, data.pub_key_a, 
         data.pub_key_b, privkey, inputs);
-    // let signed_hex = signP2SH(false, data.hex, data.pub_key_a, 
-    //     data.pub_key_b, privkey, data.inputs[0].amount);
     saveSignedHex(myUserID, channel_id, signed_hex);
 
 
@@ -148,8 +146,6 @@ async function listening110035(e) {
     // Alice sign the tx on client
     let signed_hex = signP2SH(false, e.hex, e.pub_key_a, e.pub_key_b, 
         tempPrivKey, e.inputs);
-    // let signed_hex = signP2SH(false, e.hex, e.pub_key_a, e.pub_key_b, 
-    //     fundingPrivKey, e.inputs[0].amount);
 
     // will send -101134
     let info           = new SignedInfo101134();
@@ -530,11 +526,8 @@ async function listening110340(e) {
     let privkey = await getFundingPrivKey(myUserID, channel_id);
     let data    = e.sign_data;
     let inputs  = data.inputs;
-    // console.info('e.sign_data = ' + JSON.stringify(e.sign_data));
     let signed_hex = signP2SH(false, data.hex, data.pub_key_a, 
         data.pub_key_b, privkey, inputs);
-    // let signed_hex = signP2SH(false, data.hex, data.pub_key_a, 
-    //     data.pub_key_b, privkey, data.inputs[0].amount);
     saveSignedHex(myUserID, channel_id, signed_hex);
 
 
@@ -598,13 +591,26 @@ async function listening110351(e, netType) {
     console.info('SDK: NOW isAutoMode = ' + isAutoMode);
 
     let myUserID = e.to_peer_id;
-
-    saveTempData(myUserID, e.channel_id, e.msg_hash);
-
     let isFunder = await getIsFunder(myUserID, e.channel_id);
     saveChannelStatus(myUserID, e.channel_id, isFunder, kStatusCommitmentTransactionCreated);
+    saveTempData(myUserID, e.channel_id, e.msg_hash);
     saveSenderRole(kIsReceiver);
 
+    // Receiver sign the tx on client side
+    // NO.1 counterparty_raw_data
+    let cr      = e.counterparty_raw_data;
+    let inputs  = cr.inputs;
+    let privkey = await getFundingPrivKey(myUserID, e.channel_id);
+    let cr_hex  = signP2SH(false, cr.hex, cr.pub_key_a, cr.pub_key_b, privkey, inputs);
+    saveSignedHexCR110351(myUserID, channel_id, cr_hex);
+
+    // NO.2 rsmc_raw_data
+    let rr     = e.rsmc_raw_data;
+    inputs     = rr.inputs;
+    let rr_hex = signP2SH(false, rr.hex, rr.pub_key_a, rr.pub_key_b, privkey, inputs);
+    saveSignedHexRR110351(myUserID, channel_id, rr_hex);
+
+    // auto mode is closed
     if (isAutoMode != 'Yes') return;
 
     console.info('listening110351 = ' + JSON.stringify(e));
@@ -644,4 +650,12 @@ async function listening110351(e, netType) {
 async function listening110352(e) {
     let isFunder = await getIsFunder(e.to_peer_id, e.channel_id);
     saveChannelStatus(e.to_peer_id, e.channel_id, isFunder, kStatusCommitmentTransactionAccepted);
+}
+
+/**
+ * listening to -110353
+ * @param e 
+ */
+async function listening110353(e) {
+
 }

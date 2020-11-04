@@ -122,14 +122,11 @@ function bitcoinFundingCreated(myUserID, nodeID, userID, info) {
             }
 
             // Sign tx
-            // console.info('bitcoinFundingCreated e.hex = ' + e.hex);
             if (e.hex) {
                 // Alice sign the tx on client
                 let privkey    = await getFundingPrivKey(myUserID, channel_id);
                 let signed_hex = signP2SH(true, e.hex, e.pub_key_a, 
                     e.pub_key_b, privkey, e.inputs);
-                // let signed_hex = signP2SH(true, e.hex, e.pub_key_a, 
-                //     e.pub_key_b, privkey, e.inputs[0].amount);
                 resolve(signed_hex);
             }
 
@@ -221,8 +218,9 @@ function fundingAsset(myUserID, info) {
  * @param nodeID peer id of the obd node where the fundee logged in.
  * @param userID the user id of the fundee.
  * @param info 
+ * @param tempKey  temp_address_private_key
  */
-function assetFundingCreated(myUserID, nodeID, userID, info) {
+function assetFundingCreated(myUserID, nodeID, userID, info, tempKey) {
     return new Promise((resolve, reject) => {
         obdApi.assetFundingCreated(nodeID, userID, info, async function(e) {
             console.info('SDK: -100034 - assetFundingCreated = ' + JSON.stringify(e));
@@ -230,20 +228,15 @@ function assetFundingCreated(myUserID, nodeID, userID, info) {
             let channel_id = info.temporary_channel_id;
 
             // Save temporary private key to local storage
-            let tempKey = getPrivKeyFromPubKey(myUserID, info.temp_address_pub_key);
-            console.info('tempKey = ' + tempKey);
+            // let tempKey = getPrivKeyFromPubKey(myUserID, info.temp_address_pub_key);
             saveTempPrivKey(myUserID, kTempPrivKey, channel_id, tempKey);
             saveChannelStatus(myUserID, channel_id, true, kStatusAssetFundingCreated);
 
             // Alice sign the tx on client
-            // console.info('bitcoinFundingCreated e.hex = ' + e.hex);
             if (e.hex) {
                 let privkey    = await getFundingPrivKey(myUserID, channel_id);
                 let signed_hex = signP2SH(true, e.hex, e.pub_key_a, 
                     e.pub_key_b, privkey, e.inputs);
-                // let signed_hex = signP2SH(true, e.hex, e.pub_key_a, 
-                //     e.pub_key_b, privkey, e.inputs[0].amount);
-                // resolve(signed_hex);
                 await sendSignedHex101034(nodeID, userID, signed_hex);
             }
 
@@ -299,24 +292,18 @@ function assetFundingSigned(myUserID, nodeID, userID, info) {
             let channel_id = info.temporary_channel_id;
             
             // Bob sign the tx on client side
-            // console.info('bitcoinFundingCreated e.hex = ' + e.hex);
-
             // NO.1 alice_br_sign_data
             let br      = e.alice_br_sign_data;
             let inputs  = br.inputs;
             let privkey = await getFundingPrivKey(myUserID, channel_id);
             let br_hex  = signP2SH(true, br.hex, br.pub_key_a, br.pub_key_b, 
                 privkey, inputs);
-            // let br_hex  = signP2SH(true, br.hex, br.pub_key_a, br.pub_key_b, 
-            //     privkey, br.inputs[0].amount);
 
             // NO.2 alice_rd_sign_data
             let rd     = e.alice_rd_sign_data;
             inputs     = rd.inputs;
             let rd_hex = signP2SH(true, rd.hex, rd.pub_key_a, rd.pub_key_b, 
                 privkey, inputs);
-            // let rd_hex = signP2SH(true, rd.hex, rd.pub_key_a, rd.pub_key_b, 
-            //     privkey, rd.inputs[0].amount);
 
             // will send 101035
             let signedInfo                  = new SignedInfo101035();
@@ -381,15 +368,56 @@ function sendSignedHex101035(nodeID, userID, signedInfo, myUserID, tempCID, priv
  * @param userID the user id of the fundee.
  * @param info 
  * @param isFunder 
+ * @param tempKey curr_temp_address_private_key 
  */
-function commitmentTransactionCreated(myUserID, nodeID, userID, info, isFunder) {
+function commitmentTransactionCreated(myUserID, nodeID, userID, info, isFunder, tempKey) {
     return new Promise((resolve, reject) => {
-        obdApi.commitmentTransactionCreated(nodeID, userID, info, function(e) {
+        obdApi.commitmentTransactionCreated(nodeID, userID, info, async function(e) {
             console.info('SDK: -100351 commitmentTransactionCreated = ' + JSON.stringify(e));
-            saveTempPrivKey(myUserID, kTempPrivKey, e.channel_id, info.curr_temp_address_private_key);
+
+            // Sender sign the tx on client side
+            // NO.1 counterparty_raw_data
+            let cr      = e.counterparty_raw_data;
+            let inputs  = cr.inputs;
+            let privkey = await getFundingPrivKey(myUserID, e.channel_id);
+            let cr_hex  = signP2SH(true, cr.hex, cr.pub_key_a, cr.pub_key_b, 
+                privkey, inputs);
+
+            // NO.2 rsmc_raw_data
+            let rr     = e.rsmc_raw_data;
+            inputs     = rr.inputs;
+            let rr_hex = signP2SH(true, rr.hex, rr.pub_key_a, rr.pub_key_b, 
+                privkey, inputs);
+
+            // will send 100360
+            let signedInfo                     = new SignedInfo100360();
+            signedInfo.channel_id              = e.channel_id;
+            signedInfo.counterparty_signed_hex = cr_hex;
+            signedInfo.rsmc_signed_hex         = rr_hex;
+
+            await sendSignedHex100360(nodeID, userID, signedInfo);
+
+            // save some data
+            saveTempPrivKey(myUserID, kTempPrivKey, e.channel_id, tempKey);
             saveChannelStatus(myUserID, e.channel_id, isFunder, kStatusCommitmentTransactionCreated);
             saveSenderRole(kIsSender);
             resolve(true);
+        });
+    })
+}
+
+/**
+ * Type -100360 Protocol send signed info that Sender signed in 100351 to OBD.
+ * 
+ * @param nodeID peer id of the obd node where the fundee logged in.
+ * @param userID the user id of the fundee.
+ * @param signedInfo 
+ */
+function sendSignedHex100360(nodeID, userID, signedInfo) {
+    return new Promise((resolve, reject) => {
+        obdApi.sendSignedHex100360(nodeID, userID, signedInfo, function(e) {
+            console.info('sendSignedHex100360 = ' + JSON.stringify(e));
+            resolve(e);
         });
     })
 }
@@ -403,14 +431,71 @@ function commitmentTransactionCreated(myUserID, nodeID, userID, info, isFunder) 
  * @param userID the user id of the fundee.
  * @param info 
  * @param isFunder 
+ * @param tempKey curr_temp_address_private_key
  */
-function commitmentTransactionAccepted(myUserID, nodeID, userID, info, isFunder) {
+function commitmentTransactionAccepted(myUserID, nodeID, userID, info, isFunder, tempKey) {
     return new Promise((resolve, reject) => {
-        obdApi.commitmentTransactionAccepted(nodeID, userID, info, function(e) {
+        obdApi.commitmentTransactionAccepted(nodeID, userID, info, async function(e) {
             console.info('SDK: -100352 commitmentTransactionAccepted = ' + JSON.stringify(e));
-            saveTempPrivKey(myUserID, kTempPrivKey, e.channel_id, info.curr_temp_address_private_key);
+
+            // Receiver sign the tx on client side
+
+            // NO.1 c2a_br_raw_data
+            let c2a_br     = e.c2a_br_raw_data;
+            let inputs     = c2a_br.inputs;
+            let privkey    = await getFundingPrivKey(myUserID, e.channel_id);
+            let c2a_br_hex = signP2SH(true, c2a_br.hex, c2a_br.pub_key_a, 
+                c2a_br.pub_key_b, privkey, inputs);
+
+            // NO.2 c2a_rd_raw_data
+            let c2a_rd     = e.c2a_rd_raw_data;
+            inputs         = c2a_rd.inputs;
+            let c2a_rd_hex = signP2SH(true, c2a_rd.hex, c2a_rd.pub_key_a, 
+                c2a_rd.pub_key_b, privkey, inputs);
+            
+            // NO.3 c2b_counterparty_raw_data
+            let c2b_cr     = e.c2b_counterparty_raw_data;
+            inputs         = c2b_cr.inputs;
+            let c2b_cr_hex = signP2SH(true, c2b_cr.hex, c2b_cr.pub_key_a, 
+                c2b_cr.pub_key_b, privkey, inputs);
+            
+            // NO.4 c2b_rsmc_raw_data
+            let c2b_rr     = e.c2b_rsmc_raw_data;
+            inputs         = c2b_rr.inputs;
+            let c2b_rr_hex = signP2SH(true, c2b_rr.hex, c2b_rr.pub_key_a, 
+                c2b_rr.pub_key_b, privkey, inputs);
+
+            // will send 100361
+            let signedInfo                         = new SignedInfo100361();
+            signedInfo.channel_id                  = e.channel_id;
+            signedInfo.c2b_rsmc_signed_hex         = c2b_rr_hex;
+            signedInfo.c2b_counterparty_signed_hex = c2b_cr_hex;
+            signedInfo.c2a_rd_signed_hex           = c2a_rd_hex;
+            signedInfo.c2a_br_signed_hex           = c2a_br_hex;
+            signedInfo.c2a_br_id                   = c2a_br.br_id;
+
+            await sendSignedHex100361(nodeID, userID, signedInfo);
+
+            // will be moved to
+            saveTempPrivKey(myUserID, kTempPrivKey, e.channel_id, tempKey);
             saveChannelStatus(myUserID, e.channel_id, isFunder, kStatusCommitmentTransactionAccepted);
             resolve(true);
+        });
+    })
+}
+
+/**
+ * Type -100361 Protocol send signed info that Receiver signed in 100352 to OBD.
+ * 
+ * @param nodeID peer id of the obd node where the fundee logged in.
+ * @param userID the user id of the fundee.
+ * @param signedInfo 
+ */
+function sendSignedHex100361(nodeID, userID, signedInfo) {
+    return new Promise((resolve, reject) => {
+        obdApi.sendSignedHex100361(nodeID, userID, signedInfo, function(e) {
+            console.info('sendSignedHex100361 = ' + JSON.stringify(e));
+            resolve(e);
         });
     })
 }

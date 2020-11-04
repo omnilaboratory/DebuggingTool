@@ -78,6 +78,21 @@ class SignedInfo101134 {
   rd_signed_hex: string = "";
 }
 
+class SignedInfo100360 {
+  channel_id: string = "";
+  rsmc_signed_hex: string = "";
+  counterparty_signed_hex: string = "";
+}
+
+class SignedInfo100361 {
+  channel_id: string = "";
+  c2b_rsmc_signed_hex: string = "";
+  c2b_counterparty_signed_hex: string = "";
+  c2a_rd_signed_hex: string = "";
+  c2a_br_signed_hex: string = "";
+  c2a_br_id: number = 0;
+}
+
 class CommitmentTx {
   channel_id: string = "";
   amount: number = 0;
@@ -90,12 +105,12 @@ class CommitmentTx {
 
 class CommitmentTxSigned {
   channel_id: string = "";
+  msg_hash: string = "";
+  c2a_rsmc_signed_hex: string = "";
+  c2a_counterparty_signed_hex: string = "";
   curr_temp_address_pub_key: string = "";
-  curr_temp_address_private_key: string = "";
   curr_temp_address_index: number = 0;
   last_temp_address_private_key: string = "";
-  msg_hash: string = "";
-  channel_address_private_key: string = "";
   approval: boolean = false;
 }
 
@@ -327,6 +342,13 @@ class MessageType {
   MsgType_CommitmentTx_RecvCommitmentTransactionCreated_351  = -110351;
   MsgType_CommitmentTxSigned_SendRevokeAndAcknowledgeCommitmentTransaction_352  = -100352;
   MsgType_CommitmentTxSigned_RecvRevokeAndAcknowledgeCommitmentTransaction_352  = -110352;
+
+  MsgType_ClientSign_BobC2b_Rd_353                                              = -110353;
+	MsgType_ClientSign_CommitmentTx_AliceSignC2a_360                              = -100360;
+	MsgType_ClientSign_CommitmentTx_BobSignC2b_361                                = -100361;
+	MsgType_ClientSign_CommitmentTx_AliceSignC2b_362                              = -100362;
+	MsgType_ClientSign_CommitmentTx_AliceSignC2b_Rd_363                           = -100363;
+  MsgType_ClientSign_CommitmentTx_BobSignC2b_Rd_364                             = -100364;
   
   MsgType_ChannelOpen_AllItem_3150          = -103150;
   MsgType_ChannelOpen_ItemByTempId_3151     = -103151;
