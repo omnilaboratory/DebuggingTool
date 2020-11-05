@@ -93,6 +93,25 @@ class SignedInfo100361 {
   c2a_br_id: number = 0;
 }
 
+class SignedInfo100362 {
+  channel_id: string = "";
+  c2b_rsmc_signed_hex: string = "";
+  c2b_counterparty_signed_hex: string = "";
+  c2a_rd_signed_hex: string = "";
+}
+
+class SignedInfo100363 {
+  channel_id: string = "";
+  c2b_rd_signed_hex: string = "";
+  c2b_br_signed_hex: string = "";
+  c2b_br_id: number = 0;
+}
+
+class SignedInfo100364 {
+  channel_id: string = "";
+  c2b_rd_signed_hex: string = "";
+}
+
 class CommitmentTx {
   channel_id: string = "";
   amount: number = 0;

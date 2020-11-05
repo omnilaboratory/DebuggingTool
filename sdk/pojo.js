@@ -107,6 +107,28 @@ class SignedInfo100361 {
         this.c2a_br_id = 0;
     }
 }
+class SignedInfo100362 {
+    constructor() {
+        this.channel_id = "";
+        this.c2b_rsmc_signed_hex = "";
+        this.c2b_counterparty_signed_hex = "";
+        this.c2a_rd_signed_hex = "";
+    }
+}
+class SignedInfo100363 {
+    constructor() {
+        this.channel_id = "";
+        this.c2b_rd_signed_hex = "";
+        this.c2b_br_signed_hex = "";
+        this.c2b_br_id = 0;
+    }
+}
+class SignedInfo100364 {
+    constructor() {
+        this.channel_id = "";
+        this.c2b_rd_signed_hex = "";
+    }
+}
 class CommitmentTx {
     constructor() {
         this.channel_id = "";

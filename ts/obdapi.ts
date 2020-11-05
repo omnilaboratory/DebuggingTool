@@ -1120,7 +1120,6 @@ class ObdApi {
   }
   public onCommitmentTransactionAccepted(jsonData: any) {}
 
-
   /**
    * MsgType_ClientSign_CommitmentTx_BobSignC2b_361
    * @param recipient_node_peer_id string
@@ -1176,6 +1175,143 @@ class ObdApi {
 
     let msg  = new Message();
     msg.type = this.messageType.MsgType_ClientSign_CommitmentTx_BobSignC2b_361;
+    msg.data = info;
+    this.sendData(msg, callback);
+  }
+
+  /**
+   * MsgType_ClientSign_CommitmentTx_AliceSignC2b_362
+   * @param recipient_node_peer_id string
+   * @param recipient_user_peer_id string
+   * @param info      SignedInfo100362
+   * @param callback  Function
+   */
+  public sendSignedHex100362(
+    recipient_node_peer_id: string,
+    recipient_user_peer_id: string,
+    info: SignedInfo100362,
+    callback: Function ) {
+      
+    if (this.isNotString(recipient_node_peer_id)) {
+      alert("error recipient_node_peer_id");
+      return;
+    }
+
+    if (this.isNotString(recipient_user_peer_id)) {
+      alert("error recipient_user_peer_id");
+      return;
+    }
+
+    if (this.isNotString(info.channel_id)) {
+      alert("empty channel_id");
+      return;
+    }
+      
+    if (this.isNotString(info.c2b_rsmc_signed_hex)) {
+      alert("empty c2b_rsmc_signed_hex");
+      return;
+    }
+      
+    if (this.isNotString(info.c2b_counterparty_signed_hex)) {
+      alert("empty c2b_counterparty_signed_hex");
+      return;
+    }
+      
+    if (this.isNotString(info.c2a_rd_signed_hex)) {
+      alert("empty c2a_rd_signed_hex");
+      return;
+    }
+      
+    let msg  = new Message();
+    msg.type = this.messageType.MsgType_ClientSign_CommitmentTx_AliceSignC2b_362;
+    msg.data = info;
+    this.sendData(msg, callback);
+  }
+
+  /**
+   * MsgType_ClientSign_CommitmentTx_AliceSignC2b_Rd_363
+   * @param recipient_node_peer_id string
+   * @param recipient_user_peer_id string
+   * @param info      SignedInfo100363
+   * @param callback  Function
+   */
+  public sendSignedHex100363(
+    recipient_node_peer_id: string,
+    recipient_user_peer_id: string,
+    info: SignedInfo100363,
+    callback: Function ) {
+      
+    if (this.isNotString(recipient_node_peer_id)) {
+      alert("error recipient_node_peer_id");
+      return;
+    }
+
+    if (this.isNotString(recipient_user_peer_id)) {
+      alert("error recipient_user_peer_id");
+      return;
+    }
+
+    if (this.isNotString(info.channel_id)) {
+      alert("empty channel_id");
+      return;
+    }
+
+    if (this.isNotString(info.c2b_rd_signed_hex)) {
+      alert("empty c2b_rd_signed_hex");
+      return;
+    }
+
+    if (this.isNotString(info.c2b_br_signed_hex)) {
+      alert("empty c2b_br_signed_hex");
+      return;
+    }
+    
+    if (info.c2b_br_id == null || info.c2b_br_id <= 0) {
+      alert("wrong c2b_br_id");
+      return;
+    }
+
+    let msg  = new Message();
+    msg.type = this.messageType.MsgType_ClientSign_CommitmentTx_AliceSignC2b_Rd_363;
+    msg.data = info;
+    this.sendData(msg, callback);
+  }
+
+  /**
+   * MsgType_ClientSign_CommitmentTx_BobSignC2b_Rd_364
+   * @param recipient_node_peer_id string
+   * @param recipient_user_peer_id string
+   * @param info      SignedInfo100364
+   * @param callback  Function
+   */
+  public sendSignedHex100364(
+    recipient_node_peer_id: string,
+    recipient_user_peer_id: string,
+    info: SignedInfo100364,
+    callback: Function ) {
+      
+    if (this.isNotString(recipient_node_peer_id)) {
+      alert("error recipient_node_peer_id");
+      return;
+    }
+
+    if (this.isNotString(recipient_user_peer_id)) {
+      alert("error recipient_user_peer_id");
+      return;
+    }
+
+    if (this.isNotString(info.channel_id)) {
+      alert("empty channel_id");
+      return;
+    }
+
+    if (this.isNotString(info.c2b_rd_signed_hex)) {
+      alert("empty c2b_rd_signed_hex");
+      return;
+    }
+
+    let msg  = new Message();
+    msg.type = this.messageType.MsgType_ClientSign_CommitmentTx_BobSignC2b_Rd_364;
     msg.data = info;
     this.sendData(msg, callback);
   }

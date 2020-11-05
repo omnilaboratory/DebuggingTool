@@ -625,11 +625,13 @@ async function listening110351(e, netType) {
     let info                           = new CommitmentTxSigned();
     info.channel_id                    = e.channel_id;
     info.msg_hash                      = e.msg_hash;
+    info.c2a_rsmc_signed_hex           = rr_hex;
+    info.c2a_counterparty_signed_hex   = cr_hex;
     info.curr_temp_address_pub_key     = addr.result.pubkey;
-    info.curr_temp_address_private_key = addr.result.wif;
-    info.approval                      = true;
     info.last_temp_address_private_key = getTempPrivKey(myUserID, kTempPrivKey, e.channel_id);
-    info.channel_address_private_key   = await getFundingPrivKey(myUserID, e.channel_id);
+    info.approval                      = true;
+    // info.curr_temp_address_private_key = addr.result.wif;
+    // info.channel_address_private_key   = await getFundingPrivKey(myUserID, e.channel_id);
 
     // Save address index to OBD and can get private key back if lose it.
     info.curr_temp_address_index = Number(getIndexFromPubKey(addr.result.pubkey));
@@ -648,8 +650,37 @@ async function listening110351(e, netType) {
  * @param e 
  */
 async function listening110352(e) {
-    let isFunder = await getIsFunder(e.to_peer_id, e.channel_id);
-    saveChannelStatus(e.to_peer_id, e.channel_id, isFunder, kStatusCommitmentTransactionAccepted);
+    let myUserID = e.to_peer_id;
+    let isFunder = await getIsFunder(myUserID, e.channel_id);
+    saveChannelStatus(myUserID, e.channel_id, isFunder, kStatusCommitmentTransactionAccepted);
+
+
+    // Receiver sign the tx on client side
+    // NO.1 c2a_rd_partial_data
+    let rd      = e.c2a_rd_partial_data;
+    let inputs  = rd.inputs;
+    let tempKey = getTempPrivKey(myUserID, kTempPrivKey, e.channel_id);
+    let rd_hex  = signP2SH(false, rd.hex, rd.pub_key_a, rd.pub_key_b, tempKey, inputs);
+
+    // NO.2 c2b_counterparty_partial_data
+    let cp      = e.c2b_counterparty_partial_data;
+    inputs      = cp.inputs;
+    let privkey = await getFundingPrivKey(myUserID, e.channel_id);
+    let cp_hex  = signP2SH(false, cp.hex, cp.pub_key_a, cp.pub_key_b, privkey, inputs);
+
+    // NO.3 c2b_rsmc_partial_data
+    let rp     = e.c2b_rsmc_partial_data;
+    inputs     = rp.inputs;
+    let rp_hex = signP2SH(false, rp.hex, rp.pub_key_a, rp.pub_key_b, privkey, inputs);
+
+    // will send 100362
+    let signedInfo                         = new SignedInfo100362();
+    signedInfo.channel_id                  = e.channel_id;
+    signedInfo.c2b_rsmc_signed_hex         = rp_hex;
+    signedInfo.c2b_counterparty_signed_hex = cp_hex;
+    signedInfo.c2a_rd_signed_hex           = rd_hex;
+
+    await sendSignedHex100362(myUserID, nodeID, userID, signedInfo);
 }
 
 /**
@@ -658,4 +689,16 @@ async function listening110352(e) {
  */
 async function listening110353(e) {
 
+    // Receiver sign the tx on client side
+    let rd      = e.c2b_rd_partial_data;
+    let inputs  = rd.inputs;
+    let tempKey = getTempPrivKey(e.to_peer_id, kTempPrivKey, e.channel_id);
+    let rd_hex  = signP2SH(false, rd.hex, rd.pub_key_a, rd.pub_key_b, tempKey, inputs);
+
+    // will send 100364
+    let signedInfo               = new SignedInfo100364();
+    signedInfo.channel_id        = e.channel_id;
+    signedInfo.c2b_rd_signed_hex = rd_hex;
+
+    await sendSignedHex100364(nodeID, userID, signedInfo);
 }

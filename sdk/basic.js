@@ -501,6 +501,76 @@ function sendSignedHex100361(nodeID, userID, signedInfo) {
 }
 
 /**
+ * Type -100362 Protocol send signed info that Receiver signed in 110352 to OBD.
+ * 
+ * @param myUserID The user id of logged in
+ * @param nodeID peer id of the obd node where the fundee logged in.
+ * @param userID the user id of the fundee.
+ * @param signedInfo 
+ */
+function sendSignedHex100362(myUserID, nodeID, userID, signedInfo) {
+    return new Promise((resolve, reject) => {
+        obdApi.sendSignedHex100362(nodeID, userID, signedInfo, async function(e) {
+            console.info('sendSignedHex100362 = ' + JSON.stringify(e));
+
+            // Receiver sign the tx on client side
+            // NO.1 c2b_br_raw_data
+            let br      = e.c2b_br_raw_data;
+            let inputs  = br.inputs;
+            let privkey = await getFundingPrivKey(myUserID, e.channel_id);
+            let br_hex  = signP2SH(true, br.hex, br.pub_key_a, br.pub_key_b, privkey, inputs);
+
+            // NO.2 c2b_rd_raw_data
+            let rd      = e.c2b_rd_raw_data;
+            inputs      = rd.inputs;
+            let rd_hex  = signP2SH(true, rd.hex, rd.pub_key_a, rd.pub_key_b, privkey, inputs);
+
+            // will send 100363
+            let signedInfo               = new SignedInfo100363();
+            signedInfo.channel_id        = e.channel_id;
+            signedInfo.c2b_rd_signed_hex = rp_hex;
+            signedInfo.c2b_br_signed_hex = rd_hex;
+            signedInfo.c2b_br_id         = br.br_id;
+
+            await sendSignedHex100363(nodeID, userID, signedInfo);
+            resolve(e);
+        });
+    })
+}
+
+/**
+ * Type -100363 Protocol send signed info that Receiver signed in 100362 to OBD.
+ * 
+ * @param nodeID peer id of the obd node where the fundee logged in.
+ * @param userID the user id of the fundee.
+ * @param signedInfo 
+ */
+function sendSignedHex100363(nodeID, userID, signedInfo) {
+    return new Promise((resolve, reject) => {
+        obdApi.sendSignedHex100363(nodeID, userID, signedInfo, function(e) {
+            console.info('sendSignedHex100363 = ' + JSON.stringify(e));
+            resolve(e);
+        });
+    })
+}
+
+/**
+ * Type -100364 Protocol send signed info that Receiver signed in 110353 to OBD.
+ * 
+ * @param nodeID peer id of the obd node where the fundee logged in.
+ * @param userID the user id of the fundee.
+ * @param signedInfo 
+ */
+function sendSignedHex100364(nodeID, userID, signedInfo) {
+    return new Promise((resolve, reject) => {
+        obdApi.sendSignedHex100364(nodeID, userID, signedInfo, function(e) {
+            console.info('sendSignedHex100364 = ' + JSON.stringify(e));
+            resolve(e);
+        });
+    })
+}
+
+/**
  * Type -100038 Protocol is used to close a channel. 
  * 
  * @param myUserID The user id of logged in

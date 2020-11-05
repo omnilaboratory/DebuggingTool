@@ -4539,6 +4539,12 @@ function registerEvent(netType) {
         listening110352(e);
         listening110352ForGUITool(e);
     });
+
+    // auto response mode
+    let msg_110353 = enumMsgType.MsgType_ClientSign_BobC2b_Rd_353;
+    obdApi.registerEvent(msg_110353, function(e) {
+        listening110353(e);
+    });
     
     // auto response mode
     let msg_110040 = enumMsgType.MsgType_HTLC_RecvAddHTLC_40;
