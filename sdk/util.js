@@ -1406,7 +1406,7 @@ function signP2SH(is_first_sign, txhex, pubkey_1, pubkey_2, privkey, inputs) {
     const key     = btctool.bitcoin.ECPair.fromWIF(privkey, network);
 
     // Sign all inputs
-    console.info('inputs = ' + JSON.stringify(inputs));
+    // console.info('inputs = ' + JSON.stringify(inputs));
     for (let i = 0; i < inputs.length; i++) {
         txb.sign(i, key, p2sh.redeem.output, undefined, 
             inputs[i].amount * 100000000, undefined);

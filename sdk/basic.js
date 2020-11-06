@@ -476,7 +476,7 @@ function commitmentTransactionAccepted(myUserID, nodeID, userID, info, isFunder,
 
             await sendSignedHex100361(nodeID, userID, signedInfo);
 
-            // will be moved to
+            // 
             saveTempPrivKey(myUserID, kTempPrivKey, e.channel_id, tempKey);
             saveChannelStatus(myUserID, e.channel_id, isFunder, kStatusCommitmentTransactionAccepted);
             resolve(true);
@@ -556,14 +556,11 @@ function sendSignedHex100363(nodeID, userID, signedInfo) {
 
 /**
  * Type -100364 Protocol send signed info that Receiver signed in 110353 to OBD.
- * 
- * @param nodeID peer id of the obd node where the fundee logged in.
- * @param userID the user id of the fundee.
  * @param signedInfo 
  */
-function sendSignedHex100364(nodeID, userID, signedInfo) {
+function sendSignedHex100364(signedInfo) {
     return new Promise((resolve, reject) => {
-        obdApi.sendSignedHex100364(nodeID, userID, signedInfo, function(e) {
+        obdApi.sendSignedHex100364(signedInfo, function(e) {
             console.info('sendSignedHex100364 = ' + JSON.stringify(e));
             resolve(e);
         });

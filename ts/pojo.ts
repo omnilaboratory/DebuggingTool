@@ -116,10 +116,10 @@ class CommitmentTx {
   channel_id: string = "";
   amount: number = 0;
   curr_temp_address_pub_key: string = "";
-  curr_temp_address_private_key: string = "";
   curr_temp_address_index: number = 0;
-  channel_address_private_key: string = "";
   last_temp_address_private_key: string = "";
+  // channel_address_private_key: string = "";
+  // curr_temp_address_private_key: string = "";
 }
 
 class CommitmentTxSigned {

@@ -588,19 +588,15 @@ async function listening110350(e) {
 async function listening110351(e, netType) {
 
     let isAutoMode = getAutoPilot();
+    let myUserID   = e.to_peer_id;
+    let channel_id = e.channel_id;
     console.info('SDK: NOW isAutoMode = ' + isAutoMode);
-
-    let myUserID = e.to_peer_id;
-    let isFunder = await getIsFunder(myUserID, e.channel_id);
-    saveChannelStatus(myUserID, e.channel_id, isFunder, kStatusCommitmentTransactionCreated);
-    saveTempData(myUserID, e.channel_id, e.msg_hash);
-    saveSenderRole(kIsReceiver);
 
     // Receiver sign the tx on client side
     // NO.1 counterparty_raw_data
     let cr      = e.counterparty_raw_data;
     let inputs  = cr.inputs;
-    let privkey = await getFundingPrivKey(myUserID, e.channel_id);
+    let privkey = await getFundingPrivKey(myUserID, channel_id);
     let cr_hex  = signP2SH(false, cr.hex, cr.pub_key_a, cr.pub_key_b, privkey, inputs);
     saveSignedHexCR110351(myUserID, channel_id, cr_hex);
 
@@ -609,6 +605,12 @@ async function listening110351(e, netType) {
     inputs     = rr.inputs;
     let rr_hex = signP2SH(false, rr.hex, rr.pub_key_a, rr.pub_key_b, privkey, inputs);
     saveSignedHexRR110351(myUserID, channel_id, rr_hex);
+
+    // save some data
+    let isFunder = await getIsFunder(myUserID, channel_id);
+    saveChannelStatus(myUserID, channel_id, isFunder, kStatusCommitmentTransactionCreated);
+    saveTempData(myUserID, channel_id, e.msg_hash);
+    saveSenderRole(kIsReceiver);
 
     // auto mode is closed
     if (isAutoMode != 'Yes') return;
@@ -700,5 +702,5 @@ async function listening110353(e) {
     signedInfo.channel_id        = e.channel_id;
     signedInfo.c2b_rd_signed_hex = rd_hex;
 
-    await sendSignedHex100364(nodeID, userID, signedInfo);
+    await sendSignedHex100364(signedInfo);
 }

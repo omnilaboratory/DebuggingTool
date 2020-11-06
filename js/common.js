@@ -582,7 +582,6 @@ async function sdkBitcoinFundingCreated() {
     displaySentMessage100340(nodeID, userID, info);
     
     let signed_hex = await bitcoinFundingCreated($("#logined").text(), nodeID, userID, info);
-    // console.info('alice signed_hex => ' + signed_hex);
     if (signed_hex != true) {
         await sendSignedHex100341(nodeID, userID, signed_hex);
     }
@@ -1584,7 +1583,7 @@ async function fillHTLCPathData(myUserID, channel_id) {
  */
 async function fillChannelIDAndFundingPrivKey(myUserID, channel_id) {
     let fundingPrivKey = await getFundingPrivKey(myUserID, channel_id);
-    // $("#channel_address_private_key").val(fundingPrivKey);
+    $("#channel_address_private_key").val(fundingPrivKey);
     $("#channel_id").val(channel_id);
 }
 
@@ -1667,7 +1666,9 @@ async function fillFundingBtcData(myUserID, channel_id, status) {
     let result = await getFundingBtcData(myUserID, channel_id);
     $("#from_address").val(result.from_address);
     $("#from_address_private_key").val(result.from_address_private_key);
-    $("#amount").val(result.amount);
+    // auto fill amount
+    autoCalcAmount();
+    // $("#amount").val(result.amount);
     $("#miner_fee").val(result.miner_fee);
     
     if (status != kStatusAcceptChannel) {
@@ -1743,8 +1744,8 @@ async function changeInvokeAPIEnable(status, isFunder, myUserID, channel_id) {
             } else if (status != kStatusAcceptChannel && 
                        status != kStatusFirstBitcoinFundingSigned &&
                        status != kStatusSecondBitcoinFundingSigned   ) {
-                disableInvokeAPI();
-                break;
+                // disableInvokeAPI();
+                // break;
             }
 
             if (isFunder === false) { // Is Bob
@@ -1896,6 +1897,10 @@ async function changeInvokeAPIEnable(status, isFunder, myUserID, channel_id) {
             fillCurrTempAddrKey();
             data = await getTempData(myUserID, channel_id);
             $("#msg_hash").val(data);
+            data = await getSignedHexRR110351(myUserID, channel_id);
+            $("#c2a_rsmc_signed_hex").val(data);
+            data = await getSignedHexCR110351(myUserID, channel_id);
+            $("#c2a_counterparty_signed_hex").val(data);
             break;
 
         case 'addInvoice':

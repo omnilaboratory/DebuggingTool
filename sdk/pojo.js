@@ -134,10 +134,10 @@ class CommitmentTx {
         this.channel_id = "";
         this.amount = 0;
         this.curr_temp_address_pub_key = "";
-        this.curr_temp_address_private_key = "";
         this.curr_temp_address_index = 0;
-        this.channel_address_private_key = "";
         this.last_temp_address_private_key = "";
+        // channel_address_private_key: string = "";
+        // curr_temp_address_private_key: string = "";
     }
 }
 class CommitmentTxSigned {
