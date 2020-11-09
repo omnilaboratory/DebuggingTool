@@ -528,8 +528,8 @@ function sendSignedHex100362(myUserID, nodeID, userID, signedInfo) {
             // will send 100363
             let signedInfo               = new SignedInfo100363();
             signedInfo.channel_id        = e.channel_id;
-            signedInfo.c2b_rd_signed_hex = rp_hex;
-            signedInfo.c2b_br_signed_hex = rd_hex;
+            signedInfo.c2b_rd_signed_hex = rd_hex;
+            signedInfo.c2b_br_signed_hex = br_hex;
             signedInfo.c2b_br_id         = br.br_id;
 
             await sendSignedHex100363(nodeID, userID, signedInfo);
