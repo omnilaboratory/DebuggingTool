@@ -44,11 +44,13 @@ async function listening110032(e, netType) {
     // Save address index to OBD and can get private key back if lose it.
     info.fundee_address_index = Number(getIndexFromPubKey(info.funding_pubkey));
 
-    // SDK API send -100033 acceptChannel
+    // FUNCTION ONLY FOR GUI TOOL
+    displaySentMessage100033(nodeID, userID, info);
+
+    // SDK API
     await acceptChannel(myUserID, nodeID, userID, info);
 
-    // NOT SDK API. This a client function, just for Debugging Tool.
-    displaySentMessage100033(nodeID, userID, info);
+    // FUNCTION ONLY FOR GUI TOOL
     afterAcceptChannel();
     displayMyChannelListAtTopRight(kPageSize, kPageIndex);
 }
@@ -74,17 +76,18 @@ async function listening110034(e) {
 
     let myUserID   = e.to_peer_id;
     let channel_id = e.temporary_channel_id;
-    saveChannelStatus(myUserID, channel_id, false, kStatusAssetFundingCreated);
-
+    
     // Bob sign the tx on client
-    let privkey = await getFundingPrivKey(myUserID, channel_id);
-    let data    = e.sign_data;
-    let inputs  = data.inputs;
-    // console.info('e.sign_data = ' + JSON.stringify(e.sign_data));
+    let privkey    = await getFundingPrivKey(myUserID, channel_id);
+    let data       = e.sign_data;
+    let inputs     = data.inputs;
     let signed_hex = signP2SH(false, data.hex, data.pub_key_a, 
         data.pub_key_b, privkey, inputs);
+        
     saveSignedHex(myUserID, channel_id, signed_hex);
-
+    
+    // save some data
+    saveChannelStatus(myUserID, channel_id, false, kStatusAssetFundingCreated);
 
     // auto mode is closed
     if (isAutoMode != 'Yes') return;
@@ -98,14 +101,12 @@ async function listening110034(e) {
     let info                   = new AssetFundingSignedInfo();
     info.temporary_channel_id  = channel_id;
     info.signed_alice_rsmc_hex = signed_hex;
-
+    
+    // FUNCTION ONLY FOR GUI TOOL
+    displaySentMessage100035(nodeID, userID, info, privkey);
+    
     // SDK API
-    let resp = await assetFundingSigned(myUserID, nodeID, userID, info);
-
-    // NOT SDK API. This a client function, just for Debugging Tool.
-    displaySentMessage100035(nodeID, userID, info);
-    afterAssetFundingSigned(resp);
-    displayMyChannelListAtTopRight(kPageSize, kPageIndex);
+    await assetFundingSigned(myUserID, nodeID, userID, info);
 }
 
 /**
@@ -142,7 +143,6 @@ async function listening110035(e) {
     saveCounterparty(myUserID, channel_id, result.toNodeID, result.toUserID);
     delCounterparty(myUserID, tempCID);
 
-
     // Alice sign the tx on client
     let signed_hex = signP2SH(false, e.hex, e.pub_key_a, e.pub_key_b, 
         tempPrivKey, e.inputs);
@@ -151,6 +151,11 @@ async function listening110035(e) {
     let info           = new SignedInfo101134();
     info.channel_id    = channel_id;
     info.rd_signed_hex = signed_hex;
+
+    // FUNCTION ONLY FOR GUI TOOL
+    displaySentMessage101134(info);
+
+    // SDK API
     await sendSignedHex101134(info);
 }
 
@@ -506,6 +511,16 @@ async function listening110340(e) {
 
     let myUserID   = e.to_peer_id;
     let channel_id = e.temporary_channel_id;
+
+    // Bob sign the tx on client
+    let privkey = await getFundingPrivKey(myUserID, channel_id);
+    let data    = e.sign_data;
+    let inputs  = data.inputs;
+    let signed_hex = signP2SH(false, data.hex, data.pub_key_a, 
+        data.pub_key_b, privkey, inputs);
+    saveSignedHex(myUserID, channel_id, signed_hex);
+
+    // save some data
     let status     = await getChannelStatus(channel_id, false);
     console.info('listening110340 status = ' + status);
     switch (Number(status)) {
@@ -522,35 +537,28 @@ async function listening110340(e) {
             
     saveTempData(myUserID, channel_id, e.funding_txid);
 
-    // Bob sign the tx on client
-    let privkey = await getFundingPrivKey(myUserID, channel_id);
-    let data    = e.sign_data;
-    let inputs  = data.inputs;
-    let signed_hex = signP2SH(false, data.hex, data.pub_key_a, 
-        data.pub_key_b, privkey, inputs);
-    saveSignedHex(myUserID, channel_id, signed_hex);
-
-
     // auto mode is closed
     if (isAutoMode != 'Yes') return;
 
     console.info('listening110340 = ' + JSON.stringify(e));
 
-    let nodeID   = e.funder_node_address;
-    let userID   = e.funder_peer_id;
+    let nodeID = e.funder_node_address;
+    let userID = e.funder_peer_id;
 
     // will send -100350 bitcoinFundingSigned
-    let info                          = new FundingBtcSigned();
-    info.temporary_channel_id         = channel_id;
-    info.funding_txid                 = e.funding_txid;
-    info.approval                     = true;
+    let info                                 = new FundingBtcSigned();
+    info.temporary_channel_id                = channel_id;
+    info.funding_txid                        = e.funding_txid;
     info.signed_miner_redeem_transaction_hex = signed_hex;
+    info.approval                            = true;
 
+    // FUNCTION ONLY FOR GUI TOOL
+    displaySentMessage100350(nodeID, userID, info, privkey);
+    
     // SDK API
     await bitcoinFundingSigned(myUserID, nodeID, userID, info);
 
-    // NOT SDK API. This a client function, just for Debugging Tool.
-    displaySentMessage100350(nodeID, userID, info);
+    // FUNCTION ONLY FOR GUI TOOL
     afterBitcoinFundingSigned(channel_id);
 }
 
@@ -615,6 +623,8 @@ async function listening110351(e, netType) {
     // auto mode is closed
     if (isAutoMode != 'Yes') return;
 
+    //------------------------
+    // auto mode is opening
     console.info('listening110351 = ' + JSON.stringify(e));
 
     let nodeID   = e.payer_node_address;
@@ -633,19 +643,12 @@ async function listening110351(e, netType) {
     info.curr_temp_address_pub_key     = addr.result.pubkey;
     info.last_temp_address_private_key = getTempPrivKey(myUserID, kTempPrivKey, e.channel_id);
     info.approval                      = true;
-    // info.curr_temp_address_private_key = addr.result.wif;
-    // info.channel_address_private_key   = await getFundingPrivKey(myUserID, e.channel_id);
-
     // Save address index to OBD and can get private key back if lose it.
     info.curr_temp_address_index = Number(getIndexFromPubKey(addr.result.pubkey));
-
-    // SDK API
     await commitmentTransactionAccepted(myUserID, nodeID, userID, info, isFunder, tempKey);
 
-    // NOT SDK API. This a client function, just for Debugging Tool.
+    // FUNCTION ONLY FOR GUI TOOL
     displaySentMessage100352(nodeID, userID, info);
-    afterCommitmentTransactionAccepted();
-    displayMyChannelListAtTopRight(kPageSize, kPageIndex);
 }
 
 /**
