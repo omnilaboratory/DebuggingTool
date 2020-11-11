@@ -127,7 +127,6 @@ function bitcoinFundingCreated(myUserID, nodeID, userID, info) {
                 let privkey    = await getFundingPrivKey(myUserID, channel_id);
                 let signed_hex = signP2SH(true, e.hex, e.pub_key_a, 
                     e.pub_key_b, privkey, e.inputs);
-                // resolve(signed_hex);
 
                 // FUNCTION ONLY FOR GUI TOOL
                 displaySentMessage100341(nodeID, userID, signed_hex);

@@ -39,6 +39,43 @@ function addHTLC(myUserID, nodeID, userID, info, isFunder) {
     return new Promise((resolve, reject) => {
         obdApi.addHTLC(nodeID, userID, info, function(e) {
             console.info('SDK: -100040 addHTLC = ' + JSON.stringify(e));
+
+            // FUNCTION ONLY FOR GUI TOOL
+            // disableInvokeAPI();
+            // afterCommitmentTransactionCreated();
+
+            // Sender sign the tx on client side
+            // NO.1 counterparty_raw_data
+            let cr      = e.counterparty_raw_data;
+            let inputs  = cr.inputs;
+            let privkey = await getFundingPrivKey(myUserID, e.channel_id);
+            let cr_hex  = signP2SH(true, cr.hex, cr.pub_key_a, cr.pub_key_b, 
+                privkey, inputs);
+
+            // NO.2 rsmc_raw_data
+            let rr     = e.rsmc_raw_data;
+            inputs     = rr.inputs;
+            let rr_hex = signP2SH(true, rr.hex, rr.pub_key_a, rr.pub_key_b, 
+                privkey, inputs);
+
+            // NO.3 rsmc_raw_data
+            let rr     = e.rsmc_raw_data;
+            inputs     = rr.inputs;
+            let rr_hex = signP2SH(true, rr.hex, rr.pub_key_a, rr.pub_key_b, 
+                privkey, inputs);
+
+            // will send 100100
+            let signedInfo                     = new SignedInfo100100();
+            signedInfo.channel_id              = e.channel_id;
+            signedInfo.counterparty_signed_hex = cr_hex;
+            signedInfo.rsmc_signed_hex         = rr_hex;
+
+            // FUNCTION ONLY FOR GUI TOOL
+            displaySentMessage100100(nodeID, userID, signedInfo);
+
+            // SDK API
+            await sendSignedHex100100(nodeID, userID, signedInfo);
+
             // save 3 privkeys
             saveTempPrivKey(myUserID, kRsmcTempPrivKey, e.channel_id, 
                 info.curr_rsmc_temp_address_private_key);

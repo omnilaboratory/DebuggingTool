@@ -769,103 +769,59 @@
                 },
                 {
                     "name": "channel_address_private_key",
-                    "help": "This is the private key used by Alice to create the channel. It will be used to sign C2a and BR2a transaction in below picture as Alice Sig.",
+                    "help": "Client use the private key to sign C2a and BR2a transaction in below picture as Alice Sig.",
                     "imgPath": "doc/tooltip/HTLC-1.png",
-                    "buttons": [
-                        {
-                            "innerText": "Display",
-                            "onclick": "displayUserDataInNewHtml('MyAddresses')"
-                        }
-                    ]
+                    "disable": "yes",
+                    "buttons": []
                 },
                 {
                     "name": "curr_rsmc_temp_address_pub_key",
                     "help": "This public key of an address (Alice's address in output 0 of C2a in below picture) will be used to create a temp 2-2 multi-sig address as output 0 of newer Cx transaction like C2a in below picture.",
                     "imgPath": "doc/tooltip/HTLC-1.png",
-                    "buttons": [
-                        {
-                            "innerText": "Select",
-                            "onclick": "displayUserDataInNewHtml('MyAddresses')"
-                        },
-                        {
-                            "innerText": "Create",
-                            "onclick": "autoCreateAddress(-401)"
-                        }
-                    ]
+                    "disable": "yes",
+                    "buttons": []
                 },
                 {
                     "name": "curr_rsmc_temp_address_private_key",
                     "help": "This private key of an address (Alice's) will be used to sign RD2a and BR2a transaction in below picture.",
                     "imgPath": "doc/tooltip/HTLC-1.png",
-                    "buttons": [
-                        {
-                            "innerText": "Select",
-                            "onclick": "displayUserDataInNewHtml('MyAddresses')"
-                        }
-                    ]
+                    "disable": "yes",
+                    "buttons": []
                 },
                 {
                     "name": "curr_htlc_temp_address_pub_key",
                     "help": "This public key of an address (Alice's address in output 2 of C2a in below picture) will be used to create a temp 2-2 multi-sig address as output 2 of newer Cx transaction like C2a in below picture.",
                     "imgPath": "doc/tooltip/HTLC-2.png",
-                    "buttons": [
-                        {
-                            "innerText": "Select",
-                            "onclick": "displayUserDataInNewHtml('MyAddresses')"
-                        },
-                        {
-                            "innerText": "Create",
-                            "onclick": "autoCreateAddress(-402)"
-                        }
-                    ]
+                    "disable": "yes",
+                    "buttons": []
                 },
                 {
                     "name": "curr_htlc_temp_address_private_key",
                     "help": "This private key of an address (Alice's) will be used to sign HED1a transaction in below picture.",
                     "imgPath": "doc/tooltip/HTLC-2.png",
-                    "buttons": [
-                        {
-                            "innerText": "Select",
-                            "onclick": "displayUserDataInNewHtml('MyAddresses')"
-                        }
-                    ]
+                    "disable": "yes",
+                    "buttons": []
                 },
                 {
                     "name": "curr_htlc_temp_address_for_ht1a_pub_key",
                     "help": "This public key of an address (Alice's address in output 2 of C2a in below picture) will be used to create a temp 2-2 multi-sig address as output 2 of newer Cx transaction like C2a in below picture.",
                     "imgPath": "doc/tooltip/HTLC-2.png",
-                    "buttons": [
-                        {
-                            "innerText": "Select",
-                            "onclick": "displayUserDataInNewHtml('MyAddresses')"
-                        },
-                        {
-                            "innerText": "Create",
-                            "onclick": "autoCreateAddress(-403)"
-                        }
-                    ]
+                    "disable": "yes",
+                    "buttons": []
                 },
                 {
                     "name": "curr_htlc_temp_address_for_ht1a_private_key",
                     "help": "This private key of an address (Alice's) will be used to sign HT1a transaction in below picture.",
                     "imgPath": "doc/tooltip/HTLC-2.png",
-                    "buttons": [
-                        {
-                            "innerText": "Select",
-                            "onclick": "displayUserDataInNewHtml('MyAddresses')"
-                        }
-                    ]
+                    "disable": "yes",
+                    "buttons": []
                 },
                 {
                     "name": "last_temp_address_private_key",
                     "help": "This is the private key used in last transaction by Alice. It will be used to sign ?  transaction in below picture as Alice Sig.",
                     "imgPath": "doc/tooltip/HTLC-2.png",
-                    "buttons": [
-                        {
-                            "innerText": "Display",
-                            "onclick": "displayUserDataInNewHtml('MyAddresses')"
-                        }
-                    ]
+                    "disable": "yes",
+                    "buttons": []
                 }
             ]
         },

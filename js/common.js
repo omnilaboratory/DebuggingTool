@@ -580,12 +580,6 @@ async function sdkBitcoinFundingCreated() {
 
     displaySentMessage100340(nodeID, userID, info);
     await bitcoinFundingCreated($("#logined").text(), nodeID, userID, info);
-    // let signed_hex = await bitcoinFundingCreated($("#logined").text(), nodeID, userID, info);
-    // if (signed_hex != true) {
-    //     displaySentMessage100341(nodeID, userID, signed_hex);
-    //     await sendSignedHex100341(nodeID, userID, signed_hex);
-    // }
-
     afterBitcoinFundingCreated();
 }
 
@@ -806,7 +800,7 @@ function makeQRCode(e) {
     qrcode.makeCode(strInvoice);
 }
 
-// -100040 Old name addHTLC API at local.
+// -100040 addHTLC API at local.
 async function sdkAddHTLC() {
 
     let nodeID  = $("#recipient_node_peer_id").val();
@@ -820,14 +814,15 @@ async function sdkAddHTLC() {
     info.h                                           = $("#h").val();
     info.routing_packet                              = $("#routing_packet").val();
     info.cltv_expiry                                 = Number($("#cltv_expiry").val());
-    info.channel_address_private_key                 = $("#channel_address_private_key").val();
-    info.last_temp_address_private_key               = $("#last_temp_address_private_key").val();
     info.curr_rsmc_temp_address_pub_key              = $("#curr_rsmc_temp_address_pub_key").val();
-    info.curr_rsmc_temp_address_private_key          = $("#curr_rsmc_temp_address_private_key").val();
     info.curr_htlc_temp_address_pub_key              = $("#curr_htlc_temp_address_pub_key").val();
-    info.curr_htlc_temp_address_private_key          = $("#curr_htlc_temp_address_private_key").val();
     info.curr_htlc_temp_address_for_ht1a_pub_key     = $("#curr_htlc_temp_address_for_ht1a_pub_key").val();
-    info.curr_htlc_temp_address_for_ht1a_private_key = $("#curr_htlc_temp_address_for_ht1a_private_key").val();
+    info.last_temp_address_private_key               = $("#last_temp_address_private_key").val();
+    
+    // info.channel_address_private_key                 = $("#channel_address_private_key").val();
+    // info.curr_rsmc_temp_address_private_key          = $("#curr_rsmc_temp_address_private_key").val();
+    // info.curr_htlc_temp_address_private_key          = $("#curr_htlc_temp_address_private_key").val();
+    // info.curr_htlc_temp_address_for_ht1a_private_key = $("#curr_htlc_temp_address_for_ht1a_private_key").val();
 
     // Save address index to OBD and can get private key back if lose it.
     info.curr_rsmc_temp_address_index          = Number(getIndexFromPubKey(info.curr_rsmc_temp_address_pub_key));
@@ -4229,14 +4224,14 @@ function displaySentMessage100040(nodeID, userID, info) {
             memo: info.memo,
             h: info.h,
             routing_packet: info.routing_packet,
-            channel_address_private_key: info.channel_address_private_key,
-            last_temp_address_private_key: info.last_temp_address_private_key,
+            channel_address_private_key: $("#channel_address_private_key").val(),
             curr_rsmc_temp_address_pub_key: info.curr_rsmc_temp_address_pub_key,
-            curr_rsmc_temp_address_private_key: info.curr_rsmc_temp_address_private_key,
+            curr_rsmc_temp_address_private_key: $("#curr_rsmc_temp_address_private_key").val(),
             curr_htlc_temp_address_pub_key: info.curr_htlc_temp_address_pub_key,
-            curr_htlc_temp_address_private_key: info.curr_htlc_temp_address_private_key,
+            curr_htlc_temp_address_private_key: $("#curr_htlc_temp_address_private_key").val(),
             curr_htlc_temp_address_for_ht1a_pub_key: info.curr_htlc_temp_address_for_ht1a_pub_key,
-            curr_htlc_temp_address_for_ht1a_private_key: info.curr_htlc_temp_address_for_ht1a_private_key,
+            curr_htlc_temp_address_for_ht1a_private_key: $("#curr_htlc_temp_address_for_ht1a_private_key").val(),
+            last_temp_address_private_key: info.last_temp_address_private_key,
         }
     }
 
