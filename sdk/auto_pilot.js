@@ -645,10 +645,12 @@ async function listening110351(e, netType) {
     info.approval                      = true;
     // Save address index to OBD and can get private key back if lose it.
     info.curr_temp_address_index = Number(getIndexFromPubKey(addr.result.pubkey));
-    await commitmentTransactionAccepted(myUserID, nodeID, userID, info, isFunder, tempKey);
 
     // FUNCTION ONLY FOR GUI TOOL
     displaySentMessage100352(nodeID, userID, info);
+
+    // SDK API
+    await commitmentTransactionAccepted(myUserID, nodeID, userID, info, isFunder, tempKey);
 }
 
 /**
@@ -692,6 +694,10 @@ async function listening110352(e) {
     signedInfo.c2b_counterparty_signed_hex = cp_hex;
     signedInfo.c2a_rd_signed_hex           = rd_hex;
 
+    // FUNCTION ONLY FOR GUI TOOL
+    displaySentMessage100362(nodeID, userID, signedInfo);
+
+    // SDK API
     await sendSignedHex100362(myUserID, nodeID, userID, signedInfo);
 }
 
@@ -707,8 +713,6 @@ async function listening110353(e) {
     let rd      = e.c2b_rd_partial_data;
     let inputs  = rd.inputs;
     let tempKey = getTempPrivKey(e.to_peer_id, kTempPrivKey, e.channel_id);
-    console.info('listening110353 e.to_peer_id = ' + e.to_peer_id);
-    console.info('listening110353 tempKey = ' + tempKey);
     let rd_hex  = signP2SH(false, rd.hex, rd.pub_key_a, rd.pub_key_b, tempKey, inputs);
 
     // will send 100364
@@ -716,5 +720,9 @@ async function listening110353(e) {
     signedInfo.channel_id        = e.channel_id;
     signedInfo.c2b_rd_signed_hex = rd_hex;
 
+    // FUNCTION ONLY FOR GUI TOOL
+    displaySentMessage100364(signedInfo);
+
+    // SDK API
     await sendSignedHex100364(signedInfo);
 }

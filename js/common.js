@@ -4676,6 +4676,8 @@ async function listening110340ForGUITool(e) {
             $("#recipient_node_peer_id").val(e.funder_node_address);
             $("#recipient_user_peer_id").val(e.funder_peer_id);
             $("#funding_txid").val(e.funding_txid);
+            let data = await getSignedHex($("#logined").text(), channel_id);
+            $("#signed_miner_redeem_transaction_hex").val(data);
         }
     }
 }
@@ -4736,6 +4738,10 @@ function listening110351ForGUITool(e) {
             $("#recipient_node_peer_id").val(e.payer_node_address);
             $("#recipient_user_peer_id").val(e.payer_peer_id);
             $("#msg_hash").val(e.msg_hash);
+
+            let msg = 'Please click the button on the tips area to get data.';
+            $("#c2a_rsmc_signed_hex").val(msg);
+            $("#c2a_counterparty_signed_hex").val(msg);
         }
     }
 }
@@ -4773,9 +4779,12 @@ function listening110034ForGUITool(e) {
         let api_name = $("#api_name").text();
         if (api_name === 'assetFundingSigned') {
             enableInvokeAPI();
-            fillTempChannelIDAndFundingPrivKey($("#logined").text(), e.temporary_channel_id);
+            fillTempChannelIDAndFundingPrivKey($("#logined").text(), channel_id);
             $("#recipient_node_peer_id").val(e.funder_node_address);
             $("#recipient_user_peer_id").val(e.funder_peer_id);
+
+            let msg = 'Please click the button on the tips area to get data.';
+            $("#signed_alice_rsmc_hex").val(msg);
         }
     }
 }
@@ -5872,6 +5881,110 @@ function displaySentMessage101134(info) {
         data: {
             channel_id:    info.channel_id,
             rd_signed_hex: info.rd_signed_hex,
+        }
+    }
+
+    displaySentMessage(msgSend);
+}
+
+/**
+ * -100360 Display the sent message in the message box and save it to the log file
+ * @param nodeID 
+ * @param userID
+ * @param info 
+ */
+function displaySentMessage100360(nodeID, userID, info) {
+    let msgSend = {
+        type: -100360,
+        recipient_node_peer_id: nodeID,
+        recipient_user_peer_id: userID,
+        data: {
+            channel_id:              info.channel_id,
+            counterparty_signed_hex: info.counterparty_signed_hex,
+            rsmc_signed_hex:         info.rsmc_signed_hex,
+        }
+    }
+
+    displaySentMessage(msgSend);
+}
+
+/**
+ * -100361 Display the sent message in the message box and save it to the log file
+ * @param nodeID 
+ * @param userID
+ * @param info 
+ */
+function displaySentMessage100361(nodeID, userID, info) {
+    let msgSend = {
+        type: -100361,
+        recipient_node_peer_id: nodeID,
+        recipient_user_peer_id: userID,
+        data: {
+            c2b_rsmc_signed_hex:         info.c2b_rsmc_signed_hex,
+            c2b_counterparty_signed_hex: info.c2b_counterparty_signed_hex,
+            c2a_rd_signed_hex:           info.c2a_rd_signed_hex,
+            c2a_br_signed_hex:           info.c2a_br_signed_hex,
+            c2a_br_id:                   info.c2a_br_id,
+        }
+    }
+
+    displaySentMessage(msgSend);
+}
+
+/**
+ * -100362 Display the sent message in the message box and save it to the log file
+ * @param nodeID 
+ * @param userID
+ * @param info 
+ */
+function displaySentMessage100362(nodeID, userID, info) {
+    let msgSend = {
+        type: -100362,
+        recipient_node_peer_id: nodeID,
+        recipient_user_peer_id: userID,
+        data: {
+            channel_id:                  info.channel_id,
+            c2b_rsmc_signed_hex:         info.c2b_rsmc_signed_hex,
+            c2b_counterparty_signed_hex: info.c2b_counterparty_signed_hex,
+            c2a_rd_signed_hex:           info.c2a_rd_signed_hex,
+        }
+    }
+
+    displaySentMessage(msgSend);
+}
+
+/**
+ * -100363 Display the sent message in the message box and save it to the log file
+ * @param nodeID 
+ * @param userID
+ * @param info 
+ */
+function displaySentMessage100363(nodeID, userID, info) {
+    let msgSend = {
+        type: -100363,
+        recipient_node_peer_id: nodeID,
+        recipient_user_peer_id: userID,
+        data: {
+            channel_id:        info.channel_id,
+            c2b_rd_signed_hex: info.c2b_rd_signed_hex,
+            c2b_br_signed_hex: info.c2b_br_signed_hex,
+            c2b_br_id:         info.c2b_br_id,
+        }
+    }
+
+    displaySentMessage(msgSend);
+}
+
+/**
+ * -100364 Display the sent message in the message box and save it to the log file
+ * @param info 
+ */
+function displaySentMessage100364(info) {
+    let msgSend = {
+        type: -100364,
+        data: {
+            channel_id:        info.channel_id,
+            c2b_rd_signed_hex: info.c2b_rd_signed_hex,
         }
     }
 

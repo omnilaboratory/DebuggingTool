@@ -462,11 +462,6 @@ class ObdApi {
       return;
     }
 
-    if (this.isNotString(signed_hex)) {
-      alert("empty signed_hex");
-      return;
-    }
-
     let msg  = new Message();
     msg.type = this.messageType.MsgType_FundingCreate_BtcFundingMinerRDTxToClient_341;
     msg.recipient_user_peer_id = recipient_user_peer_id;
@@ -836,11 +831,6 @@ class ObdApi {
       return;
     }
 
-    if (this.isNotString(signed_hex)) {
-      alert("empty signed_hex");
-      return;
-    }
-
     let msg  = new Message();
     msg.type = this.messageType.MsgType_ClientSign_AssetFunding_AliceSignC1a_1034;
     msg.recipient_user_peer_id = recipient_user_peer_id;
@@ -863,11 +853,6 @@ class ObdApi {
       return;
     }
       
-    if (this.isNotString(info.rd_signed_hex)) {
-      alert("empty rd_signed_hex");
-      return;
-    }
-
     let msg  = new Message();
     msg.type = this.messageType.MsgType_ClientSign_AssetFunding_AliceSignRD_1134;
     msg.data = info;
@@ -944,21 +929,6 @@ class ObdApi {
       return;
     }
 
-    if (this.isNotString(info.br_signed_hex)) {
-      alert("empty br_signed_hex");
-      return;
-    }
-
-    if (this.isNotString(info.rd_signed_hex)) {
-      alert("empty rd_signed_hex");
-      return;
-    }
-
-    if (info.br_id == null || info.br_id <= 0) {
-      alert("wrong br_id");
-      return;
-    }
-
     let msg  = new Message();
     msg.type = this.messageType.MsgType_ClientSign_Duplex_AssetFunding_RdAndBr_1035;
     msg.recipient_user_peer_id = recipient_user_peer_id;
@@ -998,10 +968,6 @@ class ObdApi {
       alert("empty curr_temp_address_pub_key");
       return;
     }
-    // if (this.isNotString(info.last_temp_address_private_key)) {
-    //   alert("empty last_temp_address_private_key");
-    //   return;
-    // }
     if (info.amount == null || info.amount <= 0) {
       alert("wrong amount");
       return;
@@ -1044,16 +1010,6 @@ class ObdApi {
       return;
     }
       
-    if (this.isNotString(info.counterparty_signed_hex)) {
-      alert("empty counterparty_signed_hex");
-      return;
-    }
-      
-    if (this.isNotString(info.rsmc_signed_hex)) {
-      alert("empty rsmc_signed_hex");
-      return;
-    }
-
     let msg  = new Message();
     msg.type = this.messageType.MsgType_ClientSign_CommitmentTx_AliceSignC2a_360;
     msg.recipient_user_peer_id = recipient_user_peer_id;
@@ -1092,16 +1048,6 @@ class ObdApi {
 
     if (this.isNotString(info.msg_hash)) {
       alert("empty msg_hash");
-      return;
-    }
-
-    if (this.isNotString(info.c2a_rsmc_signed_hex)) {
-      alert("empty c2a_rsmc_signed_hex");
-      return;
-    }
-
-    if (this.isNotString(info.c2a_counterparty_signed_hex)) {
-      alert("empty c2a_counterparty_signed_hex");
       return;
     }
 
@@ -1152,31 +1098,6 @@ class ObdApi {
       return;
     }
       
-    if (this.isNotString(info.c2b_rsmc_signed_hex)) {
-      alert("empty c2b_rsmc_signed_hex");
-      return;
-    }
-      
-    if (this.isNotString(info.c2b_counterparty_signed_hex)) {
-      alert("empty c2b_counterparty_signed_hex");
-      return;
-    }
-      
-    if (this.isNotString(info.c2a_rd_signed_hex)) {
-      alert("empty c2a_rd_signed_hex");
-      return;
-    }
-      
-    if (this.isNotString(info.c2a_br_signed_hex)) {
-      alert("empty c2a_br_signed_hex");
-      return;
-    }
-
-    if (info.c2a_br_id == null || info.c2a_br_id <= 0) {
-      alert("wrong c2a_br_id");
-      return;
-    }
-
     let msg  = new Message();
     msg.type = this.messageType.MsgType_ClientSign_CommitmentTx_BobSignC2b_361;
     msg.recipient_user_peer_id = recipient_user_peer_id;
@@ -1210,21 +1131,6 @@ class ObdApi {
 
     if (this.isNotString(info.channel_id)) {
       alert("empty channel_id");
-      return;
-    }
-      
-    if (this.isNotString(info.c2b_rsmc_signed_hex)) {
-      alert("empty c2b_rsmc_signed_hex");
-      return;
-    }
-      
-    if (this.isNotString(info.c2b_counterparty_signed_hex)) {
-      alert("empty c2b_counterparty_signed_hex");
-      return;
-    }
-      
-    if (this.isNotString(info.c2a_rd_signed_hex)) {
-      alert("empty c2a_rd_signed_hex");
       return;
     }
       
@@ -1264,21 +1170,6 @@ class ObdApi {
       return;
     }
 
-    if (this.isNotString(info.c2b_rd_signed_hex)) {
-      alert("empty c2b_rd_signed_hex");
-      return;
-    }
-
-    if (this.isNotString(info.c2b_br_signed_hex)) {
-      alert("empty c2b_br_signed_hex");
-      return;
-    }
-    
-    if (info.c2b_br_id == null || info.c2b_br_id <= 0) {
-      alert("wrong c2b_br_id");
-      return;
-    }
-
     let msg  = new Message();
     msg.type = this.messageType.MsgType_ClientSign_CommitmentTx_AliceSignC2b_Rd_363;
     msg.recipient_user_peer_id = recipient_user_peer_id;
@@ -1298,11 +1189,6 @@ class ObdApi {
       
     if (this.isNotString(info.channel_id)) {
       alert("empty channel_id");
-      return;
-    }
-
-    if (this.isNotString(info.c2b_rd_signed_hex)) {
-      alert("empty c2b_rd_signed_hex");
       return;
     }
 

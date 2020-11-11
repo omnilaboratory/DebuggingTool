@@ -1366,6 +1366,8 @@ function getSenderRole() {
  * @param privkey
  */
 function signP2PKH(txhex, privkey) {
+    
+    if (txhex === '') return '';
 
     const network = btctool.bitcoin.networks.testnet;
     const tx      = btctool.bitcoin.Transaction.fromHex(txhex);
@@ -1394,6 +1396,8 @@ function signP2PKH(txhex, privkey) {
  * @param inputs    all of inputs
  */
 function signP2SH(is_first_sign, txhex, pubkey_1, pubkey_2, privkey, inputs) {
+
+    if (txhex === '') return '';
 
     const network = btctool.bitcoin.networks.testnet;
     const tx      = btctool.bitcoin.Transaction.fromHex(txhex);

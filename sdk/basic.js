@@ -420,6 +420,10 @@ function commitmentTransactionCreated(myUserID, nodeID, userID, info, isFunder, 
             signedInfo.counterparty_signed_hex = cr_hex;
             signedInfo.rsmc_signed_hex         = rr_hex;
 
+            // FUNCTION ONLY FOR GUI TOOL
+            displaySentMessage100360(nodeID, userID, signedInfo);
+
+            // SDK API
             await sendSignedHex100360(nodeID, userID, signedInfo);
 
             // save some data
@@ -503,6 +507,10 @@ function commitmentTransactionAccepted(myUserID, nodeID, userID, info, isFunder,
             signedInfo.c2a_br_signed_hex           = c2a_br_hex;
             signedInfo.c2a_br_id                   = c2a_br.br_id;
 
+            // FUNCTION ONLY FOR GUI TOOL
+            displaySentMessage100361(nodeID, userID, signedInfo);
+
+            // SDK API
             await sendSignedHex100361(nodeID, userID, signedInfo);
 
             // 
@@ -561,6 +569,10 @@ function sendSignedHex100362(myUserID, nodeID, userID, signedInfo) {
             signedInfo.c2b_br_signed_hex = br_hex;
             signedInfo.c2b_br_id         = br.br_id;
 
+            // FUNCTION ONLY FOR GUI TOOL
+            displaySentMessage100363(nodeID, userID, signedInfo);
+
+            // SDK API
             await sendSignedHex100363(nodeID, userID, signedInfo);
             resolve(e);
         });
