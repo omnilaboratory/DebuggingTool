@@ -273,6 +273,11 @@ const kPayInvoice = 'Pay Invoice is processing ... Wait for response from counte
  */
 const kProcessing = 'Processing...';
 
+/**
+ * Display Processing...
+ */
+const kSignedHexTip = 'Please click the button on the tips area to get data.';
+
 
 //----------------------------------------------------------------
 // Status of a channel

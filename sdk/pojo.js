@@ -129,6 +129,38 @@ class SignedInfo100364 {
         this.c2b_rd_signed_hex = "";
     }
 }
+class SignedInfo100100 {
+    constructor() {
+        this.channel_id = "";
+        this.c3a_counterparty_partial_signed_hex = "";
+        this.c3a_htlc_partial_signed_hex = "";
+        this.c3a_rsmc_partial_signed_hex = "";
+    }
+}
+class SignedInfo100101 {
+    constructor() {
+        this.channel_id = "";
+        this.c3a_rsmc_rd_partial_signed_hex = "";
+        this.c3a_rsmc_br_partial_signed_hex = "";
+        this.c3a_htlc_ht_partial_signed_hex = "";
+        this.c3a_htlc_hlock_partial_signed_hex = "";
+        this.c3a_htlc_br_partial_signed_hex = "";
+        this.c3b_rsmc_partial_signed_hex = "";
+        this.c3b_counterparty_partial_signed_hex = "";
+        this.c3b_htlc_partial_signed_hex = "";
+    }
+}
+class SignedInfo100102 {
+    constructor() {
+        this.channel_id = "";
+        this.c3a_rsmc_rd_complete_signed_hex = "";
+        this.c3a_htlc_ht_complete_signed_hex = "";
+        this.c3a_htlc_hlock_complete_signed_hex = "";
+        this.c3b_rsmc_complete_signed_hex = "";
+        this.c3b_counterparty_complete_signed_hex = "";
+        this.c3b_htlc_complete_signed_hex = "";
+    }
+}
 class CommitmentTx {
     constructor() {
         this.channel_id = "";
@@ -179,31 +211,34 @@ class addHTLCInfo {
         this.h = "";
         this.routing_packet = "";
         this.cltv_expiry = 0;
-        this.channel_address_private_key = "";
+        // channel_address_private_key: string = "";
         this.last_temp_address_private_key = "";
         this.curr_rsmc_temp_address_pub_key = "";
-        this.curr_rsmc_temp_address_private_key = "";
+        // curr_rsmc_temp_address_private_key: string = "";
         this.curr_rsmc_temp_address_index = 0;
         this.curr_htlc_temp_address_pub_key = "";
-        this.curr_htlc_temp_address_private_key = "";
+        // curr_htlc_temp_address_private_key: string = "";
         this.curr_htlc_temp_address_index = 0;
         this.curr_htlc_temp_address_for_ht1a_pub_key = "";
-        this.curr_htlc_temp_address_for_ht1a_private_key = "";
+        // curr_htlc_temp_address_for_ht1a_private_key: string = "";
         this.curr_htlc_temp_address_for_ht1a_index = 0;
     }
 }
 class HtlcSignedInfo {
     constructor() {
         this.payer_commitment_tx_hash = "";
-        // approval: boolean = false;
-        this.channel_address_private_key = "";
-        this.last_temp_address_private_key = "";
         this.curr_rsmc_temp_address_pub_key = "";
-        this.curr_rsmc_temp_address_private_key = "";
         this.curr_rsmc_temp_address_index = 0;
         this.curr_htlc_temp_address_pub_key = "";
-        this.curr_htlc_temp_address_private_key = "";
         this.curr_htlc_temp_address_index = 0;
+        this.last_temp_address_private_key = "";
+        this.c3a_complete_signed_rsmc_hex = "";
+        this.c3a_complete_signed_counterparty_hex = "";
+        this.c3a_complete_signed_htlc_hex = "";
+        // channel_address_private_key: string = "";
+        // curr_rsmc_temp_address_private_key: string = "";
+        // curr_htlc_temp_address_private_key: string = "";
+        // approval: boolean = false;
     }
 }
 class SignGetHInfo {
@@ -433,6 +468,14 @@ class MessageType {
         this.MsgType_HTLC_RecvRequestCloseCurrTx_49 = -110049;
         this.MsgType_HTLC_SendCloseSigned_50 = -100050;
         this.MsgType_HTLC_RecvCloseSigned_50 = -110050;
+        this.MsgType_HTLC_ClientSign_Alice_C3a_100 = -100100;
+        this.MsgType_HTLC_ClientSign_Bob_C3b_101 = -100101;
+        this.MsgType_HTLC_ClientSign_Alice_C3b_102 = -100102;
+        this.MsgType_HTLC_ClientSign_Alice_C3bSub_103 = -100103;
+        this.MsgType_HTLC_ClientSign_Bob_C3bSub_104 = -100104;
+        this.MsgType_HTLC_ClientSign_Alice_He_105 = -100105;
+        this.MsgType_HTLC_ClientSign_Bob_HeSub_106 = -100106;
+        this.MsgType_HTLC_ClientSign_Alice_HeSub_107 = -100107;
         this.MsgType_Atomic_SendSwap_80 = -100080;
         this.MsgType_Atomic_RecvSwap_80 = -110080;
         this.MsgType_Atomic_SendSwapAccept_81 = -100081;

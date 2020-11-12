@@ -1044,10 +1044,6 @@ class ObdApi {
             alert("wrong cltv_expiry");
             return;
         }
-        if (this.isNotString(info.channel_address_private_key)) {
-            alert("empty channel_address_private_key");
-            return;
-        }
         if (this.isNotString(info.last_temp_address_private_key)) {
             alert("empty last_temp_address_private_key");
             return;
@@ -1056,24 +1052,12 @@ class ObdApi {
             alert("empty curr_rsmc_temp_address_pub_key");
             return;
         }
-        if (this.isNotString(info.curr_rsmc_temp_address_private_key)) {
-            alert("empty curr_rsmc_temp_address_private_key");
-            return;
-        }
         if (this.isNotString(info.curr_htlc_temp_address_pub_key)) {
             alert("empty curr_htlc_temp_address_pub_key");
             return;
         }
-        if (this.isNotString(info.curr_htlc_temp_address_private_key)) {
-            alert("empty curr_htlc_temp_address_private_key");
-            return;
-        }
         if (this.isNotString(info.curr_htlc_temp_address_for_ht1a_pub_key)) {
             alert("empty curr_htlc_temp_address_for_ht1a_pub_key");
-            return;
-        }
-        if (this.isNotString(info.curr_htlc_temp_address_for_ht1a_private_key)) {
-            alert("empty curr_htlc_temp_address_for_ht1a_private_key");
             return;
         }
         let msg = new Message();
@@ -1084,6 +1068,60 @@ class ObdApi {
         this.sendData(msg, callback);
     }
     onAddHTLC(jsonData) { }
+    /**
+     * MsgType_HTLC_ClientSign_Alice_C3a_100
+     * @param recipient_node_peer_id string
+     * @param recipient_user_peer_id string
+     * @param info  SignedInfo100100
+     * @param callback  Function
+     */
+    sendSignedHex100100(recipient_node_peer_id, recipient_user_peer_id, info, callback) {
+        if (this.isNotString(recipient_node_peer_id)) {
+            alert("error recipient_node_peer_id");
+            return;
+        }
+        if (this.isNotString(recipient_user_peer_id)) {
+            alert("error recipient_user_peer_id");
+            return;
+        }
+        if (this.isNotString(info.channel_id)) {
+            alert("empty channel_id");
+            return;
+        }
+        let msg = new Message();
+        msg.type = this.messageType.MsgType_HTLC_ClientSign_Alice_C3a_100;
+        msg.recipient_user_peer_id = recipient_user_peer_id;
+        msg.recipient_node_peer_id = recipient_node_peer_id;
+        msg.data = info;
+        this.sendData(msg, callback);
+    }
+    /**
+     * MsgType_HTLC_ClientSign_Bob_C3b_101
+     * @param recipient_node_peer_id string
+     * @param recipient_user_peer_id string
+     * @param info  SignedInfo100101
+     * @param callback  Function
+     */
+    sendSignedHex100101(recipient_node_peer_id, recipient_user_peer_id, info, callback) {
+        if (this.isNotString(recipient_node_peer_id)) {
+            alert("error recipient_node_peer_id");
+            return;
+        }
+        if (this.isNotString(recipient_user_peer_id)) {
+            alert("error recipient_user_peer_id");
+            return;
+        }
+        if (this.isNotString(info.channel_id)) {
+            alert("empty channel_id");
+            return;
+        }
+        let msg = new Message();
+        msg.type = this.messageType.MsgType_HTLC_ClientSign_Bob_C3b_101;
+        msg.recipient_user_peer_id = recipient_user_peer_id;
+        msg.recipient_node_peer_id = recipient_node_peer_id;
+        msg.data = info;
+        this.sendData(msg, callback);
+    }
     /**
      * MsgType_HTLC_SendAddHTLCSigned_41
      * @param recipient_node_peer_id string
@@ -1104,28 +1142,12 @@ class ObdApi {
             alert("empty payer_commitment_tx_hash");
             return;
         }
-        if (this.isNotString(info.channel_address_private_key)) {
-            alert("empty channel_address_private_key");
-            return;
-        }
-        // if (this.isNotString(info.last_temp_address_private_key)) {
-        //   alert("empty last_temp_address_private_key");
-        //   return;
-        // }
         if (this.isNotString(info.curr_rsmc_temp_address_pub_key)) {
             alert("empty curr_rsmc_temp_address_pub_key");
             return;
         }
-        if (this.isNotString(info.curr_rsmc_temp_address_private_key)) {
-            alert("empty curr_rsmc_temp_address_private_key");
-            return;
-        }
         if (this.isNotString(info.curr_htlc_temp_address_pub_key)) {
             alert("empty curr_htlc_temp_address_pub_key");
-            return;
-        }
-        if (this.isNotString(info.curr_htlc_temp_address_private_key)) {
-            alert("empty curr_htlc_temp_address_private_key");
             return;
         }
         let msg = new Message();

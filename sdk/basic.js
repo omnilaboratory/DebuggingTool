@@ -473,38 +473,34 @@ function commitmentTransactionAccepted(myUserID, nodeID, userID, info, isFunder,
             // Receiver sign the tx on client side
 
             // NO.1 c2a_br_raw_data
-            let c2a_br     = e.c2a_br_raw_data;
-            let inputs     = c2a_br.inputs;
-            let privkey    = await getFundingPrivKey(myUserID, e.channel_id);
-            let c2a_br_hex = signP2SH(true, c2a_br.hex, c2a_br.pub_key_a, 
-                c2a_br.pub_key_b, privkey, inputs);
+            let ab      = e.c2a_br_raw_data;
+            let inputs  = ab.inputs;
+            let privkey = await getFundingPrivKey(myUserID, e.channel_id);
+            let ab_hex  = signP2SH(true, ab.hex, ab.pub_key_a, ab.pub_key_b, privkey, inputs);
 
             // NO.2 c2a_rd_raw_data
-            let c2a_rd     = e.c2a_rd_raw_data;
-            inputs         = c2a_rd.inputs;
-            let c2a_rd_hex = signP2SH(true, c2a_rd.hex, c2a_rd.pub_key_a, 
-                c2a_rd.pub_key_b, privkey, inputs);
+            let ar     = e.c2a_rd_raw_data;
+            inputs     = ar.inputs;
+            let ar_hex = signP2SH(true, ar.hex, ar.pub_key_a, ar.pub_key_b, privkey, inputs);
             
             // NO.3 c2b_counterparty_raw_data
-            let c2b_cr     = e.c2b_counterparty_raw_data;
-            inputs         = c2b_cr.inputs;
-            let c2b_cr_hex = signP2SH(true, c2b_cr.hex, c2b_cr.pub_key_a, 
-                c2b_cr.pub_key_b, privkey, inputs);
+            let bc     = e.c2b_counterparty_raw_data;
+            inputs     = bc.inputs;
+            let bc_hex = signP2SH(true, bc.hex, bc.pub_key_a, bc.pub_key_b, privkey, inputs);
             
             // NO.4 c2b_rsmc_raw_data
-            let c2b_rr     = e.c2b_rsmc_raw_data;
-            inputs         = c2b_rr.inputs;
-            let c2b_rr_hex = signP2SH(true, c2b_rr.hex, c2b_rr.pub_key_a, 
-                c2b_rr.pub_key_b, privkey, inputs);
+            let br     = e.c2b_rsmc_raw_data;
+            inputs     = br.inputs;
+            let br_hex = signP2SH(true, br.hex, br.pub_key_a, br.pub_key_b, privkey, inputs);
 
             // will send 100361
             let signedInfo                         = new SignedInfo100361();
             signedInfo.channel_id                  = e.channel_id;
-            signedInfo.c2b_rsmc_signed_hex         = c2b_rr_hex;
-            signedInfo.c2b_counterparty_signed_hex = c2b_cr_hex;
-            signedInfo.c2a_rd_signed_hex           = c2a_rd_hex;
-            signedInfo.c2a_br_signed_hex           = c2a_br_hex;
-            signedInfo.c2a_br_id                   = c2a_br.br_id;
+            signedInfo.c2b_rsmc_signed_hex         = br_hex;
+            signedInfo.c2b_counterparty_signed_hex = bc_hex;
+            signedInfo.c2a_rd_signed_hex           = ar_hex;
+            signedInfo.c2a_br_signed_hex           = ab_hex;
+            signedInfo.c2a_br_id                   = ab.br_id;
 
             // FUNCTION ONLY FOR GUI TOOL
             displaySentMessage100361(nodeID, userID, signedInfo);

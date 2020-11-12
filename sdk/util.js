@@ -137,6 +137,24 @@ const kTbSignedHexCR110351 = 'tb_signed_hex_CR110351';
 const kTbSignedHexRR110351 = 'tb_signed_hex_RR110351';
 
 /**
+ * Object Store (table) name of IndexedDB.
+ * Signed Hex CR110040
+ */
+const kTbSignedHexCR110040 = 'tb_signed_hex_CR110040';
+
+/**
+ * Object Store (table) name of IndexedDB.
+ * Signed Hex HR110040
+ */
+const kTbSignedHexHR110040 = 'tb_signed_hex_HR110040';
+
+/**
+ * Object Store (table) name of IndexedDB.
+ * Signed Hex RR110040
+ */
+const kTbSignedHexRR110040 = 'tb_signed_hex_RR110040';
+
+/**
  *  List of Counterparties who have interacted
  *  @param myUserID The user id of logged in
  *  @param channel_id 
@@ -649,12 +667,13 @@ function getTempData(myUserID, channel_id) {
  * @param myUserID
  * @param channel_id
  * @param value
+ * @param tb_name table name
  */
-function saveSignedHex(myUserID, channel_id, value) {
+function saveSignedHex(myUserID, channel_id, value, tb_name) {
 
     let key     = myUserID + channel_id;
-    let request = db.transaction([kTbSignedHex], 'readwrite')
-        .objectStore(kTbSignedHex)
+    let request = db.transaction([tb_name], 'readwrite')
+        .objectStore(tb_name)
         .put({ key: key, value: value });
   
     request.onsuccess = function (e) {
@@ -671,14 +690,15 @@ function saveSignedHex(myUserID, channel_id, value) {
  * 
  * @param myUserID
  * @param channel_id
+ * @param tb_name table name
  */
-function getSignedHex(myUserID, channel_id) {
+function getSignedHex(myUserID, channel_id, tb_name) {
 
     return new Promise((resolve, reject) => {
 
         let key         = myUserID + channel_id;
-        let transaction = db.transaction([kTbSignedHex], 'readonly');
-        let store       = transaction.objectStore(kTbSignedHex);
+        let transaction = db.transaction([tb_name], 'readonly');
+        let store       = transaction.objectStore(tb_name);
         let request     = store.get(key);
     
         request.onerror = function(e) {
@@ -692,118 +712,6 @@ function getSignedHex(myUserID, channel_id) {
                 resolve(request.result.value);
             } else {
                 console.log('getSignedHex = No Data.');
-                resolve('');
-            }
-        }
-    })
-}
-
-
-/**
- * save signed hex RR110351
- * 
- * @param myUserID
- * @param channel_id
- * @param value
- */
-function saveSignedHexRR110351(myUserID, channel_id, value) {
-
-    let key     = myUserID + channel_id;
-    let request = db.transaction([kTbSignedHexRR110351], 'readwrite')
-        .objectStore(kTbSignedHexRR110351)
-        .put({ key: key, value: value });
-  
-    request.onsuccess = function (e) {
-        // console.log('Data write success.');
-    };
-  
-    request.onerror = function (e) {
-        // console.log('Data write false.');
-    }
-}
-
-/**
- * get signed hex RR110351
- * 
- * @param myUserID
- * @param channel_id
- */
-function getSignedHexRR110351(myUserID, channel_id) {
-
-    return new Promise((resolve, reject) => {
-
-        let key         = myUserID + channel_id;
-        let transaction = db.transaction([kTbSignedHexRR110351], 'readonly');
-        let store       = transaction.objectStore(kTbSignedHexRR110351);
-        let request     = store.get(key);
-    
-        request.onerror = function(e) {
-            console.log('Read data false.');
-            reject('Read data false.');
-        };
-    
-        request.onsuccess = function (e) {
-            if (request.result) {
-                console.log('getSignedHexRR110351 = ' + request.result.value);
-                resolve(request.result.value);
-            } else {
-                console.log('getSignedHexRR110351 = No Data.');
-                resolve('');
-            }
-        }
-    })
-}
-
-
-/**
- * save signed hex CR110351
- * 
- * @param myUserID
- * @param channel_id
- * @param value
- */
-function saveSignedHexCR110351(myUserID, channel_id, value) {
-
-    let key     = myUserID + channel_id;
-    let request = db.transaction([kTbSignedHexCR110351], 'readwrite')
-        .objectStore(kTbSignedHexCR110351)
-        .put({ key: key, value: value });
-  
-    request.onsuccess = function (e) {
-        // console.log('Data write success.');
-    };
-  
-    request.onerror = function (e) {
-        // console.log('Data write false.');
-    }
-}
-
-/**
- * get signed hex CR110351
- * 
- * @param myUserID
- * @param channel_id
- */
-function getSignedHexCR110351(myUserID, channel_id) {
-
-    return new Promise((resolve, reject) => {
-
-        let key         = myUserID + channel_id;
-        let transaction = db.transaction([kTbSignedHexCR110351], 'readonly');
-        let store       = transaction.objectStore(kTbSignedHexCR110351);
-        let request     = store.get(key);
-    
-        request.onerror = function(e) {
-            console.log('Read data false.');
-            reject('Read data false.');
-        };
-    
-        request.onsuccess = function (e) {
-            if (request.result) {
-                console.log('getSignedHexCR110351 = ' + request.result.value);
-                resolve(request.result.value);
-            } else {
-                console.log('getSignedHexCR110351 = No Data.');
                 resolve('');
             }
         }
@@ -1312,6 +1220,21 @@ function openDB() {
         let os13;
         if (!db.objectStoreNames.contains(kTbSignedHexRR110351)) {
             os13 = db.createObjectStore(kTbSignedHexRR110351, { keyPath: 'key' });
+        }
+
+        let os14;
+        if (!db.objectStoreNames.contains(kTbSignedHexCR110040)) {
+            os14 = db.createObjectStore(kTbSignedHexCR110040, { keyPath: 'key' });
+        }
+
+        let os15;
+        if (!db.objectStoreNames.contains(kTbSignedHexHR110040)) {
+            os15 = db.createObjectStore(kTbSignedHexHR110040, { keyPath: 'key' });
+        }
+
+        let os16;
+        if (!db.objectStoreNames.contains(kTbSignedHexRR110040)) {
+            os16 = db.createObjectStore(kTbSignedHexRR110040, { keyPath: 'key' });
         }
     }
 }

@@ -112,6 +112,35 @@ class SignedInfo100364 {
   c2b_rd_signed_hex: string = "";
 }
 
+class SignedInfo100100 {
+  channel_id: string = "";
+  c3a_counterparty_partial_signed_hex: string = "";
+  c3a_htlc_partial_signed_hex: string = "";
+  c3a_rsmc_partial_signed_hex: string = "";
+}
+
+class SignedInfo100101 {
+  channel_id: string = "";
+  c3a_rsmc_rd_partial_signed_hex: string = "";
+  c3a_rsmc_br_partial_signed_hex: string = "";
+  c3a_htlc_ht_partial_signed_hex: string = "";
+  c3a_htlc_hlock_partial_signed_hex: string = "";
+  c3a_htlc_br_partial_signed_hex: string = "";
+  c3b_rsmc_partial_signed_hex: string = "";
+  c3b_counterparty_partial_signed_hex: string = "";
+  c3b_htlc_partial_signed_hex: string = "";
+}
+
+class SignedInfo100102 {
+  channel_id: string = "";
+  c3a_rsmc_rd_complete_signed_hex: string = "";
+  c3a_htlc_ht_complete_signed_hex: string = "";
+  c3a_htlc_hlock_complete_signed_hex: string = "";
+  c3b_rsmc_complete_signed_hex: string = "";
+  c3b_counterparty_complete_signed_hex: string = "";
+  c3b_htlc_complete_signed_hex: string = "";
+}
+
 class CommitmentTx {
   channel_id: string = "";
   amount: number = 0;
@@ -156,30 +185,34 @@ class addHTLCInfo {
   h: string = "";
   routing_packet: string = "";
   cltv_expiry: number = 0;
-  channel_address_private_key: string = "";
+  // channel_address_private_key: string = "";
   last_temp_address_private_key: string = "";
   curr_rsmc_temp_address_pub_key: string = "";
-  curr_rsmc_temp_address_private_key: string = "";
+  // curr_rsmc_temp_address_private_key: string = "";
   curr_rsmc_temp_address_index: number = 0;
   curr_htlc_temp_address_pub_key: string = "";
-  curr_htlc_temp_address_private_key: string = "";
+  // curr_htlc_temp_address_private_key: string = "";
   curr_htlc_temp_address_index: number = 0;
   curr_htlc_temp_address_for_ht1a_pub_key: string = "";
-  curr_htlc_temp_address_for_ht1a_private_key: string = "";
+  // curr_htlc_temp_address_for_ht1a_private_key: string = "";
   curr_htlc_temp_address_for_ht1a_index: number = 0;
 }
 
 class HtlcSignedInfo {
   payer_commitment_tx_hash: string = "";
-  // approval: boolean = false;
-  channel_address_private_key: string = "";
-  last_temp_address_private_key: string = "";
   curr_rsmc_temp_address_pub_key: string = "";
-  curr_rsmc_temp_address_private_key: string = "";
   curr_rsmc_temp_address_index: number = 0;
   curr_htlc_temp_address_pub_key: string = "";
-  curr_htlc_temp_address_private_key: string = "";
   curr_htlc_temp_address_index: number = 0;
+  last_temp_address_private_key: string = "";
+
+  c3a_complete_signed_rsmc_hex: string = "";
+  c3a_complete_signed_counterparty_hex: string = "";
+  c3a_complete_signed_htlc_hex: string = "";
+  // channel_address_private_key: string = "";
+  // curr_rsmc_temp_address_private_key: string = "";
+  // curr_htlc_temp_address_private_key: string = "";
+  // approval: boolean = false;
 }
 
 class SignGetHInfo {
@@ -406,6 +439,15 @@ class MessageType {
   MsgType_HTLC_RecvRequestCloseCurrTx_49  = -110049;
 	MsgType_HTLC_SendCloseSigned_50         = -100050;
   MsgType_HTLC_RecvCloseSigned_50         = -110050;
+  
+	MsgType_HTLC_ClientSign_Alice_C3a_100     = -100100;
+	MsgType_HTLC_ClientSign_Bob_C3b_101       = -100101;
+	MsgType_HTLC_ClientSign_Alice_C3b_102     = -100102;
+	MsgType_HTLC_ClientSign_Alice_C3bSub_103  = -100103;
+	MsgType_HTLC_ClientSign_Bob_C3bSub_104    = -100104;
+	MsgType_HTLC_ClientSign_Alice_He_105      = -100105;
+	MsgType_HTLC_ClientSign_Bob_HeSub_106     = -100106;
+  MsgType_HTLC_ClientSign_Alice_HeSub_107   = -100107;
   
   MsgType_Atomic_SendSwap_80         = -100080;
   MsgType_Atomic_RecvSwap_80         = -110080;

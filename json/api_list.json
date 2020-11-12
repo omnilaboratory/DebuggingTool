@@ -851,82 +851,61 @@
                 {
                     "name": "payer_commitment_tx_hash",
                     "help": "The hash of commitment transaction created in addHTLC (type -40).",
-                    "buttons": [
-                    ]
+                    "buttons": []
+                },
+                {
+                    "name": "c3a_complete_signed_rsmc_hex",
+                    "buttons": []
+                },
+                {
+                    "name": "c3a_complete_signed_counterparty_hex",
+                    "buttons": []
+                },
+                {
+                    "name": "c3a_complete_signed_htlc_hex",
+                    "buttons": []
                 },
                 {
                     "name": "channel_address_private_key",
-                    "help": "This private key used by Bob to create the channel. It will be used to sign C2b and BR2b transaction in below picture as Bob Sig.",
+                    "help": "Client use the private key to sign C2b and BR2b transaction in below picture as Bob Sig.",
                     "imgPath": "doc/tooltip/HTLC-3.png",
-                    "buttons": [
-                        {
-                            "innerText": "Display",
-                            "onclick": "displayUserDataInNewHtml('MyAddresses')"
-                        }
-                    ]
+                    "disable": "yes",
+                    "buttons": []
                 },
                 {
                     "name": "curr_rsmc_temp_address_pub_key",
                     "help": "This public key of an address (Bob's address in output 1 of C2b in below picture) will be used to create a temp 2-2 multi-sig address as output 1 of newer Cx transaction like C2b in below picture.",
                     "imgPath": "doc/tooltip/HTLC-3.png",
-                    "buttons": [
-                        {
-                            "innerText": "Select",
-                            "onclick": "displayUserDataInNewHtml('MyAddresses')"
-                        },
-                        {
-                            "innerText": "Create",
-                            "onclick": "autoCreateAddress(-411)"
-                        }
-                    ]
+                    "disable": "yes",
+                    "buttons": []
                 },
                 {
                     "name": "curr_rsmc_temp_address_private_key",
                     "help": "This private key of an address (Bob's) will be used to sign RD2b and BR2b transaction in below picture.",
                     "imgPath": "doc/tooltip/HTLC-3.png",
-                    "buttons": [
-                        {
-                            "innerText": "Select",
-                            "onclick": "displayUserDataInNewHtml('MyAddresses')"
-                        }
-                    ]
+                    "disable": "yes",
+                    "buttons": []
                 },
                 {
                     "name": "curr_htlc_temp_address_pub_key",
                     "help": "This public key of an address (Bob's address in output 2 of C2b in below picture) will be used to create a temp 2-2 multi-sig address as output 2 of newer Cx transaction like C2b in below picture.",
                     "imgPath": "doc/tooltip/HTLC-3.png",
-                    "buttons": [
-                        {
-                            "innerText": "Select",
-                            "onclick": "displayUserDataInNewHtml('MyAddresses')"
-                        },
-                        {
-                            "innerText": "Create",
-                            "onclick": "autoCreateAddress(-412)"
-                        }
-                    ]
+                    "disable": "yes",
+                    "buttons": []
                 },
                 {
                     "name": "curr_htlc_temp_address_private_key",
                     "help": "This private key of an address (Bob's) will be used to sign HE1b transaction in below picture.",
                     "imgPath": "doc/tooltip/HTLC-4.png",
-                    "buttons": [
-                        {
-                            "innerText": "Select",
-                            "onclick": "displayUserDataInNewHtml('MyAddresses')"
-                        }
-                    ]
+                    "disable": "yes",
+                    "buttons": []
                 },
                 {
                     "name": "last_temp_address_private_key",
                     "help": "This is the private key used in last transaction by Alice. It will be used to sign ?  transaction in below picture as Bob Sig.",
                     "imgPath": "doc/tooltip/HTLC-4.png",
-                    "buttons": [
-                        {
-                            "innerText": "Display",
-                            "onclick": "displayUserDataInNewHtml('MyAddresses')"
-                        }
-                    ]
+                    "disable": "yes",
+                    "buttons": []
                 }
             ]
         },
