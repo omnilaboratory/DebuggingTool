@@ -37,7 +37,7 @@ function HTLCFindPath(info) {
  */
 function addHTLC(myUserID, nodeID, userID, info, isFunder) {
     return new Promise((resolve, reject) => {
-        obdApi.addHTLC(nodeID, userID, info, function(e) {
+        obdApi.addHTLC(nodeID, userID, info, async function(e) {
             console.info('SDK: -100040 addHTLC = ' + JSON.stringify(e));
 
             // FUNCTION ONLY FOR GUI TOOL
@@ -119,11 +119,10 @@ function sendSignedHex100100(nodeID, userID, signedInfo) {
  * @param nodeID peer id of the obd node where the fundee logged in.
  * @param userID the user id of the fundee.
  * @param info 
- * @param isFunder 
  */
-function HTLCSigned(myUserID, nodeID, userID, info, isFunder) {
+function HTLCSigned(myUserID, nodeID, userID, info) {
     return new Promise((resolve, reject) => {
-        obdApi.htlcSigned(nodeID, userID, info, function(e) {
+        obdApi.htlcSigned(nodeID, userID, info, async function(e) {
             console.info('SDK: -100041 htlcSigned = ' + JSON.stringify(e));
             
             let channel_id = e.channel_id;
@@ -189,11 +188,10 @@ function HTLCSigned(myUserID, nodeID, userID, info, isFunder) {
             await sendSignedHex100101(nodeID, userID, signedInfo);
 
             // save some data
-            saveTempPrivKey(myUserID, kRsmcTempPrivKey, channel_id, 
-                info.curr_rsmc_temp_address_private_key);
-            saveTempPrivKey(myUserID, kHtlcTempPrivKey, channel_id, 
-                info.curr_htlc_temp_address_private_key);
-            saveChannelStatus(myUserID, channel_id, isFunder, kStatusHTLCSigned);
+            let privkey1 = getPrivKeyFromPubKey(myUserID, info.curr_rsmc_temp_address_pub_key);
+            let privkey2 = getPrivKeyFromPubKey(myUserID, info.curr_htlc_temp_address_pub_key);
+            saveTempPrivKey(myUserID, kRsmcTempPrivKey, channel_id, privkey1);
+            saveTempPrivKey(myUserID, kHtlcTempPrivKey, channel_id, privkey2);
             resolve(e);
         });
     })
@@ -216,12 +214,154 @@ function sendSignedHex100101(nodeID, userID, signedInfo) {
 
 /**
  * Type -100102 Protocol send signed info that signed in 110041 to OBD.
+ * @param myUserID  user id of currently loged in.
  * @param signedInfo 
  */
-function sendSignedHex100102(signedInfo) {
+function sendSignedHex100102(myUserID, signedInfo) {
     return new Promise((resolve, reject) => {
-        obdApi.sendSignedHex100102(signedInfo, function(e) {
+        obdApi.sendSignedHex100102(signedInfo, async function(e) {
             console.info('sendSignedHex100102 = ' + JSON.stringify(e));
+
+            let nodeID     = e.payee_node_address;
+            let userID     = e.payee_peer_id;
+            let channel_id = e.channel_id;
+
+            // Sign the tx on client side
+            // NO.1 c3a_htlc_htrd_raw_data
+            let ahh      = e.c3a_htlc_htrd_raw_data;
+            let inputs   = ahh.inputs;
+            let temp3    = getTempPrivKey(myUserID, kHtlcHtnxTempPrivKey, channel_id);
+            let ahh_hex  = signP2SH(true, ahh.hex, ahh.pub_key_a, ahh.pub_key_b, temp3, inputs);
+
+            // NO.2 c3b_htlc_br_raw_data
+            let bhb     = e.c3b_htlc_br_raw_data;
+            inputs      = bhb.inputs;
+            let temp2   = getTempPrivKey(myUserID, kHtlcTempPrivKey, channel_id);
+            let bhb_hex = signP2SH(true, bhb.hex, bhb.pub_key_a, bhb.pub_key_b, temp2, inputs);
+
+            // NO.3 c3b_htlc_hlock_raw_data
+            let bhl     = e.c3b_htlc_hlock_raw_data;
+            inputs      = bhl.inputs;
+            let bhl_hex = signP2SH(true, bhl.hex, bhl.pub_key_a, bhl.pub_key_b, temp2, inputs);
+
+            // NO.4 c3b_htlc_htd_raw_data
+            let bhh     = e.c3b_htlc_htd_raw_data;
+            inputs      = bhh.inputs;
+            let bhh_hex = signP2SH(true, bhh.hex, bhh.pub_key_a, bhh.pub_key_b, temp2, inputs);
+
+            // NO.5 c3b_rsmc_br_raw_data
+            let brb     = e.c3b_rsmc_br_raw_data;
+            inputs      = brb.inputs;
+            let privkey = await getFundingPrivKey(myUserID, channel_id);
+            let brb_hex = signP2SH(true, brb.hex, brb.pub_key_a, brb.pub_key_b, privkey, inputs);
+
+            // NO.6 c3b_rsmc_rd_raw_data
+            let brr     = e.c3b_rsmc_rd_raw_data;
+            inputs      = brr.inputs;
+            let brr_hex = signP2SH(true, brr.hex, brr.pub_key_a, brr.pub_key_b, privkey, inputs);
+            
+            // will send 100103
+            let signedInfo                               = new SignedInfo100103();
+            signedInfo.channel_id                        = channel_id;
+            signedInfo.c3a_htlc_htrd_partial_signed_hex  = ahh_hex;
+            signedInfo.c3b_rsmc_rd_partial_signed_hex    = brr_hex;
+            signedInfo.c3b_rsmc_br_partial_signed_hex    = brb_hex;
+            signedInfo.c3b_htlc_htd_partial_signed_hex   = bhh_hex;
+            signedInfo.c3b_htlc_hlock_partial_signed_hex = bhl_hex;
+            signedInfo.c3b_htlc_br_partial_signed_hex    = bhb_hex;
+            
+            // FUNCTION ONLY FOR GUI TOOL
+            displaySentMessage100103(nodeID, userID, signedInfo);
+
+            // SDK API
+            await sendSignedHex100103(nodeID, userID, signedInfo);
+
+            resolve(true);
+        });
+    })
+}
+
+/**
+ * Type -100103 Protocol send signed info that signed in 100040 to OBD.
+ * @param nodeID peer id of the obd node where the fundee logged in.
+ * @param userID the user id of the fundee.
+ * @param signedInfo 
+ */
+function sendSignedHex100103(nodeID, userID, signedInfo) {
+    return new Promise((resolve, reject) => {
+        obdApi.sendSignedHex100103(nodeID, userID, signedInfo, function(e) {
+            console.info('sendSignedHex100103 = ' + JSON.stringify(e));
+
+            // FUNCTION ONLY FOR GUI TOOL
+            // afterCommitmentTransactionAccepted();
+            // displayMyChannelListAtTopRight(kPageSize, kPageIndex);
+
+            resolve(true);
+        });
+    })
+}
+
+/**
+ * Type -100104 Protocol send signed info that signed in 110042 to OBD.
+ * @param myUserID  user id of currently loged in.
+ * @param signedInfo 
+ */
+function sendSignedHex100104(myUserID, signedInfo) {
+    return new Promise((resolve, reject) => {
+        obdApi.sendSignedHex100104(signedInfo, async function(e) {
+            console.info('sendSignedHex100104 = ' + JSON.stringify(e));
+
+            let nodeID     = e.payer_node_address;
+            let userID     = e.payer_peer_id;
+            let channel_id = e.channel_id;
+
+            // Sign the tx on client side
+            // NO.1
+            let tx     = e.c3b_htlc_hlock_he_raw_data;
+            let inputs = tx.inputs;
+            let temp3  = getTempPrivKey(myUserID, kHtlcHtnxTempPrivKey, channel_id);
+            let hex    = signP2SH(true, tx.hex, tx.pub_key_a, tx.pub_key_b, temp3, inputs);
+
+            // will send 100105
+            let signedInfo                                  = new SignedInfo100105();
+            signedInfo.channel_id                           = channel_id;
+            signedInfo.c3b_htlc_hlock_he_partial_signed_hex = hex;
+
+            // FUNCTION ONLY FOR GUI TOOL
+            displaySentMessage100105(nodeID, userID, signedInfo);
+
+            // SDK API
+            await sendSignedHex100105(myUserID, nodeID, userID, signedInfo, channel_id);
+
+            resolve(true);
+        });
+    })
+}
+
+/**
+ * Type -100105 Protocol send signed info that signed in 100104 to OBD.
+ * @param myUserID  user id of currently loged in.
+ * @param nodeID peer id of the obd node where the fundee logged in.
+ * @param userID the user id of the fundee.
+ * @param signedInfo 
+ * @param channel_id 
+ */
+function sendSignedHex100105(myUserID, nodeID, userID, signedInfo, channel_id) {
+    return new Promise((resolve, reject) => {
+        obdApi.sendSignedHex100105(nodeID, userID, signedInfo, async function(e) {
+            console.info('sendSignedHex100105 = ' + JSON.stringify(e));
+
+            let isFunder = await getIsFunder(myUserID, channel_id);
+            saveChannelStatus(myUserID, channel_id, isFunder, kStatusHTLCSigned);
+
+            // FUNCTION ONLY FOR GUI TOOL
+            afterHTLCSigned();
+
+            //------------------------------------------
+            // If Bob has R, will send -100045 forwardR
+            let privkey = await getFundingPrivKey(myUserID, channel_id);
+            payInvoiceStep4(myUserID, nodeID, userID, channel_id, privkey);
+
             resolve(true);
         });
     })
@@ -237,11 +377,48 @@ function sendSignedHex100102(signedInfo) {
  */
 function forwardR(myUserID, nodeID, userID, info, isFunder) {
     return new Promise((resolve, reject) => {
-        obdApi.forwardR(nodeID, userID, info, function(e) {
+        obdApi.forwardR(nodeID, userID, info, async function(e) {
             console.info('SDK: -100045 forwardR = ' + JSON.stringify(e));
-            saveTempPrivKey(myUserID, kHtlcHtnxTempPrivKey, e.channel_id, 
-                info.curr_htlc_temp_address_for_he1b_private_key);
-            saveChannelStatus(myUserID, e.channel_id, isFunder, kStatusForwardR);
+
+            let channel_id = e.channel_id;
+
+            // Sign the tx on client side
+            // NO.1
+            let tx     = e.c3b_htlc_herd_raw_data;
+            let inputs = tx.inputs;
+            let temp3  = getTempPrivKey(myUserID, kHtlcHtnxTempPrivKey, channel_id);
+            let hex    = signP2SH(true, tx.hex, tx.pub_key_a, tx.pub_key_b, temp3, inputs);
+            
+            // will send 100106
+            let signedInfo                              = new SignedInfo100106();
+            signedInfo.channel_id                       = channel_id;
+            signedInfo.c3b_htlc_herd_partial_signed_hex = hex;
+
+            // FUNCTION ONLY FOR GUI TOOL
+            displaySentMessage100106(nodeID, userID, signedInfo);
+
+            // SDK API
+            await sendSignedHex100106(nodeID, userID, signedInfo);
+
+            // save some data
+            // saveTempPrivKey(myUserID, kHtlcHtnxTempPrivKey, e.channel_id, 
+            //     info.curr_htlc_temp_address_for_he1b_private_key);
+            saveChannelStatus(myUserID, channel_id, isFunder, kStatusForwardR);
+            resolve(true);
+        });
+    })
+}
+
+/**
+ * Type -100106 Protocol send signed info that signed in 100045 to OBD.
+ * @param nodeID peer id of the obd node where the fundee logged in.
+ * @param userID the user id of the fundee.
+ * @param signedInfo 
+ */
+function sendSignedHex100106(nodeID, userID, signedInfo) {
+    return new Promise((resolve, reject) => {
+        obdApi.sendSignedHex100106(nodeID, userID, signedInfo, function(e) {
+            console.info('sendSignedHex100106 = ' + JSON.stringify(e));
             resolve(true);
         });
     })

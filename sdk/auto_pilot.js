@@ -193,20 +193,20 @@ async function listening110040(e, netType) {
     console.info('SDK: NOW isAutoMode = ' + isAutoMode);
 
     // Receiver sign the tx on client side
-    // NO.1 c3a_counterparty_partial_signed_data
+    // NO.1
     let cr      = e.c3a_counterparty_partial_signed_data;
     let inputs  = cr.inputs;
     let privkey = await getFundingPrivKey(myUserID, channel_id);
     let cr_hex  = signP2SH(false, cr.hex, cr.pub_key_a, cr.pub_key_b, privkey, inputs);
     saveSignedHex(myUserID, channel_id, cr_hex, kTbSignedHexCR110040);
 
-    // NO.2 c3a_htlc_partial_signed_data
+    // NO.2
     let hr     = e.c3a_htlc_partial_signed_data;
     inputs     = hr.inputs;
     let hr_hex = signP2SH(false, hr.hex, hr.pub_key_a, hr.pub_key_b, privkey, inputs);
     saveSignedHex(myUserID, channel_id, hr_hex, kTbSignedHexHR110040);
 
-    // NO.3 c3a_rsmc_partial_signed_data
+    // NO.3
     let rr     = e.c3a_rsmc_partial_signed_data;
     inputs     = rr.inputs;
     let rr_hex = signP2SH(false, rr.hex, rr.pub_key_a, rr.pub_key_b, privkey, inputs);
@@ -250,42 +250,26 @@ async function listening110040(e, netType) {
     // info.channel_address_private_key        = await getFundingPrivKey(myUserID, e.channel_id);
 
     // Save address index to OBD and can get private key back if lose it.
-    info.curr_rsmc_temp_address_index = Number(getIndexFromPubKey(addr_1.result.pubkey));
-    info.curr_htlc_temp_address_index = Number(getIndexFromPubKey(addr_2.result.pubkey));
+    info.curr_rsmc_temp_address_index = addr_1.result.index;
+    info.curr_htlc_temp_address_index = addr_2.result.index;
 
     // FUNCTION ONLY FOR GUI TOOL
     displaySentMessage100041(nodeID, userID, info, privkey);
 
     // SDK API
-    let resp = await HTLCSigned(myUserID, nodeID, userID, info, isFunder);
-
-    // WILL BE MOVED TO 100105 ???
-    // FUNCTION ONLY FOR GUI TOOL
-    afterHTLCSigned();
-
-    // WILL BE MOVED TO 100105
-    //------------------------
-    // If Bob has R, will send -100045 forwardR
-    // let fundingPrivKey = info.channel_address_private_key;
-    payInvoiceStep4(myUserID, resp, nodeID, userID, channel_id, privkey);
+    await HTLCSigned(myUserID, nodeID, userID, info);
 }
 
 /**
  * payInvoice Step 4, Bob will send -100045 forwardR
  * @param myUserID 
- * @param e 
  * @param nodeID 
  * @param userID 
  * @param channel_id
  * @param fundingPrivKey
  */
-async function payInvoiceStep4(myUserID, e, nodeID, userID, channel_id, fundingPrivKey) {
+async function payInvoiceStep4(myUserID, nodeID, userID, channel_id, fundingPrivKey) {
     
-    if (e === null) {
-        alert("HTLCSigned failed. payInvoice paused.");
-        return;
-    }
-
     let r = getPrivKeyFromPubKey(myUserID, getInvoiceH());
 
     // Bob has NOT R. Bob maybe a middleman node.
@@ -322,8 +306,6 @@ async function payInvoiceStep4(myUserID, e, nodeID, userID, channel_id, fundingP
  */
 async function listening110041(e) {
     
-    // TODO - 11-13 DAY
-
     let myUserID   = e.to_peer_id;
     let channel_id = e.channel_id;
 
@@ -331,7 +313,7 @@ async function listening110041(e) {
     // NO.1 c3a_htlc_hlock_partial_signed_data
     let ahl      = e.c3a_htlc_hlock_partial_signed_data;
     let inputs   = ahl.inputs;
-    let temp2    = getTempPrivKey(myUserID, kRsmcTempPrivKey, channel_id);
+    let temp2    = getTempPrivKey(myUserID, kHtlcTempPrivKey, channel_id);
     let ahl_hex  = signP2SH(false, ahl.hex, ahl.pub_key_a, ahl.pub_key_b, temp2, inputs);
 
     // NO.2 c3a_htlc_ht_partial_signed_data
@@ -375,11 +357,88 @@ async function listening110041(e) {
     displaySentMessage100102(signedInfo);
 
     // SDK API
-    await sendSignedHex100102(signedInfo);
+    await sendSignedHex100102(myUserID, signedInfo);
 
     // save some data
     let isFunder = await getIsFunder(myUserID, channel_id);
     saveChannelStatus(myUserID, channel_id, isFunder, kStatusHTLCSigned);
+}
+
+/**
+ * listening to -110042
+ * @param e 
+ * @param netType
+ */
+async function listening110042(e, netType) {
+    
+    let myUserID   = e.to_peer_id;
+    let channel_id = e.channel_id;
+
+    // Sign the tx on client side
+    // NO.1
+    let ahh      = e.c3a_htlc_hed_raw_data;
+    let inputs   = ahh.inputs;
+    let privkey  = await getFundingPrivKey(myUserID, channel_id);
+    let ahh_hex  = signP2SH(true, ahh.hex, ahh.pub_key_a, ahh.pub_key_b, privkey, inputs);
+
+    // NO.2
+    let ahb     = e.c3a_htlc_htbr_raw_data;
+    inputs      = ahb.inputs;
+    let ahb_hex = signP2SH(true, ahb.hex, ahb.pub_key_a, ahb.pub_key_b, privkey, inputs);
+
+    // NO.3
+    let ahr     = e.c3a_htlc_htrd_partial_data;
+    inputs      = ahr.inputs;
+    let ahr_hex = signP2SH(false, ahr.hex, ahr.pub_key_a, ahr.pub_key_b, privkey, inputs);
+
+    // NO.4
+    let bhl     = e.c3b_htlc_hlock_partial_data;
+    inputs      = bhl.inputs;
+    let temp2   = getTempPrivKey(myUserID, kHtlcTempPrivKey, channel_id);
+    let bhl_hex = signP2SH(false, bhl.hex, bhl.pub_key_a, bhl.pub_key_b, temp2, inputs);
+
+    // NO.5
+    let bhh     = e.c3b_htlc_htd_partial_data;
+    inputs      = bhh.inputs;
+    let bhh_hex = signP2SH(false, bhh.hex, bhh.pub_key_a, bhh.pub_key_b, temp2, inputs);
+
+    // NO.6
+    let brr     = e.c3b_rsmc_rd_partial_data;
+    inputs      = brr.inputs;
+    let temp1   = getTempPrivKey(myUserID, kRsmcTempPrivKey, channel_id);
+    let brr_hex = signP2SH(false, brr.hex, brr.pub_key_a, brr.pub_key_b, temp1, inputs);
+    
+    // will send 100104
+    // new address
+    let addr    = genNewAddress(myUserID, netType);
+    saveAddress(myUserID, addr);
+    // TempPrivKey NO.3
+    saveTempPrivKey(myUserID, kHtlcHtnxTempPrivKey, channel_id, addr.result.wif);
+
+    let signedInfo                                   = new SignedInfo100104();
+    signedInfo.channel_id                            = channel_id;
+    signedInfo.curr_htlc_temp_address_for_he_pub_key = addr.result.pubkey;
+    signedInfo.curr_htlc_temp_address_for_he_index   = addr.result.index;
+    signedInfo.c3a_htlc_htrd_complete_signed_hex     = ahr_hex;
+    signedInfo.c3a_htlc_htbr_partial_signed_hex      = ahb_hex;
+    signedInfo.c3a_htlc_hed_partial_signed_hex       = ahh_hex;
+    signedInfo.c3b_rsmc_rd_complete_signed_hex       = brr_hex;
+    signedInfo.c3b_htlc_htd_complete_signed_hex      = bhh_hex;
+    signedInfo.c3b_htlc_hlock_complete_signed_hex    = bhl_hex;
+
+    // FUNCTION ONLY FOR GUI TOOL
+    displaySentMessage100104(signedInfo);
+
+    // SDK API
+    await sendSignedHex100104(myUserID, signedInfo);
+}
+
+/**
+ * listening to -110043
+ * @param e 
+ */
+function listening110043(e) {
+    console.info('listening110043 = ' + JSON.stringify(e));
 }
 
 /**
@@ -391,17 +450,32 @@ async function listening110045(e) {
 
     let isAutoMode = getAutoPilot();
     console.info('SDK: NOW isAutoMode = ' + isAutoMode);
+    
+    let myUserID   = e.to_peer_id;
+    let channel_id = e.channel_id;
 
-    let myUserID = e.to_peer_id;
-
-    saveTempData(myUserID, e.channel_id, e.msg_hash);
+    // Sign the tx on client side
+    // NO.1 
+    let br      = e.c3b_htlc_hebr_raw_data;
+    let inputs  = br.inputs;
+    let privkey = await getFundingPrivKey(myUserID, channel_id);
+    let br_hex  = signP2SH(true, br.hex, br.pub_key_a, br.pub_key_b, privkey, inputs);
+    saveSignedHex(myUserID, channel_id, br_hex, kTbSignedHexBR110045);
+    
+    // NO.2
+    let rd     = e.c3b_htlc_herd_partial_signed_data;
+    inputs     = rd.inputs;
+    let rd_hex = signP2SH(false, rd.hex, rd.pub_key_a, rd.pub_key_b, privkey, inputs);
+    saveSignedHex(myUserID, channel_id, rd_hex, kTbSignedHexRD110045);
+    
+    // save some data - no need e.msg_hash ?
+    saveTempData(myUserID, channel_id, e.msg_hash); // e.msg_hash not found in doc
     saveInvoiceR(e.r);
-    // saveForwardR(myUserID, e.channel_id, e.r);
+    let isFunder = await getIsFunder(myUserID, channel_id);
+    saveChannelStatus(myUserID, channel_id, isFunder, kStatusForwardR);
 
-    let isFunder = await getIsFunder(myUserID, e.channel_id);
-    saveChannelStatus(myUserID, e.channel_id, isFunder, kStatusForwardR);
-
-    if (isAutoMode != 'Yes') {  // auto mode closed
+    // auto mode is closed
+    if (isAutoMode != 'Yes') {  
         let isInPayInvoice = getPayInvoiceCase();
         console.info('isInPayInvoice = ' + isInPayInvoice);
         // Not in pay invoice case
@@ -416,16 +490,18 @@ async function listening110045(e) {
     // Alice will send -100046 signR
     // is payInvoice Step 5 also
 
-    let info                         = new SignRInfo();
-    info.channel_id                  = e.channel_id;
-    info.r                           = e.r;
-    info.msg_hash                    = e.msg_hash;
-    info.channel_address_private_key = await getFundingPrivKey(myUserID, e.channel_id);
+    let info                               = new SignRInfo();
+    info.channel_id                        = channel_id;
+    info.c3b_htlc_herd_complete_signed_hex = rd_hex;
+    info.c3b_htlc_hebr_partial_signed_hex  = br_hex;
+    // info.r                           = e.r;
+    // info.msg_hash                    = e.msg_hash;
+    // info.channel_address_private_key = await getFundingPrivKey(myUserID, e.channel_id);
 
     // SDK API
     let resp = await signR(myUserID, nodeID, userID, info, isFunder);
 
-    // NOT SDK API. This a client function, just for Debugging Tool.
+    // FUNCTION ONLY FOR GUI TOOL
     displaySentMessage100046(nodeID, userID, info);
     afterSignR();
 

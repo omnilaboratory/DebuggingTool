@@ -953,40 +953,10 @@
                 },
                 {
                     "name": "channel_address_private_key",
-                    "help": "This is the private key used by Bob to create the channel. It will be used to sign HTD1b transaction in below picture.",
+                    "help": "Client use the private key to sign HTD1b transaction in below picture.",
                     "imgPath": "doc/tooltip/HTLC-4.png",
-                    "buttons": [
-                        {
-                            "innerText": "Display",
-                            "onclick": "displayUserDataInNewHtml('MyAddresses')"
-                        }
-                    ]
-                },
-                {
-                    "name": "curr_htlc_temp_address_for_he1b_pub_key",
-                    "help": "This public key of an address will be used to create a temp 2-2 multi-sig address as HE1b in below picture.",
-                    "imgPath": "doc/tooltip/HTLC-4.png",
-                    "buttons": [
-                        {
-                            "innerText": "Select",
-                            "onclick": "displayUserDataInNewHtml('MyAddresses')"
-                        },
-                        {
-                            "innerText": "Create",
-                            "onclick": "autoCreateAddress(-45)"
-                        }
-                    ]
-                },
-                {
-                    "name": "curr_htlc_temp_address_for_he1b_private_key",
-                    "help": "This private key of an address will be used to sign HE1b transaction in below picture.",
-                    "imgPath": "doc/tooltip/HTLC-4.png",
-                    "buttons": [
-                        {
-                            "innerText": "Select",
-                            "onclick": "displayUserDataInNewHtml('MyAddresses')"
-                        }
-                    ]
+                    "disable": "yes",
+                    "buttons": []
                 }
             ]
         },
@@ -1023,6 +993,14 @@
                     ]
                 },
                 {
+                    "name": "c3b_htlc_herd_complete_signed_hex",
+                    "buttons": []
+                },
+                {
+                    "name": "c3b_htlc_hebr_partial_signed_hex",
+                    "buttons": []
+                },
+                {
                     "name": "msg_hash",
                     "help": "The hash of commitment transaction created in HTLCSendR (type -45).",
                     "buttons": [
@@ -1031,19 +1009,14 @@
                 {
                     "name": "r",
                     "help": "The R (a Preimage R) currently is Private Key of a wallet address, and the H (Hash of a Preimage R) is Public Key of a wallet address. This is a temporary solution.",
-                    "buttons": [
-                    ]
+                    "buttons": []
                 },
                 {
                     "name": "channel_address_private_key",
-                    "help": "This is the private key used by Alice to create the channel. It will be used to sign HERD1b transaction in below picture.",
+                    "help": "Client use the private key to sign HERD1b transaction in below picture.",
                     "imgPath": "doc/tooltip/HTLC-4.png",
-                    "buttons": [
-                        {
-                            "innerText": "Display",
-                            "onclick": "displayUserDataInNewHtml('MyAddresses')"
-                        }
-                    ]
+                    "disable": "yes",
+                    "buttons": []
                 }
             ]
         },

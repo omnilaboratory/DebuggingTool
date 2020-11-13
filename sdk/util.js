@@ -155,6 +155,18 @@ const kTbSignedHexHR110040 = 'tb_signed_hex_HR110040';
 const kTbSignedHexRR110040 = 'tb_signed_hex_RR110040';
 
 /**
+ * Object Store (table) name of IndexedDB.
+ * Signed Hex BR110045
+ */
+const kTbSignedHexBR110045 = 'tb_signed_hex_BR110045';
+
+/**
+ * Object Store (table) name of IndexedDB.
+ * Signed Hex RD110045
+ */
+const kTbSignedHexRD110045 = 'tb_signed_hex_RD110045';
+
+/**
  *  List of Counterparties who have interacted
  *  @param myUserID The user id of logged in
  *  @param channel_id 
@@ -1235,6 +1247,16 @@ function openDB() {
         let os16;
         if (!db.objectStoreNames.contains(kTbSignedHexRR110040)) {
             os16 = db.createObjectStore(kTbSignedHexRR110040, { keyPath: 'key' });
+        }
+
+        let os17;
+        if (!db.objectStoreNames.contains(kTbSignedHexBR110045)) {
+            os17 = db.createObjectStore(kTbSignedHexBR110045, { keyPath: 'key' });
+        }
+
+        let os18;
+        if (!db.objectStoreNames.contains(kTbSignedHexRD110045)) {
+            os18 = db.createObjectStore(kTbSignedHexRD110045, { keyPath: 'key' });
         }
     }
 }

@@ -207,12 +207,12 @@ async function sdkForwardR() {
     let info        = new ForwardRInfo();
     info.channel_id = $("#channel_id").val();
     info.r          = $("#r").val();
-    info.channel_address_private_key                 = $("#channel_address_private_key").val();
-    info.curr_htlc_temp_address_for_he1b_pub_key     = $("#curr_htlc_temp_address_for_he1b_pub_key").val();
-    info.curr_htlc_temp_address_for_he1b_private_key = $("#curr_htlc_temp_address_for_he1b_private_key").val();
+    // info.channel_address_private_key                 = $("#channel_address_private_key").val();
+    // info.curr_htlc_temp_address_for_he1b_pub_key     = $("#curr_htlc_temp_address_for_he1b_pub_key").val();
+    // info.curr_htlc_temp_address_for_he1b_private_key = $("#curr_htlc_temp_address_for_he1b_private_key").val();
 
     // Save address index to OBD and can get private key back if lose it.
-    info.curr_htlc_temp_address_for_he1b_index = Number(getIndexFromPubKey(info.curr_htlc_temp_address_for_he1b_pub_key));
+    // info.curr_htlc_temp_address_for_he1b_index = Number(getIndexFromPubKey(info.curr_htlc_temp_address_for_he1b_pub_key));
 
     displaySentMessage100045(nodeID, userID, info);
 
@@ -231,11 +231,13 @@ async function sdkSignR() {
     let nodeID = $("#recipient_node_peer_id").val();
     let userID = $("#recipient_user_peer_id").val();
 
-    let info                         = new SignRInfo();
-    info.channel_id                  = $("#channel_id").val();
-    info.r                           = $("#r").val();
-    info.msg_hash                    = $("#msg_hash").val();
-    info.channel_address_private_key = $("#channel_address_private_key").val();
+    let info                               = new SignRInfo();
+    info.channel_id                        = $("#channel_id").val();
+    info.c3b_htlc_herd_complete_signed_hex = $("#c3b_htlc_herd_complete_signed_hex").val();
+    info.c3b_htlc_hebr_partial_signed_hex  = $("#c3b_htlc_hebr_partial_signed_hex").val();
+    // info.r                           = $("#r").val();
+    // info.msg_hash                    = $("#msg_hash").val();
+    // info.channel_address_private_key = $("#channel_address_private_key").val();
 
     displaySentMessage100046(nodeID, userID, info);
 
@@ -863,17 +865,8 @@ async function sdkHTLCSigned() {
 
     displaySentMessage100041(nodeID, userID, info);
 
-    let isFunder = await getIsFunder(myUserID, $("#curr_channel_id").text());
-    let e        = await HTLCSigned(myUserID, nodeID, userID, info, isFunder);
-
-    // WILL BE MOVED TO 100105  ???
-    afterHTLCSigned();
-
-    // WILL BE MOVED TO 100105
-    //------------------------
-    // If is payInvoice case, will send -100045 forwardR
-    let fundingPrivKey = info.channel_address_private_key;
-    payInvoiceStep4(myUserID, e, nodeID, userID, e.channel_id, fundingPrivKey);
+    // let isFunder = await getIsFunder(myUserID, $("#curr_channel_id").text());
+    await HTLCSigned(myUserID, nodeID, userID, info);
 }
 
 // -100401 
@@ -1990,19 +1983,12 @@ async function changeInvokeAPIEnable(status, isFunder, myUserID, channel_id) {
                 break;
             }
 
-            // if (isFunder === true) { // Is Alice
-            //     disableInvokeAPI();
-            // } else if (isFunder === false) { // Is Bob
-            // }
             enableInvokeAPI();
             fillCounterparty(myUserID, channel_id);
             fillChannelIDAndFundingPrivKey(myUserID, channel_id);
             fillCurrHtlcHe1bTempKey();
-            // data = await getInvoiceR(myUserID, channel_id);
-            // data = getInvoiceR();
             data = getPrivKeyFromPubKey(myUserID, getInvoiceH());
             $("#r").val(data);
-
             break;
 
         case 'signR':
@@ -2014,16 +2000,17 @@ async function changeInvokeAPIEnable(status, isFunder, myUserID, channel_id) {
                 break;
             }
 
-            // if (isFunder === false) { // Is Bob
-            //     disableInvokeAPI();
-            // } else if (isFunder === true) { // Is Alice
-            // }
             enableInvokeAPI();
             fillCounterparty(myUserID, channel_id);
             fillChannelIDAndFundingPrivKey(myUserID, channel_id);
             $("#msg_hash").val(await getTempData(myUserID, channel_id));
             $("#r").val(getInvoiceR());
-            // $("#r").val(await getForwardR(myUserID, channel_id));
+
+            data = await getSignedHex(myUserID, channel_id, kTbSignedHexBR110045);
+            $("#c3b_htlc_hebr_partial_signed_hex").val(data);
+
+            data = await getSignedHex(myUserID, channel_id, kTbSignedHexRD110045);
+            $("#c3b_htlc_herd_complete_signed_hex").val(data);
 
             break;
 
@@ -4034,10 +4021,12 @@ function displaySentMessage100046(nodeID, userID, info) {
         recipient_node_peer_id: nodeID,
         recipient_user_peer_id: userID,
         data: {
-            channel_id:                  info.channel_id,
-            msg_hash:                    info.msg_hash,
-            r:                           info.r,
-            channel_address_private_key: info.channel_address_private_key,
+            channel_id:                        info.channel_id,
+            c3b_htlc_herd_complete_signed_hex: info.c3b_htlc_herd_complete_signed_hex,
+            c3b_htlc_hebr_partial_signed_hex:  info.c3b_htlc_hebr_partial_signed_hex,
+            // msg_hash:                    info.msg_hash,
+            // r:                           info.r,
+            // channel_address_private_key: info.channel_address_private_key,
         }
     }
 
@@ -4286,9 +4275,9 @@ function displaySentMessage100045(nodeID, userID, info) {
         data: {
             channel_id: info.channel_id,
             r:          info.r,
-            channel_address_private_key: info.channel_address_private_key,
-            curr_htlc_temp_address_for_he1b_pub_key: info.curr_htlc_temp_address_for_he1b_pub_key,
-            curr_htlc_temp_address_for_he1b_private_key: info.curr_htlc_temp_address_for_he1b_private_key,
+            // channel_address_private_key: info.channel_address_private_key,
+            // curr_htlc_temp_address_for_he1b_pub_key: info.curr_htlc_temp_address_for_he1b_pub_key,
+            // curr_htlc_temp_address_for_he1b_private_key: info.curr_htlc_temp_address_for_he1b_private_key,
         }
     }
 
@@ -4591,6 +4580,20 @@ function registerEvent(netType) {
     obdApi.registerEvent(msg_110041, function(e) {
         listening110041(e);
         listening110041ForGUITool(e);
+    });
+    
+    // auto response mode
+    let msg_110042 = enumMsgType.MsgType_HTLC_BobSignC3bSubTx_42;
+    obdApi.registerEvent(msg_110042, function(e) {
+        listening110042(e, netType);
+        // listening110041ForGUITool(e);
+    });
+    
+    // auto response mode
+    let msg_110043 = enumMsgType.MsgType_HTLC_FinishTransferH_43;
+    obdApi.registerEvent(msg_110043, function(e) {
+        listening110043(e);
+        // listening110041ForGUITool(e);
     });
 
     // auto response mode
@@ -6082,15 +6085,101 @@ function displaySentMessage100102(info) {
     let msgSend = {
         type: -100102,
         data: {
-            channel_id:                          info.channel_id,
-            c3a_rsmc_rd_partial_signed_hex:      info.c3a_rsmc_rd_partial_signed_hex,
-            c3a_rsmc_br_partial_signed_hex:      info.c3a_rsmc_br_partial_signed_hex,
-            c3a_htlc_ht_partial_signed_hex:      info.c3a_htlc_ht_partial_signed_hex,
-            c3a_htlc_hlock_partial_signed_hex:   info.c3a_htlc_hlock_partial_signed_hex,
-            c3a_htlc_br_partial_signed_hex:      info.c3a_htlc_br_partial_signed_hex,
-            c3b_rsmc_partial_signed_hex:         info.c3b_rsmc_partial_signed_hex,
-            c3b_counterparty_partial_signed_hex: info.c3b_counterparty_partial_signed_hex,
-            c3b_htlc_partial_signed_hex:         info.c3b_htlc_partial_signed_hex,
+            channel_id:                           info.channel_id,
+            c3a_rsmc_rd_complete_signed_hex:      info.c3a_rsmc_rd_complete_signed_hex,
+            c3a_htlc_ht_complete_signed_hex:      info.c3a_htlc_ht_complete_signed_hex,
+            c3a_htlc_hlock_complete_signed_hex:   info.c3a_htlc_hlock_complete_signed_hex,
+            c3b_rsmc_complete_signed_hex:         info.c3b_rsmc_complete_signed_hex,
+            c3b_counterparty_complete_signed_hex: info.c3b_counterparty_complete_signed_hex,
+            c3b_htlc_complete_signed_hex:         info.c3b_htlc_complete_signed_hex,
+        }
+    }
+
+    displaySentMessage(msgSend);
+}
+
+/**
+ * -100103 Display the sent message in the message box and save it to the log file
+ * @param nodeID 
+ * @param userID
+ * @param info 
+ */
+function displaySentMessage100103(nodeID, userID, info) {
+    let msgSend = {
+        type: -100103,
+        recipient_node_peer_id: nodeID,
+        recipient_user_peer_id: userID,
+        data: {
+            channel_id:                        info.channel_id,
+            c3a_htlc_htrd_partial_signed_hex:  info.c3a_htlc_htrd_partial_signed_hex,
+            c3b_rsmc_rd_partial_signed_hex:    info.c3b_rsmc_rd_partial_signed_hex,
+            c3b_rsmc_br_partial_signed_hex:    info.c3b_rsmc_br_partial_signed_hex,
+            c3b_htlc_htd_partial_signed_hex:   info.c3b_htlc_htd_partial_signed_hex,
+            c3b_htlc_hlock_partial_signed_hex: info.c3b_htlc_hlock_partial_signed_hex,
+            c3b_htlc_br_partial_signed_hex:    info.c3b_htlc_br_partial_signed_hex,
+        }
+    }
+
+    displaySentMessage(msgSend);
+}
+
+/**
+ * -100102 Display the sent message in the message box and save it to the log file
+ * @param info 
+ */
+function displaySentMessage100104(info) {
+    let msgSend = {
+        type: -100104,
+        data: {
+            channel_id:                            info.channel_id,
+            curr_htlc_temp_address_for_he_pub_key: info.curr_htlc_temp_address_for_he_pub_key,
+            curr_htlc_temp_address_for_he_index:   info.curr_htlc_temp_address_for_he_index,
+            c3a_htlc_htrd_complete_signed_hex:     info.c3a_htlc_htrd_complete_signed_hex,
+            c3a_htlc_htbr_partial_signed_hex:      info.c3a_htlc_htbr_partial_signed_hex,
+            c3a_htlc_hed_partial_signed_hex:       info.c3a_htlc_hed_partial_signed_hex,
+            c3b_rsmc_rd_complete_signed_hex:       info.c3b_rsmc_rd_complete_signed_hex,
+            c3b_htlc_htd_complete_signed_hex:      info.c3b_htlc_htd_complete_signed_hex,
+            c3b_htlc_hlock_complete_signed_hex:    info.c3b_htlc_hlock_complete_signed_hex,
+        }
+    }
+
+    displaySentMessage(msgSend);
+}
+
+/**
+ * -100105 Display the sent message in the message box and save it to the log file
+ * @param nodeID 
+ * @param userID
+ * @param info 
+ */
+function displaySentMessage100105(nodeID, userID, info) {
+    let msgSend = {
+        type: -100105,
+        recipient_node_peer_id: nodeID,
+        recipient_user_peer_id: userID,
+        data: {
+            channel_id:                           info.channel_id,
+            c3b_htlc_hlock_he_partial_signed_hex: info.c3b_htlc_hlock_he_partial_signed_hex,
+        }
+    }
+
+    displaySentMessage(msgSend);
+}
+
+/**
+ * -100106 Display the sent message in the message box and save it to the log file
+ * @param nodeID 
+ * @param userID
+ * @param info 
+ */
+function displaySentMessage100106(nodeID, userID, info) {
+    let msgSend = {
+        type: -100106,
+        recipient_node_peer_id: nodeID,
+        recipient_user_peer_id: userID,
+        data: {
+            channel_id:                       info.channel_id,
+            c3b_htlc_herd_partial_signed_hex: info.c3b_htlc_herd_partial_signed_hex,
         }
     }
 
