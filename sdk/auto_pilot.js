@@ -469,8 +469,9 @@ async function listening110045(e) {
     saveSignedHex(myUserID, channel_id, rd_hex, kTbSignedHexRD110045);
     
     // save some data - no need e.msg_hash ?
-    saveTempData(myUserID, channel_id, e.msg_hash); // e.msg_hash not found in doc
-    saveInvoiceR(e.r);
+    // saveTempData(myUserID, channel_id, e.msg_hash); // e.msg_hash not found in doc
+    // saveInvoiceR(e.r);
+
     let isFunder = await getIsFunder(myUserID, channel_id);
     saveChannelStatus(myUserID, channel_id, isFunder, kStatusForwardR);
 
@@ -498,18 +499,20 @@ async function listening110045(e) {
     // info.msg_hash                    = e.msg_hash;
     // info.channel_address_private_key = await getFundingPrivKey(myUserID, e.channel_id);
 
-    // SDK API
-    let resp = await signR(myUserID, nodeID, userID, info, isFunder);
-
     // FUNCTION ONLY FOR GUI TOOL
     displaySentMessage100046(nodeID, userID, info);
+    
+    // SDK API
+    let resp = await signR(myUserID, nodeID, userID, info, isFunder);
+    
+    // FUNCTION ONLY FOR GUI TOOL
     afterSignR();
 
     //------------------------
     // ////// If is payInvoice case, Alice will send -100049 closeHTLC
     // Alice will send -100049 closeHTLC
-    let fundingPrivKey = info.channel_address_private_key;
-    payInvoiceStep6(myUserID, resp, nodeID, userID, e.channel_id, fundingPrivKey);
+    // let fundingPrivKey = info.channel_address_private_key;
+    payInvoiceStep6(myUserID, resp, nodeID, userID, e.channel_id, privkey);
 }
 
 /**

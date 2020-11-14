@@ -1590,21 +1590,6 @@ class ObdApi {
       return;
     }
 
-    if (this.isNotString(info.channel_address_private_key)) {
-      alert("empty channel_address_private_key");
-      return;
-    }
-
-    if (this.isNotString(info.curr_htlc_temp_address_for_he1b_pub_key)) {
-      alert("empty curr_htlc_temp_address_for_he1b_pub_key");
-      return;
-    }
-
-    if (this.isNotString(info.curr_htlc_temp_address_for_he1b_private_key)) {
-      alert("empty curr_htlc_temp_address_for_he1b_private_key");
-      return;
-    }
-
     let msg = new Message();
     msg.type = this.messageType.MsgType_HTLC_SendVerifyR_45;
     msg.data = info;
@@ -1639,21 +1624,6 @@ class ObdApi {
 
     if (this.isNotString(info.channel_id)) {
       alert("empty channel_id");
-      return;
-    }
-
-    if (this.isNotString(info.msg_hash)) {
-      alert("empty msg_hash");
-      return;
-    }
-
-    if (this.isNotString(info.r)) {
-      alert("empty r");
-      return;
-    }
-
-    if (this.isNotString(info.channel_address_private_key)) {
-      alert("empty channel_address_private_key");
       return;
     }
 

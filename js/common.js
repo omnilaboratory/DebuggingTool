@@ -2003,8 +2003,9 @@ async function changeInvokeAPIEnable(status, isFunder, myUserID, channel_id) {
             enableInvokeAPI();
             fillCounterparty(myUserID, channel_id);
             fillChannelIDAndFundingPrivKey(myUserID, channel_id);
-            $("#msg_hash").val(await getTempData(myUserID, channel_id));
-            $("#r").val(getInvoiceR());
+
+            // $("#msg_hash").val(await getTempData(myUserID, channel_id));
+            // $("#r").val(getInvoiceR());
 
             data = await getSignedHex(myUserID, channel_id, kTbSignedHexBR110045);
             $("#c3b_htlc_hebr_partial_signed_hex").val(data);
@@ -4867,17 +4868,26 @@ function listening110041ForGUITool(e) {
  */
 function listening110045ForGUITool(e) {
 
-    tipsOnTop(e.channel_id, kTips110045, 'Sign R', 'signR');
+    let isAutoMode = getAutoPilot();
 
-    let api_name = $("#api_name").text();
-    if (api_name === 'signR') {
-        enableInvokeAPI();
-        fillChannelIDAndFundingPrivKey($("#logined").text(), e.channel_id);
-
-        $("#recipient_node_peer_id").val(e.payee_node_address);
-        $("#recipient_user_peer_id").val(e.payee_peer_id);
-        $("#msg_hash").val(e.msg_hash);
-        $("#r").val(e.r);
+    // auto mode is opening
+    if (isAutoMode === 'Yes') {
+        tipsOnTop(e.channel_id, kProcessing);
+    } else { // auto mode is closed
+        tipsOnTop(e.channel_id, kTips110045, 'Sign R', 'signR');
+    
+        let api_name = $("#api_name").text();
+        if (api_name === 'signR') {
+            enableInvokeAPI();
+            fillChannelIDAndFundingPrivKey($("#logined").text(), e.channel_id);
+    
+            $("#recipient_node_peer_id").val(e.payee_node_address);
+            $("#recipient_user_peer_id").val(e.payee_peer_id);
+            // $("#msg_hash").val(e.msg_hash);
+            // $("#r").val(e.r);
+            $("#c3b_htlc_herd_complete_signed_hex").val(kSignedHexTip);
+            $("#c3b_htlc_hebr_partial_signed_hex").val(kSignedHexTip);
+        }
     }
 }
 
