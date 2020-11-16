@@ -197,6 +197,39 @@ class SignedInfo100106 {
         this.c3b_htlc_herd_partial_signed_hex = "";
     }
 }
+class SignedInfo100110 {
+    constructor() {
+        this.channel_id = "";
+        this.counterparty_partial_signed_hex = "";
+        this.rsmc_partial_signed_hex = "";
+    }
+}
+class SignedInfo100111 {
+    constructor() {
+        this.channel_id = "";
+        this.c4a_rd_signed_hex = "";
+        this.c4a_br_signed_hex = "";
+        this.c4a_br_id = "";
+        this.c4b_rsmc_signed_hex = "";
+        this.c4b_counterparty_signed_hex = "";
+    }
+}
+class SignedInfo100112 {
+    constructor() {
+        this.channel_id = "";
+        this.c4a_rd_complete_signed_hex = "";
+        this.c4b_rsmc_complete_signed_hex = "";
+        this.c4b_counterparty_complete_signed_hex = "";
+    }
+}
+class SignedInfo100113 {
+    constructor() {
+        this.channel_id = "";
+        this.c4b_rd_partial_signed_hex = "";
+        this.c4b_br_partial_signed_hex = "";
+        this.c4b_br_id = "";
+    }
+}
 class CommitmentTx {
     constructor() {
         this.channel_id = "";
@@ -323,24 +356,24 @@ class SignRInfo {
 class CloseHtlcTxInfo {
     constructor() {
         this.channel_id = "";
-        this.channel_address_private_key = "";
+        // channel_address_private_key: string = "";
         this.last_rsmc_temp_address_private_key = "";
         this.last_htlc_temp_address_private_key = "";
         this.last_htlc_temp_address_for_htnx_private_key = "";
         this.curr_rsmc_temp_address_pub_key = "";
-        this.curr_rsmc_temp_address_private_key = "";
+        // curr_rsmc_temp_address_private_key: string = "";
         this.curr_rsmc_temp_address_index = 0;
     }
 }
 class CloseHtlcTxInfoSigned {
     constructor() {
         this.msg_hash = "";
-        this.channel_address_private_key = "";
+        // channel_address_private_key: string = "";
         this.last_rsmc_temp_address_private_key = "";
         this.last_htlc_temp_address_private_key = "";
         this.last_htlc_temp_address_for_htnx_private_key = "";
         this.curr_rsmc_temp_address_pub_key = "";
-        this.curr_rsmc_temp_address_private_key = "";
+        // curr_rsmc_temp_address_private_key: string = "";
         this.curr_rsmc_temp_address_index = 0;
     }
 }
@@ -506,6 +539,7 @@ class MessageType {
         this.MsgType_HTLC_RecvRequestCloseCurrTx_49 = -110049;
         this.MsgType_HTLC_SendCloseSigned_50 = -100050;
         this.MsgType_HTLC_RecvCloseSigned_50 = -110050;
+        this.MsgType_HTLC_Close_ClientSign_Bob_C4bSub_51 = -110051;
         this.MsgType_HTLC_ClientSign_Alice_C3a_100 = -100100;
         this.MsgType_HTLC_ClientSign_Bob_C3b_101 = -100101;
         this.MsgType_HTLC_ClientSign_Alice_C3b_102 = -100102;
@@ -514,6 +548,11 @@ class MessageType {
         this.MsgType_HTLC_ClientSign_Alice_He_105 = -100105;
         this.MsgType_HTLC_ClientSign_Bob_HeSub_106 = -100106;
         this.MsgType_HTLC_ClientSign_Alice_HeSub_107 = -100107;
+        this.MsgType_HTLC_Close_ClientSign_Alice_C4a_110 = -100110;
+        this.MsgType_HTLC_Close_ClientSign_Bob_C4b_111 = -100111;
+        this.MsgType_HTLC_Close_ClientSign_Alice_C4b_112 = -100112;
+        this.MsgType_HTLC_Close_ClientSign_Alice_C4bSub_113 = -100113;
+        this.MsgType_HTLC_Close_ClientSign_Bob_C4bSubResult_114 = -100114;
         this.MsgType_Atomic_SendSwap_80 = -100080;
         this.MsgType_Atomic_RecvSwap_80 = -110080;
         this.MsgType_Atomic_SendSwapAccept_81 = -100081;

@@ -173,6 +173,35 @@ class SignedInfo100106 {
   c3b_htlc_herd_partial_signed_hex: string = "";
 }
 
+class SignedInfo100110 {
+  channel_id: string = "";
+  counterparty_partial_signed_hex: string = "";
+  rsmc_partial_signed_hex: string = "";
+}
+
+class SignedInfo100111 {
+  channel_id: string = "";
+  c4a_rd_signed_hex: string = "";
+  c4a_br_signed_hex: string = "";
+  c4a_br_id: string = "";
+  c4b_rsmc_signed_hex: string = "";
+  c4b_counterparty_signed_hex: string = "";
+}
+
+class SignedInfo100112 {
+  channel_id: string = "";
+  c4a_rd_complete_signed_hex: string = "";
+  c4b_rsmc_complete_signed_hex: string = "";
+  c4b_counterparty_complete_signed_hex: string = "";
+}
+
+class SignedInfo100113 {
+  channel_id: string = "";
+  c4b_rd_partial_signed_hex: string = "";
+  c4b_br_partial_signed_hex: string = "";
+  c4b_br_id: string = "";
+}
+
 class CommitmentTx {
   channel_id: string = "";
   amount: number = 0;
@@ -288,23 +317,23 @@ class SignRInfo {
 
 class CloseHtlcTxInfo {
   channel_id: string = "";
-  channel_address_private_key: string = "";
+  // channel_address_private_key: string = "";
   last_rsmc_temp_address_private_key: string = "";
   last_htlc_temp_address_private_key: string = "";
   last_htlc_temp_address_for_htnx_private_key: string = "";
   curr_rsmc_temp_address_pub_key: string = "";
-  curr_rsmc_temp_address_private_key: string = "";
+  // curr_rsmc_temp_address_private_key: string = "";
   curr_rsmc_temp_address_index: number = 0;
 }
 
 class CloseHtlcTxInfoSigned {
   msg_hash: string = "";
-  channel_address_private_key: string = "";
+  // channel_address_private_key: string = "";
   last_rsmc_temp_address_private_key: string = "";
   last_htlc_temp_address_private_key: string = "";
   last_htlc_temp_address_for_htnx_private_key: string = "";
   curr_rsmc_temp_address_pub_key: string = "";
-  curr_rsmc_temp_address_private_key: string = "";
+  // curr_rsmc_temp_address_private_key: string = "";
   curr_rsmc_temp_address_index: number = 0;
 }
 
@@ -473,6 +502,7 @@ class MessageType {
   MsgType_HTLC_RecvRequestCloseCurrTx_49  = -110049;
 	MsgType_HTLC_SendCloseSigned_50         = -100050;
   MsgType_HTLC_RecvCloseSigned_50         = -110050;
+	MsgType_HTLC_Close_ClientSign_Bob_C4bSub_51 = -110051;
   
 	MsgType_HTLC_ClientSign_Alice_C3a_100     = -100100;
 	MsgType_HTLC_ClientSign_Bob_C3b_101       = -100101;
@@ -482,6 +512,12 @@ class MessageType {
 	MsgType_HTLC_ClientSign_Alice_He_105      = -100105;
 	MsgType_HTLC_ClientSign_Bob_HeSub_106     = -100106;
   MsgType_HTLC_ClientSign_Alice_HeSub_107   = -100107;
+  
+  MsgType_HTLC_Close_ClientSign_Alice_C4a_110         = -100110;
+	MsgType_HTLC_Close_ClientSign_Bob_C4b_111           = -100111;
+	MsgType_HTLC_Close_ClientSign_Alice_C4b_112         = -100112;
+	MsgType_HTLC_Close_ClientSign_Alice_C4bSub_113      = -100113;
+  MsgType_HTLC_Close_ClientSign_Bob_C4bSubResult_114  = -100114;
   
   MsgType_Atomic_SendSwap_80         = -100080;
   MsgType_Atomic_RecvSwap_80         = -110080;

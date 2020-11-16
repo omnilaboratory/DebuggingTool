@@ -80,7 +80,7 @@ function fundingBitcoin(myUserID, info) {
 
             // Sign the tx on client
             let privkey    = getPrivKeyFromAddress(info.from_address);
-            let signed_hex = signP2PKH(e.hex, privkey);
+            let signed_hex = signP2PKH(e.hex, privkey, e.inputs);
 
             // saveFundingPrivKey(myUserID, channel_id, info.from_address_private_key);
 
@@ -205,7 +205,8 @@ function fundingAsset(myUserID, info) {
             
             // Sign the tx on client
             let privkey    = getPrivKeyFromAddress(info.from_address);
-            let signed_hex = signP2PKH(e.hex, privkey);
+            // console.info('fundingAsset privkey = ' + privkey);
+            let signed_hex = signP2PKH(e.hex, privkey, e.inputs);
 
             let channel_id = await getChannelIDFromAddr(info.to_address);
             saveChannelStatus(myUserID, channel_id, true, kStatusFundingAsset);

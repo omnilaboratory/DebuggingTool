@@ -1211,6 +1211,141 @@ class ObdApi {
         this.sendData(msg, callback);
     }
     /**
+     * MsgType_HTLC_ClientSign_Bob_HeSub_106
+     * @param recipient_node_peer_id string
+     * @param recipient_user_peer_id string
+     * @param info  SignedInfo100106
+     * @param callback  Function
+     */
+    sendSignedHex100106(recipient_node_peer_id, recipient_user_peer_id, info, callback) {
+        if (this.isNotString(recipient_node_peer_id)) {
+            alert("error recipient_node_peer_id");
+            return;
+        }
+        if (this.isNotString(recipient_user_peer_id)) {
+            alert("error recipient_user_peer_id");
+            return;
+        }
+        if (this.isNotString(info.channel_id)) {
+            alert("empty channel_id");
+            return;
+        }
+        let msg = new Message();
+        msg.type = this.messageType.MsgType_HTLC_ClientSign_Bob_HeSub_106;
+        msg.recipient_user_peer_id = recipient_user_peer_id;
+        msg.recipient_node_peer_id = recipient_node_peer_id;
+        msg.data = info;
+        this.sendData(msg, callback);
+    }
+    /**
+     * MsgType_HTLC_Close_ClientSign_Alice_C4a_110
+     * @param recipient_node_peer_id string
+     * @param recipient_user_peer_id string
+     * @param info  SignedInfo100110
+     * @param callback  Function
+     */
+    sendSignedHex100110(recipient_node_peer_id, recipient_user_peer_id, info, callback) {
+        if (this.isNotString(recipient_node_peer_id)) {
+            alert("error recipient_node_peer_id");
+            return;
+        }
+        if (this.isNotString(recipient_user_peer_id)) {
+            alert("error recipient_user_peer_id");
+            return;
+        }
+        if (this.isNotString(info.channel_id)) {
+            alert("empty channel_id");
+            return;
+        }
+        let msg = new Message();
+        msg.type = this.messageType.MsgType_HTLC_Close_ClientSign_Alice_C4a_110;
+        msg.recipient_user_peer_id = recipient_user_peer_id;
+        msg.recipient_node_peer_id = recipient_node_peer_id;
+        msg.data = info;
+        this.sendData(msg, callback);
+    }
+    /**
+     * MsgType_HTLC_Close_ClientSign_Bob_C4b_111
+     * @param recipient_node_peer_id string
+     * @param recipient_user_peer_id string
+     * @param info  SignedInfo100111
+     * @param callback  Function
+     */
+    sendSignedHex100111(recipient_node_peer_id, recipient_user_peer_id, info, callback) {
+        if (this.isNotString(recipient_node_peer_id)) {
+            alert("error recipient_node_peer_id");
+            return;
+        }
+        if (this.isNotString(recipient_user_peer_id)) {
+            alert("error recipient_user_peer_id");
+            return;
+        }
+        if (this.isNotString(info.channel_id)) {
+            alert("empty channel_id");
+            return;
+        }
+        let msg = new Message();
+        msg.type = this.messageType.MsgType_HTLC_Close_ClientSign_Bob_C4b_111;
+        msg.recipient_user_peer_id = recipient_user_peer_id;
+        msg.recipient_node_peer_id = recipient_node_peer_id;
+        msg.data = info;
+        this.sendData(msg, callback);
+    }
+    /**
+     * MsgType_HTLC_Close_ClientSign_Alice_C4b_112
+     * @param recipient_node_peer_id string
+     * @param recipient_user_peer_id string
+     * @param info  SignedInfo100112
+     * @param callback  Function
+     */
+    sendSignedHex100112(recipient_node_peer_id, recipient_user_peer_id, info, callback) {
+        if (this.isNotString(recipient_node_peer_id)) {
+            alert("error recipient_node_peer_id");
+            return;
+        }
+        if (this.isNotString(recipient_user_peer_id)) {
+            alert("error recipient_user_peer_id");
+            return;
+        }
+        if (this.isNotString(info.channel_id)) {
+            alert("empty channel_id");
+            return;
+        }
+        let msg = new Message();
+        msg.type = this.messageType.MsgType_HTLC_Close_ClientSign_Alice_C4b_112;
+        msg.recipient_user_peer_id = recipient_user_peer_id;
+        msg.recipient_node_peer_id = recipient_node_peer_id;
+        msg.data = info;
+        this.sendData(msg, callback);
+    }
+    /**
+     * MsgType_HTLC_Close_ClientSign_Alice_C4bSub_113
+     * @param recipient_node_peer_id string
+     * @param recipient_user_peer_id string
+     * @param info  SignedInfo100113
+     * @param callback  Function
+     */
+    sendSignedHex100113(recipient_node_peer_id, recipient_user_peer_id, info, callback) {
+        if (this.isNotString(recipient_node_peer_id)) {
+            alert("error recipient_node_peer_id");
+            return;
+        }
+        if (this.isNotString(recipient_user_peer_id)) {
+            alert("error recipient_user_peer_id");
+            return;
+        }
+        if (this.isNotString(info.channel_id)) {
+            alert("empty channel_id");
+            return;
+        }
+        let msg = new Message();
+        msg.type = this.messageType.MsgType_HTLC_Close_ClientSign_Alice_C4bSub_113;
+        msg.recipient_user_peer_id = recipient_user_peer_id;
+        msg.recipient_node_peer_id = recipient_node_peer_id;
+        msg.data = info;
+        this.sendData(msg, callback);
+    }
+    /**
      * MsgType_HTLC_SendAddHTLCSigned_41
      * @param recipient_node_peer_id string
      * @param recipient_user_peer_id string

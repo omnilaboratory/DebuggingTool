@@ -45,20 +45,20 @@ function addHTLC(myUserID, nodeID, userID, info, isFunder) {
             // afterCommitmentTransactionCreated();
 
             // Sender sign the tx on client side
-            // NO.1 c3a_counterparty_raw_data
+            // NO.1
             let cr      = e.c3a_counterparty_raw_data;
             let inputs  = cr.inputs;
             let privkey = await getFundingPrivKey(myUserID, e.channel_id);
             let cr_hex  = signP2SH(true, cr.hex, cr.pub_key_a, cr.pub_key_b, 
                 privkey, inputs);
 
-            // NO.2 c3a_htlc_raw_data
+            // NO.2
             let hr     = e.c3a_htlc_raw_data;
             inputs     = hr.inputs;
             let hr_hex = signP2SH(true, hr.hex, hr.pub_key_a, hr.pub_key_b, 
                 privkey, inputs);
 
-            // NO.3 c3a_rsmc_raw_data
+            // NO.3
             let rr     = e.c3a_rsmc_raw_data;
             inputs     = rr.inputs;
             let rr_hex = signP2SH(true, rr.hex, rr.pub_key_a, rr.pub_key_b, 
@@ -125,46 +125,50 @@ function HTLCSigned(myUserID, nodeID, userID, info) {
         obdApi.htlcSigned(nodeID, userID, info, async function(e) {
             console.info('SDK: -100041 htlcSigned = ' + JSON.stringify(e));
             
+            // FUNCTION ONLY FOR GUI TOOL
+            disableInvokeAPI();
+            tipsOnTop('', kProcessing);
+
             let channel_id = e.channel_id;
 
             // Sign the tx on client side
-            // NO.1 c3a_htlc_br_raw_data
+            // NO.1
             let ahb      = e.c3a_htlc_br_raw_data;
             let inputs   = ahb.inputs;
             let privkey  = await getFundingPrivKey(myUserID, channel_id);
             let ahb_hex  = signP2SH(true, ahb.hex, ahb.pub_key_a, ahb.pub_key_b, privkey, inputs);
 
-            // NO.2 c3a_htlc_hlock_raw_data
+            // NO.2
             let ahl     = e.c3a_htlc_hlock_raw_data;
             inputs      = ahl.inputs;
             let ahl_hex = signP2SH(true, ahl.hex, ahl.pub_key_a, ahl.pub_key_b, privkey, inputs);
 
-            // NO.3 c3a_htlc_ht_raw_data
+            // NO.3
             let ahh     = e.c3a_htlc_ht_raw_data;
             inputs      = ahh.inputs;
             let ahh_hex = signP2SH(true, ahh.hex, ahh.pub_key_a, ahh.pub_key_b, privkey, inputs);
 
-            // NO.4 c3a_rsmc_br_raw_data
+            // NO.4
             let arb     = e.c3a_rsmc_br_raw_data;
             inputs      = arb.inputs;
             let arb_hex = signP2SH(true, arb.hex, arb.pub_key_a, arb.pub_key_b, privkey, inputs);
 
-            // NO.5 c3a_rsmc_rd_raw_data
+            // NO.5
             let arr     = e.c3a_rsmc_rd_raw_data;
             inputs      = arr.inputs;
             let arr_hex = signP2SH(true, arr.hex, arr.pub_key_a, arr.pub_key_b, privkey, inputs);
 
-            // NO.6 c3b_counterparty_raw_data
+            // NO.6
             let bc     = e.c3b_counterparty_raw_data;
             inputs     = bc.inputs;
             let bc_hex = signP2SH(true, bc.hex, bc.pub_key_a, bc.pub_key_b, privkey, inputs);
 
-            // NO.7 c3b_htlc_raw_data
+            // NO.7
             let bh     = e.c3b_htlc_raw_data;
             inputs     = bh.inputs;
             let bh_hex = signP2SH(true, bh.hex, bh.pub_key_a, bh.pub_key_b, privkey, inputs);
 
-            // NO.8 c3b_rsmc_raw_data
+            // NO.8
             let br     = e.c3b_rsmc_raw_data;
             inputs     = br.inputs;
             let br_hex = signP2SH(true, br.hex, br.pub_key_a, br.pub_key_b, privkey, inputs);
@@ -227,39 +231,38 @@ function sendSignedHex100102(myUserID, signedInfo) {
             let channel_id = e.channel_id;
 
             // Sign the tx on client side
-            // NO.1 c3a_htlc_htrd_raw_data
+            // NO.1
             let ahh      = e.c3a_htlc_htrd_raw_data;
             let inputs   = ahh.inputs;
             let temp3    = getTempPrivKey(myUserID, kHtlcHtnxTempPrivKey, channel_id);
             let ahh_hex  = signP2SH(true, ahh.hex, ahh.pub_key_a, ahh.pub_key_b, temp3, inputs);
 
-            // NO.2 c3b_htlc_br_raw_data
-            let bhb     = e.c3b_htlc_br_raw_data;
-            inputs      = bhb.inputs;
-            let temp2   = getTempPrivKey(myUserID, kHtlcTempPrivKey, channel_id);
-            let bhb_hex = signP2SH(true, bhb.hex, bhb.pub_key_a, bhb.pub_key_b, temp2, inputs);
-
-            // NO.3 c3b_htlc_hlock_raw_data
-            let bhl     = e.c3b_htlc_hlock_raw_data;
-            inputs      = bhl.inputs;
-            let bhl_hex = signP2SH(true, bhl.hex, bhl.pub_key_a, bhl.pub_key_b, temp2, inputs);
-
-            // NO.4 c3b_htlc_htd_raw_data
-            let bhh     = e.c3b_htlc_htd_raw_data;
-            inputs      = bhh.inputs;
-            let bhh_hex = signP2SH(true, bhh.hex, bhh.pub_key_a, bhh.pub_key_b, temp2, inputs);
-
-            // NO.5 c3b_rsmc_br_raw_data
+            // NO.2
             let brb     = e.c3b_rsmc_br_raw_data;
             inputs      = brb.inputs;
             let privkey = await getFundingPrivKey(myUserID, channel_id);
             let brb_hex = signP2SH(true, brb.hex, brb.pub_key_a, brb.pub_key_b, privkey, inputs);
 
-            // NO.6 c3b_rsmc_rd_raw_data
+            // NO.3
             let brr     = e.c3b_rsmc_rd_raw_data;
             inputs      = brr.inputs;
             let brr_hex = signP2SH(true, brr.hex, brr.pub_key_a, brr.pub_key_b, privkey, inputs);
             
+            // NO.4
+            let bhb     = e.c3b_htlc_br_raw_data;
+            inputs      = bhb.inputs;
+            let bhb_hex = signP2SH(true, bhb.hex, bhb.pub_key_a, bhb.pub_key_b, privkey, inputs);
+
+            // NO.5
+            let bhl     = e.c3b_htlc_hlock_raw_data;
+            inputs      = bhl.inputs;
+            let bhl_hex = signP2SH(true, bhl.hex, bhl.pub_key_a, bhl.pub_key_b, privkey, inputs);
+
+            // NO.6
+            let bhh     = e.c3b_htlc_htd_raw_data;
+            inputs      = bhh.inputs;
+            let bhh_hex = signP2SH(true, bhh.hex, bhh.pub_key_a, bhh.pub_key_b, privkey, inputs);
+
             // will send 100103
             let signedInfo                               = new SignedInfo100103();
             signedInfo.channel_id                        = channel_id;
@@ -317,10 +320,10 @@ function sendSignedHex100104(myUserID, signedInfo) {
 
             // Sign the tx on client side
             // NO.1
-            let tx     = e.c3b_htlc_hlock_he_raw_data;
-            let inputs = tx.inputs;
-            let temp3  = getTempPrivKey(myUserID, kHtlcHtnxTempPrivKey, channel_id);
-            let hex    = signP2SH(true, tx.hex, tx.pub_key_a, tx.pub_key_b, temp3, inputs);
+            let tx      = e.c3b_htlc_hlock_he_raw_data;
+            let inputs  = tx.inputs;
+            let privkey = await getFundingPrivKey(myUserID, channel_id);
+            let hex     = signP2SH(true, tx.hex, tx.pub_key_a, tx.pub_key_b, privkey, inputs);
 
             // will send 100105
             let signedInfo                                  = new SignedInfo100105();
@@ -354,13 +357,10 @@ function sendSignedHex100105(myUserID, nodeID, userID, signedInfo, channel_id) {
             let isFunder = await getIsFunder(myUserID, channel_id);
             saveChannelStatus(myUserID, channel_id, isFunder, kStatusHTLCSigned);
 
-            // FUNCTION ONLY FOR GUI TOOL
-            afterHTLCSigned();
-
             //------------------------------------------
             // If Bob has R, will send -100045 forwardR
-            let privkey = await getFundingPrivKey(myUserID, channel_id);
-            payInvoiceStep4(myUserID, nodeID, userID, channel_id, privkey);
+            // let privkey = await getFundingPrivKey(myUserID, channel_id);
+            payInvoiceStep4(myUserID, nodeID, userID, channel_id);
 
             resolve(true);
         });
@@ -398,7 +398,8 @@ function forwardR(myUserID, nodeID, userID, info, isFunder) {
             displaySentMessage100106(nodeID, userID, signedInfo);
 
             // SDK API
-            await sendSignedHex100106(nodeID, userID, signedInfo);
+            sendSignedHex100106(nodeID, userID, signedInfo);
+            // await sendSignedHex100106(nodeID, userID, signedInfo);
 
             // save some data
             // saveTempPrivKey(myUserID, kHtlcHtnxTempPrivKey, e.channel_id, 
@@ -419,6 +420,108 @@ function sendSignedHex100106(nodeID, userID, signedInfo) {
     return new Promise((resolve, reject) => {
         obdApi.sendSignedHex100106(nodeID, userID, signedInfo, function(e) {
             console.info('sendSignedHex100106 = ' + JSON.stringify(e));
+            resolve(true);
+        });
+    })
+}
+
+/**
+ * Type -100110 Protocol send signed info that signed in 100049 to OBD.
+ * @param nodeID peer id of the obd node where the fundee logged in.
+ * @param userID the user id of the fundee.
+ * @param signedInfo 
+ */
+function sendSignedHex100110(nodeID, userID, signedInfo) {
+    return new Promise((resolve, reject) => {
+        obdApi.sendSignedHex100110(nodeID, userID, signedInfo, function(e) {
+            console.info('sendSignedHex100110 = ' + JSON.stringify(e));
+
+            // FUNCTION ONLY FOR GUI TOOL
+            // afterCommitmentTransactionAccepted();
+            // displayMyChannelListAtTopRight(kPageSize, kPageIndex);
+
+            resolve(true);
+        });
+    })
+}
+
+/**
+ * Type -100111 Protocol send signed info that signed in 100050 to OBD.
+ * @param nodeID peer id of the obd node where the fundee logged in.
+ * @param userID the user id of the fundee.
+ * @param signedInfo 
+ */
+function sendSignedHex100111(nodeID, userID, signedInfo) {
+    return new Promise((resolve, reject) => {
+        obdApi.sendSignedHex100111(nodeID, userID, signedInfo, function(e) {
+            console.info('sendSignedHex100111 = ' + JSON.stringify(e));
+            resolve(true);
+        });
+    })
+}
+
+/**
+ * Type -100112 Protocol send signed info that signed in 110050 to OBD.
+ * 
+ * @param myUserID The user id of logged in
+ * @param nodeID peer id of the obd node where the fundee logged in.
+ * @param userID the user id of the fundee.
+ * @param signedInfo 
+ */
+function sendSignedHex100112(myUserID, nodeID, userID, signedInfo) {
+    return new Promise((resolve, reject) => {
+        obdApi.sendSignedHex100112(nodeID, userID, signedInfo, function(e) {
+            console.info('sendSignedHex100112 = ' + JSON.stringify(e));
+
+            let nodeID     = e.closee_node_address;
+            let userID     = e.closeee_peer_id;
+            let channel_id = e.channel_id;
+
+            // Sign the tx on client side
+            // NO.1
+            let br      = e.c4b_br_raw_data;
+            let inputs  = br.inputs;
+            let privkey = await getFundingPrivKey(myUserID, channel_id);
+            let br_hex  = signP2SH(true, br.hex, br.pub_key_a, br.pub_key_b, privkey, inputs);
+
+            // NO.2
+            let rd     = e.c4b_rd_raw_data;
+            inputs     = rd.inputs;
+            let rd_hex = signP2SH(true, rd.hex, rd.pub_key_a, rd.pub_key_b, privkey, inputs);
+            
+            // will send 100113
+            let signedInfo                       = new SignedInfo100113();
+            signedInfo.channel_id                = channel_id;
+            signedInfo.c4b_rd_partial_signed_hex = rd_hex;
+            signedInfo.c4b_br_partial_signed_hex = br_hex;
+            signedInfo.c4b_br_id                 = br.br_id;
+            
+            // FUNCTION ONLY FOR GUI TOOL
+            displaySentMessage100113(nodeID, userID, signedInfo);
+
+            // SDK API
+            await sendSignedHex100113(nodeID, userID, signedInfo);
+
+            resolve(true);
+        });
+    })
+}
+
+/**
+ * Type -100113 Protocol send signed info that signed in 100112 to OBD.
+ * @param nodeID peer id of the obd node where the fundee logged in.
+ * @param userID the user id of the fundee.
+ * @param signedInfo 
+ */
+function sendSignedHex100113(nodeID, userID, signedInfo) {
+    return new Promise((resolve, reject) => {
+        obdApi.sendSignedHex100113(nodeID, userID, signedInfo, function(e) {
+            console.info('sendSignedHex100113 = ' + JSON.stringify(e));
+
+            // FUNCTION ONLY FOR GUI TOOL
+            // afterCommitmentTransactionAccepted();
+            // displayMyChannelListAtTopRight(kPageSize, kPageIndex);
+
             resolve(true);
         });
     })
@@ -457,9 +560,41 @@ function closeHTLC(myUserID, nodeID, userID, info, isFunder) {
     return new Promise((resolve, reject) => {
         obdApi.closeHTLC(nodeID, userID, info, function(e) {
             console.info('SDK: -100049 closeHTLC = ' + JSON.stringify(e));
-            saveTempPrivKey(myUserID, kTempPrivKey, e.channel_id, 
-                info.curr_rsmc_temp_address_private_key);
-            saveChannelStatus(myUserID, e.channel_id, isFunder, kStatusCloseHTLC);
+            
+            // FUNCTION ONLY FOR GUI TOOL
+            disableInvokeAPI();
+            tipsOnTop('', kProcessing);
+
+            let channel_id = e.channel_id;
+
+            // Sign the tx on client side
+            // NO.1
+            let cr      = e.c4a_counterparty_raw_data;
+            let inputs   = cr.inputs;
+            let privkey  = await getFundingPrivKey(myUserID, channel_id);
+            let cr_hex  = signP2SH(true, cr.hex, cr.pub_key_a, cr.pub_key_b, privkey, inputs);
+
+            // NO.2
+            let rr     = e.c4a_rsmc_raw_data;
+            inputs      = rr.inputs;
+            let rr_hex = signP2SH(true, rr.hex, rr.pub_key_a, rr.pub_key_b, privkey, inputs);
+
+            // will send 100110
+            let signedInfo                             = new SignedInfo100110();
+            signedInfo.channel_id                      = channel_id;
+            signedInfo.counterparty_partial_signed_hex = cr_hex;
+            signedInfo.rsmc_partial_signed_hex         = rr_hex;
+
+            // FUNCTION ONLY FOR GUI TOOL
+            displaySentMessage100110(nodeID, userID, signedInfo);
+
+            // SDK API
+            await sendSignedHex100110(nodeID, userID, signedInfo);
+
+            // save some data
+            saveTempPrivKey(myUserID, kTempPrivKey, channel_id, 
+                getPrivKeyFromPubKey(myUserID, info.curr_rsmc_temp_address_pub_key));
+            saveChannelStatus(myUserID, channel_id, isFunder, kStatusCloseHTLC);
             saveSenderRole(kIsSender);
             resolve(true);
         });
@@ -479,6 +614,51 @@ function closeHTLCSigned(myUserID, nodeID, userID, info, isFunder) {
     return new Promise((resolve, reject) => {
         obdApi.closeHTLCSigned(nodeID, userID, info, function(e) {
             console.info('SDK: -100050 closeHTLCSigned = ' + JSON.stringify(e));
+
+            // FUNCTION ONLY FOR GUI TOOL
+            disableInvokeAPI();
+            tipsOnTop('', kProcessing);
+
+            let channel_id = e.channel_id;
+
+            // Sign the tx on client side
+            // NO.1
+            let abr      = e.c4a_br_raw_data;
+            let inputs   = abr.inputs;
+            let privkey  = await getFundingPrivKey(myUserID, channel_id);
+            let abr_hex  = signP2SH(true, abr.hex, abr.pub_key_a, abr.pub_key_b, privkey, inputs);
+
+            // NO.2
+            let ard     = e.c4a_rd_raw_data;
+            inputs      = ard.inputs;
+            let ard_hex = signP2SH(true, ard.hex, ard.pub_key_a, ard.pub_key_b, privkey, inputs);
+
+            // NO.3
+            let bcr     = e.c4b_counterparty_raw_data;
+            inputs      = bcr.inputs;
+            let bcr_hex = signP2SH(true, bcr.hex, bcr.pub_key_a, bcr.pub_key_b, privkey, inputs);
+
+            // NO.4
+            let brr     = e.c4b_rsmc_raw_data;
+            inputs      = brr.inputs;
+            let brr_hex = signP2SH(true, brr.hex, brr.pub_key_a, brr.pub_key_b, privkey, inputs);
+
+            // will send 100111
+            let signedInfo                         = new SignedInfo100111();
+            signedInfo.channel_id                  = channel_id;
+            signedInfo.c4a_rd_signed_hex           = ard_hex;
+            signedInfo.c4a_br_signed_hex           = abr_hex;
+            signedInfo.c4a_br_id                   = abr.br_id;
+            signedInfo.c4b_rsmc_signed_hex         = brr_hex;
+            signedInfo.c4b_counterparty_signed_hex = bcr_hex;
+
+            // FUNCTION ONLY FOR GUI TOOL
+            displaySentMessage100111(nodeID, userID, signedInfo);
+
+            // SDK API
+            await sendSignedHex100111(nodeID, userID, signedInfo);
+
+            // save some data
             saveTempPrivKey(myUserID, kTempPrivKey, e.channel_id, info.curr_rsmc_temp_address_private_key);
             saveChannelStatus(myUserID, e.channel_id, isFunder, kStatusCloseHTLCSigned);
             resolve(true);

@@ -253,17 +253,17 @@ async function sdkSignR() {
  */
 async function sdkCloseHTLC() {
 
-    let nodeID    = $("#recipient_node_peer_id").val();
-    let userID    = $("#recipient_user_peer_id").val();
+    let nodeID = $("#recipient_node_peer_id").val();
+    let userID = $("#recipient_user_peer_id").val();
 
     let info                                         = new CloseHtlcTxInfo();
     info.channel_id                                  = $("#channel_id").val();
-    info.channel_address_private_key                 = $("#channel_address_private_key").val();
     info.last_rsmc_temp_address_private_key          = $("#last_rsmc_temp_address_private_key").val();
     info.last_htlc_temp_address_private_key          = $("#last_htlc_temp_address_private_key").val();
     info.last_htlc_temp_address_for_htnx_private_key = $("#last_htlc_temp_address_for_htnx_private_key").val();
     info.curr_rsmc_temp_address_pub_key              = $("#curr_rsmc_temp_address_pub_key").val();
-    info.curr_rsmc_temp_address_private_key          = $("#curr_rsmc_temp_address_private_key").val();
+    // info.channel_address_private_key                 = $("#channel_address_private_key").val();
+    // info.curr_rsmc_temp_address_private_key          = $("#curr_rsmc_temp_address_private_key").val();
 
     // Save address index to OBD and can get private key back if lose it.
     info.curr_rsmc_temp_address_index = Number(getIndexFromPubKey(info.curr_rsmc_temp_address_pub_key));
@@ -282,17 +282,19 @@ async function sdkCloseHTLC() {
  */
 async function sdkCloseHTLCSigned() {
 
-    let nodeID    = $("#recipient_node_peer_id").val();
-    let userID    = $("#recipient_user_peer_id").val();
+    let nodeID = $("#recipient_node_peer_id").val();
+    let userID = $("#recipient_user_peer_id").val();
 
     let info                                         = new CloseHtlcTxInfoSigned();
     info.msg_hash                                    = $("#msg_hash").val();
-    info.channel_address_private_key                 = $("#channel_address_private_key").val();
     info.last_rsmc_temp_address_private_key          = $("#last_rsmc_temp_address_private_key").val();
     info.last_htlc_temp_address_private_key          = $("#last_htlc_temp_address_private_key").val();
     info.last_htlc_temp_address_for_htnx_private_key = $("#last_htlc_temp_address_for_htnx_private_key").val();
     info.curr_rsmc_temp_address_pub_key              = $("#curr_rsmc_temp_address_pub_key").val();
-    info.curr_rsmc_temp_address_private_key          = $("#curr_rsmc_temp_address_private_key").val();
+    info.c4a_rsmc_complete_signed_hex                = $("#c4a_rsmc_complete_signed_hex").val();
+    info.c4a_counterparty_complete_signed_hex        = $("#c4a_counterparty_complete_signed_hex").val();
+    // info.channel_address_private_key                 = $("#channel_address_private_key").val();
+    // info.curr_rsmc_temp_address_private_key          = $("#curr_rsmc_temp_address_private_key").val();
 
     // Save address index to OBD and can get private key back if lose it.
     info.curr_rsmc_temp_address_index = Number(getIndexFromPubKey(info.curr_rsmc_temp_address_pub_key));
@@ -303,6 +305,7 @@ async function sdkCloseHTLCSigned() {
     let isFunder = await getIsFunder(myUserID, $("#curr_channel_id").text());
     await closeHTLCSigned(myUserID, nodeID, userID, info, isFunder);
 
+    // WILL BE MOVE TO 100114 ??
     afterCloseHTLCSigned();
     displayMyChannelListAtTopRight(kPageSize, kPageIndex);
 }
@@ -676,17 +679,9 @@ function sdkAddInvoice() {
     info.description = $("#description").val();
     info.is_private  = $("#checkbox_n402").prop("checked");
 
-    // SDK API
+    displaySentMessage100402(info);
     addInvoice(info, function(e) {
         console.info('-100402 sdkAddInvoice = ' + JSON.stringify(e));
-
-        // let myUserID   = $("#logined").text();
-        // let channel_id = $("#curr_channel_id").text();
-        // let r          = getPrivKeyFromPubKey(myUserID, info.h);
-        // saveInvoiceR(r);
-        // saveInvoiceR(myUserID, channel_id, r);
-
-        displaySentMessage100402(info);
         makeQRCode(e);
     });
 }
@@ -749,30 +744,31 @@ async function payInvoiceStep2(e, myUserID, channel_id) {
     info.routing_packet                 = e.routing_packet;
     info.cltv_expiry                    = e.min_cltv_expiry;
     info.memo                           = e.memo;
-    info.channel_address_private_key    = await getFundingPrivKey(myUserID, channel_id);
+    // info.channel_address_private_key    = await getFundingPrivKey(myUserID, channel_id);
     info.last_temp_address_private_key  = getTempPrivKey(myUserID, kTempPrivKey, channel_id);
 
-    result = sdkGenAddressFromMnemonic();
-    saveAddress(myUserID, result);
-    info.curr_rsmc_temp_address_pub_key     = result.result.pubkey;
-    info.curr_rsmc_temp_address_private_key = result.result.wif;
+    let addr_1 = sdkGenAddressFromMnemonic();
+    saveAddress(myUserID, addr_1);
+    info.curr_rsmc_temp_address_pub_key     = addr_1.result.pubkey;
+    // info.curr_rsmc_temp_address_private_key = result.result.wif;
 
-    result = sdkGenAddressFromMnemonic();
-    saveAddress(myUserID, result);
-    info.curr_htlc_temp_address_pub_key     = result.result.pubkey;
-    info.curr_htlc_temp_address_private_key = result.result.wif;
+    let addr_2 = sdkGenAddressFromMnemonic();
+    saveAddress(myUserID, addr_2);
+    info.curr_htlc_temp_address_pub_key     = addr_2.result.pubkey;
+    // info.curr_htlc_temp_address_private_key = result.result.wif;
 
-    result = sdkGenAddressFromMnemonic();
-    saveAddress(myUserID, result);
-    info.curr_htlc_temp_address_for_ht1a_pub_key     = result.result.pubkey;
-    info.curr_htlc_temp_address_for_ht1a_private_key = result.result.wif;
+    let addr_3 = sdkGenAddressFromMnemonic();
+    saveAddress(myUserID, addr_3);
+    info.curr_htlc_temp_address_for_ht1a_pub_key     = addr_3.result.pubkey;
+    // info.curr_htlc_temp_address_for_ht1a_private_key = result.result.wif;
 
     // Save address index to OBD and can get private key back if lose it.
-    info.curr_rsmc_temp_address_index          = Number(getIndexFromPubKey(info.curr_rsmc_temp_address_pub_key));
-    info.curr_htlc_temp_address_index          = Number(getIndexFromPubKey(info.curr_htlc_temp_address_pub_key));
-    info.curr_htlc_temp_address_for_ht1a_index = Number(getIndexFromPubKey(info.curr_htlc_temp_address_for_ht1a_pub_key));
+    info.curr_rsmc_temp_address_index          = addr_1.result.index;
+    info.curr_htlc_temp_address_index          = addr_2.result.index;
+    info.curr_htlc_temp_address_for_ht1a_index = addr_3.result.index;
 
-    displaySentMessage100040(nodeID, userID, info);
+    let privkey = await getFundingPrivKey(myUserID, channel_id);
+    displaySentMessage100040(nodeID, userID, info, privkey);
 
     let isFunder = await getIsFunder(myUserID, channel_id);
     await addHTLC(myUserID, nodeID, userID, info, isFunder);
@@ -4039,20 +4035,30 @@ function displaySentMessage100046(nodeID, userID, info) {
  * @param nodeID 
  * @param userID 
  * @param info 
+ * @param privkey  channel_address_private_key
  */
-function displaySentMessage100050(nodeID, userID, info) {
+function displaySentMessage100050(nodeID, userID, info, privkey) {
+
+    if (privkey) {
+    } else {
+        privkey = $("#channel_address_private_key").val();
+    }
+
     let msgSend = {
         type: -100050,
         recipient_node_peer_id: nodeID,
         recipient_user_peer_id: userID,
         data: {
             msg_hash:                                    info.msg_hash,
-            channel_address_private_key:                 info.channel_address_private_key,
+            channel_address_private_key:                 privkey,
             last_rsmc_temp_address_private_key:          info.last_rsmc_temp_address_private_key,
             last_htlc_temp_address_private_key:          info.last_htlc_temp_address_private_key,
             last_htlc_temp_address_for_htnx_private_key: info.last_htlc_temp_address_for_htnx_private_key,
             curr_rsmc_temp_address_pub_key:              info.curr_rsmc_temp_address_pub_key,
-            curr_rsmc_temp_address_private_key:          info.curr_rsmc_temp_address_private_key,
+            curr_rsmc_temp_address_private_key:          getPrivKeyFromPubKey($("#logined").text(), 
+                info.curr_rsmc_temp_address_pub_key),
+            c4a_rsmc_complete_signed_hex:                info.c4a_rsmc_complete_signed_hex,
+            c4a_counterparty_complete_signed_hex:        info.c4a_counterparty_complete_signed_hex,
         }
     }
 
@@ -4235,8 +4241,15 @@ function displaySentMessage100401(info, isInvPay) {
  * @param nodeID 
  * @param userID
  * @param info 
+ * @param privkey  channel_address_private_key
  */
-function displaySentMessage100040(nodeID, userID, info) {
+function displaySentMessage100040(nodeID, userID, info, privkey) {
+
+    if (privkey) {
+    } else {
+        privkey = $("#channel_address_private_key").val();
+    }
+
     let msgSend = {
         type: -100040,
         recipient_node_peer_id: nodeID,
@@ -4248,13 +4261,16 @@ function displaySentMessage100040(nodeID, userID, info) {
             memo: info.memo,
             h: info.h,
             routing_packet: info.routing_packet,
-            channel_address_private_key: $("#channel_address_private_key").val(),
+            channel_address_private_key: privkey,
             curr_rsmc_temp_address_pub_key: info.curr_rsmc_temp_address_pub_key,
-            curr_rsmc_temp_address_private_key: $("#curr_rsmc_temp_address_private_key").val(),
+            curr_rsmc_temp_address_private_key: getPrivKeyFromPubKey($("#logined").text(), 
+                info.curr_rsmc_temp_address_pub_key),
             curr_htlc_temp_address_pub_key: info.curr_htlc_temp_address_pub_key,
-            curr_htlc_temp_address_private_key: $("#curr_htlc_temp_address_private_key").val(),
+            curr_htlc_temp_address_private_key: getPrivKeyFromPubKey($("#logined").text(), 
+                info.curr_htlc_temp_address_pub_key),
             curr_htlc_temp_address_for_ht1a_pub_key: info.curr_htlc_temp_address_for_ht1a_pub_key,
-            curr_htlc_temp_address_for_ht1a_private_key: $("#curr_htlc_temp_address_for_ht1a_private_key").val(),
+            curr_htlc_temp_address_for_ht1a_private_key: getPrivKeyFromPubKey($("#logined").text(), 
+                info.curr_htlc_temp_address_for_ht1a_pub_key),
             last_temp_address_private_key: info.last_temp_address_private_key,
         }
     }
@@ -4290,20 +4306,28 @@ function displaySentMessage100045(nodeID, userID, info) {
  * @param nodeID 
  * @param userID
  * @param info 
+ * @param privkey  channel_address_private_key
  */
-function displaySentMessage100049(nodeID, userID, info) {
+function displaySentMessage100049(nodeID, userID, info, privkey) {
+
+    if (privkey) {
+    } else {
+        privkey = $("#channel_address_private_key").val();
+    }
+
     let msgSend = {
         type: -100049,
         recipient_node_peer_id: nodeID,
         recipient_user_peer_id: userID,
         data: {
             channel_id: info.channel_id,
-            channel_address_private_key: info.channel_address_private_key,
+            channel_address_private_key: privkey,
             last_rsmc_temp_address_private_key: info.last_rsmc_temp_address_private_key,
             last_htlc_temp_address_private_key: info.last_htlc_temp_address_private_key,
             last_htlc_temp_address_for_htnx_private_key: info.last_htlc_temp_address_for_htnx_private_key,
             curr_rsmc_temp_address_pub_key: info.curr_rsmc_temp_address_pub_key,
-            curr_rsmc_temp_address_private_key: info.curr_rsmc_temp_address_private_key,
+            curr_rsmc_temp_address_private_key: getPrivKeyFromPubKey($("#logined").text(), 
+                info.curr_rsmc_temp_address_pub_key),
         }
     }
 
@@ -6190,6 +6214,95 @@ function displaySentMessage100106(nodeID, userID, info) {
         data: {
             channel_id:                       info.channel_id,
             c3b_htlc_herd_partial_signed_hex: info.c3b_htlc_herd_partial_signed_hex,
+        }
+    }
+
+    displaySentMessage(msgSend);
+}
+
+/**
+ * -100110 Display the sent message in the message box and save it to the log file
+ * @param nodeID 
+ * @param userID
+ * @param info 
+ */
+function displaySentMessage100110(nodeID, userID, info) {
+    let msgSend = {
+        type: -100110,
+        recipient_node_peer_id: nodeID,
+        recipient_user_peer_id: userID,
+        data: {
+            channel_id:                      info.channel_id,
+            counterparty_partial_signed_hex: info.counterparty_partial_signed_hex,
+            rsmc_partial_signed_hex:         info.rsmc_partial_signed_hex,
+        }
+    }
+
+    displaySentMessage(msgSend);
+}
+
+/**
+ * -100111 Display the sent message in the message box and save it to the log file
+ * @param nodeID 
+ * @param userID
+ * @param info 
+ */
+function displaySentMessage100111(nodeID, userID, info) {
+    let msgSend = {
+        type: -100111,
+        recipient_node_peer_id: nodeID,
+        recipient_user_peer_id: userID,
+        data: {
+            channel_id:                  info.channel_id,
+            c4a_rd_signed_hex:           info.c4a_rd_signed_hex,
+            c4a_br_signed_hex:           info.c4a_br_signed_hex,
+            c4a_br_id:                   info.c4a_br_id,
+            c4b_rsmc_signed_hex:         info.c4b_rsmc_signed_hex,
+            c4b_counterparty_signed_hex: info.c4b_counterparty_signed_hex,
+        }
+    }
+
+    displaySentMessage(msgSend);
+}
+
+/**
+ * -100112 Display the sent message in the message box and save it to the log file
+ * @param nodeID 
+ * @param userID
+ * @param info 
+ */
+function displaySentMessage100112(nodeID, userID, info) {
+    let msgSend = {
+        type: -100112,
+        recipient_node_peer_id: nodeID,
+        recipient_user_peer_id: userID,
+        data: {
+            channel_id:                           info.channel_id,
+            c4a_rd_complete_signed_hex:           info.c4a_rd_complete_signed_hex,
+            c4b_rsmc_complete_signed_hex:         info.c4b_rsmc_complete_signed_hex,
+            c4b_counterparty_complete_signed_hex: info.c4b_counterparty_complete_signed_hex,
+        }
+    }
+
+    displaySentMessage(msgSend);
+}
+
+/**
+ * -100113 Display the sent message in the message box and save it to the log file
+ * @param nodeID 
+ * @param userID
+ * @param info 
+ */
+function displaySentMessage100113(nodeID, userID, info) {
+    let msgSend = {
+        type: -100113,
+        recipient_node_peer_id: nodeID,
+        recipient_user_peer_id: userID,
+        data: {
+            channel_id:                info.channel_id,
+            c4b_rd_partial_signed_hex: info.c4b_rd_partial_signed_hex,
+            c4b_br_partial_signed_hex: info.c4b_br_partial_signed_hex,
+            c4b_br_id:                 info.c4b_br_id,
         }
     }
 

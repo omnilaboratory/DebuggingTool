@@ -1001,17 +1001,6 @@
                     "buttons": []
                 },
                 {
-                    "name": "msg_hash",
-                    "help": "The hash of commitment transaction created in HTLCSendR (type -45).",
-                    "buttons": [
-                    ]
-                },
-                {
-                    "name": "r",
-                    "help": "The R (a Preimage R) currently is Private Key of a wallet address, and the H (Hash of a Preimage R) is Public Key of a wallet address. This is a temporary solution.",
-                    "buttons": []
-                },
-                {
                     "name": "channel_address_private_key",
                     "help": "Client use the private key to sign HERD1b transaction in below picture.",
                     "imgPath": "doc/tooltip/HTLC-4.png",
@@ -1054,68 +1043,40 @@
                 },
                 {
                     "name": "channel_address_private_key",
-                    "help": "This is the private key used by Alice (launcher of the close request) to create the channel. It will be used to sign newer RSMC transaction like C3a.",
+                    "help": "Client use the private key to sign newer RSMC transaction like C3a.",
                     "imgPath": "doc/tooltip/HTLC-1.png",
-                    "buttons": [
-                        {
-                            "innerText": "Display",
-                            "onclick": "displayUserDataInNewHtml('MyAddresses')"
-                        }
-                    ]
+                    "disable": "yes",
+                    "buttons": []
                 },
                 {
                     "name": "last_rsmc_temp_address_private_key",
                     "help": "Private Key of creating temporary 2-2 multi-sig address in previous RSMC transaction.",
-                    "buttons": [
-                        {
-                            "innerText": "Display",
-                            "onclick": "displayUserDataInNewHtml('MyAddresses')"
-                        }
-                    ]
+                    "disable": "yes",
+                    "buttons": []
                 },
                 {
                     "name": "last_htlc_temp_address_private_key",
                     "help": "Private Key of creating temporary 2-2 multi-sig address in previous HTLC transaction.",
-                    "buttons": [
-                        {
-                            "innerText": "Display",
-                            "onclick": "displayUserDataInNewHtml('MyAddresses')"
-                        }
-                    ]
+                    "disable": "yes",
+                    "buttons": []
                 },
                 {
                     "name": "last_htlc_temp_address_for_htnx_private_key",
                     "help": "Private Key of creating temporary 2-2 multi-sig address in previous HTLC htnx transaction.",
-                    "buttons": [
-                        {
-                            "innerText": "Display",
-                            "onclick": "displayUserDataInNewHtml('MyAddresses')"
-                        }
-                    ]
+                    "disable": "yes",
+                    "buttons": []
                 },
                 {
                     "name": "curr_rsmc_temp_address_pub_key",
                     "help": "This public key of an address will be used to create a temp 2-2 multi-sig address as output 0 of newer Cx transaction in RSMC.",
-                    "buttons": [
-                        {
-                            "innerText": "Select",
-                            "onclick": "displayUserDataInNewHtml('MyAddresses')"
-                        },
-                        {
-                            "innerText": "Create",
-                            "onclick": "autoCreateAddress(-49)"
-                        }
-                    ]
+                    "disable": "yes",
+                    "buttons": []
                 },
                 {
                     "name": "curr_rsmc_temp_address_private_key",
                     "help": "This private key of an address will be used to sign newer RDxa and BRxa transaction.",
-                    "buttons": [
-                        {
-                            "innerText": "Select",
-                            "onclick": "displayUserDataInNewHtml('MyAddresses')"
-                        }
-                    ]
+                    "disable": "yes",
+                    "buttons": []
                 }
             ]
         },
@@ -1150,68 +1111,40 @@
                 },
                 {
                     "name": "channel_address_private_key",
-                    "help": "This is the private key used by Bob (responser of the close request) to create the channel. It will be used to sign newer RSMC transaction like C3b.",
+                    "help": "Client use the private key to sign newer RSMC transaction like C3b.",
                     "imgPath": "doc/tooltip/HTLC-5.png",
-                    "buttons": [
-                        {
-                            "innerText": "Display",
-                            "onclick": "displayUserDataInNewHtml('MyAddresses')"
-                        }
-                    ]
+                    "disable": "yes",
+                    "buttons": []
                 },
                 {
                     "name": "last_rsmc_temp_address_private_key",
                     "help": "Private Key of creating temporary 2-2 multi-sig address in previous RSMC transaction.",
-                    "buttons": [
-                        {
-                            "innerText": "Display",
-                            "onclick": "displayUserDataInNewHtml('MyAddresses')"
-                        }
-                    ]
+                    "disable": "yes",
+                    "buttons": []
                 },
                 {
                     "name": "last_htlc_temp_address_private_key",
                     "help": "Private Key of creating temporary 2-2 multi-sig address in previous HTLC transaction.",
-                    "buttons": [
-                        {
-                            "innerText": "Display",
-                            "onclick": "displayUserDataInNewHtml('MyAddresses')"
-                        }
-                    ]
+                    "disable": "yes",
+                    "buttons": []
                 },
                 {
                     "name": "last_htlc_temp_address_for_htnx_private_key",
                     "help": "Private Key of creating temporary 2-2 multi-sig address in previous HTLC htnx transaction.",
-                    "buttons": [
-                        {
-                            "innerText": "Display",
-                            "onclick": "displayUserDataInNewHtml('MyAddresses')"
-                        }
-                    ]
+                    "disable": "yes",
+                    "buttons": []
                 },
                 {
                     "name": "curr_rsmc_temp_address_pub_key",
                     "help": "This public key of an address will be used to create a temp 2-2 multi-sig address as output 0 of newer Cx transaction in RSMC.",
-                    "buttons": [
-                        {
-                            "innerText": "Select",
-                            "onclick": "displayUserDataInNewHtml('MyAddresses')"
-                        },
-                        {
-                            "innerText": "Create",
-                            "onclick": "autoCreateAddress(-50)"
-                        }
-                    ]
+                    "disable": "yes",
+                    "buttons": []
                 },
                 {
                     "name": "curr_rsmc_temp_address_private_key",
                     "help": "This private key of an address will be used to sign newer RDxa and BRxa transaction.",
-                    "buttons": [
-                        {
-                            "innerText": "Select",
-                            "onclick": "displayUserDataInNewHtml('MyAddresses')"
-                        }
-                    ]
+                    "disable": "yes",
+                    "buttons": []
                 }
             ]
         },

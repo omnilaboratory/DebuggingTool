@@ -1304,13 +1304,36 @@ function getSenderRole() {
     return localStorage.getItem(kSenderRole);
 }
 
+// OLD
+// function signP2PKH(txhex, privkey) {
+    
+//     if (txhex === '') return '';
+
+//     const network = btctool.bitcoin.networks.testnet;
+//     const tx      = btctool.bitcoin.Transaction.fromHex(txhex);
+//     const txb     = btctool.bitcoin.TransactionBuilder.fromTransaction(tx, network);
+//     const key     = btctool.bitcoin.ECPair.fromWIF(privkey, network);
+
+//     txb.sign({
+//         prevOutScriptType: 'p2pkh',
+//         vin: 0,
+//         keyPair: key,
+//     });
+
+//     // Export hex
+//     let toHex = txb.build().toHex();
+//     console.info('signP2PKH - toHex = ' + toHex);
+//     return toHex;
+// }
+
 /**
  * Sign P2PKH address with TransactionBuilder way
  * main network: btctool.bitcoin.networks.bitcoin;
  * @param txhex
  * @param privkey
+ * @param inputs    all of inputs
  */
-function signP2PKH(txhex, privkey) {
+function signP2PKH(txhex, privkey, inputs) {
     
     if (txhex === '') return '';
 
@@ -1319,11 +1342,15 @@ function signP2PKH(txhex, privkey) {
     const txb     = btctool.bitcoin.TransactionBuilder.fromTransaction(tx, network);
     const key     = btctool.bitcoin.ECPair.fromWIF(privkey, network);
 
-    txb.sign({
-        prevOutScriptType: 'p2pkh',
-        vin: 0,
-        keyPair: key,
-    });
+    // Sign all inputs
+    // console.info('inputs = ' + JSON.stringify(inputs));
+    for (let i = 0; i < inputs.length; i++) {
+        txb.sign({
+            prevOutScriptType: 'p2pkh',
+            vin: i,
+            keyPair: key,
+        });
+    }
 
     // Export hex
     let toHex = txb.build().toHex();
