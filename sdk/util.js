@@ -1382,10 +1382,9 @@ function signP2SH(is_first_sign, txhex, pubkey_1, pubkey_2, privkey, inputs) {
     const key     = btctool.bitcoin.ECPair.fromWIF(privkey, network);
 
     // Sign all inputs
-    // console.info('inputs = ' + JSON.stringify(inputs));
     for (let i = 0; i < inputs.length; i++) {
-        txb.sign(i, key, p2sh.redeem.output, undefined, 
-            inputs[i].amount * 100000000, undefined);
+        let amount = accMul(inputs[i].amount, 100000000);
+        txb.sign(i, key, p2sh.redeem.output, undefined, amount, undefined);
     }
 
     if (is_first_sign === true) { // The first person to sign this transaction
@@ -1398,4 +1397,26 @@ function signP2SH(is_first_sign, txhex, pubkey_1, pubkey_2, privkey, inputs) {
         console.info('signP2SH - Second signed - Hex = ' + finalHex);
         return finalHex;
     }
+}
+
+/**
+ ** 乘法函数，用来得到精确的乘法结果
+** 说明：javascript的乘法结果会有误差，在两个浮点数相乘的时候会比较明显。这个函数返回较为精确的乘法结果。
+** 调用：accMul(arg1,arg2)
+** 返回值：arg1乘以 arg2的精确结果
+**/
+function accMul(arg1, arg2) {
+    let m  = 0,
+        s1 = arg1.toString(),
+        s2 = arg2.toString();
+
+    try {
+        m += s1.split(".")[1].length;
+    } catch (e) {}
+
+    try {
+        m += s2.split(".")[1].length;
+    } catch (e) {}
+
+    return Number(s1.replace(".", "")) * Number(s2.replace(".", "")) / Math.pow(10, m);
 }
