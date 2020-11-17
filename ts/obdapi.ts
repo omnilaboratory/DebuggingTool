@@ -1915,7 +1915,7 @@ class ObdApi {
       alert("empty last_htlc_temp_address_for_htnx_private_key");
       return;
     }
-    if (this.isNotString(info.curr_rsmc_temp_address_pub_key)) {
+    if (this.isNotString(info.curr_temp_address_pub_key)) {
       alert("empty curr_rsmc_temp_address_pub_key");
       return;
     }

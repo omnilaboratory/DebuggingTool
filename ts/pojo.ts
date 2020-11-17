@@ -327,13 +327,11 @@ class CloseHtlcTxInfo {
 
 class CloseHtlcTxInfoSigned {
   msg_hash: string = "";
-  // channel_address_private_key: string = "";
   last_rsmc_temp_address_private_key: string = "";
   last_htlc_temp_address_private_key: string = "";
   last_htlc_temp_address_for_htnx_private_key: string = "";
-  curr_rsmc_temp_address_pub_key: string = "";
-  // curr_rsmc_temp_address_private_key: string = "";
-  curr_rsmc_temp_address_index: number = 0;
+  curr_temp_address_pub_key: string = "";
+  curr_temp_address_index: number = 0;
 }
 
 class IssueManagedAmoutInfo {

@@ -368,13 +368,11 @@ class CloseHtlcTxInfo {
 class CloseHtlcTxInfoSigned {
     constructor() {
         this.msg_hash = "";
-        // channel_address_private_key: string = "";
         this.last_rsmc_temp_address_private_key = "";
         this.last_htlc_temp_address_private_key = "";
         this.last_htlc_temp_address_for_htnx_private_key = "";
-        this.curr_rsmc_temp_address_pub_key = "";
-        // curr_rsmc_temp_address_private_key: string = "";
-        this.curr_rsmc_temp_address_index = 0;
+        this.curr_temp_address_pub_key = "";
+        this.curr_temp_address_index = 0;
     }
 }
 class IssueManagedAmoutInfo {

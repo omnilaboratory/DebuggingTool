@@ -592,11 +592,11 @@ async function listening110049(e, netType) {
     saveSenderRole(kIsReceiver);
 
     // auto mode closed
-    if (isAutoMode != 'Yes') {  
-        let r = getPrivKeyFromPubKey(myUserID, getInvoiceH());
-        // Bob has NOT R. Bob maybe a middleman node.
-        if (r === '') return;
-    }
+    // if (isAutoMode != 'Yes') {  
+    //     let r = getPrivKeyFromPubKey(myUserID, getInvoiceH());
+    //     // Bob has NOT R. Bob maybe a middleman node.
+    //     if (r === '') return;
+    // }
 
     console.info('listening110049 = ' + JSON.stringify(e));
 
@@ -614,14 +614,11 @@ async function listening110049(e, netType) {
     info.last_rsmc_temp_address_private_key          = getTempPrivKey(myUserID, kRsmcTempPrivKey, channel_id);
     info.last_htlc_temp_address_private_key          = getTempPrivKey(myUserID, kHtlcTempPrivKey, channel_id);
     info.last_htlc_temp_address_for_htnx_private_key = getTempPrivKey(myUserID, kHtlcHtnxTempPrivKey, channel_id);
-    info.curr_rsmc_temp_address_pub_key              = addr.result.pubkey;
+    info.curr_temp_address_pub_key                   = addr.result.pubkey;
     info.c4a_rsmc_complete_signed_hex                = rr_hex;
     info.c4a_counterparty_complete_signed_hex        = cr_hex;
-    // info.channel_address_private_key                 = await getFundingPrivKey(myUserID, e.channel_id);
-    // info.curr_rsmc_temp_address_private_key          = addr.result.wif;
-
     // Save address index to OBD and can get private key back if lose it.
-    info.curr_rsmc_temp_address_index = addr.result.index;
+    info.curr_temp_address_index = addr.result.index;
     
     // FUNCTION ONLY FOR GUI TOOL
     displaySentMessage100050(nodeID, userID, info, privkey);

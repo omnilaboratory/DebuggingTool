@@ -673,7 +673,7 @@ function closeHTLCSigned(myUserID, nodeID, userID, info, isFunder) {
             await sendSignedHex100111(nodeID, userID, signedInfo);
 
             // save some data
-            let tempkey = getPrivKeyFromPubKey(myUserID, info.curr_rsmc_temp_address_pub_key);
+            let tempkey = getPrivKeyFromPubKey(myUserID, info.curr_temp_address_pub_key);
             saveTempPrivKey(myUserID, kTempPrivKey, channel_id, tempkey);
             saveChannelStatus(myUserID, channel_id, isFunder, kStatusCloseHTLCSigned);
             resolve(true);

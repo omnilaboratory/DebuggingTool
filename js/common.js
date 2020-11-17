@@ -262,7 +262,6 @@ async function sdkCloseHTLC() {
     info.last_htlc_temp_address_private_key          = $("#last_htlc_temp_address_private_key").val();
     info.last_htlc_temp_address_for_htnx_private_key = $("#last_htlc_temp_address_for_htnx_private_key").val();
     info.curr_temp_address_pub_key                   = $("#curr_temp_address_pub_key").val();
-
     // Save address index to OBD and can get private key back if lose it.
     info.curr_temp_address_index = Number(getIndexFromPubKey(info.curr_temp_address_pub_key));
 
@@ -288,14 +287,11 @@ async function sdkCloseHTLCSigned() {
     info.last_rsmc_temp_address_private_key          = $("#last_rsmc_temp_address_private_key").val();
     info.last_htlc_temp_address_private_key          = $("#last_htlc_temp_address_private_key").val();
     info.last_htlc_temp_address_for_htnx_private_key = $("#last_htlc_temp_address_for_htnx_private_key").val();
-    info.curr_rsmc_temp_address_pub_key              = $("#curr_rsmc_temp_address_pub_key").val();
+    info.curr_temp_address_pub_key                   = $("#curr_temp_address_pub_key").val();
     info.c4a_rsmc_complete_signed_hex                = $("#c4a_rsmc_complete_signed_hex").val();
     info.c4a_counterparty_complete_signed_hex        = $("#c4a_counterparty_complete_signed_hex").val();
-    // info.channel_address_private_key                 = $("#channel_address_private_key").val();
-    // info.curr_rsmc_temp_address_private_key          = $("#curr_rsmc_temp_address_private_key").val();
-
     // Save address index to OBD and can get private key back if lose it.
-    info.curr_rsmc_temp_address_index = Number(getIndexFromPubKey(info.curr_rsmc_temp_address_pub_key));
+    info.curr_temp_address_index = Number(getIndexFromPubKey(info.curr_temp_address_pub_key));
 
     displaySentMessage100050(nodeID, userID, info);
 
@@ -1712,8 +1708,8 @@ async function changeInvokeAPIEnable(status, isFunder, myUserID, channel_id) {
             } else if (status != kStatusAcceptChannel && 
                        status != kStatusFirstBitcoinFundingSigned &&
                        status != kStatusSecondBitcoinFundingSigned   ) {
-                // disableInvokeAPI();
-                // break;
+                disableInvokeAPI();
+                break;
             }
 
             if (isFunder === false) { // Is Bob
@@ -2035,7 +2031,7 @@ async function changeInvokeAPIEnable(status, isFunder, myUserID, channel_id) {
             fillCounterparty(myUserID, channel_id);
             fillChannelIDAndFundingPrivKey(myUserID, channel_id);
             fillThreeLastPrivKey(myUserID, channel_id);
-            fillCurrRsmcTempKey();
+            fillCurrTempAddrKey();
 
             data = await getTempData(myUserID, channel_id);
             $("#msg_hash").val(data);
@@ -4055,9 +4051,9 @@ function displaySentMessage100050(nodeID, userID, info, privkey) {
             last_rsmc_temp_address_private_key:          info.last_rsmc_temp_address_private_key,
             last_htlc_temp_address_private_key:          info.last_htlc_temp_address_private_key,
             last_htlc_temp_address_for_htnx_private_key: info.last_htlc_temp_address_for_htnx_private_key,
-            curr_rsmc_temp_address_pub_key:              info.curr_rsmc_temp_address_pub_key,
-            curr_rsmc_temp_address_private_key:          getPrivKeyFromPubKey($("#logined").text(), 
-                info.curr_rsmc_temp_address_pub_key),
+            curr_temp_address_pub_key:                   info.curr_temp_address_pub_key,
+            curr_temp_address_private_key:               getPrivKeyFromPubKey($("#logined").text(), 
+                    info.curr_temp_address_pub_key),
             c4a_rsmc_complete_signed_hex:                info.c4a_rsmc_complete_signed_hex,
             c4a_counterparty_complete_signed_hex:        info.c4a_counterparty_complete_signed_hex,
         }
@@ -4321,14 +4317,14 @@ function displaySentMessage100049(nodeID, userID, info, privkey) {
         recipient_node_peer_id: nodeID,
         recipient_user_peer_id: userID,
         data: {
-            channel_id: info.channel_id,
-            channel_address_private_key: privkey,
-            last_rsmc_temp_address_private_key: info.last_rsmc_temp_address_private_key,
-            last_htlc_temp_address_private_key: info.last_htlc_temp_address_private_key,
+            channel_id:                                  info.channel_id,
+            channel_address_private_key:                 privkey,
+            last_rsmc_temp_address_private_key:          info.last_rsmc_temp_address_private_key,
+            last_htlc_temp_address_private_key:          info.last_htlc_temp_address_private_key,
             last_htlc_temp_address_for_htnx_private_key: info.last_htlc_temp_address_for_htnx_private_key,
-            curr_rsmc_temp_address_pub_key: info.curr_rsmc_temp_address_pub_key,
-            curr_rsmc_temp_address_private_key: getPrivKeyFromPubKey($("#logined").text(), 
-                info.curr_rsmc_temp_address_pub_key),
+            curr_temp_address_pub_key:                   info.curr_temp_address_pub_key,
+            curr_temp_address_private_key:               getPrivKeyFromPubKey($("#logined").text(), 
+                    info.curr_temp_address_pub_key),
         }
     }
 
@@ -5241,23 +5237,8 @@ function tableMyChannelListAtTopRight(e) {
         }
 
         table.append(tr);
-
         createElement(tr, 'td', i + 1 + iNum);
         rowMyChannelListAtTopRight(e, i, tr);
-        
-        // createElement(table, 'tr');
-        // if (i % 2 != 0) {
-        //     let tr = document.createElement('tr');
-        //     tr.setAttribute('class', 'altTopRight');
-        //     table.append(tr);
-
-        //     createElement(tr, 'td', i + 1 + iNum);
-        //     rowMyChannelListAtTopRight(e, i, tr);
-        // } else {
-        //     createElement(table, 'tr');
-        //     createElement(table, 'td', i + 1 + iNum);
-        //     rowMyChannelListAtTopRight(e, i, table);
-        // }
     }
 
     // total count
