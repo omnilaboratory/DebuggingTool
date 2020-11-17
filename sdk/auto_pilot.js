@@ -509,7 +509,6 @@ async function listening110045(e) {
 
     //------------------------
     // If is payInvoice case, Alice will send -100049 closeHTLC
-    // Alice will send -100049 closeHTLC
     payInvoiceStep6(myUserID, nodeID, userID, channel_id, privkey);
 }
 
@@ -524,8 +523,6 @@ async function listening110045(e) {
  */
 async function payInvoiceStep6(myUserID, nodeID, userID, channel_id, privkey) {
 
-    // Alice will send -100049 closeHTLC
-
     let info        = new CloseHtlcTxInfo();
     info.channel_id = channel_id;
 
@@ -539,13 +536,9 @@ async function payInvoiceStep6(myUserID, nodeID, userID, channel_id, privkey) {
     
     let addr = genNewAddress(myUserID, true);
     saveAddress(myUserID, addr);
-
-    info.curr_rsmc_temp_address_pub_key  = addr.result.pubkey;
-    // info.curr_rsmc_temp_address_private_key = result.result.wif;
-    // info.channel_address_private_key = privkey;
-
+    info.curr_temp_address_pub_key = addr.result.pubkey;
     // Save address index to OBD and can get private key back if lose it.
-    info.curr_rsmc_temp_address_index = addr.result.index;
+    info.curr_temp_address_index = addr.result.index;
 
     // FUNCTION ONLY FOR GUI TOOL
     displaySentMessage100049(nodeID, userID, info, privkey);
@@ -607,8 +600,8 @@ async function listening110049(e, netType) {
 
     console.info('listening110049 = ' + JSON.stringify(e));
 
-    let nodeID   = e.sender_node_address;
-    let userID   = e.sender_peer_id;
+    let nodeID = e.sender_node_address;
+    let userID = e.sender_peer_id;
 
     let addr = genNewAddress(myUserID, netType);
     saveAddress(myUserID, addr);
@@ -635,13 +628,6 @@ async function listening110049(e, netType) {
     
     // SDK API
     await closeHTLCSigned(myUserID, nodeID, userID, info, isFunder);
-    
-    // FUNCTION ONLY FOR GUI TOOL WILL BE MOVE TO 100114 ??
-    afterCloseHTLCSigned();
-    displayMyChannelListAtTopRight(kPageSize, kPageIndex);
-
-    // Clear H at Bob side
-    saveInvoiceH('');
 }
 
 /**
@@ -652,8 +638,6 @@ async function listening110050(e) {
 
     let myUserID   = e.to_peer_id;
     let channel_id = e.channel_id;
-    // let nodeID     = e.payee_node_address;
-    // let userID     = e.payee_peer_id;
 
     // Sign the tx on client side
     // NO.1
@@ -681,15 +665,38 @@ async function listening110050(e) {
     signedInfo.c4b_counterparty_complete_signed_hex = bcr_hex;
 
     // FUNCTION ONLY FOR GUI TOOL
-    displaySentMessage100112(nodeID, userID, signedInfo);
+    displaySentMessage100112(signedInfo);
 
-    // SDK API  nodeID, userID -- ???
-    await sendSignedHex100112(myUserID, nodeID, userID, signedInfo);
+    // SDK API
+    await sendSignedHex100112(myUserID, signedInfo);
+}
 
-    //----------------------------------------------------------------
-    let isFunder = await getIsFunder(myUserID, channel_id);
-    saveChannelStatus(myUserID, channel_id, isFunder, kStatusCloseHTLCSigned);
-    savePayInvoiceCase('No');
+/**
+ * listening to -110051
+ * @param e 
+ */
+async function listening110051(e) {
+
+    let myUserID   = e.to_peer_id;
+    let channel_id = e.channel_id;
+
+    // Sign the tx on client side
+    // NO.1
+    let brd     = e.c4b_rd_partial_signed_data;
+    let inputs  = brd.inputs;
+    let tempKey = getTempPrivKey(myUserID, kTempPrivKey, channel_id);
+    let brd_hex = signP2SH(false, brd.hex, brd.pub_key_a, brd.pub_key_b, tempKey, inputs);
+
+    // will send 100114
+    let signedInfo                        = new SignedInfo100114();
+    signedInfo.channel_id                 = channel_id;
+    signedInfo.c4b_rd_complete_signed_hex = brd_hex;
+
+    // FUNCTION ONLY FOR GUI TOOL
+    displaySentMessage100114(signedInfo);
+
+    // SDK API
+    await sendSignedHex100114(signedInfo);
 }
 
 /**

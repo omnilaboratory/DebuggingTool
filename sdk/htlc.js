@@ -402,8 +402,6 @@ function forwardR(myUserID, nodeID, userID, info, isFunder) {
             // await sendSignedHex100106(nodeID, userID, signedInfo);
 
             // save some data
-            // saveTempPrivKey(myUserID, kHtlcHtnxTempPrivKey, e.channel_id, 
-            //     info.curr_htlc_temp_address_for_he1b_private_key);
             saveChannelStatus(myUserID, channel_id, isFunder, kStatusForwardR);
             resolve(true);
         });
@@ -435,11 +433,6 @@ function sendSignedHex100110(nodeID, userID, signedInfo) {
     return new Promise((resolve, reject) => {
         obdApi.sendSignedHex100110(nodeID, userID, signedInfo, function(e) {
             console.info('sendSignedHex100110 = ' + JSON.stringify(e));
-
-            // FUNCTION ONLY FOR GUI TOOL
-            // afterCommitmentTransactionAccepted();
-            // displayMyChannelListAtTopRight(kPageSize, kPageIndex);
-
             resolve(true);
         });
     })
@@ -462,19 +455,16 @@ function sendSignedHex100111(nodeID, userID, signedInfo) {
 
 /**
  * Type -100112 Protocol send signed info that signed in 110050 to OBD.
- * 
  * @param myUserID The user id of logged in
- * @param nodeID peer id of the obd node where the fundee logged in.
- * @param userID the user id of the fundee.
  * @param signedInfo 
  */
-function sendSignedHex100112(myUserID, nodeID, userID, signedInfo) {
+function sendSignedHex100112(myUserID, signedInfo) {
     return new Promise((resolve, reject) => {
-        obdApi.sendSignedHex100112(nodeID, userID, signedInfo, function(e) {
+        obdApi.sendSignedHex100112(signedInfo, async function(e) {
             console.info('sendSignedHex100112 = ' + JSON.stringify(e));
 
-            let nodeID     = e.closee_node_address;
-            let userID     = e.closeee_peer_id;
+            let nodeID     = e.sendee_node_address;
+            let userID     = e.sendee_peer_id;
             let channel_id = e.channel_id;
 
             // Sign the tx on client side
@@ -500,8 +490,7 @@ function sendSignedHex100112(myUserID, nodeID, userID, signedInfo) {
             displaySentMessage100113(nodeID, userID, signedInfo);
 
             // SDK API
-            await sendSignedHex100113(nodeID, userID, signedInfo);
-
+            await sendSignedHex100113(myUserID, nodeID, userID, signedInfo);
             resolve(true);
         });
     })
@@ -509,19 +498,44 @@ function sendSignedHex100112(myUserID, nodeID, userID, signedInfo) {
 
 /**
  * Type -100113 Protocol send signed info that signed in 100112 to OBD.
+ * 
+ * @param myUserID The user id of logged in
  * @param nodeID peer id of the obd node where the fundee logged in.
  * @param userID the user id of the fundee.
  * @param signedInfo 
  */
-function sendSignedHex100113(nodeID, userID, signedInfo) {
+function sendSignedHex100113(myUserID, nodeID, userID, signedInfo) {
     return new Promise((resolve, reject) => {
-        obdApi.sendSignedHex100113(nodeID, userID, signedInfo, function(e) {
+        obdApi.sendSignedHex100113(nodeID, userID, signedInfo, async function(e) {
             console.info('sendSignedHex100113 = ' + JSON.stringify(e));
 
             // FUNCTION ONLY FOR GUI TOOL
-            // afterCommitmentTransactionAccepted();
-            // displayMyChannelListAtTopRight(kPageSize, kPageIndex);
+            listening110050ForGUITool(e);
 
+            // save some data
+            let isFunder = await getIsFunder(myUserID, e.channel_id);
+            saveChannelStatus(myUserID, e.channel_id, isFunder, kStatusCloseHTLCSigned);
+            savePayInvoiceCase('No');
+            resolve(true);
+        });
+    })
+}
+
+/**
+ * Type -100114 Protocol send signed info that signed in 110051 to OBD.
+ * @param signedInfo 
+ */
+function sendSignedHex100114(signedInfo) {
+    return new Promise((resolve, reject) => {
+        obdApi.sendSignedHex100114(signedInfo, function(e) {
+            console.info('sendSignedHex100114 = ' + JSON.stringify(e));
+
+            // FUNCTION ONLY FOR GUI TOOL
+            afterCloseHTLCSigned();
+            displayMyChannelListAtTopRight(kPageSize, kPageIndex);
+
+            // Clear H at Bob side
+            saveInvoiceH('');
             resolve(true);
         });
     })
@@ -558,20 +572,20 @@ function signR(myUserID, nodeID, userID, info, isFunder) {
  */
 function closeHTLC(myUserID, nodeID, userID, info, isFunder) {
     return new Promise((resolve, reject) => {
-        obdApi.closeHTLC(nodeID, userID, info, function(e) {
+        obdApi.closeHTLC(nodeID, userID, info, async function(e) {
             console.info('SDK: -100049 closeHTLC = ' + JSON.stringify(e));
             
             // FUNCTION ONLY FOR GUI TOOL
-            disableInvokeAPI();
-            tipsOnTop('', kProcessing);
+            // disableInvokeAPI();
+            // tipsOnTop('', kProcessing);
 
             let channel_id = e.channel_id;
 
             // Sign the tx on client side
             // NO.1
             let cr      = e.c4a_counterparty_raw_data;
-            let inputs   = cr.inputs;
-            let privkey  = await getFundingPrivKey(myUserID, channel_id);
+            let inputs  = cr.inputs;
+            let privkey = await getFundingPrivKey(myUserID, channel_id);
             let cr_hex  = signP2SH(true, cr.hex, cr.pub_key_a, cr.pub_key_b, privkey, inputs);
 
             // NO.2
@@ -592,8 +606,8 @@ function closeHTLC(myUserID, nodeID, userID, info, isFunder) {
             await sendSignedHex100110(nodeID, userID, signedInfo);
 
             // save some data
-            saveTempPrivKey(myUserID, kTempPrivKey, channel_id, 
-                getPrivKeyFromPubKey(myUserID, info.curr_rsmc_temp_address_pub_key));
+            let tempkey = getPrivKeyFromPubKey(myUserID, info.curr_temp_address_pub_key);
+            saveTempPrivKey(myUserID, kTempPrivKey, channel_id, tempkey);
             saveChannelStatus(myUserID, channel_id, isFunder, kStatusCloseHTLC);
             saveSenderRole(kIsSender);
             resolve(true);
@@ -612,7 +626,7 @@ function closeHTLC(myUserID, nodeID, userID, info, isFunder) {
  */
 function closeHTLCSigned(myUserID, nodeID, userID, info, isFunder) {
     return new Promise((resolve, reject) => {
-        obdApi.closeHTLCSigned(nodeID, userID, info, function(e) {
+        obdApi.closeHTLCSigned(nodeID, userID, info, async function(e) {
             console.info('SDK: -100050 closeHTLCSigned = ' + JSON.stringify(e));
 
             // FUNCTION ONLY FOR GUI TOOL
@@ -659,8 +673,9 @@ function closeHTLCSigned(myUserID, nodeID, userID, info, isFunder) {
             await sendSignedHex100111(nodeID, userID, signedInfo);
 
             // save some data
-            saveTempPrivKey(myUserID, kTempPrivKey, e.channel_id, info.curr_rsmc_temp_address_private_key);
-            saveChannelStatus(myUserID, e.channel_id, isFunder, kStatusCloseHTLCSigned);
+            let tempkey = getPrivKeyFromPubKey(myUserID, info.curr_rsmc_temp_address_pub_key);
+            saveTempPrivKey(myUserID, kTempPrivKey, channel_id, tempkey);
+            saveChannelStatus(myUserID, channel_id, isFunder, kStatusCloseHTLCSigned);
             resolve(true);
         });
     })

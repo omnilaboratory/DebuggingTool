@@ -202,6 +202,11 @@ class SignedInfo100113 {
   c4b_br_id: string = "";
 }
 
+class SignedInfo100114 {
+  channel_id: string = "";
+  c4b_rd_complete_signed_hex: string = "";
+}
+
 class CommitmentTx {
   channel_id: string = "";
   amount: number = 0;
@@ -300,10 +305,6 @@ class HtlcRequestOpen {
 class ForwardRInfo {
   channel_id: string = "";
   r: string = "";
-  // channel_address_private_key: string = "";
-  // curr_htlc_temp_address_for_he1b_pub_key: string = "";
-  // curr_htlc_temp_address_for_he1b_private_key: string = "";
-  // curr_htlc_temp_address_for_he1b_index: number = 0;
 }
 
 class SignRInfo {
@@ -317,13 +318,11 @@ class SignRInfo {
 
 class CloseHtlcTxInfo {
   channel_id: string = "";
-  // channel_address_private_key: string = "";
   last_rsmc_temp_address_private_key: string = "";
   last_htlc_temp_address_private_key: string = "";
   last_htlc_temp_address_for_htnx_private_key: string = "";
-  curr_rsmc_temp_address_pub_key: string = "";
-  // curr_rsmc_temp_address_private_key: string = "";
-  curr_rsmc_temp_address_index: number = 0;
+  curr_temp_address_pub_key: string = "";
+  curr_temp_address_index: number = 0;
 }
 
 class CloseHtlcTxInfoSigned {

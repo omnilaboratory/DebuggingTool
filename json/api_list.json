@@ -1067,13 +1067,13 @@
                     "buttons": []
                 },
                 {
-                    "name": "curr_rsmc_temp_address_pub_key",
+                    "name": "curr_temp_address_pub_key",
                     "help": "This public key of an address will be used to create a temp 2-2 multi-sig address as output 0 of newer Cx transaction in RSMC.",
                     "disable": "yes",
                     "buttons": []
                 },
                 {
-                    "name": "curr_rsmc_temp_address_private_key",
+                    "name": "curr_temp_address_private_key",
                     "help": "This private key of an address will be used to sign newer RDxa and BRxa transaction.",
                     "disable": "yes",
                     "buttons": []

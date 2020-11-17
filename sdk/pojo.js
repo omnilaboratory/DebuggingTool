@@ -230,6 +230,12 @@ class SignedInfo100113 {
         this.c4b_br_id = "";
     }
 }
+class SignedInfo100114 {
+    constructor() {
+        this.channel_id = "";
+        this.c4b_rd_complete_signed_hex = "";
+    }
+}
 class CommitmentTx {
     constructor() {
         this.channel_id = "";
@@ -337,10 +343,6 @@ class ForwardRInfo {
     constructor() {
         this.channel_id = "";
         this.r = "";
-        // channel_address_private_key: string = "";
-        // curr_htlc_temp_address_for_he1b_pub_key: string = "";
-        // curr_htlc_temp_address_for_he1b_private_key: string = "";
-        // curr_htlc_temp_address_for_he1b_index: number = 0;
     }
 }
 class SignRInfo {
@@ -356,13 +358,11 @@ class SignRInfo {
 class CloseHtlcTxInfo {
     constructor() {
         this.channel_id = "";
-        // channel_address_private_key: string = "";
         this.last_rsmc_temp_address_private_key = "";
         this.last_htlc_temp_address_private_key = "";
         this.last_htlc_temp_address_for_htnx_private_key = "";
-        this.curr_rsmc_temp_address_pub_key = "";
-        // curr_rsmc_temp_address_private_key: string = "";
-        this.curr_rsmc_temp_address_index = 0;
+        this.curr_temp_address_pub_key = "";
+        this.curr_temp_address_index = 0;
     }
 }
 class CloseHtlcTxInfoSigned {

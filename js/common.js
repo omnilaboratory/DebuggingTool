@@ -261,12 +261,10 @@ async function sdkCloseHTLC() {
     info.last_rsmc_temp_address_private_key          = $("#last_rsmc_temp_address_private_key").val();
     info.last_htlc_temp_address_private_key          = $("#last_htlc_temp_address_private_key").val();
     info.last_htlc_temp_address_for_htnx_private_key = $("#last_htlc_temp_address_for_htnx_private_key").val();
-    info.curr_rsmc_temp_address_pub_key              = $("#curr_rsmc_temp_address_pub_key").val();
-    // info.channel_address_private_key                 = $("#channel_address_private_key").val();
-    // info.curr_rsmc_temp_address_private_key          = $("#curr_rsmc_temp_address_private_key").val();
+    info.curr_temp_address_pub_key                   = $("#curr_temp_address_pub_key").val();
 
     // Save address index to OBD and can get private key back if lose it.
-    info.curr_rsmc_temp_address_index = Number(getIndexFromPubKey(info.curr_rsmc_temp_address_pub_key));
+    info.curr_temp_address_index = Number(getIndexFromPubKey(info.curr_temp_address_pub_key));
 
     displaySentMessage100049(nodeID, userID, info);
 
@@ -304,10 +302,6 @@ async function sdkCloseHTLCSigned() {
     let myUserID = $("#logined").text();
     let isFunder = await getIsFunder(myUserID, $("#curr_channel_id").text());
     await closeHTLCSigned(myUserID, nodeID, userID, info, isFunder);
-
-    // WILL BE MOVE TO 100114 ??
-    afterCloseHTLCSigned();
-    displayMyChannelListAtTopRight(kPageSize, kPageIndex);
 }
 
 /** 
@@ -2024,7 +2018,7 @@ async function changeInvokeAPIEnable(status, isFunder, myUserID, channel_id) {
             fillCounterparty(myUserID, channel_id);
             fillChannelIDAndFundingPrivKey(myUserID, channel_id);
             fillThreeLastPrivKey(myUserID, channel_id);
-            fillCurrRsmcTempKey();
+            fillCurrTempAddrKey();
 
             break;
 
@@ -2042,8 +2036,15 @@ async function changeInvokeAPIEnable(status, isFunder, myUserID, channel_id) {
             fillChannelIDAndFundingPrivKey(myUserID, channel_id);
             fillThreeLastPrivKey(myUserID, channel_id);
             fillCurrRsmcTempKey();
+
             data = await getTempData(myUserID, channel_id);
             $("#msg_hash").val(data);
+
+            data = await getSignedHex(myUserID, channel_id, kTbSignedHexCR110040);
+            $("#c4a_counterparty_complete_signed_hex").val(data);
+
+            data = await getSignedHex(myUserID, channel_id, kTbSignedHexHR110040);
+            $("#c4a_rsmc_complete_signed_hex").val(data);
 
             break;
 
@@ -4611,14 +4612,12 @@ function registerEvent(netType) {
     let msg_110042 = enumMsgType.MsgType_HTLC_BobSignC3bSubTx_42;
     obdApi.registerEvent(msg_110042, function(e) {
         listening110042(e, netType);
-        // listening110041ForGUITool(e);
     });
     
     // auto response mode
     let msg_110043 = enumMsgType.MsgType_HTLC_FinishTransferH_43;
     obdApi.registerEvent(msg_110043, function(e) {
         listening110043(e);
-        // listening110041ForGUITool(e);
     });
 
     // auto response mode
@@ -4644,7 +4643,13 @@ function registerEvent(netType) {
     let msg_110050 = enumMsgType.MsgType_HTLC_RecvCloseSigned_50;
     obdApi.registerEvent(msg_110050, function(e) {
         listening110050(e);
-        listening110050ForGUITool(e);
+        // listening110050ForGUITool(e);
+    });
+
+    let msg_110051 = enumMsgType.MsgType_HTLC_Close_ClientSign_Bob_C4bSub_51;
+    obdApi.registerEvent(msg_110051, function(e) {
+        listening110051(e);
+        // listening110051ForGUITool(e);
     });
 
     // save request_close_channel_hash
@@ -4927,18 +4932,27 @@ function listening110046ForGUITool(e) {
  */
 function listening110049ForGUITool(e) {
 
-    tipsOnTop(e.channel_id, kTips110049, 'Accept', 'closeHTLCSigned');
+    let isAutoMode = getAutoPilot();
 
-    let api_name = $("#api_name").text();
-    if (api_name === 'closeHTLCSigned') {
-        enableInvokeAPI();
-        fillChannelIDAndFundingPrivKey($("#logined").text(), e.channel_id);
-        fillThreeLastPrivKey($("#logined").text(), e.channel_id);
-        fillCurrRsmcTempKey();
-
-        $("#recipient_node_peer_id").val(e.sender_node_address);
-        $("#recipient_user_peer_id").val(e.sender_peer_id);
-        $("#msg_hash").val(e.msg_hash);
+    // auto mode is opening
+    if (isAutoMode === 'Yes') {
+        tipsOnTop(e.channel_id, kProcessing);
+    } else { // auto mode is closed
+        tipsOnTop(e.channel_id, kTips110049, 'Accept', 'closeHTLCSigned');
+    
+        let api_name = $("#api_name").text();
+        if (api_name === 'closeHTLCSigned') {
+            enableInvokeAPI();
+            fillChannelIDAndFundingPrivKey($("#logined").text(), e.channel_id);
+            fillThreeLastPrivKey($("#logined").text(), e.channel_id);
+            fillCurrRsmcTempKey();
+    
+            $("#recipient_node_peer_id").val(e.sender_node_address);
+            $("#recipient_user_peer_id").val(e.sender_peer_id);
+            $("#msg_hash").val(e.msg_hash);
+            $("#c4a_rsmc_complete_signed_hex").val(kSignedHexTip);
+            $("#c4a_counterparty_complete_signed_hex").val(kSignedHexTip);
+        }
     }
 }
 
@@ -6267,15 +6281,11 @@ function displaySentMessage100111(nodeID, userID, info) {
 
 /**
  * -100112 Display the sent message in the message box and save it to the log file
- * @param nodeID 
- * @param userID
  * @param info 
  */
-function displaySentMessage100112(nodeID, userID, info) {
+function displaySentMessage100112(info) {
     let msgSend = {
         type: -100112,
-        recipient_node_peer_id: nodeID,
-        recipient_user_peer_id: userID,
         data: {
             channel_id:                           info.channel_id,
             c4a_rd_complete_signed_hex:           info.c4a_rd_complete_signed_hex,
@@ -6303,6 +6313,22 @@ function displaySentMessage100113(nodeID, userID, info) {
             c4b_rd_partial_signed_hex: info.c4b_rd_partial_signed_hex,
             c4b_br_partial_signed_hex: info.c4b_br_partial_signed_hex,
             c4b_br_id:                 info.c4b_br_id,
+        }
+    }
+
+    displaySentMessage(msgSend);
+}
+
+/**
+ * -100114 Display the sent message in the message box and save it to the log file
+ * @param info 
+ */
+function displaySentMessage100114(info) {
+    let msgSend = {
+        type: -100114,
+        data: {
+            channel_id:                 info.channel_id,
+            c4b_rd_complete_signed_hex: info.c4b_rd_complete_signed_hex,
         }
     }
 

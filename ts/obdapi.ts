@@ -1620,27 +1620,13 @@ class ObdApi {
 
   /**
    * MsgType_HTLC_Close_ClientSign_Alice_C4b_112
-   * @param recipient_node_peer_id string
-   * @param recipient_user_peer_id string
    * @param info  SignedInfo100112
    * @param callback  Function
    */
   public sendSignedHex100112(
-    recipient_node_peer_id: string,
-    recipient_user_peer_id: string,
     info: SignedInfo100112,
     callback: Function ) {
       
-    if (this.isNotString(recipient_node_peer_id)) {
-      alert("error recipient_node_peer_id");
-      return;
-    }
-
-    if (this.isNotString(recipient_user_peer_id)) {
-      alert("error recipient_user_peer_id");
-      return;
-    }
-
     if (this.isNotString(info.channel_id)) {
       alert("empty channel_id");
       return;
@@ -1648,8 +1634,6 @@ class ObdApi {
 
     let msg  = new Message();
     msg.type = this.messageType.MsgType_HTLC_Close_ClientSign_Alice_C4b_112;
-    msg.recipient_user_peer_id = recipient_user_peer_id;
-    msg.recipient_node_peer_id = recipient_node_peer_id;
     msg.data = info;
     this.sendData(msg, callback);
   }
@@ -1686,6 +1670,26 @@ class ObdApi {
     msg.type = this.messageType.MsgType_HTLC_Close_ClientSign_Alice_C4bSub_113;
     msg.recipient_user_peer_id = recipient_user_peer_id;
     msg.recipient_node_peer_id = recipient_node_peer_id;
+    msg.data = info;
+    this.sendData(msg, callback);
+  }
+
+  /**
+   * MsgType_HTLC_Close_ClientSign_Bob_C4bSubResult_114
+   * @param info  SignedInfo100114
+   * @param callback  Function
+   */
+  public sendSignedHex100114(
+    info: SignedInfo100114,
+    callback: Function ) {
+      
+    if (this.isNotString(info.channel_id)) {
+      alert("empty channel_id");
+      return;
+    }
+
+    let msg  = new Message();
+    msg.type = this.messageType.MsgType_HTLC_Close_ClientSign_Bob_C4bSubResult_114;
     msg.data = info;
     this.sendData(msg, callback);
   }
@@ -1846,11 +1850,6 @@ class ObdApi {
       return;
     }
 
-    if (this.isNotString(info.channel_address_private_key)) {
-      alert("empty channel_address_private_key");
-      return;
-    }
-
     if (this.isNotString(info.last_rsmc_temp_address_private_key)) {
       alert("empty last_rsmc_temp_address_private_key");
       return;
@@ -1863,12 +1862,8 @@ class ObdApi {
       alert("empty last_htlc_temp_address_private_key");
       return;
     }
-    if (this.isNotString(info.curr_rsmc_temp_address_pub_key)) {
+    if (this.isNotString(info.curr_temp_address_pub_key)) {
       alert("empty curr_rsmc_temp_address_pub_key");
-      return;
-    }
-    if (this.isNotString(info.curr_rsmc_temp_address_private_key)) {
-      alert("empty curr_rsmc_temp_address_private_key");
       return;
     }
 
@@ -1908,10 +1903,6 @@ class ObdApi {
       alert("empty msg_hash");
       return;
     }
-    if (this.isNotString(info.channel_address_private_key)) {
-      alert("empty channel_address_private_key");
-      return;
-    }
     if (this.isNotString(info.last_rsmc_temp_address_private_key)) {
       alert("empty last_rsmc_temp_address_private_key");
       return;
@@ -1928,10 +1919,7 @@ class ObdApi {
       alert("empty curr_rsmc_temp_address_pub_key");
       return;
     }
-    if (this.isNotString(info.curr_rsmc_temp_address_private_key)) {
-      alert("empty curr_rsmc_temp_address_private_key");
-      return;
-    }
+    
     let msg = new Message();
     msg.type = this.messageType.MsgType_HTLC_SendCloseSigned_50;
     msg.recipient_user_peer_id = recipient_user_peer_id;
