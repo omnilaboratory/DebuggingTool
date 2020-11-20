@@ -4856,6 +4856,13 @@ function listening110035ForGUITool(e) {
  */
 function listening110040ForGUITool(e) {
 
+    let isInPayInvoice = getPayInvoiceCase();
+    // In pay invoice case
+    if (isInPayInvoice === 'Yes') {
+        tipsOnTop(e.channel_id, kPayInvoice);
+        return;
+    }
+
     let isAutoMode = getAutoPilot();
 
     // auto mode is opening
@@ -4885,6 +4892,14 @@ function listening110040ForGUITool(e) {
  * For GUI Tool. Display tips
  */
 function listening110041ForGUITool(e) {
+
+    let isInPayInvoice = getPayInvoiceCase();
+    // In pay invoice case
+    if (isInPayInvoice === 'Yes') {
+        tipsOnTop(e.channel_id, kPayInvoice);
+        return;
+    }
+
     tipsOnTop(e.channel_id, kTips110041);
 }
 
@@ -4892,6 +4907,13 @@ function listening110041ForGUITool(e) {
  * For GUI Tool. Display tips
  */
 function listening110045ForGUITool(e) {
+
+    let isInPayInvoice = getPayInvoiceCase();
+    // In pay invoice case
+    if (isInPayInvoice === 'Yes') {
+        tipsOnTop(e.channel_id, kPayInvoice);
+        return;
+    }
 
     let isAutoMode = getAutoPilot();
 
@@ -4908,8 +4930,6 @@ function listening110045ForGUITool(e) {
     
             $("#recipient_node_peer_id").val(e.payee_node_address);
             $("#recipient_user_peer_id").val(e.payee_peer_id);
-            // $("#msg_hash").val(e.msg_hash);
-            // $("#r").val(e.r);
             $("#c3b_htlc_herd_complete_signed_hex").val(kSignedHexTip);
             $("#c3b_htlc_hebr_partial_signed_hex").val(kSignedHexTip);
         }
@@ -4920,6 +4940,21 @@ function listening110045ForGUITool(e) {
  * For GUI Tool. Display tips
  */
 function listening110046ForGUITool(e) {
+
+    let isInPayInvoice = getPayInvoiceCase();
+    // In pay invoice case
+    if (isInPayInvoice === 'Yes') {
+        tipsOnTop(e.channel_id, kPayInvoice);
+        return;
+    }
+
+    // let isAutoMode = getAutoPilot();
+
+    // // auto mode is opening
+    // if (isAutoMode === 'Yes') {
+    //     tipsOnTop(e.channel_id, kProcessing);
+    // } else { // auto mode is closed
+    // }
     tipsOnTop(e.channel_id, kTips110046, 'Close HTLC', 'closeHTLC');
 }
 
@@ -4927,6 +4962,13 @@ function listening110046ForGUITool(e) {
  * For GUI Tool. Display tips
  */
 function listening110049ForGUITool(e) {
+
+    let isInPayInvoice = getPayInvoiceCase();
+    // In pay invoice case
+    if (isInPayInvoice === 'Yes') {
+        tipsOnTop(e.channel_id, kPayInvoice);
+        return;
+    }
 
     let isAutoMode = getAutoPilot();
 

@@ -1161,103 +1161,111 @@ function openDB() {
     // Create table and index
     request.onupgradeneeded = function (e) {
         db = e.target.result;
+        createOS();
+        console.log('DB onupgradeneeded success!');
+    }
+}
 
-        let os1;
-        if (!db.objectStoreNames.contains(kTbGlobalMsg)) {
-            os1 = db.createObjectStore(kTbGlobalMsg, { autoIncrement: true });
-            os1.createIndex('user_id', 'user_id', { unique: false });
-        }
+/**
+ * Create Object Store of IndexedDB
+ */
+function createOS() {
+    
+    let os1;
+    if (!db.objectStoreNames.contains(kTbGlobalMsg)) {
+        os1 = db.createObjectStore(kTbGlobalMsg, { autoIncrement: true });
+        os1.createIndex('user_id', 'user_id', { unique: false });
+    }
 
-        let os2;
-        if (!db.objectStoreNames.contains(kTbFundingPrivKey)) {
-            os2 = db.createObjectStore(kTbFundingPrivKey, { keyPath: 'key' });
-        }
+    let os2;
+    if (!db.objectStoreNames.contains(kTbFundingPrivKey)) {
+        os2 = db.createObjectStore(kTbFundingPrivKey, { keyPath: 'key' });
+    }
 
-        let os3;
-        if (!db.objectStoreNames.contains(kTbChannelStatus)) {
-            os3 = db.createObjectStore(kTbChannelStatus, { keyPath: 'key' });
-            os3.createIndex('channel_id', 'channel_id',   { unique: false });
-            os3.createIndex('user_id', 'user_id', { unique: false });
-            os3.createIndex('funder',  'funder',  { unique: false });
-            os3.createIndex('status',  'status',  { unique: false });
-        }
+    let os3;
+    if (!db.objectStoreNames.contains(kTbChannelStatus)) {
+        os3 = db.createObjectStore(kTbChannelStatus, { keyPath: 'key' });
+        os3.createIndex('channel_id', 'channel_id',   { unique: false });
+        os3.createIndex('user_id', 'user_id', { unique: false });
+        os3.createIndex('funder',  'funder',  { unique: false });
+        os3.createIndex('status',  'status',  { unique: false });
+    }
 
-        let os4;
-        if (!db.objectStoreNames.contains(kTbChannelAddr)) {
-            os4 = db.createObjectStore(kTbChannelAddr, { keyPath: 'channel_id' });
-            os4.createIndex('channel_addr', 'channel_addr', { unique: true });
-        }
+    let os4;
+    if (!db.objectStoreNames.contains(kTbChannelAddr)) {
+        os4 = db.createObjectStore(kTbChannelAddr, { keyPath: 'channel_id' });
+        os4.createIndex('channel_addr', 'channel_addr', { unique: true });
+    }
 
-        let os5;
-        if (!db.objectStoreNames.contains(kTbCounterparty)) {
-            os5 = db.createObjectStore(kTbCounterparty, { keyPath: 'key' });
-            os5.createIndex('user_id', 'user_id', { unique: false });
-        }
+    let os5;
+    if (!db.objectStoreNames.contains(kTbCounterparty)) {
+        os5 = db.createObjectStore(kTbCounterparty, { keyPath: 'key' });
+        os5.createIndex('user_id', 'user_id', { unique: false });
+    }
 
-        let os6;
-        if (!db.objectStoreNames.contains(kTbFundingBTC)) {
-            os6 = db.createObjectStore(kTbFundingBTC, { keyPath: 'key' });
-        }
+    let os6;
+    if (!db.objectStoreNames.contains(kTbFundingBTC)) {
+        os6 = db.createObjectStore(kTbFundingBTC, { keyPath: 'key' });
+    }
 
-        let os7;
-        if (!db.objectStoreNames.contains(kTbTempData)) {
-            os7 = db.createObjectStore(kTbTempData, { keyPath: 'key' });
-        }
+    let os7;
+    if (!db.objectStoreNames.contains(kTbTempData)) {
+        os7 = db.createObjectStore(kTbTempData, { keyPath: 'key' });
+    }
 
-        let os8;
-        if (!db.objectStoreNames.contains(kTbHTLCPathData)) {
-            os8 = db.createObjectStore(kTbHTLCPathData, { keyPath: 'key' });
-        }
+    let os8;
+    if (!db.objectStoreNames.contains(kTbHTLCPathData)) {
+        os8 = db.createObjectStore(kTbHTLCPathData, { keyPath: 'key' });
+    }
 
-        let os9;
-        if (!db.objectStoreNames.contains(kTbForwardR)) {
-            os9 = db.createObjectStore(kTbForwardR, { keyPath: 'key' });
-        }
+    let os9;
+    if (!db.objectStoreNames.contains(kTbForwardR)) {
+        os9 = db.createObjectStore(kTbForwardR, { keyPath: 'key' });
+    }
 
-        let os10;
-        if (!db.objectStoreNames.contains(kTbInvoiceR)) {
-            os10 = db.createObjectStore(kTbInvoiceR, { keyPath: 'key' });
-        }
+    let os10;
+    if (!db.objectStoreNames.contains(kTbInvoiceR)) {
+        os10 = db.createObjectStore(kTbInvoiceR, { keyPath: 'key' });
+    }
 
-        let os11;
-        if (!db.objectStoreNames.contains(kTbSignedHex)) {
-            os11 = db.createObjectStore(kTbSignedHex, { keyPath: 'key' });
-        }
+    let os11;
+    if (!db.objectStoreNames.contains(kTbSignedHex)) {
+        os11 = db.createObjectStore(kTbSignedHex, { keyPath: 'key' });
+    }
 
-        let os12;
-        if (!db.objectStoreNames.contains(kTbSignedHexCR110351)) {
-            os12 = db.createObjectStore(kTbSignedHexCR110351, { keyPath: 'key' });
-        }
+    let os12;
+    if (!db.objectStoreNames.contains(kTbSignedHexCR110351)) {
+        os12 = db.createObjectStore(kTbSignedHexCR110351, { keyPath: 'key' });
+    }
 
-        let os13;
-        if (!db.objectStoreNames.contains(kTbSignedHexRR110351)) {
-            os13 = db.createObjectStore(kTbSignedHexRR110351, { keyPath: 'key' });
-        }
+    let os13;
+    if (!db.objectStoreNames.contains(kTbSignedHexRR110351)) {
+        os13 = db.createObjectStore(kTbSignedHexRR110351, { keyPath: 'key' });
+    }
 
-        let os14;
-        if (!db.objectStoreNames.contains(kTbSignedHexCR110040)) {
-            os14 = db.createObjectStore(kTbSignedHexCR110040, { keyPath: 'key' });
-        }
+    let os14;
+    if (!db.objectStoreNames.contains(kTbSignedHexCR110040)) {
+        os14 = db.createObjectStore(kTbSignedHexCR110040, { keyPath: 'key' });
+    }
 
-        let os15;
-        if (!db.objectStoreNames.contains(kTbSignedHexHR110040)) {
-            os15 = db.createObjectStore(kTbSignedHexHR110040, { keyPath: 'key' });
-        }
+    let os15;
+    if (!db.objectStoreNames.contains(kTbSignedHexHR110040)) {
+        os15 = db.createObjectStore(kTbSignedHexHR110040, { keyPath: 'key' });
+    }
 
-        let os16;
-        if (!db.objectStoreNames.contains(kTbSignedHexRR110040)) {
-            os16 = db.createObjectStore(kTbSignedHexRR110040, { keyPath: 'key' });
-        }
+    let os16;
+    if (!db.objectStoreNames.contains(kTbSignedHexRR110040)) {
+        os16 = db.createObjectStore(kTbSignedHexRR110040, { keyPath: 'key' });
+    }
 
-        let os17;
-        if (!db.objectStoreNames.contains(kTbSignedHexBR110045)) {
-            os17 = db.createObjectStore(kTbSignedHexBR110045, { keyPath: 'key' });
-        }
+    let os17;
+    if (!db.objectStoreNames.contains(kTbSignedHexBR110045)) {
+        os17 = db.createObjectStore(kTbSignedHexBR110045, { keyPath: 'key' });
+    }
 
-        let os18;
-        if (!db.objectStoreNames.contains(kTbSignedHexRD110045)) {
-            os18 = db.createObjectStore(kTbSignedHexRD110045, { keyPath: 'key' });
-        }
+    let os18;
+    if (!db.objectStoreNames.contains(kTbSignedHexRD110045)) {
+        os18 = db.createObjectStore(kTbSignedHexRD110045, { keyPath: 'key' });
     }
 }
 
@@ -1400,11 +1408,15 @@ function signP2SH(is_first_sign, txhex, pubkey_1, pubkey_2, privkey, inputs) {
 }
 
 /**
- ** 乘法函数，用来得到精确的乘法结果
-** 说明：javascript的乘法结果会有误差，在两个浮点数相乘的时候会比较明显。这个函数返回较为精确的乘法结果。
-** 调用：accMul(arg1,arg2)
-** 返回值：arg1乘以 arg2的精确结果
-**/
+ * This function is used to get accurate multiplication result.
+ * 
+ * Explanation: There will be errors in the multiplication result of javascript, 
+ * which is more obvious when multiplying two floating-point numbers. 
+ * This function returns a more accurate multiplication result.
+ * 
+ * @param arg1
+ * @param arg2
+ */
 function accMul(arg1, arg2) {
     let m  = 0,
         s1 = arg1.toString(),
