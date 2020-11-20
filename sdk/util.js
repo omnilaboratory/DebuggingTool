@@ -7,18 +7,6 @@ const kAddress = 'address';
 //
 const kMnemonic = 'mnemonic';
 
-//
-// const kRoutingPacket = 'routing_packet';
-
-//
-// const kCltvExpiry = 'cltv_expiry';
-
-//
-// const kHtlcH = 'htlc_h';
-
-//
-// const kHtlcR = 'htlc_r';
-
 /**
  * Save RSMC tx temporary private key to local storage
  */
@@ -131,6 +119,54 @@ const kSenderRole = 'sender_role';
 // const kTbTempPrivKey = 'tb_temp_priv_key';
 
 /**
+ * Object Store (table) name of IndexedDB.
+ * Signed Hex
+ */
+const kTbSignedHex = 'tb_signed_hex';
+
+/**
+ * Object Store (table) name of IndexedDB.
+ * Signed Hex CR110351
+ */
+const kTbSignedHexCR110351 = 'tb_signed_hex_CR110351';
+
+/**
+ * Object Store (table) name of IndexedDB.
+ * Signed Hex RR110351
+ */
+const kTbSignedHexRR110351 = 'tb_signed_hex_RR110351';
+
+/**
+ * Object Store (table) name of IndexedDB.
+ * Signed Hex CR110040
+ */
+const kTbSignedHexCR110040 = 'tb_signed_hex_CR110040';
+
+/**
+ * Object Store (table) name of IndexedDB.
+ * Signed Hex HR110040
+ */
+const kTbSignedHexHR110040 = 'tb_signed_hex_HR110040';
+
+/**
+ * Object Store (table) name of IndexedDB.
+ * Signed Hex RR110040
+ */
+const kTbSignedHexRR110040 = 'tb_signed_hex_RR110040';
+
+/**
+ * Object Store (table) name of IndexedDB.
+ * Signed Hex BR110045
+ */
+const kTbSignedHexBR110045 = 'tb_signed_hex_BR110045';
+
+/**
+ * Object Store (table) name of IndexedDB.
+ * Signed Hex RD110045
+ */
+const kTbSignedHexRD110045 = 'tb_signed_hex_RD110045';
+
+/**
  *  List of Counterparties who have interacted
  *  @param myUserID The user id of logged in
  *  @param channel_id 
@@ -230,7 +266,7 @@ function getAllCounterpartyFromUserID(myUserID) {
                 result.continue();
 
             } else {
-                console.log('getAllCounterpartyFromUserID No More Data.');
+                // console.log('getAllCounterpartyFromUserID No More Data.');
                 console.log('getAllCounterpartyFromUserID = ' + JSON.stringify(data));
                 resolve(data);
             }
@@ -374,7 +410,7 @@ function getChannelStatus(channel_id, funder) {
     
         request.onsuccess = function (e) {
             if (request.result) {
-                console.log('channel status = ' + request.result.status);
+                // console.log('channel status = ' + request.result.status);
                 resolve(request.result.status);
             } else {
                 console.log('channel status = No Data.');
@@ -638,6 +674,63 @@ function getTempData(myUserID, channel_id) {
 }
 
 /**
+ * save signed hex
+ * 
+ * @param myUserID
+ * @param channel_id
+ * @param value
+ * @param tb_name table name
+ */
+function saveSignedHex(myUserID, channel_id, value, tb_name) {
+
+    let key     = myUserID + channel_id;
+    let request = db.transaction([tb_name], 'readwrite')
+        .objectStore(tb_name)
+        .put({ key: key, value: value });
+  
+    request.onsuccess = function (e) {
+        // console.log('Data write success.');
+    };
+  
+    request.onerror = function (e) {
+        // console.log('Data write false.');
+    }
+}
+
+/**
+ * get signed hex
+ * 
+ * @param myUserID
+ * @param channel_id
+ * @param tb_name table name
+ */
+function getSignedHex(myUserID, channel_id, tb_name) {
+
+    return new Promise((resolve, reject) => {
+
+        let key         = myUserID + channel_id;
+        let transaction = db.transaction([tb_name], 'readonly');
+        let store       = transaction.objectStore(tb_name);
+        let request     = store.get(key);
+    
+        request.onerror = function(e) {
+            console.log('Read data false.');
+            reject('Read data false.');
+        };
+    
+        request.onsuccess = function (e) {
+            if (request.result) {
+                console.log('getSignedHex = ' + request.result.value);
+                resolve(request.result.value);
+            } else {
+                console.log('getSignedHex = No Data.');
+                resolve('');
+            }
+        }
+    })
+}
+
+/**
  * 
  * @param {*} myUserID 
  * @param {*} channel_id 
@@ -689,51 +782,6 @@ function getFundingBtcData(myUserID, channel_id) {
         }
     })
 }
-
-/**
- * Save Htlc H
- * @param value
- */
-// function saveHtlcH(value) {
-//     localStorage.setItem(kHtlcH, value);
-// }
-
-/**
- * Get Htlc H
- */
-// function getHtlcH() {
-//     return localStorage.getItem(kHtlcH);
-// }
-
-/**
- * Save Routing Packet
- * @param value
- */
-// function saveRoutingPacket(value) {
-//     localStorage.setItem(kRoutingPacket, value);
-// }
-
-/**
- * Get Routing Packet
- */
-// function getRoutingPacket() {
-//     return localStorage.getItem(kRoutingPacket);
-// }
-
-/**
- * Save Cltv Expiry
- * @param value
- */
-// function saveCltvExpiry(value) {
-//     localStorage.setItem(kCltvExpiry, value);
-// }
-
-/**
- * Get Cltv Expiry
- */
-// function getCltvExpiry() {
-//     return localStorage.getItem(kCltvExpiry);
-// }
 
 /**
  * Save temporary private key to local storage
@@ -921,112 +969,6 @@ function getInvoiceH() {
 }
 
 /**
- * save r from addInvoice type ( -100402 )
- * @param myUserID
- * @param channel_id
- * @param r
- */
-// function OLDsaveInvoiceR(myUserID, channel_id, r) {
-
-//     let key     = myUserID + channel_id;
-//     let request = db.transaction([kTbInvoiceR], 'readwrite')
-//         .objectStore(kTbInvoiceR)
-//         .put({ key: key, r: r });
-  
-//     request.onsuccess = function (e) {
-//         // console.log('Data write success.');
-//     };
-  
-//     request.onerror = function (e) {
-//         // console.log('Data write false.');
-//     }
-// }
-
-/**
- * get r from addInvoice type ( -100402 )
- * @param myUserID 
- * @param channel_id
- */
-// function OLDgetInvoiceR(myUserID, channel_id) {
-
-//     return new Promise((resolve, reject) => {
-
-//         let key         = myUserID + channel_id;
-//         let transaction = db.transaction([kTbInvoiceR], 'readonly');
-//         let store       = transaction.objectStore(kTbInvoiceR);
-//         let request     = store.get(key);
-    
-//         request.onerror = function(e) {
-//             console.log('Read data false.');
-//             reject('Read data false.');
-//         };
-    
-//         request.onsuccess = function (e) {
-//             if (request.result) {
-//                 console.log('getInvoiceR = ' + request.result.r);
-//                 resolve(request.result.r);
-//             } else {
-//                 console.log('getInvoiceR = No Data.');
-//                 resolve('');
-//             }
-//         }
-//     })
-// }
-
-/**
- * save r from forwardR type ( -100045 ) return
- * @param myUserID
- * @param channel_id
- * @param r
- */
-// function saveForwardR(myUserID, channel_id, r) {
-
-//     let key     = myUserID + channel_id;
-//     let request = db.transaction([kTbForwardR], 'readwrite')
-//         .objectStore(kTbForwardR)
-//         .put({ key: key, r: r });
-  
-//     request.onsuccess = function (e) {
-//         // console.log('Data write success.');
-//     };
-  
-//     request.onerror = function (e) {
-//         // console.log('Data write false.');
-//     }
-// }
-
-/**
- * get r from forwardR type ( -100045 ) return
- * @param myUserID 
- * @param channel_id
- */
-// function getForwardR(myUserID, channel_id) {
-
-//     return new Promise((resolve, reject) => {
-
-//         let key         = myUserID + channel_id;
-//         let transaction = db.transaction([kTbForwardR], 'readonly');
-//         let store       = transaction.objectStore(kTbForwardR);
-//         let request     = store.get(key);
-    
-//         request.onerror = function(e) {
-//             console.log('Read data false.');
-//             reject('Read data false.');
-//         };
-    
-//         request.onsuccess = function (e) {
-//             if (request.result) {
-//                 console.log('getForwardR = ' + request.result.r);
-//                 resolve(request.result.r);
-//             } else {
-//                 console.log('getForwardR = No Data.');
-//                 resolve('');
-//             }
-//         }
-//     })
-// }
-
-/**
  * Save auto pilot status
  * @param value Yes or No
  */
@@ -1125,54 +1067,6 @@ function getHTLCPathData() {
 }
 
 /**
- * Save HTLC Path Data
- * @param e
- */
-// function OLDsaveHTLCPathData(e) {
-    
-//     let key     = myUserID + channel_id;
-//     let request = db.transaction([kTbHTLCPathData], 'readwrite')
-//         .objectStore(kTbHTLCPathData)
-//         .put({ key: key, e: e});
-  
-//     request.onsuccess = function (e) {
-//     };
-  
-//     request.onerror = function (e) {
-//     }
-// }
-
-/**
- * 
- */
-// function OLDgetHTLCPathData() {
-
-//     return new Promise((resolve, reject) => {
-
-//         let key         = myUserID + channel_id;
-//         let transaction = db.transaction([kTbHTLCPathData], 'readonly');
-//         let store       = transaction.objectStore(kTbHTLCPathData);
-//         let request     = store.get(key);
-    
-//         request.onerror = function(e) {
-//             console.log('Read data false.');
-//             reject('Read data false.');
-//         };
-    
-//         request.onsuccess = function (e) {
-//             if (request.result) {
-//                 console.log('getHTLCPathData = ' + JSON.stringify(request.result.e));
-//                 resolve(request.result.e);
-//                 // resolve(data);
-//             } else {
-//                 console.log('getHTLCPathData = No Data.');
-//                 resolve('');
-//             }
-//         }
-//     })
-// }
-
-/**
  * Save Funding private key
  * @param myUserID
  * @param channel_id
@@ -1267,63 +1161,111 @@ function openDB() {
     // Create table and index
     request.onupgradeneeded = function (e) {
         db = e.target.result;
+        createOS();
+        console.log('DB onupgradeneeded success!');
+    }
+}
 
-        let os1;
-        if (!db.objectStoreNames.contains(kTbGlobalMsg)) {
-            os1 = db.createObjectStore(kTbGlobalMsg, { autoIncrement: true });
-            os1.createIndex('user_id', 'user_id', { unique: false });
-        }
+/**
+ * Create Object Store of IndexedDB
+ */
+function createOS() {
+    
+    let os1;
+    if (!db.objectStoreNames.contains(kTbGlobalMsg)) {
+        os1 = db.createObjectStore(kTbGlobalMsg, { autoIncrement: true });
+        os1.createIndex('user_id', 'user_id', { unique: false });
+    }
 
-        let os2;
-        if (!db.objectStoreNames.contains(kTbFundingPrivKey)) {
-            os2 = db.createObjectStore(kTbFundingPrivKey, { keyPath: 'key' });
-        }
+    let os2;
+    if (!db.objectStoreNames.contains(kTbFundingPrivKey)) {
+        os2 = db.createObjectStore(kTbFundingPrivKey, { keyPath: 'key' });
+    }
 
-        let os3;
-        if (!db.objectStoreNames.contains(kTbChannelStatus)) {
-            os3 = db.createObjectStore(kTbChannelStatus, { keyPath: 'key' });
-            os3.createIndex('channel_id', 'channel_id',   { unique: false });
-            os3.createIndex('user_id', 'user_id', { unique: false });
-            os3.createIndex('funder',  'funder',  { unique: false });
-            os3.createIndex('status',  'status',  { unique: false });
-        }
+    let os3;
+    if (!db.objectStoreNames.contains(kTbChannelStatus)) {
+        os3 = db.createObjectStore(kTbChannelStatus, { keyPath: 'key' });
+        os3.createIndex('channel_id', 'channel_id',   { unique: false });
+        os3.createIndex('user_id', 'user_id', { unique: false });
+        os3.createIndex('funder',  'funder',  { unique: false });
+        os3.createIndex('status',  'status',  { unique: false });
+    }
 
-        let os4;
-        if (!db.objectStoreNames.contains(kTbChannelAddr)) {
-            os4 = db.createObjectStore(kTbChannelAddr, { keyPath: 'channel_id' });
-            os4.createIndex('channel_addr', 'channel_addr', { unique: true });
-        }
+    let os4;
+    if (!db.objectStoreNames.contains(kTbChannelAddr)) {
+        os4 = db.createObjectStore(kTbChannelAddr, { keyPath: 'channel_id' });
+        os4.createIndex('channel_addr', 'channel_addr', { unique: true });
+    }
 
-        let os5;
-        if (!db.objectStoreNames.contains(kTbCounterparty)) {
-            os5 = db.createObjectStore(kTbCounterparty, { keyPath: 'key' });
-            os5.createIndex('user_id', 'user_id', { unique: false });
-        }
+    let os5;
+    if (!db.objectStoreNames.contains(kTbCounterparty)) {
+        os5 = db.createObjectStore(kTbCounterparty, { keyPath: 'key' });
+        os5.createIndex('user_id', 'user_id', { unique: false });
+    }
 
-        let os6;
-        if (!db.objectStoreNames.contains(kTbFundingBTC)) {
-            os6 = db.createObjectStore(kTbFundingBTC, { keyPath: 'key' });
-        }
+    let os6;
+    if (!db.objectStoreNames.contains(kTbFundingBTC)) {
+        os6 = db.createObjectStore(kTbFundingBTC, { keyPath: 'key' });
+    }
 
-        let os7;
-        if (!db.objectStoreNames.contains(kTbTempData)) {
-            os7 = db.createObjectStore(kTbTempData, { keyPath: 'key' });
-        }
+    let os7;
+    if (!db.objectStoreNames.contains(kTbTempData)) {
+        os7 = db.createObjectStore(kTbTempData, { keyPath: 'key' });
+    }
 
-        let os8;
-        if (!db.objectStoreNames.contains(kTbHTLCPathData)) {
-            os8 = db.createObjectStore(kTbHTLCPathData, { keyPath: 'key' });
-        }
+    let os8;
+    if (!db.objectStoreNames.contains(kTbHTLCPathData)) {
+        os8 = db.createObjectStore(kTbHTLCPathData, { keyPath: 'key' });
+    }
 
-        let os9;
-        if (!db.objectStoreNames.contains(kTbForwardR)) {
-            os9 = db.createObjectStore(kTbForwardR, { keyPath: 'key' });
-        }
+    let os9;
+    if (!db.objectStoreNames.contains(kTbForwardR)) {
+        os9 = db.createObjectStore(kTbForwardR, { keyPath: 'key' });
+    }
 
-        let os10;
-        if (!db.objectStoreNames.contains(kTbInvoiceR)) {
-            os10 = db.createObjectStore(kTbInvoiceR, { keyPath: 'key' });
-        }
+    let os10;
+    if (!db.objectStoreNames.contains(kTbInvoiceR)) {
+        os10 = db.createObjectStore(kTbInvoiceR, { keyPath: 'key' });
+    }
+
+    let os11;
+    if (!db.objectStoreNames.contains(kTbSignedHex)) {
+        os11 = db.createObjectStore(kTbSignedHex, { keyPath: 'key' });
+    }
+
+    let os12;
+    if (!db.objectStoreNames.contains(kTbSignedHexCR110351)) {
+        os12 = db.createObjectStore(kTbSignedHexCR110351, { keyPath: 'key' });
+    }
+
+    let os13;
+    if (!db.objectStoreNames.contains(kTbSignedHexRR110351)) {
+        os13 = db.createObjectStore(kTbSignedHexRR110351, { keyPath: 'key' });
+    }
+
+    let os14;
+    if (!db.objectStoreNames.contains(kTbSignedHexCR110040)) {
+        os14 = db.createObjectStore(kTbSignedHexCR110040, { keyPath: 'key' });
+    }
+
+    let os15;
+    if (!db.objectStoreNames.contains(kTbSignedHexHR110040)) {
+        os15 = db.createObjectStore(kTbSignedHexHR110040, { keyPath: 'key' });
+    }
+
+    let os16;
+    if (!db.objectStoreNames.contains(kTbSignedHexRR110040)) {
+        os16 = db.createObjectStore(kTbSignedHexRR110040, { keyPath: 'key' });
+    }
+
+    let os17;
+    if (!db.objectStoreNames.contains(kTbSignedHexBR110045)) {
+        os17 = db.createObjectStore(kTbSignedHexBR110045, { keyPath: 'key' });
+    }
+
+    let os18;
+    if (!db.objectStoreNames.contains(kTbSignedHexRD110045)) {
+        os18 = db.createObjectStore(kTbSignedHexRD110045, { keyPath: 'key' });
     }
 }
 
@@ -1368,4 +1310,125 @@ function saveSenderRole(val) {
  */
 function getSenderRole() {
     return localStorage.getItem(kSenderRole);
+}
+
+// OLD
+// function signP2PKH(txhex, privkey) {
+    
+//     if (txhex === '') return '';
+
+//     const network = btctool.bitcoin.networks.testnet;
+//     const tx      = btctool.bitcoin.Transaction.fromHex(txhex);
+//     const txb     = btctool.bitcoin.TransactionBuilder.fromTransaction(tx, network);
+//     const key     = btctool.bitcoin.ECPair.fromWIF(privkey, network);
+
+//     txb.sign({
+//         prevOutScriptType: 'p2pkh',
+//         vin: 0,
+//         keyPair: key,
+//     });
+
+//     // Export hex
+//     let toHex = txb.build().toHex();
+//     console.info('signP2PKH - toHex = ' + toHex);
+//     return toHex;
+// }
+
+/**
+ * Sign P2PKH address with TransactionBuilder way
+ * main network: btctool.bitcoin.networks.bitcoin;
+ * @param txhex
+ * @param privkey
+ * @param inputs    all of inputs
+ */
+function signP2PKH(txhex, privkey, inputs) {
+    
+    if (txhex === '') return '';
+
+    const network = btctool.bitcoin.networks.testnet;
+    const tx      = btctool.bitcoin.Transaction.fromHex(txhex);
+    const txb     = btctool.bitcoin.TransactionBuilder.fromTransaction(tx, network);
+    const key     = btctool.bitcoin.ECPair.fromWIF(privkey, network);
+
+    // Sign all inputs
+    // console.info('inputs = ' + JSON.stringify(inputs));
+    for (let i = 0; i < inputs.length; i++) {
+        txb.sign({
+            prevOutScriptType: 'p2pkh',
+            vin: i,
+            keyPair: key,
+        });
+    }
+
+    // Export hex
+    let toHex = txb.build().toHex();
+    console.info('signP2PKH - toHex = ' + toHex);
+    return toHex;
+}
+
+/**
+ * Sign P2SH address with TransactionBuilder way for 2-2 multi-sig address
+ * @param is_first_sign  Is the first person to sign this transaction?
+ * @param txhex
+ * @param pubkey_1
+ * @param pubkey_2
+ * @param privkey
+ * @param inputs    all of inputs
+ */
+function signP2SH(is_first_sign, txhex, pubkey_1, pubkey_2, privkey, inputs) {
+
+    if (txhex === '') return '';
+
+    const network = btctool.bitcoin.networks.testnet;
+    const tx      = btctool.bitcoin.Transaction.fromHex(txhex);
+    const txb     = btctool.bitcoin.TransactionBuilder.fromTransaction(tx, network);
+    const pubkeys = [pubkey_1, pubkey_2].map(hex => btctool.buffer.Buffer.from(hex, 'hex'));
+    const p2ms    = btctool.bitcoin.payments.p2ms({ m: 2, pubkeys, network: network });
+    const p2sh    = btctool.bitcoin.payments.p2sh({ redeem: p2ms,  network: network });
+
+    // private key
+    const key     = btctool.bitcoin.ECPair.fromWIF(privkey, network);
+
+    // Sign all inputs
+    for (let i = 0; i < inputs.length; i++) {
+        let amount = accMul(inputs[i].amount, 100000000);
+        txb.sign(i, key, p2sh.redeem.output, undefined, amount, undefined);
+    }
+
+    if (is_first_sign === true) { // The first person to sign this transaction
+        let firstHex = txb.buildIncomplete().toHex();
+        console.info('First signed - Hex => ' + firstHex);
+        return firstHex;
+
+    } else { // The second person to sign this transaction
+        let finalHex = txb.build().toHex();
+        console.info('signP2SH - Second signed - Hex = ' + finalHex);
+        return finalHex;
+    }
+}
+
+/**
+ * This function is used to get accurate multiplication result.
+ * 
+ * Explanation: There will be errors in the multiplication result of javascript, 
+ * which is more obvious when multiplying two floating-point numbers. 
+ * This function returns a more accurate multiplication result.
+ * 
+ * @param arg1
+ * @param arg2
+ */
+function accMul(arg1, arg2) {
+    let m  = 0,
+        s1 = arg1.toString(),
+        s2 = arg2.toString();
+
+    try {
+        m += s1.split(".")[1].length;
+    } catch (e) {}
+
+    try {
+        m += s2.split(".")[1].length;
+    } catch (e) {}
+
+    return Number(s1.replace(".", "")) * Number(s2.replace(".", "")) / Math.pow(10, m);
 }

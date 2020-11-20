@@ -158,13 +158,9 @@
                 },
                 {
                     "name": "from_address_private_key",
-                    "help": "OBD create a transfer commitment transaction and use this private key to sign it but not broadcast.",
-                    "buttons": [
-                        {
-                            "innerText": "Select",
-                            "onclick": "displayUserDataInNewHtml('MyAddresses')"
-                        }
-                    ]
+                    "help": "Client sign the transaction with this private key.",
+                    "disable": "yes",
+                    "buttons": []
                 },
                 {
                     "name": "to_address",
@@ -230,21 +226,17 @@
                     ]
                 },
                 {
-                    "name": "channel_address_private_key",
-                    "help": "OBD create a revockable delivery transaction (RD Transaction). This private key used to sign the RD transaction. The RD transaction get bitcoin of deposit to channel (type 1009) back to sender if counterparty always does not response.",
-                    "buttons": [
-                        {
-                            "innerText": "Display",
-                            "onclick": "displayUserDataInNewHtml('MyAddresses')"
-                        }
-                    ]
-                },
-                {
                     "name": "funding_tx_hex",
                     "help": "The commitment transaction hex created in fundingBitcoin api (type 1009).",
                     "imgPath": "doc/tooltip/3400-3500.png",
                     "buttons": [
                     ]
+                },
+                {
+                    "name": "channel_address_private_key",
+                    "help": "OBD create a revockable delivery transaction (RD Tx). Client sign the transaction with this private key. The RD tx get bitcoin of deposit to channel (type 2109) back to sender if counterparty always does not response.",
+                    "disable": "yes",
+                    "buttons": []
                 }
             ]
         },
@@ -281,21 +273,20 @@
                     ]
                 },
                 {
-                    "name": "channel_address_private_key",
-                    "help": "This key is the private key of the Bob's address used to create the Channel Address. OBD use the private key to sign the RD transaction created by bitcoinFundingCreated (Alice sent type -3400). This RD transaction get bitcoin of deposit to channel (type 1009) back to Alice if Bob always does not response.",
-                    "buttons": [
-                        {
-                            "innerText": "Display",
-                            "onclick": "displayUserDataInNewHtml('MyAddresses')"
-                        }
-                    ]
-                },
-                {
                     "name": "funding_txid",
                     "help": "The commitment transaction txid created in fundingBitcoin api (type 1009).",
                     "imgPath": "doc/tooltip/3400-3500.png",
-                    "buttons": [
-                    ]
+                    "buttons": []
+                },
+                {
+                    "name": "signed_miner_redeem_transaction_hex",
+                    "buttons": []
+                },
+                {
+                    "name": "channel_address_private_key",
+                    "help": "This key is the private key of the Bob's address used to create the Channel Address. Client sign the transaction with it. This RD transaction get bitcoin of deposit to channel (type 2109) back to Alice if Bob always does not response.",
+                    "disable": "yes",
+                    "buttons": []
                 }
             ]
         },
@@ -324,14 +315,10 @@
                 },
                 {
                     "name": "from_address_private_key",
-                    "help": "OBD create a transfer commitment transaction and use this private key to sign it but not broadcast.",
+                    "help": "OBD create a transfer commitment transaction. Client sign it with this private key.",
                     "imgPath": "doc/tooltip/FundingAsset.png",
-                    "buttons": [
-                        {
-                            "innerText": "Select",
-                            "onclick": "displayUserDataInNewHtml('MyAddresses')"
-                        }
-                    ]
+                    "disable": "yes",
+                    "buttons": []
                 },
                 {
                     "name": "to_address",
@@ -392,48 +379,32 @@
                     ]
                 },
                 {
-                    "name": "temp_address_pub_key",
-                    "help": "This public key of an address (Alice2 in picture below) will be used to create a temp 2-2 multi-sig address as output 0 of C1a transaction.",
-                    "imgPath": "doc/tooltip/Cx-RDx.png",
-                    "buttons": [
-                        {
-                            "innerText": "Select",
-                            "onclick": "displayUserDataInNewHtml('MyAddresses')"
-                        },
-                        {
-                            "innerText": "Create",
-                            "onclick": "autoCreateAddress(-100034)"
-                        }
-                    ]
-                },
-                {
-                    "name": "temp_address_private_key",
-                    "help": "This private key of an address (Alice2 in picture below) will be used to sign RD1a transaction. The RD1a transaction get omni asset in channel back to Alice after a certain time (like seq = 1000 blocks) if Alice forced to close channel (broadcast C1a transaction).",
-                    "imgPath": "doc/tooltip/Cx-RDx.png",
-                    "buttons": [
-                        {
-                            "innerText": "Select",
-                            "onclick": "displayUserDataInNewHtml('MyAddresses')"
-                        }
-                    ]
-                },
-                {
-                    "name": "channel_address_private_key",
-                    "help": "This private key of the address used to create the Channel Address. OBD create C1a transaction and use the private key to sign it. The C1a transaction represents the balance distribution in the channel.",
-                    "imgPath": "doc/tooltip/Cx-RDx.png",
-                    "buttons": [
-                        {
-                            "innerText": "Display",
-                            "onclick": "displayUserDataInNewHtml('MyAddresses')"
-                        }
-                    ]
-                },
-                {
                     "name": "funding_tx_hex",
                     "help": "The commitment transaction hex created in FundingAsset api (type 2001).",
                     "imgPath": "doc/tooltip/FundingAsset.png",
                     "buttons": [
                     ]
+                },
+                {
+                    "name": "temp_address_pub_key",
+                    "help": "This public key of an address (Alice2 in picture below) will be used to create a temp 2-2 multi-sig address as output 0 of C1a transaction.",
+                    "imgPath": "doc/tooltip/Cx-RDx.png",
+                    "disable": "yes",
+                    "buttons": []
+                },
+                {
+                    "name": "temp_address_private_key",
+                    "help": "This private key of an address (Alice2 in picture below) will be used to sign RD1a transaction. The RD1a transaction get omni asset in channel back to Alice after a certain time (like seq = 1000 blocks) if Alice forced to close channel (broadcast C1a transaction).",
+                    "imgPath": "doc/tooltip/Cx-RDx.png",
+                    "disable": "yes",
+                    "buttons": []
+                },
+                {
+                    "name": "channel_address_private_key",
+                    "help": "OBD create C1a transaction. Client sign it with this private key. The C1a transaction represents the balance distribution in the channel.",
+                    "imgPath": "doc/tooltip/Cx-RDx.png",
+                    "disable": "yes",
+                    "buttons": []
                 }
             ]
         },
@@ -471,15 +442,15 @@
                     ]
                 },
                 {
+                    "name": "signed_alice_rsmc_hex",
+                    "buttons": []
+                },
+                {
                     "name": "channel_address_private_key",
-                    "help": "This private key of the counterparty (Bob) address used to create the Channel Address. OBD use the private key to sign the C1a and RD1a transactions created by AssetFundingCreated (type -34).",
+                    "help": "Client use the private key to sign the C1a and RD1a transactions created by AssetFundingCreated (type -100034).",
                     "imgPath": "doc/tooltip/34-35.png",
-                    "buttons": [
-                        {
-                            "innerText": "Display",
-                            "onclick": "displayUserDataInNewHtml('MyAddresses')"
-                        }
-                    ]
+                    "disable": "yes",
+                    "buttons": []
                 }
             ]
         },
@@ -521,51 +492,31 @@
                 },
                 {
                     "name": "channel_address_private_key",
-                    "help": "This private key used by Alice to create the channel. It will be used to sign C2a transaction in below picture as <Alice Sig>.",
+                    "help": "Client use the private key to sign the C2a transaction in below picture as <Alice Sig>.",
                     "imgPath": "doc/tooltip/C2a.png",
-                    "buttons": [
-                        {
-                            "innerText": "Display",
-                            "onclick": "displayUserDataInNewHtml('MyAddresses')"
-                        }
-                    ]
+                    "disable": "yes",
+                    "buttons": []
                 },
                 {
                     "name": "curr_temp_address_pub_key",
                     "help": "This public key of an address (Alice3 in below picture) will be used to create a temp 2-2 multi-sig address as output 0 of newer Cx transaction like C2a in below picture.",
                     "imgPath": "doc/tooltip/C2a.png",
-                    "buttons": [
-                        {
-                            "innerText": "Select",
-                            "onclick": "displayUserDataInNewHtml('MyAddresses')"
-                        },
-                        {
-                            "innerText": "Create",
-                            "onclick": "autoCreateAddress(-100351)"
-                        }
-                    ]
+                    "disable": "yes",
+                    "buttons": []
                 },
                 {
                     "name": "curr_temp_address_private_key",
                     "help": "This private key of an address (Alice3's) will be used to sign RD2a transaction in below picture. The RD transaction get omni asset in channel back to Alice delay a lock time (like seq = 1000 blocks) if Alice forced to close channel (broadcast C2a transaction).",
                     "imgPath": "doc/tooltip/C2a.png",
-                    "buttons": [
-                        {
-                            "innerText": "Select",
-                            "onclick": "displayUserDataInNewHtml('MyAddresses')"
-                        }
-                    ]
+                    "disable": "yes",
+                    "buttons": []
                 },
                 {
                     "name": "last_temp_address_private_key",
                     "help": "See below picture, this is the private key of Alice2 in the last RSMC transaction (C1a). It will be used to sign BR1a transaction. When Alice cheats, the BR transaction will punish Alice and transfer all assets belonging to Alice to Bob.",
                     "imgPath": "doc/tooltip/BR1a.png",
-                    "buttons": [
-                        {
-                            "innerText": "Display",
-                            "onclick": "displayUserDataInNewHtml('MyAddresses')"
-                        }
-                    ]
+                    "disable": "yes",
+                    "buttons": []
                 }
             ]
         },
@@ -605,56 +556,43 @@
                     "name": "msg_hash",
                     "help": "Commitment hash of C2a transaction created by Alice.",
                     "imgPath": "doc/tooltip/C2a.png",
-                    "buttons": [
-                    ]
+                    "buttons": []
+                },
+                {
+                    "name": "c2a_rsmc_signed_hex",
+                    "buttons": []
+                },
+                {
+                    "name": "c2a_counterparty_signed_hex",
+                    "buttons": []
                 },
                 {
                     "name": "channel_address_private_key",
-                    "help": "This is the private key used by Bob to create the channel. It will be used to sign C2a and BR1a transaction in below picture as Bob Sig. And used to create and sign C2b, RD2a transaction.",
+                    "help": "Client use the private key to sign the C2a and BR1a transaction in below picture as Bob Sig. And used to create and sign C2b, RD2a transaction.",
                     "imgPath": "doc/tooltip/BR1a.png",
-                    "buttons": [
-                        {
-                            "innerText": "Display",
-                            "onclick": "displayUserDataInNewHtml('MyAddresses')"
-                        }
-                    ]
+                    "disable": "yes",
+                    "buttons": []
                 },
                 {
                     "name": "curr_temp_address_pub_key",
                     "help": "This public key of an address (Bob3 in below picture) will be used to create a temp 2-2 multi-sig address as output 0 of newer Cx transaction like C2b in below picture.",
                     "imgPath": "doc/tooltip/C2b.png",
-                    "buttons": [
-                        {
-                            "innerText": "Select",
-                            "onclick": "displayUserDataInNewHtml('MyAddresses')"
-                        },
-                        {
-                            "innerText": "Create",
-                            "onclick": "autoCreateAddress(-100352)"
-                        }
-                    ]
+                    "disable": "yes",
+                    "buttons": []
                 },
                 {
                     "name": "curr_temp_address_private_key",
                     "help": "This private key of an address (Bob3's) will be used to sign RD2b transaction in below picture. The RD transaction get omni asset in channel back to Bob delay a lock time (like seq = 1000 blocks) if Bob forced to close channel (broadcast C2b transaction).",
                     "imgPath": "doc/tooltip/C2b.png",
-                    "buttons": [
-                        {
-                            "innerText": "Select",
-                            "onclick": "displayUserDataInNewHtml('MyAddresses')"
-                        }
-                    ]
+                    "disable": "yes",
+                    "buttons": []
                 },
                 {
                     "name": "last_temp_address_private_key",
                     "help": "See below picture, this is the private key of Alice2 in the last RSMC transaction (C1a). It will be used to sign BR1a transaction. When Alice cheats, the BR transaction will punish Alice and transfer all assets belonging to Alice to Bob.",
                     "imgPath": "doc/tooltip/BR1a.png",
-                    "buttons": [
-                        {
-                            "innerText": "Display",
-                            "onclick": "displayUserDataInNewHtml('MyAddresses')"
-                        }
-                    ]
+                    "disable": "yes",
+                    "buttons": []
                 }
             ]
         },
@@ -831,103 +769,59 @@
                 },
                 {
                     "name": "channel_address_private_key",
-                    "help": "This is the private key used by Alice to create the channel. It will be used to sign C2a and BR2a transaction in below picture as Alice Sig.",
+                    "help": "Client use the private key to sign C2a and BR2a transaction in below picture as Alice Sig.",
                     "imgPath": "doc/tooltip/HTLC-1.png",
-                    "buttons": [
-                        {
-                            "innerText": "Display",
-                            "onclick": "displayUserDataInNewHtml('MyAddresses')"
-                        }
-                    ]
+                    "disable": "yes",
+                    "buttons": []
                 },
                 {
                     "name": "curr_rsmc_temp_address_pub_key",
                     "help": "This public key of an address (Alice's address in output 0 of C2a in below picture) will be used to create a temp 2-2 multi-sig address as output 0 of newer Cx transaction like C2a in below picture.",
                     "imgPath": "doc/tooltip/HTLC-1.png",
-                    "buttons": [
-                        {
-                            "innerText": "Select",
-                            "onclick": "displayUserDataInNewHtml('MyAddresses')"
-                        },
-                        {
-                            "innerText": "Create",
-                            "onclick": "autoCreateAddress(-401)"
-                        }
-                    ]
+                    "disable": "yes",
+                    "buttons": []
                 },
                 {
                     "name": "curr_rsmc_temp_address_private_key",
                     "help": "This private key of an address (Alice's) will be used to sign RD2a and BR2a transaction in below picture.",
                     "imgPath": "doc/tooltip/HTLC-1.png",
-                    "buttons": [
-                        {
-                            "innerText": "Select",
-                            "onclick": "displayUserDataInNewHtml('MyAddresses')"
-                        }
-                    ]
+                    "disable": "yes",
+                    "buttons": []
                 },
                 {
                     "name": "curr_htlc_temp_address_pub_key",
                     "help": "This public key of an address (Alice's address in output 2 of C2a in below picture) will be used to create a temp 2-2 multi-sig address as output 2 of newer Cx transaction like C2a in below picture.",
                     "imgPath": "doc/tooltip/HTLC-2.png",
-                    "buttons": [
-                        {
-                            "innerText": "Select",
-                            "onclick": "displayUserDataInNewHtml('MyAddresses')"
-                        },
-                        {
-                            "innerText": "Create",
-                            "onclick": "autoCreateAddress(-402)"
-                        }
-                    ]
+                    "disable": "yes",
+                    "buttons": []
                 },
                 {
                     "name": "curr_htlc_temp_address_private_key",
                     "help": "This private key of an address (Alice's) will be used to sign HED1a transaction in below picture.",
                     "imgPath": "doc/tooltip/HTLC-2.png",
-                    "buttons": [
-                        {
-                            "innerText": "Select",
-                            "onclick": "displayUserDataInNewHtml('MyAddresses')"
-                        }
-                    ]
+                    "disable": "yes",
+                    "buttons": []
                 },
                 {
                     "name": "curr_htlc_temp_address_for_ht1a_pub_key",
                     "help": "This public key of an address (Alice's address in output 2 of C2a in below picture) will be used to create a temp 2-2 multi-sig address as output 2 of newer Cx transaction like C2a in below picture.",
                     "imgPath": "doc/tooltip/HTLC-2.png",
-                    "buttons": [
-                        {
-                            "innerText": "Select",
-                            "onclick": "displayUserDataInNewHtml('MyAddresses')"
-                        },
-                        {
-                            "innerText": "Create",
-                            "onclick": "autoCreateAddress(-403)"
-                        }
-                    ]
+                    "disable": "yes",
+                    "buttons": []
                 },
                 {
                     "name": "curr_htlc_temp_address_for_ht1a_private_key",
                     "help": "This private key of an address (Alice's) will be used to sign HT1a transaction in below picture.",
                     "imgPath": "doc/tooltip/HTLC-2.png",
-                    "buttons": [
-                        {
-                            "innerText": "Select",
-                            "onclick": "displayUserDataInNewHtml('MyAddresses')"
-                        }
-                    ]
+                    "disable": "yes",
+                    "buttons": []
                 },
                 {
                     "name": "last_temp_address_private_key",
                     "help": "This is the private key used in last transaction by Alice. It will be used to sign ?  transaction in below picture as Alice Sig.",
                     "imgPath": "doc/tooltip/HTLC-2.png",
-                    "buttons": [
-                        {
-                            "innerText": "Display",
-                            "onclick": "displayUserDataInNewHtml('MyAddresses')"
-                        }
-                    ]
+                    "disable": "yes",
+                    "buttons": []
                 }
             ]
         },
@@ -957,82 +851,61 @@
                 {
                     "name": "payer_commitment_tx_hash",
                     "help": "The hash of commitment transaction created in addHTLC (type -40).",
-                    "buttons": [
-                    ]
+                    "buttons": []
+                },
+                {
+                    "name": "c3a_complete_signed_rsmc_hex",
+                    "buttons": []
+                },
+                {
+                    "name": "c3a_complete_signed_counterparty_hex",
+                    "buttons": []
+                },
+                {
+                    "name": "c3a_complete_signed_htlc_hex",
+                    "buttons": []
                 },
                 {
                     "name": "channel_address_private_key",
-                    "help": "This private key used by Bob to create the channel. It will be used to sign C2b and BR2b transaction in below picture as Bob Sig.",
+                    "help": "Client use the private key to sign C2b and BR2b transaction in below picture as Bob Sig.",
                     "imgPath": "doc/tooltip/HTLC-3.png",
-                    "buttons": [
-                        {
-                            "innerText": "Display",
-                            "onclick": "displayUserDataInNewHtml('MyAddresses')"
-                        }
-                    ]
+                    "disable": "yes",
+                    "buttons": []
                 },
                 {
                     "name": "curr_rsmc_temp_address_pub_key",
                     "help": "This public key of an address (Bob's address in output 1 of C2b in below picture) will be used to create a temp 2-2 multi-sig address as output 1 of newer Cx transaction like C2b in below picture.",
                     "imgPath": "doc/tooltip/HTLC-3.png",
-                    "buttons": [
-                        {
-                            "innerText": "Select",
-                            "onclick": "displayUserDataInNewHtml('MyAddresses')"
-                        },
-                        {
-                            "innerText": "Create",
-                            "onclick": "autoCreateAddress(-411)"
-                        }
-                    ]
+                    "disable": "yes",
+                    "buttons": []
                 },
                 {
                     "name": "curr_rsmc_temp_address_private_key",
                     "help": "This private key of an address (Bob's) will be used to sign RD2b and BR2b transaction in below picture.",
                     "imgPath": "doc/tooltip/HTLC-3.png",
-                    "buttons": [
-                        {
-                            "innerText": "Select",
-                            "onclick": "displayUserDataInNewHtml('MyAddresses')"
-                        }
-                    ]
+                    "disable": "yes",
+                    "buttons": []
                 },
                 {
                     "name": "curr_htlc_temp_address_pub_key",
                     "help": "This public key of an address (Bob's address in output 2 of C2b in below picture) will be used to create a temp 2-2 multi-sig address as output 2 of newer Cx transaction like C2b in below picture.",
                     "imgPath": "doc/tooltip/HTLC-3.png",
-                    "buttons": [
-                        {
-                            "innerText": "Select",
-                            "onclick": "displayUserDataInNewHtml('MyAddresses')"
-                        },
-                        {
-                            "innerText": "Create",
-                            "onclick": "autoCreateAddress(-412)"
-                        }
-                    ]
+                    "disable": "yes",
+                    "buttons": []
                 },
                 {
                     "name": "curr_htlc_temp_address_private_key",
                     "help": "This private key of an address (Bob's) will be used to sign HE1b transaction in below picture.",
                     "imgPath": "doc/tooltip/HTLC-4.png",
-                    "buttons": [
-                        {
-                            "innerText": "Select",
-                            "onclick": "displayUserDataInNewHtml('MyAddresses')"
-                        }
-                    ]
+                    "disable": "yes",
+                    "buttons": []
                 },
                 {
                     "name": "last_temp_address_private_key",
                     "help": "This is the private key used in last transaction by Alice. It will be used to sign ?  transaction in below picture as Bob Sig.",
                     "imgPath": "doc/tooltip/HTLC-4.png",
-                    "buttons": [
-                        {
-                            "innerText": "Display",
-                            "onclick": "displayUserDataInNewHtml('MyAddresses')"
-                        }
-                    ]
+                    "disable": "yes",
+                    "buttons": []
                 }
             ]
         },
@@ -1080,40 +953,10 @@
                 },
                 {
                     "name": "channel_address_private_key",
-                    "help": "This is the private key used by Bob to create the channel. It will be used to sign HTD1b transaction in below picture.",
+                    "help": "Client use the private key to sign HTD1b transaction in below picture.",
                     "imgPath": "doc/tooltip/HTLC-4.png",
-                    "buttons": [
-                        {
-                            "innerText": "Display",
-                            "onclick": "displayUserDataInNewHtml('MyAddresses')"
-                        }
-                    ]
-                },
-                {
-                    "name": "curr_htlc_temp_address_for_he1b_pub_key",
-                    "help": "This public key of an address will be used to create a temp 2-2 multi-sig address as HE1b in below picture.",
-                    "imgPath": "doc/tooltip/HTLC-4.png",
-                    "buttons": [
-                        {
-                            "innerText": "Select",
-                            "onclick": "displayUserDataInNewHtml('MyAddresses')"
-                        },
-                        {
-                            "innerText": "Create",
-                            "onclick": "autoCreateAddress(-45)"
-                        }
-                    ]
-                },
-                {
-                    "name": "curr_htlc_temp_address_for_he1b_private_key",
-                    "help": "This private key of an address will be used to sign HE1b transaction in below picture.",
-                    "imgPath": "doc/tooltip/HTLC-4.png",
-                    "buttons": [
-                        {
-                            "innerText": "Select",
-                            "onclick": "displayUserDataInNewHtml('MyAddresses')"
-                        }
-                    ]
+                    "disable": "yes",
+                    "buttons": []
                 }
             ]
         },
@@ -1150,27 +993,19 @@
                     ]
                 },
                 {
-                    "name": "msg_hash",
-                    "help": "The hash of commitment transaction created in HTLCSendR (type -45).",
-                    "buttons": [
-                    ]
+                    "name": "c3b_htlc_herd_complete_signed_hex",
+                    "buttons": []
                 },
                 {
-                    "name": "r",
-                    "help": "The R (a Preimage R) currently is Private Key of a wallet address, and the H (Hash of a Preimage R) is Public Key of a wallet address. This is a temporary solution.",
-                    "buttons": [
-                    ]
+                    "name": "c3b_htlc_hebr_partial_signed_hex",
+                    "buttons": []
                 },
                 {
                     "name": "channel_address_private_key",
-                    "help": "This is the private key used by Alice to create the channel. It will be used to sign HERD1b transaction in below picture.",
+                    "help": "Client use the private key to sign HERD1b transaction in below picture.",
                     "imgPath": "doc/tooltip/HTLC-4.png",
-                    "buttons": [
-                        {
-                            "innerText": "Display",
-                            "onclick": "displayUserDataInNewHtml('MyAddresses')"
-                        }
-                    ]
+                    "disable": "yes",
+                    "buttons": []
                 }
             ]
         },
@@ -1208,68 +1043,40 @@
                 },
                 {
                     "name": "channel_address_private_key",
-                    "help": "This is the private key used by Alice (launcher of the close request) to create the channel. It will be used to sign newer RSMC transaction like C3a.",
+                    "help": "Client use the private key to sign newer RSMC transaction like C3a.",
                     "imgPath": "doc/tooltip/HTLC-1.png",
-                    "buttons": [
-                        {
-                            "innerText": "Display",
-                            "onclick": "displayUserDataInNewHtml('MyAddresses')"
-                        }
-                    ]
+                    "disable": "yes",
+                    "buttons": []
                 },
                 {
                     "name": "last_rsmc_temp_address_private_key",
                     "help": "Private Key of creating temporary 2-2 multi-sig address in previous RSMC transaction.",
-                    "buttons": [
-                        {
-                            "innerText": "Display",
-                            "onclick": "displayUserDataInNewHtml('MyAddresses')"
-                        }
-                    ]
+                    "disable": "yes",
+                    "buttons": []
                 },
                 {
                     "name": "last_htlc_temp_address_private_key",
                     "help": "Private Key of creating temporary 2-2 multi-sig address in previous HTLC transaction.",
-                    "buttons": [
-                        {
-                            "innerText": "Display",
-                            "onclick": "displayUserDataInNewHtml('MyAddresses')"
-                        }
-                    ]
+                    "disable": "yes",
+                    "buttons": []
                 },
                 {
                     "name": "last_htlc_temp_address_for_htnx_private_key",
                     "help": "Private Key of creating temporary 2-2 multi-sig address in previous HTLC htnx transaction.",
-                    "buttons": [
-                        {
-                            "innerText": "Display",
-                            "onclick": "displayUserDataInNewHtml('MyAddresses')"
-                        }
-                    ]
+                    "disable": "yes",
+                    "buttons": []
                 },
                 {
-                    "name": "curr_rsmc_temp_address_pub_key",
+                    "name": "curr_temp_address_pub_key",
                     "help": "This public key of an address will be used to create a temp 2-2 multi-sig address as output 0 of newer Cx transaction in RSMC.",
-                    "buttons": [
-                        {
-                            "innerText": "Select",
-                            "onclick": "displayUserDataInNewHtml('MyAddresses')"
-                        },
-                        {
-                            "innerText": "Create",
-                            "onclick": "autoCreateAddress(-49)"
-                        }
-                    ]
+                    "disable": "yes",
+                    "buttons": []
                 },
                 {
-                    "name": "curr_rsmc_temp_address_private_key",
+                    "name": "curr_temp_address_private_key",
                     "help": "This private key of an address will be used to sign newer RDxa and BRxa transaction.",
-                    "buttons": [
-                        {
-                            "innerText": "Select",
-                            "onclick": "displayUserDataInNewHtml('MyAddresses')"
-                        }
-                    ]
+                    "disable": "yes",
+                    "buttons": []
                 }
             ]
         },
@@ -1304,68 +1111,40 @@
                 },
                 {
                     "name": "channel_address_private_key",
-                    "help": "This is the private key used by Bob (responser of the close request) to create the channel. It will be used to sign newer RSMC transaction like C3b.",
+                    "help": "Client use the private key to sign newer RSMC transaction like C3b.",
                     "imgPath": "doc/tooltip/HTLC-5.png",
-                    "buttons": [
-                        {
-                            "innerText": "Display",
-                            "onclick": "displayUserDataInNewHtml('MyAddresses')"
-                        }
-                    ]
+                    "disable": "yes",
+                    "buttons": []
                 },
                 {
                     "name": "last_rsmc_temp_address_private_key",
                     "help": "Private Key of creating temporary 2-2 multi-sig address in previous RSMC transaction.",
-                    "buttons": [
-                        {
-                            "innerText": "Display",
-                            "onclick": "displayUserDataInNewHtml('MyAddresses')"
-                        }
-                    ]
+                    "disable": "yes",
+                    "buttons": []
                 },
                 {
                     "name": "last_htlc_temp_address_private_key",
                     "help": "Private Key of creating temporary 2-2 multi-sig address in previous HTLC transaction.",
-                    "buttons": [
-                        {
-                            "innerText": "Display",
-                            "onclick": "displayUserDataInNewHtml('MyAddresses')"
-                        }
-                    ]
+                    "disable": "yes",
+                    "buttons": []
                 },
                 {
                     "name": "last_htlc_temp_address_for_htnx_private_key",
                     "help": "Private Key of creating temporary 2-2 multi-sig address in previous HTLC htnx transaction.",
-                    "buttons": [
-                        {
-                            "innerText": "Display",
-                            "onclick": "displayUserDataInNewHtml('MyAddresses')"
-                        }
-                    ]
+                    "disable": "yes",
+                    "buttons": []
                 },
                 {
-                    "name": "curr_rsmc_temp_address_pub_key",
+                    "name": "curr_temp_address_pub_key",
                     "help": "This public key of an address will be used to create a temp 2-2 multi-sig address as output 0 of newer Cx transaction in RSMC.",
-                    "buttons": [
-                        {
-                            "innerText": "Select",
-                            "onclick": "displayUserDataInNewHtml('MyAddresses')"
-                        },
-                        {
-                            "innerText": "Create",
-                            "onclick": "autoCreateAddress(-50)"
-                        }
-                    ]
+                    "disable": "yes",
+                    "buttons": []
                 },
                 {
-                    "name": "curr_rsmc_temp_address_private_key",
+                    "name": "curr_temp_address_private_key",
                     "help": "This private key of an address will be used to sign newer RDxa and BRxa transaction.",
-                    "buttons": [
-                        {
-                            "innerText": "Select",
-                            "onclick": "displayUserDataInNewHtml('MyAddresses')"
-                        }
-                    ]
+                    "disable": "yes",
+                    "buttons": []
                 }
             ]
         },

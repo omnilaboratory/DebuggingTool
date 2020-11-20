@@ -268,6 +268,16 @@ const k100401_ClickCancel = 'You did not confirm to switch the channel, the next
  */
 const kPayInvoice = 'Pay Invoice is processing ... Wait for response from counterparty.';
 
+/**
+ * Display Processing...
+ */
+const kProcessing = 'Processing...';
+
+/**
+ * Display Processing...
+ */
+const kSignedHexTip = 'Please click the button on the tips area to get data.';
+
 
 //----------------------------------------------------------------
 // Status of a channel
