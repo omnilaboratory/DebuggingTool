@@ -575,10 +575,6 @@ function closeHTLC(myUserID, nodeID, userID, info, isFunder) {
         obdApi.closeHTLC(nodeID, userID, info, async function(e) {
             console.info('SDK: -100049 closeHTLC = ' + JSON.stringify(e));
             
-            // FUNCTION ONLY FOR GUI TOOL
-            // disableInvokeAPI();
-            // tipsOnTop('', kProcessing);
-
             let channel_id = e.channel_id;
 
             // Sign the tx on client side
@@ -628,10 +624,6 @@ function closeHTLCSigned(myUserID, nodeID, userID, info, isFunder) {
     return new Promise((resolve, reject) => {
         obdApi.closeHTLCSigned(nodeID, userID, info, async function(e) {
             console.info('SDK: -100050 closeHTLCSigned = ' + JSON.stringify(e));
-
-            // FUNCTION ONLY FOR GUI TOOL
-            disableInvokeAPI();
-            tipsOnTop('', kProcessing);
 
             let channel_id = e.channel_id;
 

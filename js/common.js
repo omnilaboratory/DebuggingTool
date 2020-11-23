@@ -235,9 +235,6 @@ async function sdkSignR() {
     info.channel_id                        = $("#channel_id").val();
     info.c3b_htlc_herd_complete_signed_hex = $("#c3b_htlc_herd_complete_signed_hex").val();
     info.c3b_htlc_hebr_partial_signed_hex  = $("#c3b_htlc_hebr_partial_signed_hex").val();
-    // info.r                           = $("#r").val();
-    // info.msg_hash                    = $("#msg_hash").val();
-    // info.channel_address_private_key = $("#channel_address_private_key").val();
 
     displaySentMessage100046(nodeID, userID, info);
 
@@ -4940,21 +4937,6 @@ function listening110045ForGUITool(e) {
  * For GUI Tool. Display tips
  */
 function listening110046ForGUITool(e) {
-
-    let isInPayInvoice = getPayInvoiceCase();
-    // In pay invoice case
-    if (isInPayInvoice === 'Yes') {
-        tipsOnTop(e.channel_id, kPayInvoice);
-        return;
-    }
-
-    // let isAutoMode = getAutoPilot();
-
-    // // auto mode is opening
-    // if (isAutoMode === 'Yes') {
-    //     tipsOnTop(e.channel_id, kProcessing);
-    // } else { // auto mode is closed
-    // }
     tipsOnTop(e.channel_id, kTips110046, 'Close HTLC', 'closeHTLC');
 }
 
@@ -4963,6 +4945,8 @@ function listening110046ForGUITool(e) {
  */
 function listening110049ForGUITool(e) {
 
+    disableInvokeAPI();
+    
     let isInPayInvoice = getPayInvoiceCase();
     // In pay invoice case
     if (isInPayInvoice === 'Yes') {
@@ -4970,28 +4954,7 @@ function listening110049ForGUITool(e) {
         return;
     }
 
-    let isAutoMode = getAutoPilot();
-
-    // auto mode is opening
-    if (isAutoMode === 'Yes') {
-        tipsOnTop(e.channel_id, kProcessing);
-    } else { // auto mode is closed
-        tipsOnTop(e.channel_id, kTips110049, 'Accept', 'closeHTLCSigned');
-    
-        let api_name = $("#api_name").text();
-        if (api_name === 'closeHTLCSigned') {
-            enableInvokeAPI();
-            fillChannelIDAndFundingPrivKey($("#logined").text(), e.channel_id);
-            fillThreeLastPrivKey($("#logined").text(), e.channel_id);
-            fillCurrRsmcTempKey();
-    
-            $("#recipient_node_peer_id").val(e.sender_node_address);
-            $("#recipient_user_peer_id").val(e.sender_peer_id);
-            $("#msg_hash").val(e.msg_hash);
-            $("#c4a_rsmc_complete_signed_hex").val(kSignedHexTip);
-            $("#c4a_counterparty_complete_signed_hex").val(kSignedHexTip);
-        }
-    }
+    tipsOnTop(e.channel_id, kProcessing);
 }
 
 /**

@@ -270,7 +270,7 @@ async function listening110040(e, netType) {
 async function payInvoiceStep4(myUserID, nodeID, userID, channel_id) {
     
     let r = getPrivKeyFromPubKey(myUserID, getInvoiceH());
-    // console.info('payInvoiceStep4 r = ' + r);
+    console.info('payInvoiceStep4 R = ' + r);
     
     // Bob has NOT R. Bob maybe a middleman node.
     if (r === '') return;
@@ -280,18 +280,10 @@ async function payInvoiceStep4(myUserID, nodeID, userID, channel_id) {
     info.channel_id = channel_id;
     info.r          = r;
     
-    // let result = genNewAddress(myUserID, true);
-    // saveAddress(myUserID, result);
-
-    // info.curr_htlc_temp_address_for_he1b_pub_key     = result.result.pubkey;
-    // info.curr_htlc_temp_address_for_he1b_private_key = result.result.wif;
-    // info.channel_address_private_key                 = fundingPrivKey;
-
-    // Save address index to OBD and can get private key back if lose it.
-    // info.curr_htlc_temp_address_for_he1b_index = Number(getIndexFromPubKey(result.result.pubkey));
-
+    // FUNCTION ONLY FOR GUI TOOL
     displaySentMessage100045(nodeID, userID, info);
 
+    // SDK API
     let isFunder = await getIsFunder(myUserID, channel_id);
     await forwardR(myUserID, nodeID, userID, info, isFunder);
 
@@ -450,6 +442,9 @@ async function listening110045(e) {
     let isAutoMode = getAutoPilot();
     console.info('SDK: NOW isAutoMode = ' + isAutoMode);
     
+    let isInPayInvoice = getPayInvoiceCase();
+    console.info('isInPayInvoice = ' + isInPayInvoice);
+
     let myUserID   = e.to_peer_id;
     let channel_id = e.channel_id;
 
@@ -467,17 +462,11 @@ async function listening110045(e) {
     let rd_hex = signP2SH(false, rd.hex, rd.pub_key_a, rd.pub_key_b, privkey, inputs);
     saveSignedHex(myUserID, channel_id, rd_hex, kTbSignedHexRD110045);
     
-    // save some data - no need e.msg_hash ?
-    // saveTempData(myUserID, channel_id, e.msg_hash); // e.msg_hash not found in doc
-    // saveInvoiceR(e.r);
-
     let isFunder = await getIsFunder(myUserID, channel_id);
     saveChannelStatus(myUserID, channel_id, isFunder, kStatusForwardR);
 
     // auto mode is closed
     if (isAutoMode != 'Yes') {  
-        let isInPayInvoice = getPayInvoiceCase();
-        console.info('isInPayInvoice = ' + isInPayInvoice);
         // Not in pay invoice case
         if (isInPayInvoice != 'Yes') return;
     }
@@ -494,9 +483,6 @@ async function listening110045(e) {
     info.channel_id                        = channel_id;
     info.c3b_htlc_herd_complete_signed_hex = rd_hex;
     info.c3b_htlc_hebr_partial_signed_hex  = br_hex;
-    // info.r                           = e.r;
-    // info.msg_hash                    = e.msg_hash;
-    // info.channel_address_private_key = await getFundingPrivKey(myUserID, e.channel_id);
 
     // FUNCTION ONLY FOR GUI TOOL
     displaySentMessage100046(nodeID, userID, info);
@@ -504,9 +490,6 @@ async function listening110045(e) {
     // SDK API
     await signR(myUserID, nodeID, userID, info, isFunder);
     
-    // FUNCTION ONLY FOR GUI TOOL
-    // afterSignR();
-
     //------------------------
     // If is payInvoice case, Alice will send -100049 closeHTLC
     payInvoiceStep6(myUserID, nodeID, userID, channel_id, privkey);
@@ -514,8 +497,8 @@ async function listening110045(e) {
 
 /**
  * payInvoice Step 6, Alice will send -100049 closeHTLC
+ * Save address index to OBD and can get private key back if lose it.
  * @param myUserID 
- * @param e 
  * @param nodeID 
  * @param userID 
  * @param channel_id 
@@ -523,22 +506,19 @@ async function listening110045(e) {
  */
 async function payInvoiceStep6(myUserID, nodeID, userID, channel_id, privkey) {
 
-    let info        = new CloseHtlcTxInfo();
-    info.channel_id = channel_id;
-
+    let info      = new CloseHtlcTxInfo();
     let privkey_1 = getTempPrivKey(myUserID, kRsmcTempPrivKey, channel_id);
     let privkey_2 = getTempPrivKey(myUserID, kHtlcTempPrivKey, channel_id);
     let privkey_3 = getTempPrivKey(myUserID, kHtlcHtnxTempPrivKey, channel_id);
+    let addr      = genNewAddress(myUserID, true);
+    saveAddress(myUserID, addr);
 
+    info.channel_id                                  = channel_id;
     info.last_rsmc_temp_address_private_key          = privkey_1;
     info.last_htlc_temp_address_private_key          = privkey_2;
     info.last_htlc_temp_address_for_htnx_private_key = privkey_3;
-    
-    let addr = genNewAddress(myUserID, true);
-    saveAddress(myUserID, addr);
-    info.curr_temp_address_pub_key = addr.result.pubkey;
-    // Save address index to OBD and can get private key back if lose it.
-    info.curr_temp_address_index = addr.result.index;
+    info.curr_temp_address_pub_key                   = addr.result.pubkey;
+    info.curr_temp_address_index                     = addr.result.index;
 
     // FUNCTION ONLY FOR GUI TOOL
     displaySentMessage100049(nodeID, userID, info, privkey);
@@ -553,8 +533,10 @@ async function payInvoiceStep6(myUserID, nodeID, userID, channel_id, privkey) {
  * @param e 
  */
 async function listening110046(e) {
-    let isFunder = await getIsFunder(e.to_peer_id, e.channel_id);
-    saveChannelStatus(e.to_peer_id, e.channel_id, isFunder, kStatusSignR);
+    let myUserID   = e.to_peer_id;
+    let channel_id = e.channel_id;
+    let isFunder   = await getIsFunder(myUserID, channel_id);
+    saveChannelStatus(myUserID, channel_id, isFunder, kStatusSignR);
 }
 
 /**
@@ -590,13 +572,6 @@ async function listening110049(e, netType) {
     saveChannelStatus(myUserID, channel_id, isFunder, kStatusCloseHTLC);
     saveTempData(myUserID, channel_id, e.msg_hash);
     saveSenderRole(kIsReceiver);
-
-    // auto mode closed
-    // if (isAutoMode != 'Yes') {  
-    //     let r = getPrivKeyFromPubKey(myUserID, getInvoiceH());
-    //     // Bob has NOT R. Bob maybe a middleman node.
-    //     if (r === '') return;
-    // }
 
     console.info('listening110049 = ' + JSON.stringify(e));
 
