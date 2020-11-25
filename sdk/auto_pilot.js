@@ -245,10 +245,6 @@ async function listening110040(e, netType) {
     info.c3a_complete_signed_counterparty_hex = cr_hex;
     info.c3a_complete_signed_htlc_hex         = hr_hex;
     
-    // info.curr_rsmc_temp_address_private_key = addr_1.result.wif;
-    // info.curr_htlc_temp_address_private_key = addr_2.result.wif;
-    // info.channel_address_private_key        = await getFundingPrivKey(myUserID, e.channel_id);
-
     // Save address index to OBD and can get private key back if lose it.
     info.curr_rsmc_temp_address_index = addr_1.result.index;
     info.curr_htlc_temp_address_index = addr_2.result.index;
@@ -273,7 +269,11 @@ async function payInvoiceStep4(myUserID, nodeID, userID, channel_id) {
     console.info('payInvoiceStep4 R = ' + r);
     
     // Bob has NOT R. Bob maybe a middleman node.
-    if (r === '') return;
+    if (r === '') {
+        // FUNCTION ONLY FOR GUI TOOL
+        tipsOnTop('', kNotFoundR, 'Forward R', 'forwardR');
+        return;
+    }
 
     // Bob will send -100045 forwardR
     let info        = new ForwardRInfo();

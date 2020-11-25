@@ -359,7 +359,6 @@ function sendSignedHex100105(myUserID, nodeID, userID, signedInfo, channel_id) {
 
             //------------------------------------------
             // If Bob has R, will send -100045 forwardR
-            // let privkey = await getFundingPrivKey(myUserID, channel_id);
             payInvoiceStep4(myUserID, nodeID, userID, channel_id);
 
             resolve(true);

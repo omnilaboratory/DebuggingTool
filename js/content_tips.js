@@ -90,7 +90,7 @@ const kTipsAfterAddHTLC = 'You have requested to add HTLC. Wait for response fro
 /**
  * Tips for
  */
-const kTipsAfterHTLCSigned = 'You have accepted the request to add an HTLC. Now, you should forward the secrete key R to your counterparty.';
+const kTipsAfterHTLCSigned = 'You have accepted the request to add an HTLC. Now, you should forward the secret key R to your counterparty.';
 
 /**
  * Tips for 
@@ -200,12 +200,12 @@ const kTips110040 = 'You received a request to add HTLC.';
 /**
  * Tips for 
  */
-const kTips110041 = 'Counterparty accepted the HTLC. Wait for secrete R from counterparty.';
+const kTips110041 = 'Counterparty accepted the HTLC. Wait for secret R from counterparty.';
 
 /**
  * Tips for 
  */
-const kTips110045 = 'You received the secrete R from counterparty and you can sign the R.';
+const kTips110045 = 'You received the secret R from counterparty and you can sign the R.';
 
 /**
  * Tips for 
@@ -252,16 +252,14 @@ const kTipsNoLocalData = 'The channel you selected has no locally stored data.';
 // Others
 
 /**
- * cn team: 找到的路径不是当前通道，需要切换通道，请确认。
  * The path found is not for the current channel, please swith channel 
  */
 const k100401 = 'The path found is not for the current channel, and will switch to.';
 
 /**
- * cn team: 你没有确认通道切换，下一步操作可能会出错。
- * You did not confirm to switch the channel, the next operation may go wrong
+ * You did not confirm to switch the channel, the next operation may be wrong
  */
-const k100401_ClickCancel = 'You did not confirm to switch the channel, the next operation may go wrong.';
+const k100401_ClickCancel = 'You did not confirm to switch the channel, the next operation may be wrong.';
 
 /**
  * Pay Invoice is processing
@@ -278,6 +276,10 @@ const kProcessing = 'Processing...';
  */
 const kSignedHexTip = 'Please click the button on the tips area to get data.';
 
+/**
+ * Not Found the R
+ */
+const kNotFoundR = 'Not found the secret key R, you should be invoke with forwardR function again.';
 
 //----------------------------------------------------------------
 // Status of a channel

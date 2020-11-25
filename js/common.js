@@ -207,12 +207,6 @@ async function sdkForwardR() {
     let info        = new ForwardRInfo();
     info.channel_id = $("#channel_id").val();
     info.r          = $("#r").val();
-    // info.channel_address_private_key                 = $("#channel_address_private_key").val();
-    // info.curr_htlc_temp_address_for_he1b_pub_key     = $("#curr_htlc_temp_address_for_he1b_pub_key").val();
-    // info.curr_htlc_temp_address_for_he1b_private_key = $("#curr_htlc_temp_address_for_he1b_private_key").val();
-
-    // Save address index to OBD and can get private key back if lose it.
-    // info.curr_htlc_temp_address_for_he1b_index = Number(getIndexFromPubKey(info.curr_htlc_temp_address_for_he1b_pub_key));
 
     displaySentMessage100045(nodeID, userID, info);
 
@@ -4286,9 +4280,6 @@ function displaySentMessage100045(nodeID, userID, info) {
         data: {
             channel_id: info.channel_id,
             r:          info.r,
-            // channel_address_private_key: info.channel_address_private_key,
-            // curr_htlc_temp_address_for_he1b_pub_key: info.curr_htlc_temp_address_for_he1b_pub_key,
-            // curr_htlc_temp_address_for_he1b_private_key: info.curr_htlc_temp_address_for_he1b_private_key,
         }
     }
 
