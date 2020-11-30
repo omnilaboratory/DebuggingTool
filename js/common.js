@@ -42,6 +42,11 @@ var lastestChannel = '';
  */
 var channelHadBtcData = '';
 
+/**
+ * timer for enable flash text.
+ */
+var timer1, timer2;
+
 
 ////////////////////////////////
 // Functions are here
@@ -565,7 +570,10 @@ async function sdkBitcoinFundingCreated() {
     info.funding_tx_hex       = $("#funding_tx_hex").val();
 
     displaySentMessage100340(nodeID, userID, info);
-    await bitcoinFundingCreated($("#logined").text(), nodeID, userID, info);
+    let resp = await bitcoinFundingCreated($("#logined").text(), nodeID, userID, info);
+    if (resp != true) {
+        displaySentMessage100341(nodeID, userID, resp);
+    }
     afterBitcoinFundingCreated();
 }
 
@@ -601,7 +609,8 @@ async function sdkAssetFundingCreated() {
     info.temp_address_index = Number(getIndexFromPubKey(info.temp_address_pub_key));
 
     displaySentMessage100034(nodeID, userID, info);
-    await assetFundingCreated($("#logined").text(), nodeID, userID, info, tempKey);
+    let resp = await assetFundingCreated($("#logined").text(), nodeID, userID, info, tempKey);
+    displaySentMessage101034(nodeID, userID, resp);
     afterAssetFundingCreated();
 }
 
@@ -615,10 +624,15 @@ async function sdkAssetFundingSigned() {
     info.temporary_channel_id  = $("#temporary_channel_id").val();
     info.signed_alice_rsmc_hex = $("#signed_alice_rsmc_hex").val();
 
+    disableInvokeAPI();
+    tipsOnTop('', kProcessing);
+
     displaySentMessage100035(nodeID, userID, info);
-    await assetFundingSigned($("#logined").text(), nodeID, userID, info);
-    // afterAssetFundingSigned(e);
-    // displayMyChannelListAtTopRight(kPageSize, kPageIndex);
+    let resp = await assetFundingSigned($("#logined").text(), nodeID, userID, info);
+    displaySentMessage101035(nodeID, userID, resp.sentMsg);
+
+    afterAssetFundingSigned(resp.respData);
+    displayMyChannelListAtTopRight(kPageSize, kPageIndex);
 }
 
 // -102109 funding BTC API at local.
@@ -4520,9 +4534,15 @@ function importToOmniCore() {
 function registerEvent(netType) {
     // auto response mode
     let msg_110032 = enumMsgType.MsgType_RecvChannelOpen_32;
-    obdApi.registerEvent(msg_110032, function(e) {
-        listening110032(e, netType);
+    obdApi.registerEvent(msg_110032, async function(e) {
+        let resp = await listening110032(e, netType);
         listening110032ForGUITool(e);
+
+        if (resp != true) {
+            displaySentMessage100033(resp.nodeID, resp.userID, resp.info);
+            afterAcceptChannel();
+            displayMyChannelListAtTopRight(kPageSize, kPageIndex);
+        }
     });
 
     let msg_110033 = enumMsgType.MsgType_RecvChannelAccept_33;
@@ -4546,16 +4566,26 @@ function registerEvent(netType) {
 
     // auto response mode
     let msg_110034 = enumMsgType.MsgType_FundingCreate_RecvAssetFundingCreated_34;
-    obdApi.registerEvent(msg_110034, function(e) {
-        listening110034(e);
+    obdApi.registerEvent(msg_110034, async function(e) {
+
+        let resp = await listening110034(e);
         listening110034ForGUITool(e);
+        // console.info('TEST RESP 110034 = ' + JSON.stringify(resp));
+
+        if (resp != true) {
+            displaySentMessage100035(resp.nodeID, resp.userID, resp.sentMsg1, resp.privkey);
+            displaySentMessage101035(resp.nodeID, resp.userID, resp.sentMsg2);
+            afterAssetFundingSigned(resp.respData);
+            displayMyChannelListAtTopRight(kPageSize, kPageIndex);
+        }
     });
 
     // auto response mode
     let msg_110035 = enumMsgType.MsgType_FundingSign_RecvAssetFundingSigned_35;
-    obdApi.registerEvent(msg_110035, function(e) {
-        listening110035(e);
-        // listening110035ForGUITool(e);
+    obdApi.registerEvent(msg_110035, async function(e) {
+        let resp = await listening110035(e);
+        displaySentMessage101134(resp.info);
+        listening110035ForGUITool(resp.e);
     });
 
     // auto response mode
@@ -4569,7 +4599,6 @@ function registerEvent(netType) {
     let msg_110352 = enumMsgType.MsgType_CommitmentTxSigned_RecvRevokeAndAcknowledgeCommitmentTransaction_352;
     obdApi.registerEvent(msg_110352, function(e) {
         listening110352(e);
-        // listening110352ForGUITool(e);
     });
 
     // auto response mode
@@ -4580,22 +4609,39 @@ function registerEvent(netType) {
     
     // auto response mode
     let msg_110040 = enumMsgType.MsgType_HTLC_RecvAddHTLC_40;
-    obdApi.registerEvent(msg_110040, function(e) {
-        listening110040(e, netType);
+    obdApi.registerEvent(msg_110040, async function(e) {
+
+        disableInvokeAPI();
+        tipsOnTop('', kProcessing);
+
+        let resp = await listening110040(e, netType);
         listening110040ForGUITool(e);
+
+        if (resp != true) {
+            displaySentMessage100041(resp.nodeID, resp.userID, resp.info, resp.privkey);
+            displaySentMessage100101(resp.nodeID, resp.userID, resp.signedInfo);
+        }
     });
     
     // auto response mode
     let msg_110041 = enumMsgType.MsgType_HTLC_RecvAddHTLCSigned_41;
-    obdApi.registerEvent(msg_110041, function(e) {
-        listening110041(e);
+    obdApi.registerEvent(msg_110041, async function(e) {
+        let resp = await listening110041(e);
         listening110041ForGUITool(e);
+        displaySentMessage100102(resp.info102);
+        displaySentMessage100103(resp.nodeID, resp.userID, resp.info103);
     });
     
     // auto response mode
     let msg_110042 = enumMsgType.MsgType_HTLC_BobSignC3bSubTx_42;
-    obdApi.registerEvent(msg_110042, function(e) {
-        listening110042(e, netType);
+    obdApi.registerEvent(msg_110042, async function(e) {
+        let resp = await listening110042(e, netType);
+        displaySentMessage100104(signedInfo);
+        displaySentMessage100105(nodeID, userID, signedInfo);
+
+        displaySentMessage100045(nodeID, userID, info);
+        afterForwardR();
+        displaySentMessage100106(nodeID, userID, signedInfo);
     });
     
     // auto response mode
@@ -4668,7 +4714,7 @@ function registerEvent(netType) {
  */
 function listening110032ForGUITool(e) {
 
-    tipsOnTop(e.temporary_channel_id, kTips110032, 'Accept', 'acceptChannel');
+    tipsOnTop(e.temporary_channel_id, kTips110032, 'Accept', 'acceptChannel', 'Yes');
     
     let api_name = $("#api_name").text();
     if (api_name === 'acceptChannel') {
@@ -4683,7 +4729,7 @@ function listening110032ForGUITool(e) {
  * For GUI Tool. Display tips
  */
 function listening110033ForGUITool(e) {
-    tipsOnTop(e.temporary_channel_id, kTips110033, 'Funding Bitcoin', 'fundingBitcoin');
+    tipsOnTop(e.temporary_channel_id, kTips110033, 'Funding Bitcoin', 'fundingBitcoin', 'Yes');
     displayMyChannelListAtTopRight(kPageSize, kPageIndex);
 }
 
@@ -4704,13 +4750,13 @@ async function listening110340ForGUITool(e) {
         console.info('listening110340ForGUITool status = ' + status);
         switch (Number(status)) {
             case kStatusAcceptChannel:
-                tipsOnTop(channel_id, kTipsFirst110340, 'Confirm', 'bitcoinFundingSigned');
+                tipsOnTop(channel_id, kTipsFirst110340, 'Confirm', 'bitcoinFundingSigned', 'Yes');
                 break;
             case kStatusFirstBitcoinFundingSigned:
-                tipsOnTop(channel_id, kTipsSecond110340, 'Confirm', 'bitcoinFundingSigned');
+                tipsOnTop(channel_id, kTipsSecond110340, 'Confirm', 'bitcoinFundingSigned', 'Yes');
                 break;
             case kStatusSecondBitcoinFundingSigned:
-                tipsOnTop(channel_id, kTipsThird110340, 'Confirm', 'bitcoinFundingSigned');
+                tipsOnTop(channel_id, kTipsThird110340, 'Confirm', 'bitcoinFundingSigned', 'Yes');
                 break;
         }
     
@@ -4740,20 +4786,20 @@ async function listening110350ForGUITool(e) {
 
     switch (Number(status)) {
         case kStatusFirstBitcoinFundingCreated:
-            tipsOnTop(channel_id, kTipsFirst110350, 'Funding Bitcoin', 'fundingBitcoin');
+            tipsOnTop(channel_id, kTipsFirst110350, 'Funding Bitcoin', 'fundingBitcoin', 'Yes');
             if (api_name === 'fundingBitcoin') {
                 enableInvokeAPI();
             }
             break;
         case kStatusSecondBitcoinFundingCreated:
-            tipsOnTop(channel_id, kTipsSecond110350, 'Funding Bitcoin', 'fundingBitcoin');
+            tipsOnTop(channel_id, kTipsSecond110350, 'Funding Bitcoin', 'fundingBitcoin', 'Yes');
             if (api_name === 'fundingBitcoin') {
                 enableInvokeAPI();
             }
             break;
         case kStatusThirdFundingBitcoin:
         case kStatusThirdBitcoinFundingCreated:
-            tipsOnTop(channel_id, kTipsThird110350, 'Funding Asset', 'fundingAsset');
+            tipsOnTop(channel_id, kTipsThird110350, 'Funding Asset', 'fundingAsset', 'Yes');
             if (api_name === 'fundingAsset') {
                 enableInvokeAPI();
             }
@@ -4773,7 +4819,7 @@ function listening110351ForGUITool(e) {
         tipsOnTop(e.channel_id, kProcessing);
     } else { // auto mode is closed
         let msg = kTips110351 + ' Transfer amount is : ' + e.amount;
-        tipsOnTop(e.channel_id, msg, 'Confirm', 'commitmentTransactionAccepted');
+        tipsOnTop(e.channel_id, msg, 'Confirm', 'commitmentTransactionAccepted', 'Yes');
     
         let api_name = $("#api_name").text();
         if (api_name === 'commitmentTransactionAccepted') {
@@ -4793,7 +4839,7 @@ function listening110351ForGUITool(e) {
  * For GUI Tool
  */
 function listening110352ForGUITool(e) {
-    tipsOnTop(e.channel_id, kTips110352, 'RSMC Transfer', 'commitmentTransactionCreated');
+    tipsOnTop(e.channel_id, kTips110352, 'RSMC Transfer', 'commitmentTransactionCreated', 'Yes');
     displayMyChannelListAtTopRight(kPageSize, kPageIndex);
 
     let api_name = $("#api_name").text();
@@ -4817,7 +4863,7 @@ function listening110034ForGUITool(e) {
     if (isAutoMode === 'Yes') {
         tipsOnTop(channel_id, kProcessing);
     } else { // auto mode is closed
-        tipsOnTop(channel_id, kTips110034, 'Confirm', 'assetFundingSigned');
+        tipsOnTop(channel_id, kTips110034, 'Confirm', 'assetFundingSigned', 'Yes');
     
         let api_name = $("#api_name").text();
         if (api_name === 'assetFundingSigned') {
@@ -4835,7 +4881,7 @@ function listening110034ForGUITool(e) {
  * @param e
  */
 function listening110035ForGUITool(e) {
-    tipsOnTop(e.channel_id, kTips110035, 'RSMC Transfer', 'commitmentTransactionCreated');
+    tipsOnTop(e.channel_id, kTips110035, 'RSMC Transfer', 'commitmentTransactionCreated', 'Yes');
     displayMyChannelListAtTopRight(kPageSize, kPageIndex);
 }
 
@@ -4857,7 +4903,7 @@ function listening110040ForGUITool(e) {
     if (isAutoMode === 'Yes') {
         tipsOnTop(e.channel_id, kProcessing);
     } else { // auto mode is closed
-        tipsOnTop(e.channel_id, kTips110040, 'Accept', 'HTLCSigned');
+        tipsOnTop(e.channel_id, kTips110040, 'Accept', 'HTLCSigned', 'Yes');
     
         let api_name = $("#api_name").text();
         if (api_name === 'HTLCSigned') {
@@ -4909,7 +4955,7 @@ function listening110045ForGUITool(e) {
     if (isAutoMode === 'Yes') {
         tipsOnTop(e.channel_id, kProcessing);
     } else { // auto mode is closed
-        tipsOnTop(e.channel_id, kTips110045, 'Sign R', 'signR');
+        tipsOnTop(e.channel_id, kTips110045, 'Sign R', 'signR', 'Yes');
     
         let api_name = $("#api_name").text();
         if (api_name === 'signR') {
@@ -4961,7 +5007,7 @@ function listening110050ForGUITool(e) {
  */
 function listening110080ForGUITool(e) {
 
-    tipsOnTop(e.channel_id, kTips110080, 'Accept', 'acceptSwap');
+    tipsOnTop(e.channel_id, kTips110080, 'Accept', 'acceptSwap', 'Yes');
 
     let api_name = $("#api_name").text();
     if (api_name === 'acceptSwap') {
@@ -4985,7 +5031,7 @@ function listening110081ForGUITool(e) {
  */
 function listening110038ForGUITool(e) {
 
-    tipsOnTop(e.channel_id, kTips110038, 'Accept', 'closeChannelSigned');
+    tipsOnTop(e.channel_id, kTips110038, 'Accept', 'closeChannelSigned', 'Yes');
 
     let api_name = $("#api_name").text();
     if (api_name === 'closeChannelSigned') {
@@ -5480,7 +5526,7 @@ function afterAcceptChannel() {
  */
 function afterFundingBitcoin() {
     disableInvokeAPI();
-    tipsOnTop('', kTipsAfterFundingBitcoin, 'Notify Counterparty', 'bitcoinFundingCreated');
+    tipsOnTop('', kTipsAfterFundingBitcoin, 'Notify Counterparty', 'bitcoinFundingCreated', 'Yes');
 }
 
 /**
@@ -5518,7 +5564,7 @@ async function afterBitcoinFundingSigned(tempCID) {
  */
 function afterFundingAsset() {
     disableInvokeAPI();
-    tipsOnTop('', kTipsAfterFundingAsset, 'Notify Counterparty', 'assetFundingCreated');
+    tipsOnTop('', kTipsAfterFundingAsset, 'Notify Counterparty', 'assetFundingCreated', 'Yes');
 }
 
 /**
@@ -5549,7 +5595,6 @@ function afterCommitmentTransactionCreated() {
  * 
  */
 function afterCommitmentTransactionAccepted() {
-    // disableInvokeAPI();
     enableInvokeAPI();
     tipsOnTop('', kTipsAfterCommitmentTransactionAccepted, 'RSMC Transfer', 'commitmentTransactionCreated');
 }
@@ -5559,7 +5604,7 @@ function afterCommitmentTransactionAccepted() {
  */
 function afterHTLCFindPath() {
     disableInvokeAPI();
-    tipsOnTop('', kTipsAfterHTLCFindPath, 'Add HTLC', 'addHTLC');
+    tipsOnTop('', kTipsAfterHTLCFindPath, 'Add HTLC', 'addHTLC', 'Yes');
 }
 
 /**
@@ -5648,19 +5693,42 @@ function afterAcceptSwap() {
  * @param tipsNextStep 
  * @param butText 
  * @param apiName 
+ * @param flash Enable flash text
  */
-function tipsOnTop(channelID, tipsNextStep, butText, apiName) {
+function tipsOnTop(channelID, tipsNextStep, butText, apiName, flash) {
 
     if (channelID != '') {
         $("#curr_channel_id").text(channelID);
     }
 
     $("#next_step").text(tipsNextStep);
+    $("#next_step").css("color", "black");
+    clearTimeout(timer1);
+    clearTimeout(timer2);
+    if (flash) flashText();
 
     $("#button_next").empty();
     if (butText) {
         buttonNextStep($("#button_next"), butText, "goNextStep('" + apiName + "')");
     }
+}
+
+/**
+ * 
+ */
+function flashText() {
+    $("#next_step").css("color", "black");
+    // $("#next_step").css({"color":"black", "font-size":"100%"});
+    timer1 = setTimeout("highlightColor()", 500);
+}
+
+/**
+ * 
+ */
+function highlightColor() {
+    $("#next_step").css("color", "red");
+    // $("#next_step").css({"color":"red", "font-size":"105%"});
+    timer2 = setTimeout("flashText()", 500);
 }
 
 /**

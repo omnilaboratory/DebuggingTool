@@ -40,10 +40,6 @@ function addHTLC(myUserID, nodeID, userID, info, isFunder) {
         obdApi.addHTLC(nodeID, userID, info, async function(e) {
             console.info('SDK: -100040 addHTLC = ' + JSON.stringify(e));
 
-            // FUNCTION ONLY FOR GUI TOOL
-            // disableInvokeAPI();
-            // afterCommitmentTransactionCreated();
-
             // Sender sign the tx on client side
             // NO.1
             let cr      = e.c3a_counterparty_raw_data;
@@ -124,10 +120,6 @@ function HTLCSigned(myUserID, nodeID, userID, info) {
     return new Promise((resolve, reject) => {
         obdApi.htlcSigned(nodeID, userID, info, async function(e) {
             console.info('SDK: -100041 htlcSigned = ' + JSON.stringify(e));
-            
-            // FUNCTION ONLY FOR GUI TOOL
-            disableInvokeAPI();
-            tipsOnTop('', kProcessing);
 
             let channel_id = e.channel_id;
 
@@ -185,10 +177,6 @@ function HTLCSigned(myUserID, nodeID, userID, info) {
             signedInfo.c3b_counterparty_partial_signed_hex = bc_hex;
             signedInfo.c3b_htlc_partial_signed_hex         = bh_hex;
 
-            // FUNCTION ONLY FOR GUI TOOL
-            displaySentMessage100101(nodeID, userID, signedInfo);
-
-            // SDK API
             await sendSignedHex100101(nodeID, userID, signedInfo);
 
             // save some data
@@ -196,7 +184,8 @@ function HTLCSigned(myUserID, nodeID, userID, info) {
             let privkey2 = getPrivKeyFromPubKey(myUserID, info.curr_htlc_temp_address_pub_key);
             saveTempPrivKey(myUserID, kRsmcTempPrivKey, channel_id, privkey1);
             saveTempPrivKey(myUserID, kHtlcTempPrivKey, channel_id, privkey2);
-            resolve(e);
+            
+            resolve(signedInfo);
         });
     })
 }
@@ -273,13 +262,15 @@ function sendSignedHex100102(myUserID, signedInfo) {
             signedInfo.c3b_htlc_hlock_partial_signed_hex = bhl_hex;
             signedInfo.c3b_htlc_br_partial_signed_hex    = bhb_hex;
             
-            // FUNCTION ONLY FOR GUI TOOL
-            displaySentMessage100103(nodeID, userID, signedInfo);
-
-            // SDK API
             await sendSignedHex100103(nodeID, userID, signedInfo);
 
-            resolve(true);
+            let returnData = {
+                nodeID:     nodeID,
+                userID:     userID,
+                signedInfo: signedInfo
+            };
+        
+            resolve(returnData);
         });
     })
 }
@@ -294,11 +285,6 @@ function sendSignedHex100103(nodeID, userID, signedInfo) {
     return new Promise((resolve, reject) => {
         obdApi.sendSignedHex100103(nodeID, userID, signedInfo, function(e) {
             console.info('sendSignedHex100103 = ' + JSON.stringify(e));
-
-            // FUNCTION ONLY FOR GUI TOOL
-            // afterCommitmentTransactionAccepted();
-            // displayMyChannelListAtTopRight(kPageSize, kPageIndex);
-
             resolve(true);
         });
     })
@@ -330,13 +316,17 @@ function sendSignedHex100104(myUserID, signedInfo) {
             signedInfo.channel_id                           = channel_id;
             signedInfo.c3b_htlc_hlock_he_partial_signed_hex = hex;
 
-            // FUNCTION ONLY FOR GUI TOOL
-            displaySentMessage100105(nodeID, userID, signedInfo);
+            let resp = await sendSignedHex100105(myUserID, nodeID, userID, signedInfo, channel_id);
 
-            // SDK API
-            await sendSignedHex100105(myUserID, nodeID, userID, signedInfo, channel_id);
-
-            resolve(true);
+            let returnData = {
+                nodeID:  nodeID,
+                userID:  userID,
+                info105: signedInfo,
+                info45:  resp.info45,
+                info106: resp.info106,
+            };
+        
+            resolve(returnData);
         });
     })
 }
@@ -359,9 +349,17 @@ function sendSignedHex100105(myUserID, nodeID, userID, signedInfo, channel_id) {
 
             //------------------------------------------
             // If Bob has R, will send -100045 forwardR
-            payInvoiceStep4(myUserID, nodeID, userID, channel_id);
+            let resp = await payInvoiceStep4(myUserID, nodeID, userID, channel_id);
 
-            resolve(true);
+            if (resp === false) {
+                resolve(false);
+            } else {
+                let returnData = {
+                    info45:  resp.info45,
+                    info106: resp.info106,
+                };
+                resolve(returnData);
+            }
         });
     })
 }
@@ -393,16 +391,9 @@ function forwardR(myUserID, nodeID, userID, info, isFunder) {
             signedInfo.channel_id                       = channel_id;
             signedInfo.c3b_htlc_herd_partial_signed_hex = hex;
 
-            // FUNCTION ONLY FOR GUI TOOL
-            displaySentMessage100106(nodeID, userID, signedInfo);
-
-            // SDK API
             sendSignedHex100106(nodeID, userID, signedInfo);
-            // await sendSignedHex100106(nodeID, userID, signedInfo);
-
-            // save some data
             saveChannelStatus(myUserID, channel_id, isFunder, kStatusForwardR);
-            resolve(true);
+            resolve(signedInfo);
         });
     })
 }

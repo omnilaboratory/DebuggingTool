@@ -128,11 +128,8 @@ function bitcoinFundingCreated(myUserID, nodeID, userID, info) {
                 let signed_hex = signP2SH(true, e.hex, e.pub_key_a, 
                     e.pub_key_b, privkey, e.inputs);
 
-                // FUNCTION ONLY FOR GUI TOOL
-                displaySentMessage100341(nodeID, userID, signed_hex);
-
-                // SDK API
                 await sendSignedHex100341(nodeID, userID, signed_hex);
+                resolve(signed_hex);
             }
 
             resolve(true);
@@ -237,16 +234,12 @@ function assetFundingCreated(myUserID, nodeID, userID, info, tempKey) {
             let signed_hex = signP2SH(true, e.hex, e.pub_key_a, 
                 e.pub_key_b, privkey, e.inputs);
             
-            // FUNCTION ONLY FOR GUI TOOL
-            displaySentMessage101034(nodeID, userID, signed_hex);
-
-            // SDK API
             await sendSignedHex101034(nodeID, userID, signed_hex);
 
             // Save temporary private key to local storage
             saveTempPrivKey(myUserID, kTempPrivKey, channel_id, tempKey);
             saveChannelStatus(myUserID, channel_id, true, kStatusAssetFundingCreated);
-            resolve(true);
+            resolve(signed_hex);
         });
     })
 }
@@ -275,11 +268,7 @@ function sendSignedHex101134(info) {
     return new Promise((resolve, reject) => {
         obdApi.sendSignedHex101134(info, function(e) {
             console.info('sendSignedHex101134 = ' + JSON.stringify(e));
-
-            // FUNCTION ONLY FOR GUI TOOL
-            listening110035ForGUITool(e);
-
-            resolve(true);
+            resolve(e);
         });
     })
 }
@@ -299,10 +288,6 @@ function assetFundingSigned(myUserID, nodeID, userID, info) {
         obdApi.assetFundingSigned(nodeID, userID, info, async function(e) {
             console.info('SDK: -100035 - assetFundingSigned = ' + JSON.stringify(e));
             
-            // FUNCTION ONLY FOR GUI TOOL
-            disableInvokeAPI();
-            tipsOnTop('', kProcessing);
-
             let channel_id = info.temporary_channel_id;
             
             // Bob sign the tx on client side
@@ -326,12 +311,14 @@ function assetFundingSigned(myUserID, nodeID, userID, info) {
             signedInfo.rd_signed_hex        = rd_hex;
             signedInfo.br_id                = br.br_id;
 
-            // FUNCTION ONLY FOR GUI TOOL
-            displaySentMessage101035(nodeID, userID, signedInfo);
-
-            // SDK API
-            await sendSignedHex101035(nodeID, userID, signedInfo, 
+            let resp = await sendSignedHex101035(nodeID, userID, signedInfo, 
                 myUserID, channel_id, privkey);
+
+            let data = {
+                sentMsg:  signedInfo,
+                respData: resp
+            };
+            resolve(data);
         });
     })
 }
@@ -370,10 +357,6 @@ function sendSignedHex101035(nodeID, userID, signedInfo, myUserID, tempCID, priv
             //
             delCounterparty(myUserID, tempCID);
             saveCounterparty(myUserID, channel_id, nodeID, userID);
-
-            // FUNCTION ONLY FOR GUI TOOL
-            afterAssetFundingSigned(e);
-            displayMyChannelListAtTopRight(kPageSize, kPageIndex);
 
             resolve(e);
         });
