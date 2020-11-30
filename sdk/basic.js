@@ -449,11 +449,6 @@ function commitmentTransactionAccepted(myUserID, nodeID, userID, info, isFunder,
     return new Promise((resolve, reject) => {
         obdApi.commitmentTransactionAccepted(nodeID, userID, info, async function(e) {
             console.info('SDK: -100352 commitmentTransactionAccepted = ' + JSON.stringify(e));
-
-            // FUNCTION ONLY FOR GUI TOOL
-            disableInvokeAPI();
-            tipsOnTop('', kProcessing);
-
             // Receiver sign the tx on client side
 
             // NO.1 c2a_br_raw_data
@@ -486,16 +481,12 @@ function commitmentTransactionAccepted(myUserID, nodeID, userID, info, isFunder,
             signedInfo.c2a_br_signed_hex           = ab_hex;
             signedInfo.c2a_br_id                   = ab.br_id;
 
-            // FUNCTION ONLY FOR GUI TOOL
-            displaySentMessage100361(nodeID, userID, signedInfo);
-
-            // SDK API
             await sendSignedHex100361(nodeID, userID, signedInfo);
 
             // 
             saveTempPrivKey(myUserID, kTempPrivKey, e.channel_id, tempKey);
             saveChannelStatus(myUserID, e.channel_id, isFunder, kStatusCommitmentTransactionAccepted);
-            resolve(true);
+            resolve(signedInfo);
         });
     })
 }
@@ -548,12 +539,8 @@ function sendSignedHex100362(myUserID, nodeID, userID, signedInfo) {
             signedInfo.c2b_br_signed_hex = br_hex;
             signedInfo.c2b_br_id         = br.br_id;
 
-            // FUNCTION ONLY FOR GUI TOOL
-            displaySentMessage100363(nodeID, userID, signedInfo);
-
-            // SDK API
             await sendSignedHex100363(nodeID, userID, signedInfo);
-            resolve(e);
+            resolve(signedInfo);
         });
     })
 }
@@ -569,10 +556,6 @@ function sendSignedHex100363(nodeID, userID, signedInfo) {
     return new Promise((resolve, reject) => {
         obdApi.sendSignedHex100363(nodeID, userID, signedInfo, function(e) {
             console.info('sendSignedHex100363 = ' + JSON.stringify(e));
-
-            // FUNCTION ONLY FOR GUI TOOL
-            listening110352ForGUITool(e);
-
             resolve(e);
         });
     })
@@ -586,11 +569,6 @@ function sendSignedHex100364(signedInfo) {
     return new Promise((resolve, reject) => {
         obdApi.sendSignedHex100364(signedInfo, function(e) {
             console.info('sendSignedHex100364 = ' + JSON.stringify(e));
-
-            // FUNCTION ONLY FOR GUI TOOL
-            afterCommitmentTransactionAccepted();
-            displayMyChannelListAtTopRight(kPageSize, kPageIndex);
-
             resolve(e);
         });
     })

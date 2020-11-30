@@ -4535,9 +4535,8 @@ function registerEvent(netType) {
     // auto response mode
     let msg_110032 = enumMsgType.MsgType_RecvChannelOpen_32;
     obdApi.registerEvent(msg_110032, async function(e) {
-        let resp = await listening110032(e, netType);
         listening110032ForGUITool(e);
-
+        let resp = await listening110032(e, netType);
         if (resp != true) {
             displaySentMessage100033(resp.nodeID, resp.userID, resp.info);
             afterAcceptChannel();
@@ -4553,9 +4552,13 @@ function registerEvent(netType) {
 
     // auto response mode
     let msg_110340 = enumMsgType.MsgType_FundingCreate_RecvBtcFundingCreated_340;
-    obdApi.registerEvent(msg_110340, function(e) {
-        listening110340(e);
+    obdApi.registerEvent(msg_110340, async function(e) {
         listening110340ForGUITool(e);
+        let resp = await listening110340(e);
+        if (resp != true) {
+            displaySentMessage100350(resp.nodeID, resp.userID, resp.info350, resp.privkey);
+            afterBitcoinFundingSigned(e.temporary_channel_id);
+        }
     });
 
     let msg_110350 = enumMsgType.MsgType_FundingSign_RecvBtcSign_350;
@@ -4590,21 +4593,39 @@ function registerEvent(netType) {
 
     // auto response mode
     let msg_110351 = enumMsgType.MsgType_CommitmentTx_RecvCommitmentTransactionCreated_351;
-    obdApi.registerEvent(msg_110351, function(e) {
-        listening110351(e, netType);
+    obdApi.registerEvent(msg_110351, async function(e) {
+
+        disableInvokeAPI();
+        tipsOnTop('', kProcessing);
+
         listening110351ForGUITool(e);
+        let resp   = await listening110351(e, netType);
+        let nodeID = resp.nodeID;
+        let userID = resp.userID;
+        if (resp != true) {
+            displaySentMessage100352(nodeID, userID, resp.info352);
+            displaySentMessage100361(nodeID, userID, resp.info361);
+        }
     });
 
     // auto response mode
     let msg_110352 = enumMsgType.MsgType_CommitmentTxSigned_RecvRevokeAndAcknowledgeCommitmentTransaction_352;
-    obdApi.registerEvent(msg_110352, function(e) {
-        listening110352(e);
+    obdApi.registerEvent(msg_110352, async function(e) {
+        let resp   = await listening110352(e);
+        let nodeID = resp.nodeID;
+        let userID = resp.userID;
+        displaySentMessage100362(nodeID, userID, resp.info362);
+        displaySentMessage100363(nodeID, userID, resp.info363);
+        listening110352ForGUITool(e);
     });
 
     // auto response mode
     let msg_110353 = enumMsgType.MsgType_ClientSign_BobC2b_Rd_353;
-    obdApi.registerEvent(msg_110353, function(e) {
-        listening110353(e);
+    obdApi.registerEvent(msg_110353, async function(e) {
+        let resp = listening110353(e);
+        displaySentMessage100364(resp);
+        afterCommitmentTransactionAccepted();
+        displayMyChannelListAtTopRight(kPageSize, kPageIndex);
     });
     
     // auto response mode
@@ -4635,13 +4656,21 @@ function registerEvent(netType) {
     // auto response mode
     let msg_110042 = enumMsgType.MsgType_HTLC_BobSignC3bSubTx_42;
     obdApi.registerEvent(msg_110042, async function(e) {
-        let resp = await listening110042(e, netType);
-        displaySentMessage100104(signedInfo);
-        displaySentMessage100105(nodeID, userID, signedInfo);
 
-        displaySentMessage100045(nodeID, userID, info);
-        afterForwardR();
-        displaySentMessage100106(nodeID, userID, signedInfo);
+        let resp   = await listening110042(e, netType);
+        let nodeID = resp.nodeID;
+        let userID = resp.userID;
+
+        displaySentMessage100104(resp.info104);
+        displaySentMessage100105(nodeID, userID, resp.info105);
+
+        if (resp.status === false) {
+            tipsOnTop('', kNotFoundR, 'Forward R', 'forwardR', 'Yes');
+        } else {
+            displaySentMessage100045(nodeID, userID, resp.info45);
+            afterForwardR();
+            displaySentMessage100106(nodeID, userID, resp.info106);
+        }
     });
     
     // auto response mode
@@ -4652,9 +4681,16 @@ function registerEvent(netType) {
 
     // auto response mode
     let msg_110045 = enumMsgType.MsgType_HTLC_RecvVerifyR_45;
-    obdApi.registerEvent(msg_110045, function(e) {
-        listening110045(e);
+    obdApi.registerEvent(msg_110045, async function(e) {
         listening110045ForGUITool(e);
+        let resp  = await listening110045(e);
+        if (resp != true) {
+            let nodeID = resp.nodeID;
+            let userID = resp.userID;
+            displaySentMessage100046(nodeID, userID, resp.info46);
+            displaySentMessage100049(nodeID, userID, resp.info49, resp.privkey);
+            displaySentMessage100110(nodeID, userID, resp.info110);
+        }
     });
 
     let msg_110046 = enumMsgType.MsgType_HTLC_RecvSignVerifyR_46;
@@ -4665,21 +4701,30 @@ function registerEvent(netType) {
 
     // auto response mode
     let msg_110049 = enumMsgType.MsgType_HTLC_RecvRequestCloseCurrTx_49;
-    obdApi.registerEvent(msg_110049, function(e) {
-        listening110049(e, netType);
+    obdApi.registerEvent(msg_110049, async function(e) {
         listening110049ForGUITool(e);
+        let resp  = await listening110049(e, netType);
+        let nodeID = resp.nodeID;
+        let userID = resp.userID;
+        displaySentMessage100050(nodeID, userID, resp.info50, resp.privkey);
+        displaySentMessage100111(nodeID, userID, resp.info111);
     });
 
     let msg_110050 = enumMsgType.MsgType_HTLC_RecvCloseSigned_50;
-    obdApi.registerEvent(msg_110050, function(e) {
-        listening110050(e);
-        // listening110050ForGUITool(e);
+    obdApi.registerEvent(msg_110050, async function(e) {
+        let resp = await listening110050(e);
+        displaySentMessage100112(resp.info112);
+        displaySentMessage100113(resp.nodeID, resp.userID, resp.info113);
+        tipsOnTop(e.channel_id, kTips110050);
+        displayMyChannelListAtTopRight(kPageSize, kPageIndex);
     });
 
     let msg_110051 = enumMsgType.MsgType_HTLC_Close_ClientSign_Bob_C4bSub_51;
-    obdApi.registerEvent(msg_110051, function(e) {
-        listening110051(e);
-        // listening110051ForGUITool(e);
+    obdApi.registerEvent(msg_110051, async function(e) {
+        let resp = await listening110051(e);
+        displaySentMessage100114(resp);
+        afterCloseHTLCSigned();
+        displayMyChannelListAtTopRight(kPageSize, kPageIndex);
     });
 
     // save request_close_channel_hash
@@ -4992,14 +5037,6 @@ function listening110049ForGUITool(e) {
     }
 
     tipsOnTop(e.channel_id, kProcessing);
-}
-
-/**
- * For GUI Tool. Display tips
- */
-function listening110050ForGUITool(e) {
-    tipsOnTop(e.channel_id, kTips110050);
-    displayMyChannelListAtTopRight(kPageSize, kPageIndex);
 }
 
 /**
