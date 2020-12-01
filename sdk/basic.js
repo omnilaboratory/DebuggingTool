@@ -400,6 +400,7 @@ function commitmentTransactionCreated(myUserID, nodeID, userID, info, isFunder, 
             // save some data
             saveTempPrivKey(myUserID, kTempPrivKey, e.channel_id, tempKey);
             saveChannelStatus(myUserID, e.channel_id, isFunder, kStatusCommitmentTransactionCreated);
+            saveCounterparty(myUserID, e.channel_id, nodeID, userID);
             saveSenderRole(kIsSender);
         
             resolve(signedInfo);
@@ -473,6 +474,7 @@ function commitmentTransactionAccepted(myUserID, nodeID, userID, info, isFunder,
             await sendSignedHex100361(nodeID, userID, signedInfo);
             saveTempPrivKey(myUserID, kTempPrivKey, e.channel_id, tempKey);
             saveChannelStatus(myUserID, e.channel_id, isFunder, kStatusCommitmentTransactionAccepted);
+            saveCounterparty(myUserID, e.channel_id, nodeID, userID);
             resolve(signedInfo);
         });
     })

@@ -736,23 +736,19 @@ async function payInvoiceStep2(e, myUserID, channel_id) {
     info.routing_packet                 = e.routing_packet;
     info.cltv_expiry                    = e.min_cltv_expiry;
     info.memo                           = e.memo;
-    // info.channel_address_private_key    = await getFundingPrivKey(myUserID, channel_id);
     info.last_temp_address_private_key  = getTempPrivKey(myUserID, kTempPrivKey, channel_id);
 
     let addr_1 = sdkGenAddressFromMnemonic();
     saveAddress(myUserID, addr_1);
-    info.curr_rsmc_temp_address_pub_key     = addr_1.result.pubkey;
-    // info.curr_rsmc_temp_address_private_key = result.result.wif;
+    info.curr_rsmc_temp_address_pub_key = addr_1.result.pubkey;
 
     let addr_2 = sdkGenAddressFromMnemonic();
     saveAddress(myUserID, addr_2);
-    info.curr_htlc_temp_address_pub_key     = addr_2.result.pubkey;
-    // info.curr_htlc_temp_address_private_key = result.result.wif;
+    info.curr_htlc_temp_address_pub_key = addr_2.result.pubkey;
 
     let addr_3 = sdkGenAddressFromMnemonic();
     saveAddress(myUserID, addr_3);
-    info.curr_htlc_temp_address_for_ht1a_pub_key     = addr_3.result.pubkey;
-    // info.curr_htlc_temp_address_for_ht1a_private_key = result.result.wif;
+    info.curr_htlc_temp_address_for_ht1a_pub_key = addr_3.result.pubkey;
 
     // Save address index to OBD and can get private key back if lose it.
     info.curr_rsmc_temp_address_index          = addr_1.result.index;
@@ -763,7 +759,8 @@ async function payInvoiceStep2(e, myUserID, channel_id) {
     displaySentMessage100040(nodeID, userID, info, privkey);
 
     let isFunder = await getIsFunder(myUserID, channel_id);
-    await addHTLC(myUserID, nodeID, userID, info, isFunder);
+    let resp     = await addHTLC(myUserID, nodeID, userID, info, isFunder);
+    displaySentMessage100100(nodeID, userID, resp);
 }
 
 /**
@@ -3422,7 +3419,7 @@ async function showLog() {
     let user_id = receive["user_id"];
     $("#log_page_logined").text(user_id);
 
-    console.log('Sent user_id = ' + user_id);
+    // console.log('Sent user_id = ' + user_id);
 
     await openDBInNewHtml();
     getGlobalMsg(user_id);
@@ -3475,11 +3472,11 @@ function getTrackerData(getWhat, pageNum, pageSize) {
         url: strURL,
         type: "GET",
         success: function(result) {
-            console.log(JSON.stringify(result));
+            // console.log(JSON.stringify(result));
             tableData(getWhat, result);
         },
         error: function(error) {
-            console.log('ERROR IS : ' + JSON.stringify(error));
+            // console.log('ERROR IS : ' + JSON.stringify(error));
         }
     })
 }
@@ -3756,11 +3753,11 @@ function openDBInNewHtml() {
         let request = window.indexedDB.open('data');
         
         request.onerror = function (e) {
-            console.log('NEW PAGE DB open error!');
+            // console.log('NEW PAGE DB open error!');
         };
     
         request.onsuccess = function (e) {
-            console.log('NEW PAGE DB open success!');
+            // console.log('NEW PAGE DB open success!');
             db = request.result;
             resolve();
         };
@@ -3799,7 +3796,7 @@ function getGlobalMsg(user_id) {
         request     = index.openCursor(user_id);
 
     request.onerror = function(e) {
-        console.log('Read data false.');
+        // console.log('Read data false.');
     };
 
     request.onsuccess = function (e) {
@@ -3809,7 +3806,7 @@ function getGlobalMsg(user_id) {
             data.push(result.value.msg);
             result.continue();
         } else {
-            console.log('global msg No More Data.');
+            // console.log('global msg No More Data.');
             for (let i = data.length - 1; i >= 0; i--) {
                 showMsg += data[i] + '\n\n\n\n';
             }
@@ -4515,13 +4512,13 @@ function importToOmniCore() {
  * @param netType true: testnet  false: mainnet
  */
 async function register110032(e, netType) {
-    listening110032ForGUITool(e);
     let resp = await listening110032(e, netType);
     if (resp != true) {
         displaySentMessage100033(resp.nodeID, resp.userID, resp.info33);
         afterAcceptChannel();
         displayMyChannelListAtTopRight(kPageSize, kPageIndex);
     }
+    listening110032ForGUITool(e);
 }
 
 /**
@@ -4529,12 +4526,12 @@ async function register110032(e, netType) {
  * @param e 
  */
 async function register110340(e) {
-    listening110340ForGUITool(e);
     let resp = await listening110340(e);
     if (resp != true) {
         displaySentMessage100350(resp.nodeID, resp.userID, resp.info350, resp.privkey);
         afterBitcoinFundingSigned(e.temporary_channel_id);
     }
+    listening110340ForGUITool(e);
 }
 
 /**
@@ -4542,7 +4539,6 @@ async function register110340(e) {
  * @param e 
  */
 async function register110034(e) {
-    listening110034ForGUITool(e);
     let resp = await listening110034(e);
     if (resp != true) {
         let nodeID = resp.nodeID;
@@ -4552,6 +4548,7 @@ async function register110034(e) {
         afterAssetFundingSigned(resp.resp1035);
         displayMyChannelListAtTopRight(kPageSize, kPageIndex);
     }
+    listening110034ForGUITool(e);
 }
 
 /**
@@ -4559,9 +4556,9 @@ async function register110034(e) {
  * @param e 
  */
 async function register110035(e) {
-    listening110035ForGUITool(e);
     let resp = await listening110035(e);
     displaySentMessage101134(resp);
+    listening110035ForGUITool(e);
 }
 
 /**
@@ -4572,8 +4569,7 @@ async function register110035(e) {
 async function register110351(e, netType) {
     disableInvokeAPI();
     tipsOnTop('', kProcessing);
-    listening110351ForGUITool(e);
-
+    
     let resp  = await listening110351(e, netType);
     if (resp != true) {
         let nodeID = resp.nodeID;
@@ -4581,6 +4577,7 @@ async function register110351(e, netType) {
         displaySentMessage100352(nodeID, userID, resp.info352);
         displaySentMessage100361(nodeID, userID, resp.info361);
     }
+    listening110351ForGUITool(e);
 }
 
 /**
@@ -4588,12 +4585,12 @@ async function register110351(e, netType) {
  * @param e 
  */
 async function register110352(e) {
-    listening110352ForGUITool(e);
     let resp   = await listening110352(e);
     let nodeID = resp.nodeID;
     let userID = resp.userID;
     displaySentMessage100362(nodeID, userID, resp.info362);
     displaySentMessage100363(nodeID, userID, resp.info363);
+    listening110352ForGUITool(e);
 }
 
 /**
@@ -4601,7 +4598,7 @@ async function register110352(e) {
  * @param e 
  */
 async function register110353(e) {
-    let resp = listening110353(e);
+    let resp = await listening110353(e);
     displaySentMessage100364(resp);
     afterCommitmentTransactionAccepted();
     displayMyChannelListAtTopRight(kPageSize, kPageIndex);
@@ -4615,8 +4612,7 @@ async function register110353(e) {
 async function register110040(e, netType) {
     disableInvokeAPI();
     tipsOnTop('', kProcessing);
-    listening110040ForGUITool(e);
-
+    
     let resp  = await listening110040(e, netType);
     if (resp != true) {
         let nodeID = resp.nodeID;
@@ -4624,6 +4620,7 @@ async function register110040(e, netType) {
         displaySentMessage100041(nodeID, userID, resp.info41, resp.privkey);
         displaySentMessage100101(nodeID, userID, resp.info101);
     }
+    listening110040ForGUITool(e);
 }
 
 /**
@@ -4631,10 +4628,10 @@ async function register110040(e, netType) {
  * @param e 
  */
 async function register110041(e) {
-    listening110041ForGUITool(e);
     let resp = await listening110041(e);
     displaySentMessage100102(resp.info102);
     displaySentMessage100103(resp.nodeID, resp.userID, resp.info103);
+    listening110041ForGUITool(e);
 }
 
 /**
@@ -4664,7 +4661,6 @@ async function register110042(e, netType) {
  * @param e 
  */
 async function register110045(e) {
-    listening110045ForGUITool(e);
     let resp  = await listening110045(e);
     if (resp != true) {
         let nodeID = resp.nodeID;
@@ -4673,6 +4669,7 @@ async function register110045(e) {
         displaySentMessage100049(nodeID, userID, resp.info49, resp.privkey);
         displaySentMessage100110(nodeID, userID, resp.info110);
     }
+    listening110045ForGUITool(e);
 }
 
 /**
@@ -4681,12 +4678,12 @@ async function register110045(e) {
  * @param netType true: testnet  false: mainnet
  */
 async function register110049(e, netType) {
-    listening110049ForGUITool(e);
     let resp   = await listening110049(e, netType);
     let nodeID = resp.nodeID;
     let userID = resp.userID;
     displaySentMessage100050(nodeID, userID, resp.info50, resp.privkey);
     displaySentMessage100111(nodeID, userID, resp.info111);
+    listening110049ForGUITool(e);
 }
 
 /**
@@ -4888,15 +4885,15 @@ async function listening110340ForGUITool(e) {
         tipsOnTop(channel_id, kProcessing);
     } else { // auto mode is closed
         let status = await getChannelStatus(channel_id, false);
-        // console.info('listening110340ForGUITool status = ' + status);
+        console.info('listening110340ForGUITool status = ' + status);
         switch (Number(status)) {
-            case kStatusAcceptChannel:
+            case kStatusFirstBitcoinFundingCreated:
                 tipsOnTop(channel_id, kTipsFirst110340, 'Confirm', 'bitcoinFundingSigned', 'Yes');
                 break;
-            case kStatusFirstBitcoinFundingSigned:
+            case kStatusSecondBitcoinFundingCreated:
                 tipsOnTop(channel_id, kTipsSecond110340, 'Confirm', 'bitcoinFundingSigned', 'Yes');
                 break;
-            case kStatusSecondBitcoinFundingSigned:
+            case kStatusThirdBitcoinFundingCreated:
                 tipsOnTop(channel_id, kTipsThird110340, 'Confirm', 'bitcoinFundingSigned', 'Yes');
                 break;
         }

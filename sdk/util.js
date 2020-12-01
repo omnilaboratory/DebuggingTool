@@ -181,11 +181,9 @@ function saveCounterparty(myUserID, channel_id, toNodeID, toUserID) {
         .put({ key: key, user_id: myUserID, toNodeID: toNodeID, toUserID: toUserID });
   
     request.onsuccess = function (e) {
-        console.log('saveCounterparty Data write success.');
     };
   
     request.onerror = function (e) {
-        console.log('saveCounterparty Data write false.');
     }
 }
 
@@ -203,7 +201,7 @@ function getCounterparty(myUserID, channel_id) {
         let request     = store.get(key);
     
         request.onerror = function(e) {
-            console.log('Read data false.');
+            // console.log('Read data false.');
             reject('Read data false.');
         };
     
@@ -216,7 +214,7 @@ function getCounterparty(myUserID, channel_id) {
                 // console.log('getCounterparty = ' + JSON.stringify(data));
                 resolve(data);
             } else {
-                console.log('getCounterparty = No Data.');
+                // console.log('getCounterparty = No Data.');
                 resolve('');
             }
         }
@@ -239,7 +237,7 @@ function getAllCounterpartyFromUserID(myUserID) {
             request     = index.openCursor(myUserID);
     
         request.onerror = function(e) {
-            console.log('Read data false.');
+            // console.log('Read data false.');
             reject('Read data false.');
         };
     
@@ -267,7 +265,7 @@ function getAllCounterpartyFromUserID(myUserID) {
 
             } else {
                 // console.log('getAllCounterpartyFromUserID No More Data.');
-                console.log('getAllCounterpartyFromUserID = ' + JSON.stringify(data));
+                // console.log('getAllCounterpartyFromUserID = ' + JSON.stringify(data));
                 resolve(data);
             }
         }
@@ -286,11 +284,11 @@ function delCounterparty(myUserID, channel_id) {
         .delete(key);
 
     request.onerror = function(e) {
-        console.log('delCounterparty failed');
+        // console.log('delCounterparty failed');
     };
 
     request.onsuccess = function (e) {
-        console.log('delCounterparty success');
+        // console.log('delCounterparty success');
     }
 }
 
@@ -373,17 +371,17 @@ function getChannelIDFromAddr(channel_addr) {
         let request     = index.get(channel_addr);
     
         request.onerror = function(e) {
-            console.log('Read data false.');
+            // console.log('Read data false.');
             reject('Read data false.');
         };
     
         request.onsuccess = function (e) {
             let result = e.target.result;
             if (result) {
-                console.log('result.channel_id = ' + result.channel_id);
+                // console.log('result.channel_id = ' + result.channel_id);
                 resolve(result.channel_id);
             } else {
-                console.log('result.channel_id = No Data.');
+                // console.log('result.channel_id = No Data.');
                 resolve('');
             }
         }
@@ -404,7 +402,7 @@ function getChannelStatus(channel_id, funder) {
         let request     = store.get(key);
     
         request.onerror = function(e) {
-            console.log('Read data false.');
+            // console.log('Read data false.');
             reject('Read data false.');
         };
     
@@ -413,7 +411,7 @@ function getChannelStatus(channel_id, funder) {
                 // console.log('channel status = ' + request.result.status);
                 resolve(request.result.status);
             } else {
-                console.log('channel status = No Data.');
+                // console.log('channel status = No Data.');
                 resolve(-1);
             }
         }
@@ -435,7 +433,7 @@ function getIsFunder(user_id, channel_id) {
             request     = index.openCursor(channel_id);
 
         request.onerror = function(e) {
-            console.log('Read data false.');
+            // console.log('Read data false.');
             reject('Read data false.');
         };
     
@@ -443,13 +441,13 @@ function getIsFunder(user_id, channel_id) {
             let result = e.target.result;
             if (result) {
                 if (result.value.user_id === user_id) {
-                    console.log('getIsFunder = ' + result.value.funder);
+                    // console.log('getIsFunder = ' + result.value.funder);
                     resolve(result.value.funder);
                 } else {
                     result.continue();
                 }
             } else {
-                console.log('getIsFunder No More Data.');
+                // console.log('getIsFunder No More Data.');
                 // Not found 
                 resolve('');
             }
@@ -469,11 +467,11 @@ function delChannelStatus(channel_id, funder) {
         .delete(key);
 
     request.onerror = function(e) {
-        console.log('delChannelStatus failed');
+        // console.log('delChannelStatus failed');
     };
 
     request.onsuccess = function (e) {
-        console.log('delChannelStatus success');
+        // console.log('delChannelStatus success');
     }
 }
 
@@ -553,11 +551,11 @@ function saveChannelAddr(channel_id, channel_addr) {
         .put({ channel_id: channel_id, channel_addr: channel_addr });
   
     request.onsuccess = function (e) {
-        console.log('saveChannelAddr Data write success.');
+        // console.log('saveChannelAddr Data write success.');
     };
   
     request.onerror = function (e) {
-        console.log('saveChannelAddr Data write false.');
+        // console.log('saveChannelAddr Data write false.');
     }
 }
 
@@ -573,15 +571,15 @@ function getChannelAddr(channel_id) {
         let request     = store.get(channel_id);
     
         request.onerror = function(e) {
-            console.log('Read data false.');
+            // console.log('Read data false.');
         };
     
         request.onsuccess = function (e) {
             if (request.result) {
-                console.log('channel_addr = ' + request.result.channel_addr);
+                // console.log('channel_addr = ' + request.result.channel_addr);
                 resolve(request.result.channel_addr);
             } else {
-                console.log('channel_addr = No Data.');
+                // console.log('channel_addr = No Data.');
                 resolve('');
             }
         }
@@ -598,11 +596,11 @@ function delChannelAddr(channel_id) {
         .delete(channel_id);
 
     request.onerror = function(e) {
-        console.log('delChannelAddr failed');
+        // console.log('delChannelAddr failed');
     };
 
     request.onsuccess = function (e) {
-        console.log('delChannelAddr success');
+        // console.log('delChannelAddr success');
     }
 }
 
@@ -657,16 +655,16 @@ function getTempData(myUserID, channel_id) {
         let request     = store.get(key);
     
         request.onerror = function(e) {
-            console.log('Read data false.');
+            // console.log('Read data false.');
             reject('Read data false.');
         };
     
         request.onsuccess = function (e) {
             if (request.result) {
-                console.log('getTempData = ' + request.result.value);
+                // console.log('getTempData = ' + request.result.value);
                 resolve(request.result.value);
             } else {
-                console.log('getTempData = No Data.');
+                // console.log('getTempData = No Data.');
                 resolve('');
             }
         }
@@ -714,16 +712,16 @@ function getSignedHex(myUserID, channel_id, tb_name) {
         let request     = store.get(key);
     
         request.onerror = function(e) {
-            console.log('Read data false.');
+            // console.log('Read data false.');
             reject('Read data false.');
         };
     
         request.onsuccess = function (e) {
             if (request.result) {
-                console.log('getSignedHex = ' + request.result.value);
+                // console.log('getSignedHex = ' + request.result.value);
                 resolve(request.result.value);
             } else {
-                console.log('getSignedHex = No Data.');
+                // console.log('getSignedHex = No Data.');
                 resolve('');
             }
         }
@@ -767,16 +765,16 @@ function getFundingBtcData(myUserID, channel_id) {
         let request     = store.get(key);
     
         request.onerror = function(e) {
-            console.log('Read data false.');
+            // console.log('Read data false.');
             reject('Read data false.');
         };
     
         request.onsuccess = function (e) {
             if (request.result) {
-                console.log('getFundingBtcData = ' + JSON.stringify(request.result.info));
+                // console.log('getFundingBtcData = ' + JSON.stringify(request.result.info));
                 resolve(request.result.info);
             } else {
-                console.log('getFundingBtcData No Data.');
+                // console.log('getFundingBtcData No Data.');
                 resolve('');
             }
         }
@@ -1103,16 +1101,16 @@ function getFundingPrivKey(myUserID, channel_id) {
         let request     = store.get(key);
     
         request.onerror = function(e) {
-            console.log('Read data false.');
+            // console.log('Read data false.');
             reject('Read data false.');
         };
     
         request.onsuccess = function (e) {
             if (request.result) {
-                console.log('getFundingPrivKey = ' + request.result.priv_key);
+                // console.log('getFundingPrivKey = ' + request.result.priv_key);
                 resolve(request.result.priv_key);
             } else {
-                console.log('getFundingPrivKey = No Data.');
+                // console.log('getFundingPrivKey = No Data.');
                 resolve('');
             }
         }
@@ -1150,19 +1148,19 @@ function openDB() {
     let request = window.indexedDB.open('data');
     
     request.onerror = function (e) {
-        console.log('DB open error!');
+        // console.log('DB open error!');
     };
 
     request.onsuccess = function (e) {
         db = request.result;
-        console.log('DB open success!');
+        // console.log('DB open success!');
     };
 
     // Create table and index
     request.onupgradeneeded = function (e) {
         db = e.target.result;
         createOS();
-        console.log('DB onupgradeneeded success!');
+        // console.log('DB onupgradeneeded success!');
     }
 }
 
@@ -1290,11 +1288,11 @@ function saveChannelStatus(myUserID, channel_id, funder, status) {
         .put({ key: key, user_id: myUserID, channel_id: channel_id, funder: funder, status: status });
   
     request.onsuccess = function (e) {
-        console.log('saveChannelStatus Data write success.');
+        // console.log('saveChannelStatus Data write success.');
     };
   
     request.onerror = function (e) {
-        console.log('saveChannelStatus Data write false.');
+        // console.log('saveChannelStatus Data write false.');
     }
 }
 

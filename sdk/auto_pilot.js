@@ -24,7 +24,8 @@ function listening110032(e, netType) {
         saveChannelStatus(myUserID, channel_id, false, kStatusOpenChannel);
         saveCounterparty(myUserID, channel_id, nodeID, userID);
     
-        if (isAutoMode != 'Yes') resolve(true);
+        // auto mode is closed
+        if (isAutoMode != 'Yes') return resolve(true);
     
         // console.info('SDK: listening110032 = ' + JSON.stringify(e));
     
@@ -91,7 +92,7 @@ function listening110034(e) {
         saveChannelStatus(myUserID, channel_id, false, kStatusAssetFundingCreated);
     
         // auto mode is closed
-        if (isAutoMode != 'Yes') resolve(true);
+        if (isAutoMode != 'Yes') return resolve(true);
     
         // console.info('listening110034 = ' + JSON.stringify(e));
     
@@ -136,18 +137,15 @@ function listening110035(e) {
         let fundingPrivKey = await getFundingPrivKey(myUserID, tempCID);
         saveFundingPrivKey(myUserID, channel_id, fundingPrivKey);
     
-        //
         let tempPrivKey = getTempPrivKey(myUserID, kTempPrivKey, tempCID);
         saveTempPrivKey(myUserID, kTempPrivKey, channel_id, tempPrivKey);
     
-        //
         delChannelAddr(tempCID);
         saveChannelAddr(channel_id, channel_addr);
     
-        //
         delChannelStatus(tempCID, true);
         saveChannelStatus(myUserID, channel_id, true, kStatusAssetFundingSigned);
-        //
+
         let result = await getCounterparty(myUserID, tempCID);
         saveCounterparty(myUserID, channel_id, result.toNodeID, result.toUserID);
         delCounterparty(myUserID, tempCID);
@@ -228,7 +226,7 @@ function listening110040(e, netType) {
         saveSenderRole(kIsReceiver);
     
         // auto mode is closed
-        if (isAutoMode != 'Yes') resolve(true);
+        if (isAutoMode != 'Yes') return resolve(true);
     
         // console.info('listening110040 = ' + JSON.stringify(e));
     
@@ -283,9 +281,7 @@ function payInvoiceStep4(myUserID, nodeID, userID, channel_id) {
         // console.info('payInvoiceStep4 R = ' + r);
         
         // Bob has NOT R. Bob maybe a middleman node.
-        if (r === '') {
-            resolve(false);
-        }
+        if (r === '') return resolve(false);
     
         // Bob will send -100045 forwardR
         let info        = new ForwardRInfo();
@@ -508,7 +504,7 @@ function listening110045(e) {
         // auto mode is closed
         if (isAutoMode != 'Yes') {  
             // Not in pay invoice case
-            if (isInPayInvoice != 'Yes') resolve(true);
+            if (isInPayInvoice != 'Yes') return resolve(true);
         }
     
         // console.info('listening110045 = ' + JSON.stringify(e));
@@ -777,7 +773,7 @@ function listening110340(e) {
     
         // save some data
         let status     = await getChannelStatus(channel_id, false);
-        // console.info('listening110340 status = ' + status);
+        console.info('listening110340 status = ' + status);
         switch (Number(status)) {
             case kStatusAcceptChannel:
                 saveChannelStatus(myUserID, channel_id, false, kStatusFirstBitcoinFundingCreated);
@@ -793,7 +789,7 @@ function listening110340(e) {
         saveTempData(myUserID, channel_id, e.funding_txid);
     
         // auto mode is closed
-        if (isAutoMode != 'Yes') resolve(true);
+        if (isAutoMode != 'Yes') return resolve(true);
     
         // console.info('listening110340 = ' + JSON.stringify(e));
     
@@ -878,7 +874,7 @@ function listening110351(e, netType) {
         saveSenderRole(kIsReceiver);
     
         // auto mode is closed
-        if (isAutoMode != 'Yes') resolve(true);
+        if (isAutoMode != 'Yes') return resolve(true);
     
         //------------------------
         // auto mode is opening

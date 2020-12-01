@@ -79,6 +79,7 @@ function addHTLC(myUserID, nodeID, userID, info, isFunder) {
 
             //
             saveChannelStatus(myUserID, e.channel_id, isFunder, kStatusAddHTLC);
+            saveCounterparty(myUserID, e.channel_id, nodeID, userID);
             saveSenderRole(kIsSender);
 
             resolve(signedInfo);
@@ -176,7 +177,7 @@ function HTLCSigned(myUserID, nodeID, userID, info) {
             let privkey2 = getPrivKeyFromPubKey(myUserID, info.curr_htlc_temp_address_pub_key);
             saveTempPrivKey(myUserID, kRsmcTempPrivKey, channel_id, privkey1);
             saveTempPrivKey(myUserID, kHtlcTempPrivKey, channel_id, privkey2);
-            
+            saveCounterparty(myUserID, channel_id, nodeID, userID);
             resolve(signedInfo);
         });
     })
