@@ -15,7 +15,7 @@
 function listening110032(e, netType) {
     return new Promise(async function(resolve, reject) {
         let isAutoMode = getAutoPilot();
-        console.info('SDK: NOW isAutoMode = ' + isAutoMode);
+        // console.info('SDK: NOW isAutoMode = ' + isAutoMode);
     
         let myUserID     = e.to_peer_id;
         let nodeID       = e.funder_node_address;
@@ -26,7 +26,7 @@ function listening110032(e, netType) {
     
         if (isAutoMode != 'Yes') resolve(true);
     
-        console.info('SDK: listening110032 = ' + JSON.stringify(e));
+        // console.info('SDK: listening110032 = ' + JSON.stringify(e));
     
         // will send -100033 acceptChannel
         let info                  = new AcceptChannelInfo();
@@ -49,7 +49,7 @@ function listening110032(e, netType) {
         let returnData = {
             nodeID: nodeID,
             userID: userID,
-            info:   info
+            info33: info
         };
     
         resolve(returnData);
@@ -73,7 +73,7 @@ function listening110033(e) {
 function listening110034(e) {
     return new Promise(async function(resolve, reject) {
         let isAutoMode = getAutoPilot();
-        console.info('SDK: NOW isAutoMode = ' + isAutoMode);
+        // console.info('SDK: NOW isAutoMode = ' + isAutoMode);
     
         let myUserID   = e.to_peer_id;
         let channel_id = e.temporary_channel_id;
@@ -93,7 +93,7 @@ function listening110034(e) {
         // auto mode is closed
         if (isAutoMode != 'Yes') resolve(true);
     
-        console.info('listening110034 = ' + JSON.stringify(e));
+        // console.info('listening110034 = ' + JSON.stringify(e));
     
         let nodeID = e.funder_node_address;
         let userID = e.funder_peer_id;
@@ -108,10 +108,10 @@ function listening110034(e) {
         let returnData = {
             nodeID:   nodeID,
             userID:   userID,
-            sentMsg1: info,
+            info35:   info,
             privkey:  privkey,
-            sentMsg2: resp.sentMsg,
-            respData: resp.respData
+            info1035: resp.info1035,
+            resp1035: resp.resp1035
         };
 
         resolve(returnData);
@@ -126,7 +126,7 @@ function listening110034(e) {
  */
 function listening110035(e) {
     return new Promise(async function(resolve, reject) {
-        console.info('listening110035 = ' + JSON.stringify(e));
+        // console.info('listening110035 = ' + JSON.stringify(e));
     
         let myUserID     = e.to_peer_id;
         let tempCID      = e.temporary_channel_id;
@@ -161,14 +161,8 @@ function listening110035(e) {
         info.channel_id    = channel_id;
         info.rd_signed_hex = signed_hex;
     
-        let resp = await sendSignedHex101134(info);
-
-        let returnData = {
-            info: info,
-            e:    resp,
-        };
-
-        resolve(returnData);
+        await sendSignedHex101134(info);
+        resolve(info);
     })
 }
 
@@ -203,7 +197,7 @@ function listening110040(e, netType) {
         let myUserID   = e.to_peer_id;
         let channel_id = e.channel_id;
         let isAutoMode = getAutoPilot();
-        console.info('SDK: NOW isAutoMode = ' + isAutoMode);
+        // console.info('SDK: NOW isAutoMode = ' + isAutoMode);
     
         // Receiver sign the tx on client side
         // NO.1
@@ -236,7 +230,7 @@ function listening110040(e, netType) {
         // auto mode is closed
         if (isAutoMode != 'Yes') resolve(true);
     
-        console.info('listening110040 = ' + JSON.stringify(e));
+        // console.info('listening110040 = ' + JSON.stringify(e));
     
         let nodeID = e.payer_node_address;
         let userID = e.payer_peer_id;
@@ -262,14 +256,14 @@ function listening110040(e, netType) {
         info.curr_rsmc_temp_address_index = addr_1.result.index;
         info.curr_htlc_temp_address_index = addr_2.result.index;
     
-        let signedInfo = await HTLCSigned(myUserID, nodeID, userID, info);
+        let resp = await HTLCSigned(myUserID, nodeID, userID, info);
 
         let returnData = {
             nodeID:  nodeID,
             userID:  userID,
-            info:    info,
+            info41:  info,
             privkey: privkey,
-            signedInfo: signedInfo,
+            info101: resp,
         };
     
         resolve(returnData);
@@ -286,7 +280,7 @@ function listening110040(e, netType) {
 function payInvoiceStep4(myUserID, nodeID, userID, channel_id) {
     return new Promise(async function(resolve, reject) {
         let r = getPrivKeyFromPubKey(myUserID, getInvoiceH());
-        console.info('payInvoiceStep4 R = ' + r);
+        // console.info('payInvoiceStep4 R = ' + r);
         
         // Bob has NOT R. Bob maybe a middleman node.
         if (r === '') {
@@ -475,7 +469,7 @@ function listening110042(e, netType) {
  * @param e 
  */
 function listening110043(e) {
-    console.info('listening110043 = ' + JSON.stringify(e));
+    // console.info('listening110043 = ' + JSON.stringify(e));
 }
 
 /**
@@ -486,10 +480,10 @@ function listening110043(e) {
 function listening110045(e) {
     return new Promise(async function(resolve, reject) {
         let isAutoMode = getAutoPilot();
-        console.info('SDK: NOW isAutoMode = ' + isAutoMode);
+        // console.info('SDK: NOW isAutoMode = ' + isAutoMode);
         
         let isInPayInvoice = getPayInvoiceCase();
-        console.info('isInPayInvoice = ' + isInPayInvoice);
+        // console.info('isInPayInvoice = ' + isInPayInvoice);
     
         let myUserID   = e.to_peer_id;
         let channel_id = e.channel_id;
@@ -517,7 +511,7 @@ function listening110045(e) {
             if (isInPayInvoice != 'Yes') resolve(true);
         }
     
-        console.info('listening110045 = ' + JSON.stringify(e));
+        // console.info('listening110045 = ' + JSON.stringify(e));
         
         let nodeID   = e.payee_node_address;
         let userID   = e.payee_peer_id;
@@ -632,7 +626,7 @@ function listening110049(e, netType) {
         saveTempData(myUserID, channel_id, e.msg_hash);
         saveSenderRole(kIsReceiver);
     
-        console.info('listening110049 = ' + JSON.stringify(e));
+        // console.info('listening110049 = ' + JSON.stringify(e));
     
         let nodeID = e.sender_node_address;
         let userID = e.sender_peer_id;
@@ -768,7 +762,7 @@ async function listening110081(e) {
 function listening110340(e) {
     return new Promise(async function(resolve, reject) {
         let isAutoMode = getAutoPilot();
-        console.info('SDK: NOW isAutoMode = ' + isAutoMode);
+        // console.info('SDK: NOW isAutoMode = ' + isAutoMode);
     
         let myUserID   = e.to_peer_id;
         let channel_id = e.temporary_channel_id;
@@ -783,7 +777,7 @@ function listening110340(e) {
     
         // save some data
         let status     = await getChannelStatus(channel_id, false);
-        console.info('listening110340 status = ' + status);
+        // console.info('listening110340 status = ' + status);
         switch (Number(status)) {
             case kStatusAcceptChannel:
                 saveChannelStatus(myUserID, channel_id, false, kStatusFirstBitcoinFundingCreated);
@@ -801,7 +795,7 @@ function listening110340(e) {
         // auto mode is closed
         if (isAutoMode != 'Yes') resolve(true);
     
-        console.info('listening110340 = ' + JSON.stringify(e));
+        // console.info('listening110340 = ' + JSON.stringify(e));
     
         let nodeID = e.funder_node_address;
         let userID = e.funder_peer_id;
@@ -831,12 +825,11 @@ function listening110340(e) {
  * @param e 
  */
 async function listening110350(e) {
-    console.info('listening110350');
 
     let myUserID     = e.to_peer_id;
     let channel_id   = e.temporary_channel_id;
     let status       = await getChannelStatus(channel_id, true);
-    console.info('listening110350 status = ' + status);
+    // console.info('listening110350 status = ' + status);
     switch (Number(status)) {
         case kStatusFirstBitcoinFundingCreated:
             saveChannelStatus(myUserID, channel_id, true, kStatusFirstBitcoinFundingSigned);
@@ -862,7 +855,7 @@ function listening110351(e, netType) {
         let isAutoMode = getAutoPilot();
         let myUserID   = e.to_peer_id;
         let channel_id = e.channel_id;
-        console.info('SDK: NOW isAutoMode = ' + isAutoMode);
+        // console.info('SDK: NOW isAutoMode = ' + isAutoMode);
     
         // Receiver sign the tx on client side
         // NO.1 counterparty_raw_data
@@ -889,7 +882,7 @@ function listening110351(e, netType) {
     
         //------------------------
         // auto mode is opening
-        console.info('listening110351 = ' + JSON.stringify(e));
+        // console.info('listening110351 = ' + JSON.stringify(e));
     
         let nodeID  = e.payer_node_address;
         let userID  = e.payer_peer_id;
@@ -930,7 +923,7 @@ function listening110351(e, netType) {
  */
 function listening110352(e) {
     return new Promise(async function(resolve, reject) {
-        console.info('listening110352 = ' + JSON.stringify(e));
+        // console.info('listening110352 = ' + JSON.stringify(e));
     
         let myUserID = e.to_peer_id;
         let nodeID   = e.payee_node_address;
@@ -983,7 +976,7 @@ function listening110352(e) {
  */
 function listening110353(e) {
     return new Promise(async function(resolve, reject) {
-        console.info('listening110353 = ' + JSON.stringify(e));
+        // console.info('listening110353 = ' + JSON.stringify(e));
     
         // Receiver sign the tx on client side
         let rd      = e.c2b_rd_partial_data;

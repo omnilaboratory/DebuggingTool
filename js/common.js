@@ -108,7 +108,7 @@ async function sdkLogIn() {
 
     // If already logined, then return.
     if (isLogined) {
-        console.info('-102001 isLogined = ' + isLogined);
+        // console.info('-102001 isLogined = ' + isLogined);
         return;
     }
 
@@ -158,7 +158,7 @@ function sdkConnectP2PPeer(msgType) {
 
     // SDK API
     connectPeer(info, function(e) {
-        console.info('-102003 connectP2PPeer = ' + JSON.stringify(e));
+        // console.info('-102003 connectP2PPeer = ' + JSON.stringify(e));
         createOBDResponseDiv(e, msgType);
     });
 }
@@ -169,11 +169,9 @@ async function sdkOpenChannel() {
     let nodeID  = $("#recipient_node_peer_id").val();
     let userID  = $("#recipient_user_peer_id").val();
 
-    let info            = new OpenChannelInfo();
-    info.funding_pubkey = $("#funding_pubkey").val();
-    info.is_private     = $("#checkbox_n32").prop("checked");
-    
-    // Save address index to OBD and can get private key back if lose it.
+    let info                  = new OpenChannelInfo();
+    info.funding_pubkey       = $("#funding_pubkey").val();
+    info.is_private           = $("#checkbox_n32").prop("checked");
     info.funder_address_index = Number(getIndexFromPubKey(info.funding_pubkey));
 
     displaySentMessage100032(nodeID, userID, info);
@@ -191,8 +189,6 @@ async function sdkAcceptChannel() {
     info.temporary_channel_id = $("#temporary_channel_id").val();
     info.funding_pubkey       = $("#funding_pubkey").val();
     info.approval             = $("#checkbox_n33").prop("checked");
-
-    // Save address index to OBD and can get private key back if lose it.
     info.fundee_address_index = Number(getIndexFromPubKey(info.funding_pubkey));
 
     displaySentMessage100033(nodeID, userID, info);
@@ -217,8 +213,9 @@ async function sdkForwardR() {
 
     let myUserID = $("#logined").text();
     let isFunder = await getIsFunder(myUserID, info.channel_id);
-    await forwardR(myUserID, nodeID, userID, info, isFunder);
+    let resp     = await forwardR(myUserID, nodeID, userID, info, isFunder);
 
+    displaySentMessage100106(nodeID, userID, resp);
     afterForwardR();
 }
 
@@ -258,15 +255,15 @@ async function sdkCloseHTLC() {
     info.last_htlc_temp_address_private_key          = $("#last_htlc_temp_address_private_key").val();
     info.last_htlc_temp_address_for_htnx_private_key = $("#last_htlc_temp_address_for_htnx_private_key").val();
     info.curr_temp_address_pub_key                   = $("#curr_temp_address_pub_key").val();
-    // Save address index to OBD and can get private key back if lose it.
-    info.curr_temp_address_index = Number(getIndexFromPubKey(info.curr_temp_address_pub_key));
+    info.curr_temp_address_index                     = Number(getIndexFromPubKey(info.curr_temp_address_pub_key));
 
     displaySentMessage100049(nodeID, userID, info);
 
     let myUserID = $("#logined").text();
     let isFunder = await getIsFunder(myUserID, info.channel_id);
-    await closeHTLC(myUserID, nodeID, userID, info, isFunder);
+    let resp     = await closeHTLC(myUserID, nodeID, userID, info, isFunder);
 
+    displaySentMessage100110(nodeID, userID, resp);
     afterCloseHTLC();
 }
 
@@ -286,14 +283,15 @@ async function sdkCloseHTLCSigned() {
     info.curr_temp_address_pub_key                   = $("#curr_temp_address_pub_key").val();
     info.c4a_rsmc_complete_signed_hex                = $("#c4a_rsmc_complete_signed_hex").val();
     info.c4a_counterparty_complete_signed_hex        = $("#c4a_counterparty_complete_signed_hex").val();
-    // Save address index to OBD and can get private key back if lose it.
-    info.curr_temp_address_index = Number(getIndexFromPubKey(info.curr_temp_address_pub_key));
+    info.curr_temp_address_index                     = Number(getIndexFromPubKey(info.curr_temp_address_pub_key));
 
     displaySentMessage100050(nodeID, userID, info);
 
     let myUserID = $("#logined").text();
     let isFunder = await getIsFunder(myUserID, $("#curr_channel_id").text());
-    await closeHTLCSigned(myUserID, nodeID, userID, info, isFunder);
+    let resp     = await closeHTLCSigned(myUserID, nodeID, userID, info, isFunder);
+
+    displaySentMessage100111(nodeID, userID, resp);
 }
 
 /** 
@@ -605,8 +603,7 @@ async function sdkAssetFundingCreated() {
     info.temporary_channel_id = $("#temporary_channel_id").val();
     info.funding_tx_hex       = $("#funding_tx_hex").val();
     info.temp_address_pub_key = $("#temp_address_pub_key").val();
-    // Save address index to OBD and can get private key back if lose it.
-    info.temp_address_index = Number(getIndexFromPubKey(info.temp_address_pub_key));
+    info.temp_address_index   = Number(getIndexFromPubKey(info.temp_address_pub_key));
 
     displaySentMessage100034(nodeID, userID, info);
     let resp = await assetFundingCreated($("#logined").text(), nodeID, userID, info, tempKey);
@@ -629,9 +626,9 @@ async function sdkAssetFundingSigned() {
 
     displaySentMessage100035(nodeID, userID, info);
     let resp = await assetFundingSigned($("#logined").text(), nodeID, userID, info);
-    displaySentMessage101035(nodeID, userID, resp.sentMsg);
+    displaySentMessage101035(nodeID, userID, resp.info1035);
 
-    afterAssetFundingSigned(resp.respData);
+    afterAssetFundingSigned(resp.resp1035);
     displayMyChannelListAtTopRight(kPageSize, kPageIndex);
 }
 
@@ -676,7 +673,7 @@ function sdkAddInvoice() {
 
     displaySentMessage100402(info);
     addInvoice(info, function(e) {
-        console.info('-100402 sdkAddInvoice = ' + JSON.stringify(e));
+        // console.info('-100402 sdkAddInvoice = ' + JSON.stringify(e));
         makeQRCode(e);
     });
 }
@@ -812,11 +809,6 @@ async function sdkAddHTLC() {
     info.curr_htlc_temp_address_for_ht1a_pub_key     = $("#curr_htlc_temp_address_for_ht1a_pub_key").val();
     info.last_temp_address_private_key               = $("#last_temp_address_private_key").val();
     
-    // info.channel_address_private_key                 = $("#channel_address_private_key").val();
-    // info.curr_rsmc_temp_address_private_key          = $("#curr_rsmc_temp_address_private_key").val();
-    // info.curr_htlc_temp_address_private_key          = $("#curr_htlc_temp_address_private_key").val();
-    // info.curr_htlc_temp_address_for_ht1a_private_key = $("#curr_htlc_temp_address_for_ht1a_private_key").val();
-
     // Save address index to OBD and can get private key back if lose it.
     info.curr_rsmc_temp_address_index          = Number(getIndexFromPubKey(info.curr_rsmc_temp_address_pub_key));
     info.curr_htlc_temp_address_index          = Number(getIndexFromPubKey(info.curr_htlc_temp_address_pub_key));
@@ -826,8 +818,8 @@ async function sdkAddHTLC() {
 
     let myUserID = $("#logined").text();
     let isFunder = await getIsFunder(myUserID, $("#curr_channel_id").text());
-    await addHTLC(myUserID, nodeID, userID, info, isFunder);
-
+    let resp     = await addHTLC(myUserID, nodeID, userID, info, isFunder);
+    displaySentMessage100100(nodeID, userID, resp);
     afterAddHTLC();
 }
 
@@ -846,18 +838,14 @@ async function sdkHTLCSigned() {
     info.c3a_complete_signed_rsmc_hex         = $("#c3a_complete_signed_rsmc_hex").val();
     info.c3a_complete_signed_counterparty_hex = $("#c3a_complete_signed_counterparty_hex").val();
     info.c3a_complete_signed_htlc_hex         = $("#c3a_complete_signed_htlc_hex").val();
-    // info.channel_address_private_key        = $("#channel_address_private_key").val();
-    // info.curr_rsmc_temp_address_private_key = $("#curr_rsmc_temp_address_private_key").val();
-    // info.curr_htlc_temp_address_private_key = $("#curr_htlc_temp_address_private_key").val();
 
     // Save address index to OBD and can get private key back if lose it.
     info.curr_rsmc_temp_address_index = Number(getIndexFromPubKey(info.curr_rsmc_temp_address_pub_key));
     info.curr_htlc_temp_address_index = Number(getIndexFromPubKey(info.curr_htlc_temp_address_pub_key));
 
     displaySentMessage100041(nodeID, userID, info);
-
-    // let isFunder = await getIsFunder(myUserID, $("#curr_channel_id").text());
-    await HTLCSigned(myUserID, nodeID, userID, info);
+    let resp = await HTLCSigned(myUserID, nodeID, userID, info);
+    displaySentMessage100101(nodeID, userID, resp);
 }
 
 // -100401 
@@ -884,7 +872,6 @@ async function sdkHTLCFindPath() {
     let e = await HTLCFindPath(info);
 
     let get_new_id = e.routing_packet;
-    // let myUserID   = $("#logined").text();
     let channel_id = $("#curr_channel_id").text();
 
     if (channel_id != get_new_id) {
@@ -915,13 +902,16 @@ async function sdkCommitmentTransactionCreated() {
     info.amount                        = Number($("#amount").val());
     info.curr_temp_address_pub_key     = $("#curr_temp_address_pub_key").val();
     info.last_temp_address_private_key = $("#last_temp_address_private_key").val();
-    // Save address index to OBD and can get private key back if lose it.
-    info.curr_temp_address_index = Number(getIndexFromPubKey(info.curr_temp_address_pub_key));
+    info.curr_temp_address_index       = Number(getIndexFromPubKey(info.curr_temp_address_pub_key));
     
     displaySentMessage100351(nodeID, userID, info);
 
     let isFunder = await getIsFunder(myUserID, info.channel_id);
-    await commitmentTransactionCreated(myUserID, nodeID, userID, info, isFunder, tempKey);
+    let resp     = await commitmentTransactionCreated(myUserID, nodeID, userID, 
+        info, isFunder, tempKey);
+
+    displaySentMessage100360(nodeID, userID, resp);
+    afterCommitmentTransactionCreated();
 }
 
 // -100352 Revoke and Acknowledge Commitment Transaction API at local.
@@ -940,20 +930,22 @@ async function sdkCommitmentTransactionAccepted() {
     info.curr_temp_address_pub_key     = $("#curr_temp_address_pub_key").val();
     info.last_temp_address_private_key = $("#last_temp_address_private_key").val();
     info.approval                      = $("#checkbox_n352").prop("checked");
-    // Save address index to OBD and can get private key back if lose it.
-    info.curr_temp_address_index = Number(getIndexFromPubKey(info.curr_temp_address_pub_key));
+    info.curr_temp_address_index       = Number(getIndexFromPubKey(info.curr_temp_address_pub_key));
     
     displaySentMessage100352(nodeID, userID, info);
 
     let isFunder = await getIsFunder(myUserID, info.channel_id);
-    await commitmentTransactionAccepted(myUserID, nodeID, userID, info, isFunder, tempKey);
+    let resp     = await commitmentTransactionAccepted(myUserID, nodeID, userID, 
+        info, isFunder, tempKey);
+
+    displaySentMessage100361(nodeID, userID, resp);
 }
 
 // Invoke each APIs.
 function invokeAPIs(obj) {
 
     let msgType = Number(obj.getAttribute('type_id'));
-    console.info('type_id = ' + msgType);
+    // console.info('type_id = ' + msgType);
 
     switch (msgType) {
         case -10: // payInvoice is a local solution.
@@ -1102,7 +1094,7 @@ function invokeAPIs(obj) {
             sdkConnectP2PPeer(msgType);
             break;
         default:
-            console.info(msgType + " do not exist");
+            // console.info(msgType + " do not exist");
             break;
     }
 }
@@ -1115,11 +1107,10 @@ function getNewObjectOf(src) {
 // 
 function displayOBDMessages(msg) {
     let content = getNewObjectOf(msg);
-    console.info("broadcast info:", JSON.stringify(content));
+    // console.info("broadcast info:", JSON.stringify(content));
 
     // For Save all broadcast info to IndexedDB
     let user_id = $("#logined").text();
-    // console.info("user_id ===== " + user_id);
     if (content.type === -102001) {
         user_id = content.result.userPeerId;
     }
@@ -1665,7 +1656,7 @@ async function changeInvokeAPIEnable(status, isFunder, myUserID, channel_id) {
 
     let data, date;
     let api_name = $("#api_name").text();
-    console.info('changeInvokeAPIEnable api_name = ' + api_name);
+    // console.info('changeInvokeAPIEnable api_name = ' + api_name);
 
     switch (api_name) {
         case 'logIn':
@@ -2571,7 +2562,7 @@ function sdkConnect2OBD() {
 
     // SDK API
     connectToServer(nodeAddress, function(response) {
-        console.info('SDK: sdkConnect2OBD = ' + response);
+        // console.info('SDK: sdkConnect2OBD = ' + response);
 
         $("#status").text("Connected");
         $("#status_tooltip").text("Connected to " + nodeAddress);
@@ -2599,7 +2590,7 @@ function sdkConnect2OBDInCustomMode() {
 
     // SDK API
     connectToServer(nodeAddress, function(response) {
-        console.info('sdkConnect2OBDInCustomMode = ' + response);
+        // console.info('sdkConnect2OBDInCustomMode = ' + response);
         $("#status").text("Connected");
         $("#status_tooltip").text("Connected to " + nodeAddress);
         changeConnectButtonStatus();
@@ -2816,7 +2807,7 @@ function getBalance(strAddr) {
 
     // OBD API
     obdApi.getBtcBalanceByAddress(strAddr, function(e) {
-        console.info('getBtcBalance - OBD Response = ' + JSON.stringify(e));
+        // console.info('getBtcBalance - OBD Response = ' + JSON.stringify(e));
         result = JSON.stringify(e);
         result = result.replace("\"", "").replace("\"", "");
         result = parseFloat(result);
@@ -2826,7 +2817,7 @@ function getBalance(strAddr) {
 
     // for omni assets
     obdApi.getAllBalancesForAddress(strAddr, function(e) {
-        console.info('-102112 getAllBalancesForAddress = ' + JSON.stringify(e));
+        // console.info('-102112 getAllBalancesForAddress = ' + JSON.stringify(e));
 
         if (e != "") {
             for (let i = 0; i < e.length; i++) {
@@ -2907,7 +2898,7 @@ function autoCalcMinerFee() {
 function autoCalcAmount() {
     // SDK API
     getAmountOfRechargeBTC(function(e) {
-        console.info('SDK: -102006 getAmountOfRechargeBTC = ' + JSON.stringify(e));
+        // console.info('SDK: -102006 getAmountOfRechargeBTC = ' + JSON.stringify(e));
         let value = JSON.stringify(e);
         value = value.replace("\"", "").replace("\"", "");
         $("#amount").val(value);
@@ -3041,7 +3032,6 @@ function displayAddresses(param) {
 
 //
 function displayOmniFaucet(param) {
-    // let userID = $("#logined").text();
     let parent = $("#name_req_div");
     let newDiv = document.createElement('div');
     newDiv.setAttribute('class', 'panelItem');
@@ -3049,7 +3039,7 @@ function displayOmniFaucet(param) {
     //
     let strAddr = 'n4j37pAMNsjkTs6roKof3TGNvmPh16fvpS';
     obdApi.getAllBalancesForAddress(strAddr, function(e) {
-        console.info('-102112 displayOmniFaucet = ' + JSON.stringify(e));
+        // console.info('-102112 displayOmniFaucet = ' + JSON.stringify(e));
 
         if (e != "") {
 
@@ -3356,7 +3346,7 @@ function sendCustomRequest() {
 
     // OBD API
     obdApi.sendJsonData(custom_request, Number(type), function(e) {
-        console.info('sendCustomRequest - OBD Response = ' + JSON.stringify(e));
+        // console.info('sendCustomRequest - OBD Response = ' + JSON.stringify(e));
         saveInvokeHistory(saveVal, custom_request);
         historyInCustom();
 
@@ -3496,15 +3486,13 @@ function getTrackerData(getWhat, pageNum, pageSize) {
 
 //
 function tableData(getWhat, result) {
-    console.info('getWhat = ' + getWhat);
-    console.info('total count = ' + result.totalCount);
+    // console.info('getWhat = ' + getWhat);
+    // console.info('total count = ' + result.totalCount);
 
-    // removeTrackerDiv();
     removeNameReqDiv();
 
     // table
     let tracker_div = $("#name_req_div");
-    // let tracker_div = $("#tracker_div");
     let table = document.createElement('table');
     table.id = 'tracker';
     tracker_div.append(table);
@@ -3665,7 +3653,7 @@ function tableData(getWhat, result) {
 function previousPage(obj) {
     let getWhat = obj.getAttribute("getWhat");
     let previousPage = Number(obj.getAttribute("pageNum")) - 1;
-    console.info('previousPage = ' + previousPage);
+    // console.info('previousPage = ' + previousPage);
     getTrackerData(getWhat, previousPage, 10);
 }
 
@@ -3673,7 +3661,7 @@ function previousPage(obj) {
 function nextPage(obj) {
     let getWhat = obj.getAttribute("getWhat");
     let nextPage = Number(obj.getAttribute("pageNum")) + 1;
-    console.info('nextPage = ' + nextPage);
+    // console.info('nextPage = ' + nextPage);
     getTrackerData(getWhat, nextPage, 10);
 }
 
@@ -3714,16 +3702,10 @@ function formatTime(time) {
 //
 function autoMode(obj) {
     if (obj.checked) {
-        // isAutoMode = true;
         saveAutoPilot('Yes');
     } else {
-        // isAutoMode = false;
         saveAutoPilot('No');
     }
-
-    // TEMP TEST CODE
-    let isAutoMode = getAutoPilot();
-    console.info('CLICK - isAutoMode = ' + isAutoMode);
 }
 
 /**
@@ -4529,19 +4511,216 @@ function importToOmniCore() {
 
 /**
  * Register event needed for listening.
+ * @param e 
+ * @param netType true: testnet  false: mainnet
+ */
+async function register110032(e, netType) {
+    listening110032ForGUITool(e);
+    let resp = await listening110032(e, netType);
+    if (resp != true) {
+        displaySentMessage100033(resp.nodeID, resp.userID, resp.info33);
+        afterAcceptChannel();
+        displayMyChannelListAtTopRight(kPageSize, kPageIndex);
+    }
+}
+
+/**
+ * Register event needed for listening.
+ * @param e 
+ */
+async function register110340(e) {
+    listening110340ForGUITool(e);
+    let resp = await listening110340(e);
+    if (resp != true) {
+        displaySentMessage100350(resp.nodeID, resp.userID, resp.info350, resp.privkey);
+        afterBitcoinFundingSigned(e.temporary_channel_id);
+    }
+}
+
+/**
+ * Register event needed for listening.
+ * @param e 
+ */
+async function register110034(e) {
+    listening110034ForGUITool(e);
+    let resp = await listening110034(e);
+    if (resp != true) {
+        let nodeID = resp.nodeID;
+        let userID = resp.userID;
+        displaySentMessage100035(nodeID, userID, resp.info35, resp.privkey);
+        displaySentMessage101035(nodeID, userID, resp.info1035);
+        afterAssetFundingSigned(resp.resp1035);
+        displayMyChannelListAtTopRight(kPageSize, kPageIndex);
+    }
+}
+
+/**
+ * Register event needed for listening.
+ * @param e 
+ */
+async function register110035(e) {
+    listening110035ForGUITool(e);
+    let resp = await listening110035(e);
+    displaySentMessage101134(resp);
+}
+
+/**
+ * Register event needed for listening.
+ * @param e 
+ * @param netType true: testnet  false: mainnet
+ */
+async function register110351(e, netType) {
+    disableInvokeAPI();
+    tipsOnTop('', kProcessing);
+    listening110351ForGUITool(e);
+
+    let resp  = await listening110351(e, netType);
+    if (resp != true) {
+        let nodeID = resp.nodeID;
+        let userID = resp.userID;
+        displaySentMessage100352(nodeID, userID, resp.info352);
+        displaySentMessage100361(nodeID, userID, resp.info361);
+    }
+}
+
+/**
+ * Register event needed for listening.
+ * @param e 
+ */
+async function register110352(e) {
+    listening110352ForGUITool(e);
+    let resp   = await listening110352(e);
+    let nodeID = resp.nodeID;
+    let userID = resp.userID;
+    displaySentMessage100362(nodeID, userID, resp.info362);
+    displaySentMessage100363(nodeID, userID, resp.info363);
+}
+
+/**
+ * Register event needed for listening.
+ * @param e 
+ */
+async function register110353(e) {
+    let resp = listening110353(e);
+    displaySentMessage100364(resp);
+    afterCommitmentTransactionAccepted();
+    displayMyChannelListAtTopRight(kPageSize, kPageIndex);
+}
+
+/**
+ * Register event needed for listening.
+ * @param e 
+ * @param netType true: testnet  false: mainnet
+ */
+async function register110040(e, netType) {
+    disableInvokeAPI();
+    tipsOnTop('', kProcessing);
+    listening110040ForGUITool(e);
+
+    let resp  = await listening110040(e, netType);
+    if (resp != true) {
+        let nodeID = resp.nodeID;
+        let userID = resp.userID;
+        displaySentMessage100041(nodeID, userID, resp.info41, resp.privkey);
+        displaySentMessage100101(nodeID, userID, resp.info101);
+    }
+}
+
+/**
+ * Register event needed for listening.
+ * @param e 
+ */
+async function register110041(e) {
+    listening110041ForGUITool(e);
+    let resp = await listening110041(e);
+    displaySentMessage100102(resp.info102);
+    displaySentMessage100103(resp.nodeID, resp.userID, resp.info103);
+}
+
+/**
+ * Register event needed for listening.
+ * @param e 
+ * @param netType true: testnet  false: mainnet
+ */
+async function register110042(e, netType) {
+    let resp   = await listening110042(e, netType);
+    let nodeID = resp.nodeID;
+    let userID = resp.userID;
+
+    displaySentMessage100104(resp.info104);
+    displaySentMessage100105(nodeID, userID, resp.info105);
+
+    if (resp.status === false) {
+        tipsOnTop('', kNotFoundR, 'Forward R', 'forwardR', 'Yes');
+    } else {
+        displaySentMessage100045(nodeID, userID, resp.info45);
+        displaySentMessage100106(nodeID, userID, resp.info106);
+        afterForwardR();
+    }
+}
+
+/**
+ * Register event needed for listening.
+ * @param e 
+ */
+async function register110045(e) {
+    listening110045ForGUITool(e);
+    let resp  = await listening110045(e);
+    if (resp != true) {
+        let nodeID = resp.nodeID;
+        let userID = resp.userID;
+        displaySentMessage100046(nodeID, userID, resp.info46);
+        displaySentMessage100049(nodeID, userID, resp.info49, resp.privkey);
+        displaySentMessage100110(nodeID, userID, resp.info110);
+    }
+}
+
+/**
+ * Register event needed for listening.
+ * @param e 
+ * @param netType true: testnet  false: mainnet
+ */
+async function register110049(e, netType) {
+    listening110049ForGUITool(e);
+    let resp   = await listening110049(e, netType);
+    let nodeID = resp.nodeID;
+    let userID = resp.userID;
+    displaySentMessage100050(nodeID, userID, resp.info50, resp.privkey);
+    displaySentMessage100111(nodeID, userID, resp.info111);
+}
+
+/**
+ * Register event needed for listening.
+ * @param e 
+ */
+async function register110050(e) {
+    let resp = await listening110050(e);
+    displaySentMessage100112(resp.info112);
+    displaySentMessage100113(resp.nodeID, resp.userID, resp.info113);
+    tipsOnTop(e.channel_id, kTips110050);
+    displayMyChannelListAtTopRight(kPageSize, kPageIndex);
+}
+
+/**
+ * Register event needed for listening.
+ * @param e 
+ */
+async function register110051(e) {
+    let resp = await listening110051(e);
+    displaySentMessage100114(resp);
+    afterCloseHTLCSigned();
+    displayMyChannelListAtTopRight(kPageSize, kPageIndex);
+}
+
+/**
+ * Register event needed for listening.
  * @param netType true: testnet  false: mainnet
  */
 function registerEvent(netType) {
     // auto response mode
     let msg_110032 = enumMsgType.MsgType_RecvChannelOpen_32;
-    obdApi.registerEvent(msg_110032, async function(e) {
-        listening110032ForGUITool(e);
-        let resp = await listening110032(e, netType);
-        if (resp != true) {
-            displaySentMessage100033(resp.nodeID, resp.userID, resp.info);
-            afterAcceptChannel();
-            displayMyChannelListAtTopRight(kPageSize, kPageIndex);
-        }
+    obdApi.registerEvent(msg_110032, function(e) {
+        register110032(e, netType);
     });
 
     let msg_110033 = enumMsgType.MsgType_RecvChannelAccept_33;
@@ -4552,13 +4731,8 @@ function registerEvent(netType) {
 
     // auto response mode
     let msg_110340 = enumMsgType.MsgType_FundingCreate_RecvBtcFundingCreated_340;
-    obdApi.registerEvent(msg_110340, async function(e) {
-        listening110340ForGUITool(e);
-        let resp = await listening110340(e);
-        if (resp != true) {
-            displaySentMessage100350(resp.nodeID, resp.userID, resp.info350, resp.privkey);
-            afterBitcoinFundingSigned(e.temporary_channel_id);
-        }
+    obdApi.registerEvent(msg_110340, function(e) {
+        register110340(e);
     });
 
     let msg_110350 = enumMsgType.MsgType_FundingSign_RecvBtcSign_350;
@@ -4569,108 +4743,50 @@ function registerEvent(netType) {
 
     // auto response mode
     let msg_110034 = enumMsgType.MsgType_FundingCreate_RecvAssetFundingCreated_34;
-    obdApi.registerEvent(msg_110034, async function(e) {
-
-        let resp = await listening110034(e);
-        listening110034ForGUITool(e);
-        // console.info('TEST RESP 110034 = ' + JSON.stringify(resp));
-
-        if (resp != true) {
-            displaySentMessage100035(resp.nodeID, resp.userID, resp.sentMsg1, resp.privkey);
-            displaySentMessage101035(resp.nodeID, resp.userID, resp.sentMsg2);
-            afterAssetFundingSigned(resp.respData);
-            displayMyChannelListAtTopRight(kPageSize, kPageIndex);
-        }
+    obdApi.registerEvent(msg_110034, function(e) {
+        register110034(e);
     });
 
     // auto response mode
     let msg_110035 = enumMsgType.MsgType_FundingSign_RecvAssetFundingSigned_35;
-    obdApi.registerEvent(msg_110035, async function(e) {
-        let resp = await listening110035(e);
-        displaySentMessage101134(resp.info);
-        listening110035ForGUITool(resp.e);
+    obdApi.registerEvent(msg_110035, function(e) {
+        register110035(e);
     });
 
     // auto response mode
     let msg_110351 = enumMsgType.MsgType_CommitmentTx_RecvCommitmentTransactionCreated_351;
-    obdApi.registerEvent(msg_110351, async function(e) {
-
-        disableInvokeAPI();
-        tipsOnTop('', kProcessing);
-
-        listening110351ForGUITool(e);
-        let resp   = await listening110351(e, netType);
-        let nodeID = resp.nodeID;
-        let userID = resp.userID;
-        if (resp != true) {
-            displaySentMessage100352(nodeID, userID, resp.info352);
-            displaySentMessage100361(nodeID, userID, resp.info361);
-        }
+    obdApi.registerEvent(msg_110351, function(e) {
+        register110351(e, netType);
     });
 
     // auto response mode
     let msg_110352 = enumMsgType.MsgType_CommitmentTxSigned_RecvRevokeAndAcknowledgeCommitmentTransaction_352;
-    obdApi.registerEvent(msg_110352, async function(e) {
-        let resp   = await listening110352(e);
-        let nodeID = resp.nodeID;
-        let userID = resp.userID;
-        displaySentMessage100362(nodeID, userID, resp.info362);
-        displaySentMessage100363(nodeID, userID, resp.info363);
-        listening110352ForGUITool(e);
+    obdApi.registerEvent(msg_110352, function(e) {
+        register110352(e);
     });
 
     // auto response mode
     let msg_110353 = enumMsgType.MsgType_ClientSign_BobC2b_Rd_353;
-    obdApi.registerEvent(msg_110353, async function(e) {
-        let resp = listening110353(e);
-        displaySentMessage100364(resp);
-        afterCommitmentTransactionAccepted();
-        displayMyChannelListAtTopRight(kPageSize, kPageIndex);
+    obdApi.registerEvent(msg_110353, function(e) {
+        register110353(e);
     });
     
     // auto response mode
     let msg_110040 = enumMsgType.MsgType_HTLC_RecvAddHTLC_40;
-    obdApi.registerEvent(msg_110040, async function(e) {
-
-        disableInvokeAPI();
-        tipsOnTop('', kProcessing);
-
-        let resp = await listening110040(e, netType);
-        listening110040ForGUITool(e);
-
-        if (resp != true) {
-            displaySentMessage100041(resp.nodeID, resp.userID, resp.info, resp.privkey);
-            displaySentMessage100101(resp.nodeID, resp.userID, resp.signedInfo);
-        }
+    obdApi.registerEvent(msg_110040, function(e) {
+        register110040(e, netType);
     });
     
     // auto response mode
     let msg_110041 = enumMsgType.MsgType_HTLC_RecvAddHTLCSigned_41;
-    obdApi.registerEvent(msg_110041, async function(e) {
-        let resp = await listening110041(e);
-        listening110041ForGUITool(e);
-        displaySentMessage100102(resp.info102);
-        displaySentMessage100103(resp.nodeID, resp.userID, resp.info103);
+    obdApi.registerEvent(msg_110041, function(e) {
+        register110041(e);
     });
     
     // auto response mode
     let msg_110042 = enumMsgType.MsgType_HTLC_BobSignC3bSubTx_42;
-    obdApi.registerEvent(msg_110042, async function(e) {
-
-        let resp   = await listening110042(e, netType);
-        let nodeID = resp.nodeID;
-        let userID = resp.userID;
-
-        displaySentMessage100104(resp.info104);
-        displaySentMessage100105(nodeID, userID, resp.info105);
-
-        if (resp.status === false) {
-            tipsOnTop('', kNotFoundR, 'Forward R', 'forwardR', 'Yes');
-        } else {
-            displaySentMessage100045(nodeID, userID, resp.info45);
-            afterForwardR();
-            displaySentMessage100106(nodeID, userID, resp.info106);
-        }
+    obdApi.registerEvent(msg_110042, function(e) {
+        register110042(e, netType);
     });
     
     // auto response mode
@@ -4681,16 +4797,8 @@ function registerEvent(netType) {
 
     // auto response mode
     let msg_110045 = enumMsgType.MsgType_HTLC_RecvVerifyR_45;
-    obdApi.registerEvent(msg_110045, async function(e) {
-        listening110045ForGUITool(e);
-        let resp  = await listening110045(e);
-        if (resp != true) {
-            let nodeID = resp.nodeID;
-            let userID = resp.userID;
-            displaySentMessage100046(nodeID, userID, resp.info46);
-            displaySentMessage100049(nodeID, userID, resp.info49, resp.privkey);
-            displaySentMessage100110(nodeID, userID, resp.info110);
-        }
+    obdApi.registerEvent(msg_110045, function(e) {
+        register110045(e);
     });
 
     let msg_110046 = enumMsgType.MsgType_HTLC_RecvSignVerifyR_46;
@@ -4701,30 +4809,18 @@ function registerEvent(netType) {
 
     // auto response mode
     let msg_110049 = enumMsgType.MsgType_HTLC_RecvRequestCloseCurrTx_49;
-    obdApi.registerEvent(msg_110049, async function(e) {
-        listening110049ForGUITool(e);
-        let resp  = await listening110049(e, netType);
-        let nodeID = resp.nodeID;
-        let userID = resp.userID;
-        displaySentMessage100050(nodeID, userID, resp.info50, resp.privkey);
-        displaySentMessage100111(nodeID, userID, resp.info111);
+    obdApi.registerEvent(msg_110049, function(e) {
+        register110049(e, netType);
     });
 
     let msg_110050 = enumMsgType.MsgType_HTLC_RecvCloseSigned_50;
-    obdApi.registerEvent(msg_110050, async function(e) {
-        let resp = await listening110050(e);
-        displaySentMessage100112(resp.info112);
-        displaySentMessage100113(resp.nodeID, resp.userID, resp.info113);
-        tipsOnTop(e.channel_id, kTips110050);
-        displayMyChannelListAtTopRight(kPageSize, kPageIndex);
+    obdApi.registerEvent(msg_110050, function(e) {
+        register110050(e);
     });
 
     let msg_110051 = enumMsgType.MsgType_HTLC_Close_ClientSign_Bob_C4bSub_51;
-    obdApi.registerEvent(msg_110051, async function(e) {
-        let resp = await listening110051(e);
-        displaySentMessage100114(resp);
-        afterCloseHTLCSigned();
-        displayMyChannelListAtTopRight(kPageSize, kPageIndex);
+    obdApi.registerEvent(msg_110051, function(e) {
+        register110051(e);
     });
 
     // save request_close_channel_hash
@@ -4792,7 +4888,7 @@ async function listening110340ForGUITool(e) {
         tipsOnTop(channel_id, kProcessing);
     } else { // auto mode is closed
         let status = await getChannelStatus(channel_id, false);
-        console.info('listening110340ForGUITool status = ' + status);
+        // console.info('listening110340ForGUITool status = ' + status);
         switch (Number(status)) {
             case kStatusAcceptChannel:
                 tipsOnTop(channel_id, kTipsFirst110340, 'Confirm', 'bitcoinFundingSigned', 'Yes');
@@ -4827,7 +4923,7 @@ async function listening110350ForGUITool(e) {
     let channel_id = e.temporary_channel_id;
     let status     = await getChannelStatus(channel_id, true);
     let api_name   = $("#api_name").text();
-    console.info('listening110350ForGUITool status = ' + status);
+    // console.info('listening110350ForGUITool status = ' + status);
 
     switch (Number(status)) {
         case kStatusFirstBitcoinFundingCreated:
@@ -5138,14 +5234,12 @@ function rowMyChannelList(e, i, tr) {
 
 function tableMyChannelList(e) {
     
-    console.info('total count = ' + e.totalCount);
+    // console.info('total count = ' + e.totalCount);
 
-    // removeTrackerDiv();
     removeNameReqDiv();
 
     // table
     let tracker_div = $("#name_req_div");
-    // let tracker_div = $("#tracker_div");
     let table = document.createElement('table');
     table.id = 'tracker';
     tracker_div.append(table);
@@ -5582,7 +5676,7 @@ async function afterBitcoinFundingSigned(tempCID) {
     disableInvokeAPI();
 
     let status = await getChannelStatus(tempCID, false);
-    console.info('afterBitcoinFundingSigned status = ' + status);
+    // console.info('afterBitcoinFundingSigned status = ' + status);
     switch (Number(status)) {
         case kStatusFirstBitcoinFundingSigned:
             tipsOnTop('', kTipsFirstAfterBitcoinFundingSigned);

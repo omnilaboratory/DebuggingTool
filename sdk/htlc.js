@@ -21,7 +21,7 @@ function addInvoice(info, callback) {
 function HTLCFindPath(info) {
     return new Promise((resolve, reject) => {
         obdApi.HTLCFindPath(info, function(e) {
-            console.info('SDK: -100401 - HTLCFindPath = ' + JSON.stringify(e));
+            // console.info('SDK: -100401 - HTLCFindPath = ' + JSON.stringify(e));
             resolve(e);
         });
     })
@@ -38,7 +38,7 @@ function HTLCFindPath(info) {
 function addHTLC(myUserID, nodeID, userID, info, isFunder) {
     return new Promise((resolve, reject) => {
         obdApi.addHTLC(nodeID, userID, info, async function(e) {
-            console.info('SDK: -100040 addHTLC = ' + JSON.stringify(e));
+            // console.info('SDK: -100040 addHTLC = ' + JSON.stringify(e));
 
             // Sender sign the tx on client side
             // NO.1
@@ -67,10 +67,6 @@ function addHTLC(myUserID, nodeID, userID, info, isFunder) {
             signedInfo.c3a_htlc_partial_signed_hex         = hr_hex;
             signedInfo.c3a_rsmc_partial_signed_hex         = rr_hex;
 
-            // FUNCTION ONLY FOR GUI TOOL
-            displaySentMessage100100(nodeID, userID, signedInfo);
-
-            // SDK API
             await sendSignedHex100100(nodeID, userID, signedInfo);
 
             // save 3 privkeys
@@ -84,7 +80,8 @@ function addHTLC(myUserID, nodeID, userID, info, isFunder) {
             //
             saveChannelStatus(myUserID, e.channel_id, isFunder, kStatusAddHTLC);
             saveSenderRole(kIsSender);
-            resolve(true);
+
+            resolve(signedInfo);
         });
     })
 }
@@ -98,7 +95,7 @@ function addHTLC(myUserID, nodeID, userID, info, isFunder) {
 function sendSignedHex100100(nodeID, userID, signedInfo) {
     return new Promise((resolve, reject) => {
         obdApi.sendSignedHex100100(nodeID, userID, signedInfo, function(e) {
-            console.info('sendSignedHex100100 = ' + JSON.stringify(e));
+            // console.info('sendSignedHex100100 = ' + JSON.stringify(e));
             resolve(true);
         });
     })
@@ -114,7 +111,7 @@ function sendSignedHex100100(nodeID, userID, signedInfo) {
 function HTLCSigned(myUserID, nodeID, userID, info) {
     return new Promise((resolve, reject) => {
         obdApi.htlcSigned(nodeID, userID, info, async function(e) {
-            console.info('SDK: -100041 htlcSigned = ' + JSON.stringify(e));
+            // console.info('SDK: -100041 htlcSigned = ' + JSON.stringify(e));
 
             let channel_id = e.channel_id;
 
@@ -194,7 +191,7 @@ function HTLCSigned(myUserID, nodeID, userID, info) {
 function sendSignedHex100101(nodeID, userID, signedInfo) {
     return new Promise((resolve, reject) => {
         obdApi.sendSignedHex100101(nodeID, userID, signedInfo, function(e) {
-            console.info('sendSignedHex100101 = ' + JSON.stringify(e));
+            // console.info('sendSignedHex100101 = ' + JSON.stringify(e));
             resolve(true);
         });
     })
@@ -208,7 +205,7 @@ function sendSignedHex100101(nodeID, userID, signedInfo) {
 function sendSignedHex100102(myUserID, signedInfo) {
     return new Promise((resolve, reject) => {
         obdApi.sendSignedHex100102(signedInfo, async function(e) {
-            console.info('sendSignedHex100102 = ' + JSON.stringify(e));
+            // console.info('sendSignedHex100102 = ' + JSON.stringify(e));
 
             let nodeID     = e.payee_node_address;
             let userID     = e.payee_peer_id;
@@ -279,7 +276,7 @@ function sendSignedHex100102(myUserID, signedInfo) {
 function sendSignedHex100103(nodeID, userID, signedInfo) {
     return new Promise((resolve, reject) => {
         obdApi.sendSignedHex100103(nodeID, userID, signedInfo, function(e) {
-            console.info('sendSignedHex100103 = ' + JSON.stringify(e));
+            // console.info('sendSignedHex100103 = ' + JSON.stringify(e));
             resolve(true);
         });
     })
@@ -293,7 +290,7 @@ function sendSignedHex100103(nodeID, userID, signedInfo) {
 function sendSignedHex100104(myUserID, signedInfo) {
     return new Promise((resolve, reject) => {
         obdApi.sendSignedHex100104(signedInfo, async function(e) {
-            console.info('sendSignedHex100104 = ' + JSON.stringify(e));
+            // console.info('sendSignedHex100104 = ' + JSON.stringify(e));
 
             let nodeID     = e.payer_node_address;
             let userID     = e.payer_peer_id;
@@ -349,7 +346,7 @@ function sendSignedHex100104(myUserID, signedInfo) {
 function sendSignedHex100105(myUserID, nodeID, userID, signedInfo, channel_id) {
     return new Promise((resolve, reject) => {
         obdApi.sendSignedHex100105(nodeID, userID, signedInfo, async function(e) {
-            console.info('sendSignedHex100105 = ' + JSON.stringify(e));
+            // console.info('sendSignedHex100105 = ' + JSON.stringify(e));
 
             let isFunder = await getIsFunder(myUserID, channel_id);
             saveChannelStatus(myUserID, channel_id, isFunder, kStatusHTLCSigned);
@@ -382,7 +379,7 @@ function sendSignedHex100105(myUserID, nodeID, userID, signedInfo, channel_id) {
 function forwardR(myUserID, nodeID, userID, info, isFunder) {
     return new Promise((resolve, reject) => {
         obdApi.forwardR(nodeID, userID, info, async function(e) {
-            console.info('SDK: -100045 forwardR = ' + JSON.stringify(e));
+            // console.info('SDK: -100045 forwardR = ' + JSON.stringify(e));
 
             let channel_id = e.channel_id;
 
@@ -414,7 +411,7 @@ function forwardR(myUserID, nodeID, userID, info, isFunder) {
 function sendSignedHex100106(nodeID, userID, signedInfo) {
     return new Promise((resolve, reject) => {
         obdApi.sendSignedHex100106(nodeID, userID, signedInfo, function(e) {
-            console.info('sendSignedHex100106 = ' + JSON.stringify(e));
+            // console.info('sendSignedHex100106 = ' + JSON.stringify(e));
             resolve(true);
         });
     })
@@ -429,7 +426,7 @@ function sendSignedHex100106(nodeID, userID, signedInfo) {
 function sendSignedHex100110(nodeID, userID, signedInfo) {
     return new Promise((resolve, reject) => {
         obdApi.sendSignedHex100110(nodeID, userID, signedInfo, function(e) {
-            console.info('sendSignedHex100110 = ' + JSON.stringify(e));
+            // console.info('sendSignedHex100110 = ' + JSON.stringify(e));
             resolve(true);
         });
     })
@@ -444,7 +441,7 @@ function sendSignedHex100110(nodeID, userID, signedInfo) {
 function sendSignedHex100111(nodeID, userID, signedInfo) {
     return new Promise((resolve, reject) => {
         obdApi.sendSignedHex100111(nodeID, userID, signedInfo, function(e) {
-            console.info('sendSignedHex100111 = ' + JSON.stringify(e));
+            // console.info('sendSignedHex100111 = ' + JSON.stringify(e));
             resolve(true);
         });
     })
@@ -458,7 +455,7 @@ function sendSignedHex100111(nodeID, userID, signedInfo) {
 function sendSignedHex100112(myUserID, signedInfo) {
     return new Promise((resolve, reject) => {
         obdApi.sendSignedHex100112(signedInfo, async function(e) {
-            console.info('sendSignedHex100112 = ' + JSON.stringify(e));
+            // console.info('sendSignedHex100112 = ' + JSON.stringify(e));
 
             let nodeID     = e.sendee_node_address;
             let userID     = e.sendee_peer_id;
@@ -507,7 +504,7 @@ function sendSignedHex100112(myUserID, signedInfo) {
 function sendSignedHex100113(myUserID, nodeID, userID, signedInfo) {
     return new Promise((resolve, reject) => {
         obdApi.sendSignedHex100113(nodeID, userID, signedInfo, async function(e) {
-            console.info('sendSignedHex100113 = ' + JSON.stringify(e));
+            // console.info('sendSignedHex100113 = ' + JSON.stringify(e));
 
             // save some data
             let isFunder = await getIsFunder(myUserID, e.channel_id);
@@ -525,7 +522,7 @@ function sendSignedHex100113(myUserID, nodeID, userID, signedInfo) {
 function sendSignedHex100114(signedInfo) {
     return new Promise((resolve, reject) => {
         obdApi.sendSignedHex100114(signedInfo, function(e) {
-            console.info('sendSignedHex100114 = ' + JSON.stringify(e));
+            // console.info('sendSignedHex100114 = ' + JSON.stringify(e));
             // Clear H at Bob side
             saveInvoiceH('');
             resolve(true);
@@ -546,7 +543,7 @@ function sendSignedHex100114(signedInfo) {
 function signR(myUserID, nodeID, userID, info, isFunder) {
     return new Promise((resolve, reject) => {
         obdApi.signR(nodeID, userID, info, function(e) {
-            console.info('SDK: -100046 signR = ' + JSON.stringify(e));
+            // console.info('SDK: -100046 signR = ' + JSON.stringify(e));
             saveChannelStatus(myUserID, e.channel_id, isFunder, kStatusSignR);
             resolve(true);
         });
@@ -565,7 +562,7 @@ function signR(myUserID, nodeID, userID, info, isFunder) {
 function closeHTLC(myUserID, nodeID, userID, info, isFunder) {
     return new Promise((resolve, reject) => {
         obdApi.closeHTLC(nodeID, userID, info, async function(e) {
-            console.info('SDK: -100049 closeHTLC = ' + JSON.stringify(e));
+            // console.info('SDK: -100049 closeHTLC = ' + JSON.stringify(e));
             
             let channel_id = e.channel_id;
 
@@ -594,6 +591,7 @@ function closeHTLC(myUserID, nodeID, userID, info, isFunder) {
             saveTempPrivKey(myUserID, kTempPrivKey, channel_id, tempkey);
             saveChannelStatus(myUserID, channel_id, isFunder, kStatusCloseHTLC);
             saveSenderRole(kIsSender);
+
             resolve(signedInfo);
         });
     })
@@ -611,7 +609,7 @@ function closeHTLC(myUserID, nodeID, userID, info, isFunder) {
 function closeHTLCSigned(myUserID, nodeID, userID, info, isFunder) {
     return new Promise((resolve, reject) => {
         obdApi.closeHTLCSigned(nodeID, userID, info, async function(e) {
-            console.info('SDK: -100050 closeHTLCSigned = ' + JSON.stringify(e));
+            // console.info('SDK: -100050 closeHTLCSigned = ' + JSON.stringify(e));
 
             let channel_id = e.channel_id;
 
@@ -652,6 +650,7 @@ function closeHTLCSigned(myUserID, nodeID, userID, info, isFunder) {
             let tempkey = getPrivKeyFromPubKey(myUserID, info.curr_temp_address_pub_key);
             saveTempPrivKey(myUserID, kTempPrivKey, channel_id, tempkey);
             saveChannelStatus(myUserID, channel_id, isFunder, kStatusCloseHTLCSigned);
+
             resolve(signedInfo);
         });
     })

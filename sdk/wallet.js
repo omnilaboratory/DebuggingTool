@@ -29,7 +29,7 @@ function connectPeer(info, callback) {
  */
 function genMnemonic() {
     let mnemonic = btctool.generateMnemonic(128);
-    console.info('SDK: - genMnemonic = ' + mnemonic);
+    // console.info('SDK: - genMnemonic = ' + mnemonic);
     return mnemonic;
 }
 
@@ -46,7 +46,7 @@ function genMnemonic() {
  */
 function genAddressFromMnemonic(mnemonic, index, netType) {
     let result = btctool.generateWalletInfo(mnemonic, index, netType);
-    console.info('SDK: - genAddressFromMnemonic = ' + JSON.stringify(result));
+    // console.info('SDK: - genAddressFromMnemonic = ' + JSON.stringify(result));
     return result;
 }
 
@@ -62,7 +62,7 @@ function genAddressFromMnemonic(mnemonic, index, netType) {
 function logIn(mnemonic) {
     return new Promise((resolve, reject) => {
         obdApi.logIn(mnemonic, function(e) {
-            console.info('SDK: -102001 logIn = ' + JSON.stringify(e));
+            // console.info('SDK: -102001 logIn = ' + JSON.stringify(e));
             saveMnemonic(e.userPeerId, mnemonic);
             resolve(e);
         });

@@ -1038,7 +1038,7 @@ function checkChannelAddessExist(nodeID, userID, info) {
 
     return new Promise((resolve, reject) => {
         obdApi.checkChannelAddessExist(nodeID, userID, info, function(e) {
-            console.info('SDK: -103156 checkChannelAddessExist = ' + JSON.stringify(e));
+            // console.info('SDK: -103156 checkChannelAddessExist = ' + JSON.stringify(e));
             let value = JSON.stringify(e);
             value = value.replace("\"", "").replace("\"", "");
             // console.info('SDK: value = ' + value);
@@ -1362,7 +1362,7 @@ function signP2PKH(txhex, privkey, inputs) {
 
     // Export hex
     let toHex = txb.build().toHex();
-    console.info('signP2PKH - toHex = ' + toHex);
+    // console.info('signP2PKH - toHex = ' + toHex);
     return toHex;
 }
 
@@ -1397,12 +1397,12 @@ function signP2SH(is_first_sign, txhex, pubkey_1, pubkey_2, privkey, inputs) {
 
     if (is_first_sign === true) { // The first person to sign this transaction
         let firstHex = txb.buildIncomplete().toHex();
-        console.info('First signed - Hex => ' + firstHex);
+        // console.info('First signed - Hex => ' + firstHex);
         return firstHex;
 
     } else { // The second person to sign this transaction
         let finalHex = txb.build().toHex();
-        console.info('signP2SH - Second signed - Hex = ' + finalHex);
+        // console.info('signP2SH - Second signed - Hex = ' + finalHex);
         return finalHex;
     }
 }
