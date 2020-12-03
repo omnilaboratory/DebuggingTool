@@ -74,8 +74,6 @@ function listening110033(e) {
 function listening110034(e) {
     return new Promise(async function(resolve, reject) {
         let isAutoMode = getAutoPilot();
-        // console.info('SDK: NOW isAutoMode = ' + isAutoMode);
-    
         let myUserID   = e.to_peer_id;
         let channel_id = e.temporary_channel_id;
         
@@ -87,8 +85,6 @@ function listening110034(e) {
             data.pub_key_b, privkey, inputs);
             
         saveSignedHex(myUserID, channel_id, signed_hex, kTbSignedHex);
-        
-        // save some data
         saveChannelStatus(myUserID, channel_id, false, kStatusAssetFundingCreated);
     
         // auto mode is closed

@@ -44,7 +44,7 @@ function acceptChannel(myUserID, nodeID, userID, info) {
             saveFundingPrivKey(myUserID, channel_id, privkey);
             saveChannelStatus(myUserID, channel_id, false, kStatusAcceptChannel);
             saveChannelAddr(channel_id, e.channel_address);
-            resolve(true);
+            resolve(e);
         });
     })
 }

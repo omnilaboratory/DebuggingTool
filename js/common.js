@@ -192,8 +192,8 @@ async function sdkAcceptChannel() {
     info.fundee_address_index = Number(getIndexFromPubKey(info.funding_pubkey));
 
     displaySentMessage100033(nodeID, userID, info);
-    await acceptChannel($("#logined").text(), nodeID, userID, info);
-    afterAcceptChannel();
+    let e = await acceptChannel($("#logined").text(), nodeID, userID, info);
+    afterAcceptChannel(e);
     displayMyChannelListAtTopRight(kPageSize, kPageIndex);
 }
 
@@ -1710,7 +1710,7 @@ async function changeInvokeAPIEnable(status, isFunder, myUserID, channel_id) {
             } else if (isFunder === true) { // Is Alice
                 enableInvokeAPI();
                 if (status === kStatusAcceptChannel) { // First fundingBitcoin
-                    fillFundingBtcData(myUserID, channelHadBtcData, status); // channel that had funding btc
+                    fillFundingBtcData(myUserID, channelHadBtcData, status);
                     $("#to_address").val(await getChannelAddr(channel_id));
                 } else {
                     fillFundingBtcData(myUserID, channel_id);
@@ -1982,9 +1982,6 @@ async function changeInvokeAPIEnable(status, isFunder, myUserID, channel_id) {
             enableInvokeAPI();
             fillCounterparty(myUserID, channel_id);
             fillChannelIDAndFundingPrivKey(myUserID, channel_id);
-
-            // $("#msg_hash").val(await getTempData(myUserID, channel_id));
-            // $("#r").val(getInvoiceR());
 
             data = await getSignedHex(myUserID, channel_id, kTbSignedHexBR110045);
             $("#c3b_htlc_hebr_partial_signed_hex").val(data);
@@ -4515,10 +4512,11 @@ async function register110032(e, netType) {
     let resp = await listening110032(e, netType);
     if (resp != true) {
         displaySentMessage100033(resp.nodeID, resp.userID, resp.info33);
-        afterAcceptChannel();
+        afterAcceptChannel(e);
         displayMyChannelListAtTopRight(kPageSize, kPageIndex);
+    } else {
+        listening110032ForGUITool(e);
     }
-    listening110032ForGUITool(e);
 }
 
 /**
@@ -4530,8 +4528,9 @@ async function register110340(e) {
     if (resp != true) {
         displaySentMessage100350(resp.nodeID, resp.userID, resp.info350, resp.privkey);
         afterBitcoinFundingSigned(e.temporary_channel_id);
+    } else {
+        listening110340ForGUITool(e);
     }
-    listening110340ForGUITool(e);
 }
 
 /**
@@ -4547,8 +4546,9 @@ async function register110034(e) {
         displaySentMessage101035(nodeID, userID, resp.info1035);
         afterAssetFundingSigned(resp.resp1035);
         displayMyChannelListAtTopRight(kPageSize, kPageIndex);
+    } else {
+        listening110034ForGUITool(e);
     }
-    listening110034ForGUITool(e);
 }
 
 /**
@@ -4879,13 +4879,14 @@ async function listening110340ForGUITool(e) {
 
     let isAutoMode = getAutoPilot();
     let channel_id = e.temporary_channel_id;
+    let myUserID   = $("#logined").text();
 
     // auto mode is opening
     if (isAutoMode === 'Yes') {
         tipsOnTop(channel_id, kProcessing);
     } else { // auto mode is closed
         let status = await getChannelStatus(channel_id, false);
-        console.info('listening110340ForGUITool status = ' + status);
+        // console.info('listening110340ForGUITool status = ' + status);
         switch (Number(status)) {
             case kStatusFirstBitcoinFundingCreated:
                 tipsOnTop(channel_id, kTipsFirst110340, 'Confirm', 'bitcoinFundingSigned', 'Yes');
@@ -4901,12 +4902,13 @@ async function listening110340ForGUITool(e) {
         let api_name = $("#api_name").text();
         if (api_name === 'bitcoinFundingSigned') {
             enableInvokeAPI();
-            fillTempChannelIDAndFundingPrivKey($("#logined").text(), channel_id);
+            fillTempChannelIDAndFundingPrivKey(myUserID, channel_id);
     
             $("#recipient_node_peer_id").val(e.funder_node_address);
             $("#recipient_user_peer_id").val(e.funder_peer_id);
             $("#funding_txid").val(e.funding_txid);
-            let data = await getSignedHex($("#logined").text(), channel_id, kTbSignedHex);
+
+            let data = await getSignedHex(myUserID, channel_id, kTbSignedHex);
             $("#signed_miner_redeem_transaction_hex").val(data);
         }
     }
@@ -4948,7 +4950,7 @@ async function listening110350ForGUITool(e) {
 /**
  * For GUI Tool
  */
-function listening110351ForGUITool(e) {
+async function listening110351ForGUITool(e) {
 
     let isAutoMode = getAutoPilot();
 
@@ -4959,16 +4961,24 @@ function listening110351ForGUITool(e) {
         let msg = kTips110351 + ' Transfer amount is : ' + e.amount;
         tipsOnTop(e.channel_id, msg, 'Confirm', 'commitmentTransactionAccepted', 'Yes');
     
-        let api_name = $("#api_name").text();
+        let myUserID   = $("#logined").text();
+        let channel_id = e.channel_id;
+        let api_name   = $("#api_name").text();
+
         if (api_name === 'commitmentTransactionAccepted') {
             enableInvokeAPI();
             fillCurrTempAddrKey();
-            fillChannelFundingLastTempKeys($("#logined").text(), e.channel_id);
+            fillChannelFundingLastTempKeys(myUserID, channel_id);
+
             $("#recipient_node_peer_id").val(e.payer_node_address);
             $("#recipient_user_peer_id").val(e.payer_peer_id);
             $("#msg_hash").val(e.msg_hash);
-            $("#c2a_rsmc_signed_hex").val(kSignedHexTip);
-            $("#c2a_counterparty_signed_hex").val(kSignedHexTip);
+
+            let data = await getSignedHex(myUserID, channel_id, kTbSignedHexRR110351);
+            $("#c2a_rsmc_signed_hex").val(data);
+
+            data = await getSignedHex(myUserID, channel_id, kTbSignedHexCR110351);
+            $("#c2a_counterparty_signed_hex").val(data);
         }
     }
 }
@@ -4992,7 +5002,7 @@ function listening110352ForGUITool(e) {
 /**
  * For GUI Tool. Display tips
  */
-function listening110034ForGUITool(e) {
+async function listening110034ForGUITool(e) {
 
     let isAutoMode = getAutoPilot();
     let channel_id = e.temporary_channel_id;
@@ -5009,7 +5019,8 @@ function listening110034ForGUITool(e) {
             fillTempChannelIDAndFundingPrivKey($("#logined").text(), channel_id);
             $("#recipient_node_peer_id").val(e.funder_node_address);
             $("#recipient_user_peer_id").val(e.funder_peer_id);
-            $("#signed_alice_rsmc_hex").val(kSignedHexTip);
+            let data = await getSignedHex($("#logined").text(), channel_id, kTbSignedHex);
+            $("#signed_alice_rsmc_hex").val(data);
         }
     }
 }
@@ -5026,7 +5037,7 @@ function listening110035ForGUITool(e) {
 /**
  * For GUI Tool. Display tips
  */
-function listening110040ForGUITool(e) {
+async function listening110040ForGUITool(e) {
 
     let isInPayInvoice = getPayInvoiceCase();
     // In pay invoice case
@@ -5043,19 +5054,28 @@ function listening110040ForGUITool(e) {
     } else { // auto mode is closed
         tipsOnTop(e.channel_id, kTips110040, 'Accept', 'HTLCSigned', 'Yes');
     
-        let api_name = $("#api_name").text();
+        let myUserID   = $("#logined").text();
+        let channel_id = e.channel_id;
+        let api_name   = $("#api_name").text();
+
         if (api_name === 'HTLCSigned') {
             enableInvokeAPI();
-            fillChannelFundingLastTempKeys($("#logined").text(), e.channel_id);
+            fillChannelFundingLastTempKeys(myUserID, channel_id);
             fillCurrRsmcTempKey();
             fillCurrHtlcTempKey();
     
             $("#recipient_node_peer_id").val(e.payer_node_address);
             $("#recipient_user_peer_id").val(e.payer_peer_id);
             $("#payer_commitment_tx_hash").val(e.payer_commitment_tx_hash);
-            $("#c3a_complete_signed_rsmc_hex").val(kSignedHexTip);
-            $("#c3a_complete_signed_counterparty_hex").val(kSignedHexTip);
-            $("#c3a_complete_signed_htlc_hex").val(kSignedHexTip);
+
+            let data = await getSignedHex(myUserID, channel_id, kTbSignedHexCR110040);
+            $("#c3a_complete_signed_counterparty_hex").val(data);
+
+            data = await getSignedHex(myUserID, channel_id, kTbSignedHexHR110040);
+            $("#c3a_complete_signed_htlc_hex").val(data);
+
+            data = await getSignedHex(myUserID, channel_id, kTbSignedHexRR110040);
+            $("#c3a_complete_signed_rsmc_hex").val(data);
         }
     }
 }
@@ -5078,7 +5098,7 @@ function listening110041ForGUITool(e) {
 /**
  * For GUI Tool. Display tips
  */
-function listening110045ForGUITool(e) {
+async function listening110045ForGUITool(e) {
 
     let isInPayInvoice = getPayInvoiceCase();
     // In pay invoice case
@@ -5095,15 +5115,22 @@ function listening110045ForGUITool(e) {
     } else { // auto mode is closed
         tipsOnTop(e.channel_id, kTips110045, 'Sign R', 'signR', 'Yes');
     
-        let api_name = $("#api_name").text();
+        let myUserID   = $("#logined").text();
+        let channel_id = e.channel_id;
+        let api_name   = $("#api_name").text();
+
         if (api_name === 'signR') {
             enableInvokeAPI();
-            fillChannelIDAndFundingPrivKey($("#logined").text(), e.channel_id);
+            fillChannelIDAndFundingPrivKey(myUserID, channel_id);
     
             $("#recipient_node_peer_id").val(e.payee_node_address);
             $("#recipient_user_peer_id").val(e.payee_peer_id);
-            $("#c3b_htlc_herd_complete_signed_hex").val(kSignedHexTip);
-            $("#c3b_htlc_hebr_partial_signed_hex").val(kSignedHexTip);
+
+            let data = await getSignedHex(myUserID, channel_id, kTbSignedHexBR110045);
+            $("#c3b_htlc_hebr_partial_signed_hex").val(data);
+
+            data = await getSignedHex(myUserID, channel_id, kTbSignedHexRD110045);
+            $("#c3b_htlc_herd_complete_signed_hex").val(data);
         }
     }
 }
@@ -5119,17 +5146,14 @@ function listening110046ForGUITool(e) {
  * For GUI Tool. Display tips
  */
 function listening110049ForGUITool(e) {
-
     disableInvokeAPI();
-    
     let isInPayInvoice = getPayInvoiceCase();
     // In pay invoice case
     if (isInPayInvoice === 'Yes') {
         tipsOnTop(e.channel_id, kPayInvoice);
-        return;
+    } else {
+        tipsOnTop(e.channel_id, kProcessing);
     }
-
-    tipsOnTop(e.channel_id, kProcessing);
 }
 
 /**
@@ -5144,8 +5168,6 @@ function listening110080ForGUITool(e) {
         enableInvokeAPI();
         fillCounterparty($("#logined").text(), e.channel_id);
         $("#channel_id_from").val(e.channel_id);
-        // $("#recipient_node_peer_id").val(e.sender_node_address);
-        // $("#recipient_user_peer_id").val(e.sender_peer_id);
     }
 }
 
@@ -5167,8 +5189,6 @@ function listening110038ForGUITool(e) {
     if (api_name === 'closeChannelSigned') {
         enableInvokeAPI();
         fillCounterparty($("#logined").text(), e.channel_id);
-        // $("#recipient_node_peer_id").val(e.sender_node_address);
-        // $("#recipient_user_peer_id").val(e.sender_peer_id);
         $("#channel_id").val(e.channel_id);
         $("#request_close_channel_hash").val(e.request_close_channel_hash);
     }
@@ -5346,18 +5366,18 @@ function displayMyChannelListAtTopRight(page_size, page_index) {
                     } else {
                         lastestChannel = e.data[0].channel_id;
                     }
-                }
 
-                // get a channel that had funding btc.
-                for (let i = 0; i < e.data.length; i++) {
-                    if (e.data[i].btc_funding_times > 0) {
-                        channelHadBtcData = e.data[i].temporary_channel_id;
-                        break;
+                    // get a channel that had funding btc.
+                    for (let i = 0; i < e.data.length; i++) {
+                        if (e.data[i].btc_funding_times > 0) {
+                            channelHadBtcData = e.data[i].temporary_channel_id;
+                            break;
+                        }
                     }
+                    console.info('channelHadBtcData = ' + channelHadBtcData);
                 }
             }
 
-            // Running success and return
             resolve();
         });
     })
@@ -5644,9 +5664,9 @@ function afterOpenChannel(e) {
 /**
  * 
  */
-function afterAcceptChannel() {
+function afterAcceptChannel(e) {
     disableInvokeAPI();
-    tipsOnTop('', kTipsAfterAcceptChannel);
+    tipsOnTop(e.temporary_channel_id, kTipsAfterAcceptChannel);
 }
 
 /**
