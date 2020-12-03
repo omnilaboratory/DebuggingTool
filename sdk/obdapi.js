@@ -13,7 +13,7 @@ class ObdApi {
      */
     registerEvent(msgType, callback) {
         if (callback == null) {
-            console.info("callback function is null");
+            // console.info("callback function is null");
             return;
         }
         if (msgType == null) {
@@ -28,7 +28,7 @@ class ObdApi {
      */
     removeEvent(msgType) {
         this.callbackMap.delete(msgType);
-        console.info("----------> removeEvent");
+        // console.info("----------> removeEvent");
     }
     /**
      * Send custom request
@@ -45,8 +45,11 @@ class ObdApi {
             alert("error request content.");
             return;
         }
-        console.info(new Date(), "------send json msg------");
-        console.info(msg);
+        // console.info(
+        //   new Date(),
+        //   "------send json msg------"
+        // );
+        // console.info(msg);
         if (callback != null) {
             this.callbackMap[type] = callback;
         }
@@ -59,7 +62,7 @@ class ObdApi {
      */
     connectToServer(address, callback, globalCallback) {
         if (this.isConnectToOBD == true) {
-            console.info("already connect");
+            // console.info("already connect");
             if (callback) {
                 callback("already connect");
             }
@@ -69,12 +72,12 @@ class ObdApi {
         if (address != null && address.length > 0) {
             this.defaultAddress = address;
         }
-        console.info("connect to " + this.defaultAddress);
+        // console.info("connect to " + this.defaultAddress);
         try {
             this.ws = new WebSocket(this.defaultAddress);
             this.ws.onopen = (e) => {
-                console.info(e);
-                console.info("connect success");
+                // console.info(e);
+                // console.info("connect success");
                 if (callback != null) {
                     callback("connect success");
                 }
@@ -82,22 +85,22 @@ class ObdApi {
             };
             this.ws.onmessage = (e) => {
                 let jsonData = JSON.parse(e.data);
-                console.info(jsonData);
+                // console.info(jsonData);
                 this.getDataFromServer(jsonData);
             };
             this.ws.onclose = (e) => {
-                console.info("ws close", e);
+                // console.info("ws close", e);
                 this.isConnectToOBD = false;
                 this.isLogin = false;
                 alert("ws close");
             };
             this.ws.onerror = (e) => {
-                console.info("ws error", e);
+                // console.info("ws error", e);
                 alert("ws error");
             };
         }
         catch (error) {
-            console.info(error);
+            // console.info(error);
             alert("can not connect to server");
             return;
         }
@@ -112,15 +115,18 @@ class ObdApi {
             alert("please login");
             return;
         }
-        console.info(new Date(), "----------------------------send msg------------------------------");
-        console.info(msg);
+        // console.info(
+        //   new Date(),
+        //   "----------------------------send msg------------------------------"
+        // );
+        // console.info(msg);
         if (callback != null) {
             this.callbackMap[msg.type] = callback;
         }
         this.ws.send(JSON.stringify(msg));
     }
     getDataFromServer(jsonData) {
-        console.info(jsonData);
+        // console.info(jsonData);
         if (this.globalCallback) {
             this.globalCallback(jsonData);
         }
@@ -150,7 +156,10 @@ class ObdApi {
             tempData.recipient_user_peer_id = jsonData.recipient_user_peer_id;
             jsonData = tempData;
         }
-        console.info(new Date(), "----------------------------get msg from server--------------------");
+        // console.info(
+        //   new Date(),
+        //   "----------------------------get msg from server--------------------"
+        // );
         let fromId = jsonData.from;
         let toId = jsonData.to;
         fromId = fromId.split("@")[0];

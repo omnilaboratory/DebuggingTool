@@ -272,11 +272,6 @@ const kPayInvoice = 'Pay Invoice is processing ... Wait for response from counte
 const kProcessing = 'Processing...';
 
 /**
- * Display Processing...
- */
-const kSignedHexTip = 'Please click the button on the tips area to get data.';
-
-/**
  * Not Found the R
  */
 const kNotFoundR = 'Not found the secret key R, you should be invoke with forwardR function again.';

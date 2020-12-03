@@ -29,16 +29,13 @@
 </body>
 
 <script>
-    // var name = getSaveName();
     var data = JSON.parse(localStorage.getItem(kGoWhere));
-    console.info('goWhere= '+ data.goWhere);
-    // getUserDataList(data.goWhere);
+    // console.info('goWhere= '+ data.goWhere);
 
     // 
     function sdkConnect2OBD() {
         let nodeAddress = getNewestConnOBD();
         connectToServer(nodeAddress, function(response) {
-            // console.info('OBD Response = ' + response);
             getUserDataList(data.goWhere);
         }, function(globalResponse) {
         });
