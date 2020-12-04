@@ -565,7 +565,7 @@ function payInvoiceStep6(myUserID, nodeID, userID, channel_id, privkey) {
 
         let returnData = {
             info49:  info,
-            info110: resp.info110,
+            info110: resp,
             privkey: privkey,
         };
     

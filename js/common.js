@@ -5374,7 +5374,6 @@ function displayMyChannelListAtTopRight(page_size, page_index) {
                             break;
                         }
                     }
-                    console.info('channelHadBtcData = ' + channelHadBtcData);
                 }
             }
 
