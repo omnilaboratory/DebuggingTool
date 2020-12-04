@@ -55,10 +55,6 @@ function genAddressFromMnemonic(mnemonic, index, netType) {
  * @param mnemonic 
  * @param callback 
  */
-// function logIn(mnemonic, callback) {
-//     obdApi.logIn(mnemonic, callback);
-// }
-
 function logIn(mnemonic) {
     return new Promise((resolve, reject) => {
         obdApi.logIn(mnemonic, function(e) {

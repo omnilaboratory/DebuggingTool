@@ -168,7 +168,9 @@ class ObdApi {
         if (fromId != toId) {
             if (callback != null) {
                 resultData["to_peer_id"] = toId;
-                callback(resultData);
+                if (jsonData.type != this.messageType.MsgType_UserLogin_2001) {
+                    callback(resultData);
+                }
             }
             return;
         }

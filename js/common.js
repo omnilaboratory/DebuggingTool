@@ -100,17 +100,14 @@ async function sdkLogIn() {
     // testSignP2SH();
     // return;
 
+    // If already logined, then return.
+    if (isLogined) return;
+
     let mnemonic = $("#mnemonic").val();
     let e = await logIn(mnemonic);
     
     // Register event needed for listening.
     registerEvent(true);
-
-    // If already logined, then return.
-    if (isLogined) {
-        // console.info('-102001 isLogined = ' + isLogined);
-        return;
-    }
 
     // a new loginning.
     mnemonicWithLogined = mnemonic;
@@ -1375,13 +1372,6 @@ function displayAPIContent(obj) {
     createInputParamDiv(obj, 'json/util_list.json');
     createInputParamDiv(obj, 'json/api_list.json');
     createInputParamDiv(obj, 'json/manage_asset.json');
-
-    // Temp code, will be update
-    // if (obj.getAttribute("id") === 'logIn') {
-    //     if (isLogined) {
-    //         alreadyLogin();
-    //     }
-    // }
 }
 
 // create 
