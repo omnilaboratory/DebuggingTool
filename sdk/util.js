@@ -1148,19 +1148,19 @@ function openDB() {
     let request = window.indexedDB.open('data');
     
     request.onerror = function (e) {
-        // console.log('DB open error!');
+        console.log('DB open error!');
     };
 
     request.onsuccess = function (e) {
         db = request.result;
-        // console.log('DB open success!');
+        console.log('DB open success!');
     };
 
     // Create table and index
     request.onupgradeneeded = function (e) {
         db = e.target.result;
         createOS();
-        // console.log('DB onupgradeneeded success!');
+        console.log('DB onupgradeneeded success!');
     }
 }
 

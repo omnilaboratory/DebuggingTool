@@ -265,19 +265,85 @@ function listening110040(e, netType) {
 }
 
 /**
+ * Step 2: automatically invoke -100040 addHTLC
+ * @param e
+ * @param myUserID
+ * @param channel_id
+ * @param mnemonicWithLogined
+ */
+function payInvoiceStep2(e, myUserID, channel_id, mnemonicWithLogined) {
+    return new Promise(async function(resolve, reject) {
+        let result = await getCounterparty(myUserID, channel_id);
+        let nodeID = result.toNodeID;
+        let userID = result.toUserID;
+        
+        let info                            = new addHTLCInfo();
+        info.recipient_user_peer_id         = userID;
+        // info.property_id                    = e.property_id;
+        info.amount                         = e.amount;
+        info.h                              = e.h;
+        info.routing_packet                 = e.routing_packet;
+        info.cltv_expiry                    = e.min_cltv_expiry;
+        // info.memo                           = e.memo;  // TEMP COMMENT, WAIT OBD UPDATE.
+        info.last_temp_address_private_key  = getTempPrivKey(myUserID, kTempPrivKey, channel_id);
+    
+        let index  = getNewAddrIndex(myUserID);
+        let addr_1 = genAddressFromMnemonic(mnemonicWithLogined, index, true);
+        saveAddress(myUserID, addr_1);
+        info.curr_rsmc_temp_address_pub_key = addr_1.result.pubkey;
+    
+        index      = getNewAddrIndex(myUserID);
+        let addr_2 = genAddressFromMnemonic(mnemonicWithLogined, index, true);
+        saveAddress(myUserID, addr_2);
+        info.curr_htlc_temp_address_pub_key = addr_2.result.pubkey;
+    
+        index      = getNewAddrIndex(myUserID);
+        let addr_3 = genAddressFromMnemonic(mnemonicWithLogined, index, true);
+        saveAddress(myUserID, addr_3);
+        info.curr_htlc_temp_address_for_ht1a_pub_key = addr_3.result.pubkey;
+    
+        // Save address index to OBD and can get private key back if lose it.
+        info.curr_rsmc_temp_address_index          = addr_1.result.index;
+        info.curr_htlc_temp_address_index          = addr_2.result.index;
+        info.curr_htlc_temp_address_for_ht1a_index = addr_3.result.index;
+    
+        let privkey  = await getFundingPrivKey(myUserID, channel_id);
+        let isFunder = await getIsFunder(myUserID, channel_id);
+        let resp     = await addHTLC(myUserID, nodeID, userID, info, isFunder);
+
+        let returnData = {
+            nodeID:  nodeID,
+            userID:  userID,
+            info40:  info,
+            info100: resp,
+            privkey: privkey,
+        };
+    
+        resolve(returnData);
+    })
+}
+
+/**
  * payInvoice Step 4, Bob will send -100045 forwardR
  * @param myUserID 
  * @param nodeID 
  * @param userID 
  * @param channel_id
+ * @param e data from 100105
  */
-function payInvoiceStep4(myUserID, nodeID, userID, channel_id) {
+function payInvoiceStep4(myUserID, nodeID, userID, channel_id, e) {
     return new Promise(async function(resolve, reject) {
         let r = getPrivKeyFromPubKey(myUserID, getInvoiceH());
         // console.info('payInvoiceStep4 R = ' + r);
         
         // Bob has NOT R. Bob maybe a middleman node.
-        if (r === '') return resolve(false);
+        if (r === '') {
+            // Launch a HTLC between Bob and Carol (next node).
+            // get data from 100105
+            let resp = await payInvoiceStep2(e, myUserID, channel_id, mnemonicWithLogined);
+
+            // TO-DO return resolve(false);
+        }
     
         // Bob will send -100045 forwardR
         let info        = new ForwardRInfo();
@@ -290,6 +356,44 @@ function payInvoiceStep4(myUserID, nodeID, userID, channel_id) {
         let returnData = {
             info45:  info,
             info106: resp,
+        };
+    
+        resolve(returnData);
+    })
+}
+
+/**
+ * payInvoice Step 6, Alice will send -100049 closeHTLC
+ * Save address index to OBD and can get private key back if lose it.
+ * @param myUserID 
+ * @param nodeID 
+ * @param userID 
+ * @param channel_id 
+ * @param privkey 
+ */
+function payInvoiceStep6(myUserID, nodeID, userID, channel_id, privkey) {
+    return new Promise(async function(resolve, reject) {
+        let info      = new CloseHtlcTxInfo();
+        let privkey_1 = getTempPrivKey(myUserID, kRsmcTempPrivKey, channel_id);
+        let privkey_2 = getTempPrivKey(myUserID, kHtlcTempPrivKey, channel_id);
+        let privkey_3 = getTempPrivKey(myUserID, kHtlcHtnxTempPrivKey, channel_id);
+        let addr      = genNewAddress(myUserID, true);
+        saveAddress(myUserID, addr);
+    
+        info.channel_id                                  = channel_id;
+        info.last_rsmc_temp_address_private_key          = privkey_1;
+        info.last_htlc_temp_address_private_key          = privkey_2;
+        info.last_htlc_temp_address_for_htnx_private_key = privkey_3;
+        info.curr_temp_address_pub_key                   = addr.result.pubkey;
+        info.curr_temp_address_index                     = addr.result.index;
+    
+        let isFunder = await getIsFunder(myUserID, channel_id);
+        let resp     = await closeHTLC(myUserID, nodeID, userID, info, isFunder);
+
+        let returnData = {
+            info49:  info,
+            info110: resp,
+            privkey: privkey,
         };
     
         resolve(returnData);
@@ -529,44 +633,6 @@ function listening110045(e) {
             info49:  resp.info49,
             info110: resp.info110,
             privkey: resp.privkey,
-        };
-    
-        resolve(returnData);
-    })
-}
-
-/**
- * payInvoice Step 6, Alice will send -100049 closeHTLC
- * Save address index to OBD and can get private key back if lose it.
- * @param myUserID 
- * @param nodeID 
- * @param userID 
- * @param channel_id 
- * @param privkey 
- */
-function payInvoiceStep6(myUserID, nodeID, userID, channel_id, privkey) {
-    return new Promise(async function(resolve, reject) {
-        let info      = new CloseHtlcTxInfo();
-        let privkey_1 = getTempPrivKey(myUserID, kRsmcTempPrivKey, channel_id);
-        let privkey_2 = getTempPrivKey(myUserID, kHtlcTempPrivKey, channel_id);
-        let privkey_3 = getTempPrivKey(myUserID, kHtlcHtnxTempPrivKey, channel_id);
-        let addr      = genNewAddress(myUserID, true);
-        saveAddress(myUserID, addr);
-    
-        info.channel_id                                  = channel_id;
-        info.last_rsmc_temp_address_private_key          = privkey_1;
-        info.last_htlc_temp_address_private_key          = privkey_2;
-        info.last_htlc_temp_address_for_htnx_private_key = privkey_3;
-        info.curr_temp_address_pub_key                   = addr.result.pubkey;
-        info.curr_temp_address_index                     = addr.result.index;
-    
-        let isFunder = await getIsFunder(myUserID, channel_id);
-        let resp     = await closeHTLC(myUserID, nodeID, userID, info, isFunder);
-
-        let returnData = {
-            info49:  info,
-            info110: resp,
-            privkey: privkey,
         };
     
         resolve(returnData);

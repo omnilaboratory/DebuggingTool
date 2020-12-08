@@ -733,16 +733,6 @@
                     ]
                 },
                 {
-                    "name": "property_id",
-                    "help": "The property id of an omni asset.",
-                    "buttons": [
-                        {
-                            "innerText": "Display",
-                            "onclick": "displayUserDataInNewHtml('MyAddresses')"
-                        }
-                    ]
-                },
-                {
                     "name": "amount",
                     "buttons": []
                 },

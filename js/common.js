@@ -688,14 +688,17 @@ async function payInvoice() {
     info.invoice = $("#invoice").val();
     
     displaySentMessage100401(info, true);
-    
-    let e    = await HTLCFindPath(info);
-    let path = e.routing_packet;
+    let e = await HTLCFindPath(info);
+    if (e === null) {
+        alert("HTLCFindPath failed. No path found.");
+        return;
+    }
 
-    if (channel_id != path) {
+    let path = e.routing_packet.split(',');
+    if (channel_id != path[0]) {
         // Using new channel to process htlc.
-        $("#curr_channel_id").text(path);
-        channel_id = path;
+        $("#curr_channel_id").text(path[0]);
+        channel_id = path[0];
     }
     
     saveHTLCPathData(e);
@@ -704,60 +707,9 @@ async function payInvoice() {
     savePayInvoiceCase('Yes');
 
     // Step 2: addHTLC
-    payInvoiceStep2(e, myUserID, channel_id);
-}
-
-/**
- * Step 2: -100040 addHTLC
- * @param e
- * @param myUserID
- * @param channel_id
- */
-async function payInvoiceStep2(e, myUserID, channel_id) {
-
-    if (e === null) {
-        alert("HTLCFindPath failed. No path found.");
-        return;
-    }
-    
-    // automatically invoke addHTLC
-    let result = await getCounterparty(myUserID, channel_id);
-    let nodeID = result.toNodeID;
-    let userID = result.toUserID;
-    
-    let info                            = new addHTLCInfo();
-    info.recipient_user_peer_id         = userID;
-    info.property_id                    = e.property_id;
-    info.amount                         = e.amount;
-    info.h                              = e.h;
-    info.routing_packet                 = e.routing_packet;
-    info.cltv_expiry                    = e.min_cltv_expiry;
-    info.memo                           = e.memo;
-    info.last_temp_address_private_key  = getTempPrivKey(myUserID, kTempPrivKey, channel_id);
-
-    let addr_1 = sdkGenAddressFromMnemonic();
-    saveAddress(myUserID, addr_1);
-    info.curr_rsmc_temp_address_pub_key = addr_1.result.pubkey;
-
-    let addr_2 = sdkGenAddressFromMnemonic();
-    saveAddress(myUserID, addr_2);
-    info.curr_htlc_temp_address_pub_key = addr_2.result.pubkey;
-
-    let addr_3 = sdkGenAddressFromMnemonic();
-    saveAddress(myUserID, addr_3);
-    info.curr_htlc_temp_address_for_ht1a_pub_key = addr_3.result.pubkey;
-
-    // Save address index to OBD and can get private key back if lose it.
-    info.curr_rsmc_temp_address_index          = addr_1.result.index;
-    info.curr_htlc_temp_address_index          = addr_2.result.index;
-    info.curr_htlc_temp_address_for_ht1a_index = addr_3.result.index;
-
-    let privkey = await getFundingPrivKey(myUserID, channel_id);
-    displaySentMessage100040(nodeID, userID, info, privkey);
-
-    let isFunder = await getIsFunder(myUserID, channel_id);
-    let resp     = await addHTLC(myUserID, nodeID, userID, info, isFunder);
-    displaySentMessage100100(nodeID, userID, resp);
+    let resp = await payInvoiceStep2(e, myUserID, channel_id, mnemonicWithLogined);
+    displaySentMessage100040(resp.nodeID, resp.userID, resp.info40, resp.privkey);
+    displaySentMessage100100(resp.nodeID, resp.userID, resp.info100);
 }
 
 /**
@@ -792,7 +744,7 @@ async function sdkAddHTLC() {
 
     let info                                         = new addHTLCInfo();
     info.recipient_user_peer_id                      = userID;
-    info.property_id                                 = Number($("#property_id").val());
+    // info.property_id                                 = Number($("#property_id").val());
     info.amount                                      = Number($("#amount").val());
     info.memo                                        = $("#memo").val();
     info.h                                           = $("#h").val();
@@ -865,7 +817,8 @@ async function sdkHTLCFindPath() {
     displaySentMessage100401(info, isInvPay);
     let e = await HTLCFindPath(info);
 
-    let get_new_id = e.routing_packet;
+    let arrRouting = e.routing_packet.split(',');
+    let get_new_id = arrRouting[0];
     let channel_id = $("#curr_channel_id").text();
 
     if (channel_id != get_new_id) {
@@ -1512,13 +1465,13 @@ async function fillCounterparty(myUserID, channel_id) {
 /**
  * Auto fill h, routing packet, cltv expiry
  */
-async function fillHTLCPathData(myUserID, channel_id) {
-    // let data = await getHTLCPathData(myUserID, channel_id);
+function fillHTLCPathData() {
     let data = getHTLCPathData();
-    $("#property_id").val(data.property_id);
+    // $("#property_id").val(data.property_id);
     $("#amount").val(data.amount);
     $("#memo").val(data.memo);
     $("#h").val(data.h);
+    // let arrRouting = data.routing_packet.split(',');
     $("#routing_packet").val(data.routing_packet);
     $("#cltv_expiry").val(data.min_cltv_expiry);
 }
@@ -1906,7 +1859,7 @@ async function changeInvokeAPIEnable(status, isFunder, myUserID, channel_id) {
 
             enableInvokeAPI();
             fillCounterparty(myUserID, channel_id);
-            fillHTLCPathData(myUserID, channel_id);
+            fillHTLCPathData();
             fillChannelFundingLastTempKeys(myUserID, channel_id);
             fillCurrRsmcTempKey();
             fillCurrHtlcTempKey();
@@ -4224,7 +4177,7 @@ function displaySentMessage100040(nodeID, userID, info, privkey) {
         recipient_user_peer_id: userID,
         data: {
             recipient_user_peer_id: info.recipient_user_peer_id,
-            property_id: info.property_id,
+            // property_id: info.property_id,
             amount: info.amount,
             memo: info.memo,
             h: info.h,
