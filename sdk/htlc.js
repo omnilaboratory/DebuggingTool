@@ -312,12 +312,13 @@ function sendSignedHex100104(myUserID, signedInfo) {
             let resp = await sendSignedHex100105(myUserID, nodeID, userID, signedInfo, channel_id);
 
             let returnData;
-            if (resp === false) {
+            if (resp.status === false) {
                 returnData = {
                     status:  false,
                     nodeID:  nodeID,
                     userID:  userID,
                     info105: signedInfo,
+                    infoStep2: resp.infoStep2,
                 };
 
             } else {
@@ -356,10 +357,17 @@ function sendSignedHex100105(myUserID, nodeID, userID, signedInfo, channel_id) {
             // If Bob has R, will send -100045 forwardR
             let resp = await payInvoiceStep4(myUserID, nodeID, userID, channel_id, e);
 
-            if (resp === false) {
-                resolve(false);
+            if (resp.status === false) {  // A multi-hop
+                // resolve(false);
+
+                let returnData = {
+                    status:    false,
+                    infoStep2: resp.infoStep2,
+                };
+                resolve(returnData);
             } else {
                 let returnData = {
+                    status:  true,
                     info45:  resp.info45,
                     info106: resp.info106,
                 };
@@ -481,15 +489,32 @@ function sendSignedHex100112(myUserID, signedInfo) {
             signedInfo.c4b_br_partial_signed_hex = br_hex;
             signedInfo.c4b_br_id                 = br.br_id;
             
-            await sendSignedHex100113(myUserID, nodeID, userID, signedInfo);
+            let resp = await sendSignedHex100113(myUserID, nodeID, userID, signedInfo);
 
-            let returnData = {
-                nodeID:  nodeID,
-                userID:  userID,
-                info113: signedInfo,
-            };
-        
-            resolve(returnData);
+            if (resp === true) {
+                let returnData = {
+                    status:  true,
+                    nodeID:  nodeID,
+                    userID:  userID,
+                    info113: signedInfo,
+                };
+            
+                resolve(returnData);
+
+            } else {
+                let returnData = {
+                    status:  false,
+                    nodeID:  nodeID,
+                    userID:  userID,
+                    info113: signedInfo,
+                    nodeID2: resp.nodeID,
+                    userID2: resp.userID,
+                    info45:  resp.info45,
+                    info106: resp.info106,
+                };
+            
+                resolve(returnData);
+            }
         });
     })
 }
@@ -511,7 +536,39 @@ function sendSignedHex100113(myUserID, nodeID, userID, signedInfo) {
             let isFunder = await getIsFunder(myUserID, e.channel_id);
             saveChannelStatus(myUserID, e.channel_id, isFunder, kStatusCloseHTLCSigned);
             savePayInvoiceCase('No');
-            resolve(true);
+
+            // This is a multi-hop
+            if (stepHop > 1) {
+                // Get channel_id of between middleman and previous node
+                let routs           = getRoutingPacket().split(',');
+                let prev_channel_id = routs[stepHop - 2];
+
+                // Middleman send -100045 forwardR to previous node.
+                let info        = new ForwardRInfo();
+                info.channel_id = prev_channel_id;
+                info.r          = getInvoiceR();
+
+                console.info('sendSignedHex100113 ForwardRInfo = ' + JSON.stringify(info));
+
+                let isFunder = await getIsFunder(myUserID, prev_channel_id);
+                let cp       = await getCounterparty(myUserID, prev_channel_id);
+                let resp     = await forwardR(myUserID, cp.toNodeID, cp.toUserID, info, isFunder);
+            
+                let returnData = {
+                    nodeID:  cp.toNodeID,
+                    userID:  cp.toUserID,
+                    info45:  info,
+                    info106: resp,
+                };
+
+                stepHop--;
+                saveStepHop(stepHop);
+                console.info('sendSignedHex100113 stepHop = ' + stepHop);
+                resolve(returnData);
+                
+            } else {
+                resolve(true);
+            }
         });
     })
 }

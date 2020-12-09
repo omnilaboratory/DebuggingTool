@@ -4,6 +4,10 @@
 // openChannel, bitcoinFundingCreated, assetFundingCreated, 
 // commitmentTransactionCreated, addHTLC, forwardR, closeHTLC.
 
+/**
+ * Multi-hop steps in HTLC
+ */
+var stepHop = 1;
 
 /**
  * auto response to -100032 (openChannel) 
@@ -269,36 +273,46 @@ function listening110040(e, netType) {
  * @param e
  * @param myUserID
  * @param channel_id
- * @param mnemonicWithLogined
+ * @param from100105  get data from 100105
  */
-function payInvoiceStep2(e, myUserID, channel_id, mnemonicWithLogined) {
+function payInvoiceStep2(e, myUserID, channel_id, from100105) {
     return new Promise(async function(resolve, reject) {
         let result = await getCounterparty(myUserID, channel_id);
         let nodeID = result.toNodeID;
         let userID = result.toUserID;
         
-        let info                            = new addHTLCInfo();
-        info.recipient_user_peer_id         = userID;
-        // info.property_id                    = e.property_id;
-        info.amount                         = e.amount;
-        info.h                              = e.h;
-        info.routing_packet                 = e.routing_packet;
-        info.cltv_expiry                    = e.min_cltv_expiry;
-        // info.memo                           = e.memo;  // TEMP COMMENT, WAIT OBD UPDATE.
-        info.last_temp_address_private_key  = getTempPrivKey(myUserID, kTempPrivKey, channel_id);
+        let info                    = new addHTLCInfo();
+        info.recipient_user_peer_id = userID;
+        // info.property_id         = e.property_id;
+
+        if (from100105) {
+            info.amount         = e.amount_to_htlc;
+            info.h              = e.htlc_h;
+            info.routing_packet = e.htlc_routing_packet;
+            // info.memo        = e.htlc_memo;  // TEMP COMMENT, WAIT OBD UPDATE.
+            info.cltv_expiry    = e.htlc_cltv_expiry;
+        } else {
+            info.amount         = e.amount;
+            info.h              = e.h;
+            info.routing_packet = e.routing_packet;
+            // info.memo        = e.memo;  // TEMP COMMENT, WAIT OBD UPDATE.
+            info.cltv_expiry    = e.min_cltv_expiry;
+        }
+        
+        info.last_temp_address_private_key = getTempPrivKey(myUserID, kTempPrivKey, channel_id);
     
         let index  = getNewAddrIndex(myUserID);
-        let addr_1 = genAddressFromMnemonic(mnemonicWithLogined, index, true);
+        let addr_1 = genAddressFromMnemonic(getMnemonicWithLogined(), index, true);
         saveAddress(myUserID, addr_1);
         info.curr_rsmc_temp_address_pub_key = addr_1.result.pubkey;
     
         index      = getNewAddrIndex(myUserID);
-        let addr_2 = genAddressFromMnemonic(mnemonicWithLogined, index, true);
+        let addr_2 = genAddressFromMnemonic(getMnemonicWithLogined(), index, true);
         saveAddress(myUserID, addr_2);
         info.curr_htlc_temp_address_pub_key = addr_2.result.pubkey;
     
         index      = getNewAddrIndex(myUserID);
-        let addr_3 = genAddressFromMnemonic(mnemonicWithLogined, index, true);
+        let addr_3 = genAddressFromMnemonic(getMnemonicWithLogined(), index, true);
         saveAddress(myUserID, addr_3);
         info.curr_htlc_temp_address_for_ht1a_pub_key = addr_3.result.pubkey;
     
@@ -334,31 +348,47 @@ function payInvoiceStep2(e, myUserID, channel_id, mnemonicWithLogined) {
 function payInvoiceStep4(myUserID, nodeID, userID, channel_id, e) {
     return new Promise(async function(resolve, reject) {
         let r = getPrivKeyFromPubKey(myUserID, getInvoiceH());
-        // console.info('payInvoiceStep4 R = ' + r);
+        console.info('R = ' + r);
         
         // Bob has NOT R. Bob maybe a middleman node.
         if (r === '') {
-            // Launch a HTLC between Bob and Carol (next node).
-            // get data from 100105
-            let resp = await payInvoiceStep2(e, myUserID, channel_id, mnemonicWithLogined);
+            saveRoutingPacket(e.htlc_routing_packet);
 
-            // TO-DO return resolve(false);
-        }
-    
-        // Bob will send -100045 forwardR
-        let info        = new ForwardRInfo();
-        info.channel_id = channel_id;
-        info.r          = r;
+            // get channel_id of between Bob and Carol
+            let routs = e.htlc_routing_packet.split(',');
+
+            // Launch a HTLC between Bob and Carol (next node).
+            let resp  = await payInvoiceStep2(e, myUserID, routs[stepHop], '100105');
+            stepHop++;
+            saveStepHop(stepHop);
+            console.info('payInvoiceStep4 stepHop = ' + stepHop);
+
+            // return resolve(false);
+
+            let returnData = {
+                status:    false,
+                infoStep2: resp,
+            };
+
+            resolve(returnData);
+
+        } else {
+            // Bob will send -100045 forwardR
+            let info        = new ForwardRInfo();
+            info.channel_id = channel_id;
+            info.r          = r;
+            
+            let isFunder = await getIsFunder(myUserID, channel_id);
+            let resp     = await forwardR(myUserID, nodeID, userID, info, isFunder);
         
-        let isFunder = await getIsFunder(myUserID, channel_id);
-        let resp     = await forwardR(myUserID, nodeID, userID, info, isFunder);
-    
-        let returnData = {
-            info45:  info,
-            info106: resp,
-        };
-    
-        resolve(returnData);
+            let returnData = {
+                status:  true,
+                info45:  info,
+                info106: resp,
+            };
+        
+            resolve(returnData);
+        }
     })
 }
 
@@ -542,6 +572,7 @@ function listening110042(e, netType) {
                 userID:  resp.userID,
                 info104: signedInfo,
                 info105: resp.info105,
+                infoStep2: resp.infoStep2,
             };
 
         } else {
@@ -600,7 +631,8 @@ function listening110045(e) {
         
         let isFunder = await getIsFunder(myUserID, channel_id);
         saveChannelStatus(myUserID, channel_id, isFunder, kStatusForwardR);
-    
+        saveInvoiceR(e.r);
+
         // auto mode is closed
         if (isAutoMode != 'Yes') {  
             // Not in pay invoice case
@@ -756,14 +788,32 @@ function listening110050(e) {
     
         let resp = await sendSignedHex100112(myUserID, signedInfo);
 
-        let returnData = {
-            nodeID:  resp.nodeID,
-            userID:  resp.userID,
-            info112: signedInfo,
-            info113: resp.info113,
-        };
-    
-        resolve(returnData);
+        if (resp.status === true) {
+            let returnData = {
+                status:  true,
+                nodeID:  resp.nodeID,
+                userID:  resp.userID,
+                info112: signedInfo,
+                info113: resp.info113,
+            };
+        
+            resolve(returnData);
+            
+        } else { // A multi-hop
+            let returnData = {
+                status:  false,
+                nodeID:  resp.nodeID,
+                userID:  resp.userID,
+                info112: signedInfo,
+                info113: resp.info113,
+                nodeID2: resp.nodeID2,
+                userID2: resp.userID2,
+                info45:  resp.info45,
+                info106: resp.info106,
+            };
+        
+            resolve(returnData);
+        }
     })
 }
 

@@ -111,6 +111,7 @@ async function sdkLogIn() {
 
     // a new loginning.
     mnemonicWithLogined = mnemonic;
+    saveMnemonicWithLogined(mnemonicWithLogined);
     $("#logined").text(e.userPeerId);
     isLogined = true;
 
@@ -707,7 +708,7 @@ async function payInvoice() {
     savePayInvoiceCase('Yes');
 
     // Step 2: addHTLC
-    let resp = await payInvoiceStep2(e, myUserID, channel_id, mnemonicWithLogined);
+    let resp = await payInvoiceStep2(e, myUserID, channel_id);
     displaySentMessage100040(resp.nodeID, resp.userID, resp.info40, resp.privkey);
     displaySentMessage100100(resp.nodeID, resp.userID, resp.info100);
 }
@@ -4590,8 +4591,14 @@ async function register110042(e, netType) {
     displaySentMessage100104(resp.info104);
     displaySentMessage100105(nodeID, userID, resp.info105);
 
+    // Bob has NOT R. Bob maybe a middleman node.
     if (resp.status === false) {
-        tipsOnTop('', kNotFoundR, 'Forward R', 'forwardR', 'Yes');
+        // tipsOnTop('', kNotFoundR, 'Forward R', 'forwardR', 'Yes');
+        tipsOnTop('', kNotFoundR);
+        let data = resp.infoStep2;
+        displaySentMessage100040(data.nodeID, data.userID, data.info40, data.privkey);
+        displaySentMessage100100(data.nodeID, data.userID, data.info100);
+
     } else {
         displaySentMessage100045(nodeID, userID, resp.info45);
         displaySentMessage100106(nodeID, userID, resp.info106);
@@ -4637,6 +4644,12 @@ async function register110050(e) {
     let resp = await listening110050(e);
     displaySentMessage100112(resp.info112);
     displaySentMessage100113(resp.nodeID, resp.userID, resp.info113);
+
+    if (resp.status === false) { // A multi-hop
+        displaySentMessage100045(resp.nodeID2, resp.userID2, resp.info45);
+        displaySentMessage100106(resp.nodeID2, resp.userID2, resp.info106);
+    }
+
     tipsOnTop(e.channel_id, kTips110050);
     displayMyChannelListAtTopRight(kPageSize, kPageIndex);
 }

@@ -274,7 +274,7 @@ const kProcessing = 'Processing...';
 /**
  * Not Found the R
  */
-const kNotFoundR = 'Not found the secret key R, you should be invoke with forwardR function again.';
+const kNotFoundR = 'Multi-hop Processing...';
 
 //----------------------------------------------------------------
 // Status of a channel

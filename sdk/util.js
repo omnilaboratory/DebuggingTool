@@ -38,6 +38,41 @@ const kAutoPilot = 'auto_pilot';
 const kPayInvoiceCase = 'pay_invoice_case';
 
 /**
+ * Save MnemonicWithLogined
+ */
+const kMnemonicWithLogined = 'mnemonic_with_logined';
+
+/**
+ * Steps in multi-hop HTLC
+ */
+const kStepHop = 'step_hop';
+
+/**
+ * Save R from final recipient of HTLC
+ */
+const kInvoiceR = 'invoice_r';
+
+/**
+ * 
+ */
+const kInvoiceH = 'invoice_h';
+
+/**
+ * 
+ */
+const kSenderRole = 'sender_role';
+
+/**
+ * 
+ */
+const kHTLCPathData = 'htlc_path_data';
+
+/**
+ * 
+ */
+const kRoutingPacket = 'routing_packet';
+
+/**
  * Object of IndexedDB.
  */
 var db;
@@ -88,29 +123,7 @@ const kTbTempData = 'tb_temp_data';
  * Object Store (table) name of IndexedDB.
  * tb_channel_addr
  */
-const kTbHTLCPathData = 'tb_htlc_path_data';
-
-/**
- * Object Store (table) name of IndexedDB.
- * tb_channel_addr
- */
 const kTbForwardR = 'tb_forward_r';
-
-/**
- * Object Store (table) name of IndexedDB.
- * tb_channel_addr
- */
-const kTbInvoiceR = 'tb_invoice_r';
-
-/**
- * 
- */
-const kInvoiceH = 'invoice_h';
-
-/**
- * 
- */
-const kSenderRole = 'sender_role';
 
 /**
  * Object Store (table) name of IndexedDB.
@@ -937,18 +950,33 @@ function getMnemonic(myUserID, param) {
 }
 
 /**
+ * save Steps in multi-hop HTLC
+ * @param value
+ */
+function saveStepHop(value) {
+    localStorage.setItem(kInvoiceR, value);
+}
+
+/**
+ * get Steps in multi-hop HTLC
+ */
+function getStepHop() {
+    return localStorage.getItem(kInvoiceR);
+}
+
+/**
  * save r from addInvoice type ( -100402 )
  * @param r
  */
 function saveInvoiceR(r) {
-    localStorage.setItem(kTbInvoiceR, r);
+    localStorage.setItem(kInvoiceR, r);
 }
 
 /**
  * get r from addInvoice type ( -100402 )
  */
 function getInvoiceR() {
-    return localStorage.getItem(kTbInvoiceR);
+    return localStorage.getItem(kInvoiceR);
 }
 
 /**
@@ -994,6 +1022,21 @@ function savePayInvoiceCase(value) {
  */
 function getPayInvoiceCase() {
     return localStorage.getItem(kPayInvoiceCase);
+}
+
+/**
+ * Save MnemonicWithLogined
+ * @param value
+ */
+function saveMnemonicWithLogined(value) {
+    localStorage.setItem(kMnemonicWithLogined, value);
+}
+
+/**
+ * Get MnemonicWithLogined
+ */
+function getMnemonicWithLogined() {
+    return localStorage.getItem(kMnemonicWithLogined);
 }
 
 /**
@@ -1054,14 +1097,29 @@ function checkChannelAddessExist(nodeID, userID, info) {
  * @param e
  */
 function saveHTLCPathData(e) {
-    localStorage.setItem(kTbHTLCPathData, JSON.stringify(e));
+    localStorage.setItem(kHTLCPathData, JSON.stringify(e));
 }
 
 /**
  * 
  */
 function getHTLCPathData() {
-    return JSON.parse(localStorage.getItem(kTbHTLCPathData));
+    return JSON.parse(localStorage.getItem(kHTLCPathData));
+}
+
+/**
+ * Save Routing Packet
+ * @param value
+ */
+function saveRoutingPacket(value) {
+    localStorage.setItem(kRoutingPacket, value);
+}
+
+/**
+ * Get Routing Packet
+ */
+function getRoutingPacket() {
+    return localStorage.getItem(kRoutingPacket);
 }
 
 /**
@@ -1211,19 +1269,9 @@ function createOS() {
         os7 = db.createObjectStore(kTbTempData, { keyPath: 'key' });
     }
 
-    let os8;
-    if (!db.objectStoreNames.contains(kTbHTLCPathData)) {
-        os8 = db.createObjectStore(kTbHTLCPathData, { keyPath: 'key' });
-    }
-
     let os9;
     if (!db.objectStoreNames.contains(kTbForwardR)) {
         os9 = db.createObjectStore(kTbForwardR, { keyPath: 'key' });
-    }
-
-    let os10;
-    if (!db.objectStoreNames.contains(kTbInvoiceR)) {
-        os10 = db.createObjectStore(kTbInvoiceR, { keyPath: 'key' });
     }
 
     let os11;
@@ -1309,28 +1357,6 @@ function saveSenderRole(val) {
 function getSenderRole() {
     return localStorage.getItem(kSenderRole);
 }
-
-// OLD
-// function signP2PKH(txhex, privkey) {
-    
-//     if (txhex === '') return '';
-
-//     const network = btctool.bitcoin.networks.testnet;
-//     const tx      = btctool.bitcoin.Transaction.fromHex(txhex);
-//     const txb     = btctool.bitcoin.TransactionBuilder.fromTransaction(tx, network);
-//     const key     = btctool.bitcoin.ECPair.fromWIF(privkey, network);
-
-//     txb.sign({
-//         prevOutScriptType: 'p2pkh',
-//         vin: 0,
-//         keyPair: key,
-//     });
-
-//     // Export hex
-//     let toHex = txb.build().toHex();
-//     console.info('signP2PKH - toHex = ' + toHex);
-//     return toHex;
-// }
 
 /**
  * Sign P2PKH address with TransactionBuilder way
