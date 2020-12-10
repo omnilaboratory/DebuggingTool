@@ -22,6 +22,7 @@ function HTLCFindPath(info) {
     return new Promise((resolve, reject) => {
         obdApi.HTLCFindPath(info, function(e) {
             // console.info('SDK: -100401 - HTLCFindPath = ' + JSON.stringify(e));
+            saveRoutingPacket(e.routing_packet);
             resolve(e);
         });
     })
@@ -358,8 +359,6 @@ function sendSignedHex100105(myUserID, nodeID, userID, signedInfo, channel_id) {
             let resp = await payInvoiceStep4(myUserID, nodeID, userID, channel_id, e);
 
             if (resp.status === false) {  // A multi-hop
-                // resolve(false);
-
                 let returnData = {
                     status:    false,
                     infoStep2: resp.infoStep2,
@@ -532,16 +531,28 @@ function sendSignedHex100113(myUserID, nodeID, userID, signedInfo) {
         obdApi.sendSignedHex100113(nodeID, userID, signedInfo, async function(e) {
             // console.info('sendSignedHex100113 = ' + JSON.stringify(e));
 
+            let channel_id = e.channel_id;
+
             // save some data
-            let isFunder = await getIsFunder(myUserID, e.channel_id);
-            saveChannelStatus(myUserID, e.channel_id, isFunder, kStatusCloseHTLCSigned);
+            let isFunder = await getIsFunder(myUserID, channel_id);
+            saveChannelStatus(myUserID, channel_id, isFunder, kStatusCloseHTLCSigned);
             savePayInvoiceCase('No');
 
+            // Find previous channel_id in htlc_routing_packet
+            let prevStep;
+            let routs = getRoutingPacket().split(',');
+            for (let i = 0; i < routs.length; i++) {
+                if (routs[i] === channel_id) {
+                    prevStep = i - 1;
+                    break;
+                }
+            }
+            console.info('previous channel_id = ' + prevStep);
+
             // This is a multi-hop
-            if (stepHop > 1) {
+            if (prevStep >= 0) {
                 // Get channel_id of between middleman and previous node
-                let routs           = getRoutingPacket().split(',');
-                let prev_channel_id = routs[stepHop - 2];
+                let prev_channel_id = routs[prevStep];
 
                 // Middleman send -100045 forwardR to previous node.
                 let info        = new ForwardRInfo();
@@ -561,9 +572,6 @@ function sendSignedHex100113(myUserID, nodeID, userID, signedInfo) {
                     info106: resp,
                 };
 
-                stepHop--;
-                saveStepHop(stepHop);
-                console.info('sendSignedHex100113 stepHop = ' + stepHop);
                 resolve(returnData);
                 
             } else {

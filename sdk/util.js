@@ -43,11 +43,6 @@ const kPayInvoiceCase = 'pay_invoice_case';
 const kMnemonicWithLogined = 'mnemonic_with_logined';
 
 /**
- * Steps in multi-hop HTLC
- */
-const kStepHop = 'step_hop';
-
-/**
  * Save R from final recipient of HTLC
  */
 const kInvoiceR = 'invoice_r';
@@ -947,21 +942,6 @@ function getMnemonic(myUserID, param) {
     } else {
         return '';
     }
-}
-
-/**
- * save Steps in multi-hop HTLC
- * @param value
- */
-function saveStepHop(value) {
-    localStorage.setItem(kInvoiceR, value);
-}
-
-/**
- * get Steps in multi-hop HTLC
- */
-function getStepHop() {
-    return localStorage.getItem(kInvoiceR);
 }
 
 /**

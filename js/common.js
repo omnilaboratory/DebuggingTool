@@ -689,12 +689,7 @@ async function payInvoice() {
     info.invoice = $("#invoice").val();
     
     displaySentMessage100401(info, true);
-    let e = await HTLCFindPath(info);
-    if (e === null) {
-        alert("HTLCFindPath failed. No path found.");
-        return;
-    }
-
+    let e    = await HTLCFindPath(info);
     let path = e.routing_packet.split(',');
     if (channel_id != path[0]) {
         // Using new channel to process htlc.
@@ -4591,7 +4586,7 @@ async function register110042(e, netType) {
     displaySentMessage100104(resp.info104);
     displaySentMessage100105(nodeID, userID, resp.info105);
 
-    // Bob has NOT R. Bob maybe a middleman node.
+    // A multi-hop. Bob has NOT R. Bob is a middleman.
     if (resp.status === false) {
         // tipsOnTop('', kNotFoundR, 'Forward R', 'forwardR', 'Yes');
         tipsOnTop('', kNotFoundR);
@@ -4648,9 +4643,11 @@ async function register110050(e) {
     if (resp.status === false) { // A multi-hop
         displaySentMessage100045(resp.nodeID2, resp.userID2, resp.info45);
         displaySentMessage100106(resp.nodeID2, resp.userID2, resp.info106);
+        tipsOnTop(e.channel_id, kMultiHopContinue);
+    } else {
+        tipsOnTop(e.channel_id, kTips110050);
     }
 
-    tipsOnTop(e.channel_id, kTips110050);
     displayMyChannelListAtTopRight(kPageSize, kPageIndex);
 }
 

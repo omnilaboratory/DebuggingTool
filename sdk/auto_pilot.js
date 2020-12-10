@@ -5,11 +5,6 @@
 // commitmentTransactionCreated, addHTLC, forwardR, closeHTLC.
 
 /**
- * Multi-hop steps in HTLC
- */
-var stepHop = 1;
-
-/**
  * auto response to -100032 (openChannel) 
  * listening to -110032 and send -100033 acceptChannel
  * 
@@ -289,13 +284,13 @@ function payInvoiceStep2(e, myUserID, channel_id, from100105) {
             info.amount         = e.amount_to_htlc;
             info.h              = e.htlc_h;
             info.routing_packet = e.htlc_routing_packet;
-            // info.memo        = e.htlc_memo;  // TEMP COMMENT, WAIT OBD UPDATE.
+            info.memo           = e.htlc_memo;
             info.cltv_expiry    = e.htlc_cltv_expiry;
         } else {
             info.amount         = e.amount;
             info.h              = e.h;
             info.routing_packet = e.routing_packet;
-            // info.memo        = e.memo;  // TEMP COMMENT, WAIT OBD UPDATE.
+            info.memo           = e.memo;
             info.cltv_expiry    = e.min_cltv_expiry;
         }
         
@@ -349,21 +344,24 @@ function payInvoiceStep4(myUserID, nodeID, userID, channel_id, e) {
     return new Promise(async function(resolve, reject) {
         let r = getPrivKeyFromPubKey(myUserID, getInvoiceH());
         console.info('R = ' + r);
-        
+
         // Bob has NOT R. Bob maybe a middleman node.
         if (r === '') {
             saveRoutingPacket(e.htlc_routing_packet);
 
-            // get channel_id of between Bob and Carol
+            // Find next channel_id in htlc_routing_packet
             let routs = e.htlc_routing_packet.split(',');
+            let next_channel_id;
+            for (let i = 0; i < routs.length; i++) {
+                if (routs[i] === channel_id) {
+                    next_channel_id = routs[i + 1];
+                    break;
+                }
+            }
+            console.info('Next channel_id = ' + next_channel_id);
 
             // Launch a HTLC between Bob and Carol (next node).
-            let resp  = await payInvoiceStep2(e, myUserID, routs[stepHop], '100105');
-            stepHop++;
-            saveStepHop(stepHop);
-            console.info('payInvoiceStep4 stepHop = ' + stepHop);
-
-            // return resolve(false);
+            let resp = await payInvoiceStep2(e, myUserID, next_channel_id, '100105');
 
             let returnData = {
                 status:    false,
@@ -676,6 +674,7 @@ function listening110045(e) {
  * @param e 
  */
 async function listening110046(e) {
+    console.info('listening110046');
     let myUserID   = e.to_peer_id;
     let channel_id = e.channel_id;
     let isFunder   = await getIsFunder(myUserID, channel_id);
