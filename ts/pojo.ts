@@ -245,6 +245,7 @@ class addHTLCInfo {
   recipient_user_peer_id: string = "";
   // property_id: number = 0;
   amount: number = 0;
+  amount_to_payee: number = 0;
   memo: string = "";
   h: string = "";
   routing_packet: string = "";

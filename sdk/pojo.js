@@ -280,6 +280,7 @@ class addHTLCInfo {
         this.recipient_user_peer_id = "";
         // property_id: number = 0;
         this.amount = 0;
+        this.amount_to_payee = 0;
         this.memo = "";
         this.h = "";
         this.routing_packet = "";

@@ -697,7 +697,6 @@ async function payInvoice() {
         channel_id = path[0];
     }
     
-    saveHTLCPathData(e);
     disableInvokeAPI();
     tipsOnTop('', kPayInvoice);
     savePayInvoiceCase('Yes');
@@ -738,18 +737,19 @@ async function sdkAddHTLC() {
     let nodeID  = $("#recipient_node_peer_id").val();
     let userID  = $("#recipient_user_peer_id").val();
 
-    let info                                         = new addHTLCInfo();
-    info.recipient_user_peer_id                      = userID;
-    // info.property_id                                 = Number($("#property_id").val());
-    info.amount                                      = Number($("#amount").val());
-    info.memo                                        = $("#memo").val();
-    info.h                                           = $("#h").val();
-    info.routing_packet                              = $("#routing_packet").val();
-    info.cltv_expiry                                 = Number($("#cltv_expiry").val());
-    info.curr_rsmc_temp_address_pub_key              = $("#curr_rsmc_temp_address_pub_key").val();
-    info.curr_htlc_temp_address_pub_key              = $("#curr_htlc_temp_address_pub_key").val();
-    info.curr_htlc_temp_address_for_ht1a_pub_key     = $("#curr_htlc_temp_address_for_ht1a_pub_key").val();
-    info.last_temp_address_private_key               = $("#last_temp_address_private_key").val();
+    let info                                     = new addHTLCInfo();
+    info.recipient_user_peer_id                  = userID;
+    // info.property_id                          = Number($("#property_id").val());
+    info.amount                                  = Number($("#amount").val());
+    info.amount_to_payee                         = Number(getHTLCPathData().amount);
+    info.memo                                    = $("#memo").val();
+    info.h                                       = $("#h").val();
+    info.routing_packet                          = $("#routing_packet").val();
+    info.cltv_expiry                             = Number($("#cltv_expiry").val());
+    info.curr_rsmc_temp_address_pub_key          = $("#curr_rsmc_temp_address_pub_key").val();
+    info.curr_htlc_temp_address_pub_key          = $("#curr_htlc_temp_address_pub_key").val();
+    info.curr_htlc_temp_address_for_ht1a_pub_key = $("#curr_htlc_temp_address_for_ht1a_pub_key").val();
+    info.last_temp_address_private_key           = $("#last_temp_address_private_key").val();
     
     // Save address index to OBD and can get private key back if lose it.
     info.curr_rsmc_temp_address_index          = Number(getIndexFromPubKey(info.curr_rsmc_temp_address_pub_key));
@@ -822,13 +822,11 @@ async function sdkHTLCFindPath() {
         if (resp === true) { // clicked OK buttoin
             $("#curr_channel_id").text(get_new_id);
             afterHTLCFindPath();
-            saveHTLCPathData(e);
         } else {
             tipsOnTop('', k100401_ClickCancel);
         }
     } else {
         afterHTLCFindPath();
-        saveHTLCPathData(e);
     }
 }
 
@@ -1464,7 +1462,20 @@ async function fillCounterparty(myUserID, channel_id) {
 function fillHTLCPathData() {
     let data = getHTLCPathData();
     // $("#property_id").val(data.property_id);
-    $("#amount").val(data.amount);
+
+    // Plus should pay htlc fee
+    let payFee = getPayHtlcFee();
+    let amount = Number(data.amount) + Number(payFee);
+    $("#amount").val(amount);
+
+    // let fee_in_amount = 'Fee in the amount is: ' + payFee;
+    //     fee_in_amount = '  Fee rate is: ' + getHtlcFeeRate();
+    $("#fee_in_amount").val(payFee);
+    $("#fee_rate").val(getHtlcFeeRate());
+
+    console.info('fillHTLCPathData payFee = ' + payFee);
+    console.info('fillHTLCPathData total amount = ' + amount);
+
     $("#memo").val(data.memo);
     $("#h").val(data.h);
     // let arrRouting = data.routing_packet.split(',');
@@ -5181,15 +5192,22 @@ function rowMyChannelList(e, i, tr) {
     // createElement(tr, 'td', e.data[i].balance_htlc);
     // createElement(tr, 'td', e.data[i].btc_amount);
 
-    if (e.data[i].channel_id === '') {  // is a temporary channel
-        if (e.data[i].btc_funding_times === 0) {
-            createElement(tr, 'td', '0');
-        } else {
-            createElement(tr, 'td', e.data[i].btc_funding_times);
-        }
+    // column for 'closed'
+    if (e.data[i].curr_state === 21) { // channel is closed
+        createElement(tr, 'td', 'Yes');
     } else {
-        createElement(tr, 'td', '3');
+        createElement(tr, 'td', 'No');
     }
+
+    // if (e.data[i].channel_id === '') {  // is a temporary channel
+    //     if (e.data[i].btc_funding_times === 0) {
+    //         createElement(tr, 'td', '0');
+    //     } else {
+    //         createElement(tr, 'td', e.data[i].btc_funding_times);
+    //     }
+    // } else {
+    //     createElement(tr, 'td', '3');
+    // }
 
     // createElement(tr, 'td', e.data[i].is_private);
 
@@ -5226,7 +5244,8 @@ function tableMyChannelList(e) {
     createElement(table, 'th', 'balance_b', 'col_3_width');
     // createElement(table, 'th', 'balance_htlc', 'col_4_width');
     // createElement(table, 'th', 'btc_amount', 'col_4_width');
-    createElement(table, 'th', 'btc_funding_times', 'col_3_width');
+    createElement(table, 'th', 'closed', 'col_3_width');
+    // createElement(table, 'th', 'btc_funding_times', 'col_3_width');
     // createElement(table, 'th', 'is_private', 'col_4_width');
     // createElement(table, 'th', 'user_a', 'col_5_width');
     createElement(table, 'th', 'counterparty', 'col_5_width');
@@ -5355,7 +5374,8 @@ function tableMyChannelListAtTopRight(e) {
     // createElement(table, 'th', 'property_id', 'col_2_width');
     // createElement(table, 'th', 'asset_amount', 'col_4_width');
     createElement(table, 'th', 'balance');
-    createElement(table, 'th', 'p_msg');
+    createElement(table, 'th', 'closed');
+    // createElement(table, 'th', 'p_msg');
     // createElement(table, 'th', 'balance_b', 'col_3_width');
     // createElement(table, 'th', 'balance_htlc', 'col_4_width');
     // createElement(table, 'th', 'btc_amount', 'col_4_width');
@@ -5456,7 +5476,14 @@ function rowMyChannelListAtTopRight(e, i, tr) {
     // createElement(tr, 'td', e.data[i].property_id);
     // createElement(tr, 'td', e.data[i].asset_amount);
     createElement(tr, 'td', e.data[i].balance_a);
-    createElement(tr, 'td', '0');
+
+    if (e.data[i].curr_state === 21) { // channel is closed
+        createElement(tr, 'td', 'Yes');
+    } else {
+        createElement(tr, 'td', 'No');
+    }
+
+    // createElement(tr, 'td', '0');
     // createElement(tr, 'td', e.data[i].balance_b);
     // createElement(tr, 'td', e.data[i].balance_htlc);
     // createElement(tr, 'td', e.data[i].btc_amount);

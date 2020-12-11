@@ -737,6 +737,16 @@
                     "buttons": []
                 },
                 {
+                    "name": "fee_in_amount",
+                    "disable": "yes",
+                    "buttons": []
+                },
+                {
+                    "name": "fee_rate",
+                    "disable": "yes",
+                    "buttons": []
+                },
+                {
                     "name": "memo",
                     "buttons": []
                 },

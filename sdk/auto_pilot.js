@@ -269,8 +269,9 @@ function listening110040(e, netType) {
  * @param myUserID
  * @param channel_id
  * @param from100105  get data from 100105
+ * @param nextPay  amount of pay to next ndoe
  */
-function payInvoiceStep2(e, myUserID, channel_id, from100105) {
+function payInvoiceStep2(e, myUserID, channel_id, from100105, nextPay) {
     return new Promise(async function(resolve, reject) {
         let result = await getCounterparty(myUserID, channel_id);
         let nodeID = result.toNodeID;
@@ -281,17 +282,27 @@ function payInvoiceStep2(e, myUserID, channel_id, from100105) {
         // info.property_id         = e.property_id;
 
         if (from100105) {
-            info.amount         = e.amount_to_htlc;
-            info.h              = e.htlc_h;
-            info.routing_packet = e.htlc_routing_packet;
-            info.memo           = e.htlc_memo;
-            info.cltv_expiry    = e.htlc_cltv_expiry;
-        } else {
-            info.amount         = e.amount;
-            info.h              = e.h;
-            info.routing_packet = e.routing_packet;
-            info.memo           = e.memo;
-            info.cltv_expiry    = e.min_cltv_expiry;
+            info.amount          = nextPay;
+            info.amount_to_payee = e.htlc_amount_to_payee;
+            info.h               = e.htlc_h;
+            info.routing_packet  = e.htlc_routing_packet;
+            info.memo            = e.htlc_memo;
+            info.cltv_expiry     = e.htlc_cltv_expiry;
+
+        } else { // payInvoice
+            // Plus should pay htlc fee
+            let payFee = getPayHtlcFee();
+            let amount = Number(e.amount) + Number(payFee);
+
+            console.info('payInvoice payFee = ' + payFee);
+            console.info('payInvoice total amount = ' + amount);
+
+            info.amount          = amount;
+            info.amount_to_payee = e.amount;
+            info.h               = e.h;
+            info.routing_packet  = e.routing_packet;
+            info.memo            = e.memo;
+            info.cltv_expiry     = e.min_cltv_expiry;
         }
         
         info.last_temp_address_private_key = getTempPrivKey(myUserID, kTempPrivKey, channel_id);
@@ -351,17 +362,25 @@ function payInvoiceStep4(myUserID, nodeID, userID, channel_id, e) {
 
             // Find next channel_id in htlc_routing_packet
             let routs = e.htlc_routing_packet.split(',');
-            let next_channel_id;
+            let next_channel_id, nextPay;
             for (let i = 0; i < routs.length; i++) {
                 if (routs[i] === channel_id) {
                     next_channel_id = routs[i + 1];
+
+                    // Calculate how much assets should pay to next node.
+                    let amount  = e.htlc_amount_to_payee;
+                    let htlcFee = getFeeOfEveryHop(amount); // fee of every hop
+                    let midLeft = routs.length - i - 2; // how many middleman left
+                    nextPay = Number(amount) + accMul(midLeft, htlcFee);
+                    console.info('midLeft = ' + midLeft);
+                    console.info('nextPay = ' + nextPay);
                     break;
                 }
             }
             console.info('Next channel_id = ' + next_channel_id);
 
             // Launch a HTLC between Bob and Carol (next node).
-            let resp = await payInvoiceStep2(e, myUserID, next_channel_id, '100105');
+            let resp = await payInvoiceStep2(e, myUserID, next_channel_id, '100105', nextPay);
 
             let returnData = {
                 status:    false,

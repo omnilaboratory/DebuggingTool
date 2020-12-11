@@ -68,6 +68,21 @@ const kHTLCPathData = 'htlc_path_data';
 const kRoutingPacket = 'routing_packet';
 
 /**
+ * 
+ */
+const kHtlcFeeRate = 'htlc_fee_rate';
+
+/**
+ * 
+ */
+const kHtlcMaxFee = 'htlc_max_fee';
+
+/**
+ * 
+ */
+const kPayHtlcFee = 'pay_htlc_fee';
+
+/**
  * Object of IndexedDB.
  */
 var db;
@@ -1103,6 +1118,51 @@ function getRoutingPacket() {
 }
 
 /**
+ * Save HTLC Fee Rate
+ * @param value
+ */
+function saveHtlcFeeRate(value) {
+    localStorage.setItem(kHtlcFeeRate, value);
+}
+
+/**
+ * Get HTLC Fee Rate
+ */
+function getHtlcFeeRate() {
+    return localStorage.getItem(kHtlcFeeRate);
+}
+
+/**
+ * Save Max HTLC Fee
+ * @param value
+ */
+function saveHtlcMaxFee(value) {
+    localStorage.setItem(kHtlcMaxFee, value);
+}
+
+/**
+ * Get Max HTLC Fee
+ */
+function getHtlcMaxFee() {
+    return localStorage.getItem(kHtlcMaxFee);
+}
+
+/**
+ * Save how much HTLC Fee should pay
+ * @param value
+ */
+function savePayHtlcFee(value) {
+    localStorage.setItem(kPayHtlcFee, value);
+}
+
+/**
+ * Get how much HTLC Fee should pay
+ */
+function getPayHtlcFee() {
+    return localStorage.getItem(kPayHtlcFee);
+}
+
+/**
  * Save Funding private key
  * @param myUserID
  * @param channel_id
@@ -1435,4 +1495,24 @@ function accMul(arg1, arg2) {
     } catch (e) {}
 
     return Number(s1.replace(".", "")) * Number(s2.replace(".", "")) / Math.pow(10, m);
+}
+
+/**
+ * Calculate fee of every hop
+ * @param amount amount of will send
+ */
+function getFeeOfEveryHop(amount) {
+    let maxFee  = getHtlcMaxFee();
+    let feeRate = getHtlcFeeRate();
+    let htlcFee = accMul(amount, feeRate); // fee of every hop
+
+    if (Number(htlcFee) > Number(maxFee)) {
+        htlcFee = maxFee;
+    }
+
+    if (Number(htlcFee) < 0.00000001) {
+        htlcFee = 0;
+    }
+
+    return htlcFee;
 }

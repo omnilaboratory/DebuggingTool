@@ -21,8 +21,17 @@ function addInvoice(info, callback) {
 function HTLCFindPath(info) {
     return new Promise((resolve, reject) => {
         obdApi.HTLCFindPath(info, function(e) {
-            // console.info('SDK: -100401 - HTLCFindPath = ' + JSON.stringify(e));
+            console.info('SDK: -100401 - HTLCFindPath = ' + JSON.stringify(e));
+            saveHTLCPathData(e);
             saveRoutingPacket(e.routing_packet);
+
+            // Calculate how much htlc fee the sender should pay
+            let htlcFee = getFeeOfEveryHop(e.amount); // fee of every hop
+            let routs   = e.routing_packet.split(',');
+            let payFee  = accMul(routs.length - 1, htlcFee); // should pay
+            savePayHtlcFee(payFee);
+            console.info('HTLCFindPath payFee = ' + payFee);
+
             resolve(e);
         });
     })
