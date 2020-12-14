@@ -4668,8 +4668,16 @@ async function register110050(e) {
  */
 async function register110051(e) {
     let resp = await listening110051(e);
-    displaySentMessage100114(resp);
-    afterCloseHTLCSigned();
+    displaySentMessage100114(resp.info114);
+
+    if (resp.status === false) { // A multi-hop
+        displaySentMessage100045(resp.nodeID, resp.userID, resp.info45);
+        displaySentMessage100106(resp.nodeID, resp.userID, resp.info106);
+        tipsOnTop(e.channel_id, kMultiHopContinue);
+    } else {
+        afterCloseHTLCSigned(e);
+    }
+
     displayMyChannelListAtTopRight(kPageSize, kPageIndex);
 }
 
@@ -5777,9 +5785,9 @@ function afterCloseHTLC() {
 /**
  * 
  */
-function afterCloseHTLCSigned() {
+function afterCloseHTLCSigned(e) {
     disableInvokeAPI();
-    tipsOnTop('', kTipsAfterCloseHTLCSigned);
+    tipsOnTop(e.channel_id, kTipsAfterCloseHTLCSigned);
 }
 
 /**

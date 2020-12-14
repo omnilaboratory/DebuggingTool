@@ -62,6 +62,7 @@ function logIn(mnemonic) {
             saveMnemonic(e.userPeerId, mnemonic);
             saveHtlcFeeRate(e.htlc_fee_rate);
             saveHtlcMaxFee(e.htlc_max_fee);
+            saveRoutingPacket('');
             resolve(e);
         });
     })

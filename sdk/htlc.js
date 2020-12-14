@@ -548,59 +548,87 @@ function sendSignedHex100113(myUserID, nodeID, userID, signedInfo) {
             savePayInvoiceCase('No');
 
             // Find previous channel_id in htlc_routing_packet
-            let prevStep;
-            let routs = getRoutingPacket().split(',');
-            for (let i = 0; i < routs.length; i++) {
-                if (routs[i] === channel_id) {
-                    prevStep = i - 1;
-                    break;
-                }
-            }
-            console.info('previous channel_id = ' + prevStep);
-
-            // This is a multi-hop
-            if (prevStep >= 0) {
-                // Get channel_id of between middleman and previous node
-                let prev_channel_id = routs[prevStep];
-
-                // Middleman send -100045 forwardR to previous node.
-                let info        = new ForwardRInfo();
-                info.channel_id = prev_channel_id;
-                info.r          = getInvoiceR();
-
-                console.info('sendSignedHex100113 ForwardRInfo = ' + JSON.stringify(info));
-
-                let isFunder = await getIsFunder(myUserID, prev_channel_id);
-                let cp       = await getCounterparty(myUserID, prev_channel_id);
-                let resp     = await forwardR(myUserID, cp.toNodeID, cp.toUserID, info, isFunder);
-            
-                let returnData = {
-                    nodeID:  cp.toNodeID,
-                    userID:  cp.toUserID,
-                    info45:  info,
-                    info106: resp,
-                };
-
-                resolve(returnData);
-                
-            } else {
-                resolve(true);
-            }
+            let resp = await continueForwardR(myUserID, channel_id);
+            saveRoutingPacket('');
+            resolve(resp);
         });
     })
 }
 
 /**
  * Type -100114 Protocol send signed info that signed in 110051 to OBD.
+ * @param myUserID The user id of logged in
+ * @param channel_id 
+ */
+function continueForwardR(myUserID, channel_id) {
+    return new Promise(async function(resolve, reject) {
+
+        // Find previous channel_id in htlc_routing_packet
+        let prevStep;
+        let path = getRoutingPacket();
+        if (path === null || path === '') {
+            console.info('RoutingPacket IS NULL');
+            resolve(true);
+            return;
+        }
+
+        let routs = path.split(',');
+        for (let i = 0; i < routs.length; i++) {
+            if (routs[i] === channel_id) {
+                prevStep = i - 1;
+                break;
+            }
+        }
+        console.info('previous channel_id = ' + prevStep);
+
+        // This is a multi-hop
+        if (prevStep >= 0) {
+            // Get channel_id of between middleman and previous node
+            let prev_channel_id = routs[prevStep];
+
+            // Middleman send -100045 forwardR to previous node.
+            let info        = new ForwardRInfo();
+            info.channel_id = prev_channel_id;
+            info.r          = getInvoiceR();
+
+            console.info('continueForwardR ForwardRInfo = ' + JSON.stringify(info));
+
+            let isFunder = await getIsFunder(myUserID, prev_channel_id);
+            let cp       = await getCounterparty(myUserID, prev_channel_id);
+            let resp     = await forwardR(myUserID, cp.toNodeID, cp.toUserID, info, isFunder);
+        
+            let returnData = {
+                nodeID:  cp.toNodeID,
+                userID:  cp.toUserID,
+                info45:  info,
+                info106: resp,
+            };
+
+            resolve(returnData);
+            
+        } else {
+            resolve(true);
+        }
+    })
+}
+
+/**
+ * Type -100114 Protocol send signed info that signed in 110051 to OBD.
+ * @param myUserID The user id of logged in
+ * @param channel_id 
  * @param signedInfo 
  */
-function sendSignedHex100114(signedInfo) {
+function sendSignedHex100114(myUserID, channel_id, signedInfo) {
     return new Promise((resolve, reject) => {
-        obdApi.sendSignedHex100114(signedInfo, function(e) {
+        obdApi.sendSignedHex100114(signedInfo, async function(e) {
             // console.info('sendSignedHex100114 = ' + JSON.stringify(e));
             // Clear H at Bob side
             saveInvoiceH('');
-            resolve(true);
+
+            // Find previous channel_id in htlc_routing_packet
+            let resp = await continueForwardR(myUserID, channel_id);
+            saveRoutingPacket('');
+            resolve(resp);
         });
     })
 }

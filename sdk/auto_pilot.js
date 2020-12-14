@@ -856,8 +856,28 @@ function listening110051(e) {
         signedInfo.channel_id                 = channel_id;
         signedInfo.c4b_rd_complete_signed_hex = brd_hex;
     
-        await sendSignedHex100114(signedInfo);
-        resolve(signedInfo);
+        let resp = await sendSignedHex100114(myUserID, channel_id, signedInfo);
+
+        if (resp === true) {
+            let returnData = {
+                status:  true,
+                info114: signedInfo,
+            };
+        
+            resolve(returnData);
+
+        } else {
+            let returnData = {
+                status:  false,
+                info114: signedInfo,
+                nodeID:  resp.nodeID,
+                userID:  resp.userID,
+                info45:  resp.info45,
+                info106: resp.info106,
+            };
+        
+            resolve(returnData);
+        }
     })
 }
 
