@@ -733,17 +733,17 @@
                     ]
                 },
                 {
-                    "name": "property_id",
-                    "help": "The property id of an omni asset.",
-                    "buttons": [
-                        {
-                            "innerText": "Display",
-                            "onclick": "displayUserDataInNewHtml('MyAddresses')"
-                        }
-                    ]
+                    "name": "amount",
+                    "buttons": []
                 },
                 {
-                    "name": "amount",
+                    "name": "fee_in_amount",
+                    "disable": "yes",
+                    "buttons": []
+                },
+                {
+                    "name": "fee_rate",
+                    "disable": "yes",
                     "buttons": []
                 },
                 {

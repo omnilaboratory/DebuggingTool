@@ -111,6 +111,7 @@ async function sdkLogIn() {
 
     // a new loginning.
     mnemonicWithLogined = mnemonic;
+    saveMnemonicWithLogined(mnemonicWithLogined);
     $("#logined").text(e.userPeerId);
     isLogined = true;
 
@@ -688,76 +689,22 @@ async function payInvoice() {
     info.invoice = $("#invoice").val();
     
     displaySentMessage100401(info, true);
-    
     let e    = await HTLCFindPath(info);
-    let path = e.routing_packet;
-
-    if (channel_id != path) {
+    let path = e.routing_packet.split(',');
+    if (channel_id != path[0]) {
         // Using new channel to process htlc.
-        $("#curr_channel_id").text(path);
-        channel_id = path;
+        $("#curr_channel_id").text(path[0]);
+        channel_id = path[0];
     }
     
-    saveHTLCPathData(e);
     disableInvokeAPI();
     tipsOnTop('', kPayInvoice);
     savePayInvoiceCase('Yes');
 
     // Step 2: addHTLC
-    payInvoiceStep2(e, myUserID, channel_id);
-}
-
-/**
- * Step 2: -100040 addHTLC
- * @param e
- * @param myUserID
- * @param channel_id
- */
-async function payInvoiceStep2(e, myUserID, channel_id) {
-
-    if (e === null) {
-        alert("HTLCFindPath failed. No path found.");
-        return;
-    }
-    
-    // automatically invoke addHTLC
-    let result = await getCounterparty(myUserID, channel_id);
-    let nodeID = result.toNodeID;
-    let userID = result.toUserID;
-    
-    let info                            = new addHTLCInfo();
-    info.recipient_user_peer_id         = userID;
-    info.property_id                    = e.property_id;
-    info.amount                         = e.amount;
-    info.h                              = e.h;
-    info.routing_packet                 = e.routing_packet;
-    info.cltv_expiry                    = e.min_cltv_expiry;
-    info.memo                           = e.memo;
-    info.last_temp_address_private_key  = getTempPrivKey(myUserID, kTempPrivKey, channel_id);
-
-    let addr_1 = sdkGenAddressFromMnemonic();
-    saveAddress(myUserID, addr_1);
-    info.curr_rsmc_temp_address_pub_key = addr_1.result.pubkey;
-
-    let addr_2 = sdkGenAddressFromMnemonic();
-    saveAddress(myUserID, addr_2);
-    info.curr_htlc_temp_address_pub_key = addr_2.result.pubkey;
-
-    let addr_3 = sdkGenAddressFromMnemonic();
-    saveAddress(myUserID, addr_3);
-    info.curr_htlc_temp_address_for_ht1a_pub_key = addr_3.result.pubkey;
-
-    // Save address index to OBD and can get private key back if lose it.
-    info.curr_rsmc_temp_address_index          = addr_1.result.index;
-    info.curr_htlc_temp_address_index          = addr_2.result.index;
-    info.curr_htlc_temp_address_for_ht1a_index = addr_3.result.index;
-
-    let privkey = await getFundingPrivKey(myUserID, channel_id);
-    displaySentMessage100040(nodeID, userID, info, privkey);
-
-    let isFunder = await getIsFunder(myUserID, channel_id);
-    let resp     = await addHTLC(myUserID, nodeID, userID, info, isFunder);
-    displaySentMessage100100(nodeID, userID, resp);
+    let resp = await payInvoiceStep2(e, myUserID, channel_id);
+    displaySentMessage100040(resp.nodeID, resp.userID, resp.info40, resp.privkey);
+    displaySentMessage100100(resp.nodeID, resp.userID, resp.info100);
 }
 
 /**
@@ -790,18 +737,19 @@ async function sdkAddHTLC() {
     let nodeID  = $("#recipient_node_peer_id").val();
     let userID  = $("#recipient_user_peer_id").val();
 
-    let info                                         = new addHTLCInfo();
-    info.recipient_user_peer_id                      = userID;
-    info.property_id                                 = Number($("#property_id").val());
-    info.amount                                      = Number($("#amount").val());
-    info.memo                                        = $("#memo").val();
-    info.h                                           = $("#h").val();
-    info.routing_packet                              = $("#routing_packet").val();
-    info.cltv_expiry                                 = Number($("#cltv_expiry").val());
-    info.curr_rsmc_temp_address_pub_key              = $("#curr_rsmc_temp_address_pub_key").val();
-    info.curr_htlc_temp_address_pub_key              = $("#curr_htlc_temp_address_pub_key").val();
-    info.curr_htlc_temp_address_for_ht1a_pub_key     = $("#curr_htlc_temp_address_for_ht1a_pub_key").val();
-    info.last_temp_address_private_key               = $("#last_temp_address_private_key").val();
+    let info                                     = new addHTLCInfo();
+    info.recipient_user_peer_id                  = userID;
+    // info.property_id                          = Number($("#property_id").val());
+    info.amount                                  = Number($("#amount").val());
+    info.amount_to_payee                         = Number(getHTLCPathData().amount);
+    info.memo                                    = $("#memo").val();
+    info.h                                       = $("#h").val();
+    info.routing_packet                          = $("#routing_packet").val();
+    info.cltv_expiry                             = Number($("#cltv_expiry").val());
+    info.curr_rsmc_temp_address_pub_key          = $("#curr_rsmc_temp_address_pub_key").val();
+    info.curr_htlc_temp_address_pub_key          = $("#curr_htlc_temp_address_pub_key").val();
+    info.curr_htlc_temp_address_for_ht1a_pub_key = $("#curr_htlc_temp_address_for_ht1a_pub_key").val();
+    info.last_temp_address_private_key           = $("#last_temp_address_private_key").val();
     
     // Save address index to OBD and can get private key back if lose it.
     info.curr_rsmc_temp_address_index          = Number(getIndexFromPubKey(info.curr_rsmc_temp_address_pub_key));
@@ -865,7 +813,8 @@ async function sdkHTLCFindPath() {
     displaySentMessage100401(info, isInvPay);
     let e = await HTLCFindPath(info);
 
-    let get_new_id = e.routing_packet;
+    let arrRouting = e.routing_packet.split(',');
+    let get_new_id = arrRouting[0];
     let channel_id = $("#curr_channel_id").text();
 
     if (channel_id != get_new_id) {
@@ -873,13 +822,11 @@ async function sdkHTLCFindPath() {
         if (resp === true) { // clicked OK buttoin
             $("#curr_channel_id").text(get_new_id);
             afterHTLCFindPath();
-            saveHTLCPathData(e);
         } else {
             tipsOnTop('', k100401_ClickCancel);
         }
     } else {
         afterHTLCFindPath();
-        saveHTLCPathData(e);
     }
 }
 
@@ -1512,13 +1459,26 @@ async function fillCounterparty(myUserID, channel_id) {
 /**
  * Auto fill h, routing packet, cltv expiry
  */
-async function fillHTLCPathData(myUserID, channel_id) {
-    // let data = await getHTLCPathData(myUserID, channel_id);
+function fillHTLCPathData() {
     let data = getHTLCPathData();
-    $("#property_id").val(data.property_id);
-    $("#amount").val(data.amount);
+    // $("#property_id").val(data.property_id);
+
+    // Plus should pay htlc fee
+    let payFee = getPayHtlcFee();
+    let amount = Number(data.amount) + Number(payFee);
+    $("#amount").val(amount);
+
+    // let fee_in_amount = 'Fee in the amount is: ' + payFee;
+    //     fee_in_amount = '  Fee rate is: ' + getHtlcFeeRate();
+    $("#fee_in_amount").val(payFee);
+    $("#fee_rate").val(getHtlcFeeRate());
+
+    console.info('fillHTLCPathData payFee = ' + payFee);
+    console.info('fillHTLCPathData total amount = ' + amount);
+
     $("#memo").val(data.memo);
     $("#h").val(data.h);
+    // let arrRouting = data.routing_packet.split(',');
     $("#routing_packet").val(data.routing_packet);
     $("#cltv_expiry").val(data.min_cltv_expiry);
 }
@@ -1906,7 +1866,7 @@ async function changeInvokeAPIEnable(status, isFunder, myUserID, channel_id) {
 
             enableInvokeAPI();
             fillCounterparty(myUserID, channel_id);
-            fillHTLCPathData(myUserID, channel_id);
+            fillHTLCPathData();
             fillChannelFundingLastTempKeys(myUserID, channel_id);
             fillCurrRsmcTempKey();
             fillCurrHtlcTempKey();
@@ -4224,7 +4184,7 @@ function displaySentMessage100040(nodeID, userID, info, privkey) {
         recipient_user_peer_id: userID,
         data: {
             recipient_user_peer_id: info.recipient_user_peer_id,
-            property_id: info.property_id,
+            // property_id: info.property_id,
             amount: info.amount,
             memo: info.memo,
             h: info.h,
@@ -4637,8 +4597,14 @@ async function register110042(e, netType) {
     displaySentMessage100104(resp.info104);
     displaySentMessage100105(nodeID, userID, resp.info105);
 
+    // A multi-hop. Bob has NOT R. Bob is a middleman.
     if (resp.status === false) {
-        tipsOnTop('', kNotFoundR, 'Forward R', 'forwardR', 'Yes');
+        // tipsOnTop('', kNotFoundR, 'Forward R', 'forwardR', 'Yes');
+        tipsOnTop('', kNotFoundR);
+        let data = resp.infoStep2;
+        displaySentMessage100040(data.nodeID, data.userID, data.info40, data.privkey);
+        displaySentMessage100100(data.nodeID, data.userID, data.info100);
+
     } else {
         displaySentMessage100045(nodeID, userID, resp.info45);
         displaySentMessage100106(nodeID, userID, resp.info106);
@@ -4684,7 +4650,15 @@ async function register110050(e) {
     let resp = await listening110050(e);
     displaySentMessage100112(resp.info112);
     displaySentMessage100113(resp.nodeID, resp.userID, resp.info113);
-    tipsOnTop(e.channel_id, kTips110050);
+
+    if (resp.status === false) { // A multi-hop
+        displaySentMessage100045(resp.nodeID2, resp.userID2, resp.info45);
+        displaySentMessage100106(resp.nodeID2, resp.userID2, resp.info106);
+        tipsOnTop(e.channel_id, kMultiHopContinue);
+    } else {
+        tipsOnTop(e.channel_id, kTips110050);
+    }
+
     displayMyChannelListAtTopRight(kPageSize, kPageIndex);
 }
 
@@ -4694,8 +4668,16 @@ async function register110050(e) {
  */
 async function register110051(e) {
     let resp = await listening110051(e);
-    displaySentMessage100114(resp);
-    afterCloseHTLCSigned();
+    displaySentMessage100114(resp.info114);
+
+    if (resp.status === false) { // A multi-hop
+        displaySentMessage100045(resp.nodeID, resp.userID, resp.info45);
+        displaySentMessage100106(resp.nodeID, resp.userID, resp.info106);
+        tipsOnTop(e.channel_id, kMultiHopContinue);
+    } else {
+        afterCloseHTLCSigned(e);
+    }
+
     displayMyChannelListAtTopRight(kPageSize, kPageIndex);
 }
 
@@ -5218,15 +5200,22 @@ function rowMyChannelList(e, i, tr) {
     // createElement(tr, 'td', e.data[i].balance_htlc);
     // createElement(tr, 'td', e.data[i].btc_amount);
 
-    if (e.data[i].channel_id === '') {  // is a temporary channel
-        if (e.data[i].btc_funding_times === 0) {
-            createElement(tr, 'td', '0');
-        } else {
-            createElement(tr, 'td', e.data[i].btc_funding_times);
-        }
+    // column for 'closed'
+    if (e.data[i].curr_state === 21) { // channel is closed
+        createElement(tr, 'td', 'Yes');
     } else {
-        createElement(tr, 'td', '3');
+        createElement(tr, 'td', 'No');
     }
+
+    // if (e.data[i].channel_id === '') {  // is a temporary channel
+    //     if (e.data[i].btc_funding_times === 0) {
+    //         createElement(tr, 'td', '0');
+    //     } else {
+    //         createElement(tr, 'td', e.data[i].btc_funding_times);
+    //     }
+    // } else {
+    //     createElement(tr, 'td', '3');
+    // }
 
     // createElement(tr, 'td', e.data[i].is_private);
 
@@ -5263,7 +5252,8 @@ function tableMyChannelList(e) {
     createElement(table, 'th', 'balance_b', 'col_3_width');
     // createElement(table, 'th', 'balance_htlc', 'col_4_width');
     // createElement(table, 'th', 'btc_amount', 'col_4_width');
-    createElement(table, 'th', 'btc_funding_times', 'col_3_width');
+    createElement(table, 'th', 'closed', 'col_3_width');
+    // createElement(table, 'th', 'btc_funding_times', 'col_3_width');
     // createElement(table, 'th', 'is_private', 'col_4_width');
     // createElement(table, 'th', 'user_a', 'col_5_width');
     createElement(table, 'th', 'counterparty', 'col_5_width');
@@ -5392,7 +5382,8 @@ function tableMyChannelListAtTopRight(e) {
     // createElement(table, 'th', 'property_id', 'col_2_width');
     // createElement(table, 'th', 'asset_amount', 'col_4_width');
     createElement(table, 'th', 'balance');
-    createElement(table, 'th', 'p_msg');
+    createElement(table, 'th', 'closed');
+    // createElement(table, 'th', 'p_msg');
     // createElement(table, 'th', 'balance_b', 'col_3_width');
     // createElement(table, 'th', 'balance_htlc', 'col_4_width');
     // createElement(table, 'th', 'btc_amount', 'col_4_width');
@@ -5493,7 +5484,14 @@ function rowMyChannelListAtTopRight(e, i, tr) {
     // createElement(tr, 'td', e.data[i].property_id);
     // createElement(tr, 'td', e.data[i].asset_amount);
     createElement(tr, 'td', e.data[i].balance_a);
-    createElement(tr, 'td', '0');
+
+    if (e.data[i].curr_state === 21) { // channel is closed
+        createElement(tr, 'td', 'Yes');
+    } else {
+        createElement(tr, 'td', 'No');
+    }
+
+    // createElement(tr, 'td', '0');
     // createElement(tr, 'td', e.data[i].balance_b);
     // createElement(tr, 'td', e.data[i].balance_htlc);
     // createElement(tr, 'td', e.data[i].btc_amount);
@@ -5787,9 +5785,9 @@ function afterCloseHTLC() {
 /**
  * 
  */
-function afterCloseHTLCSigned() {
+function afterCloseHTLCSigned(e) {
     disableInvokeAPI();
-    tipsOnTop('', kTipsAfterCloseHTLCSigned);
+    tipsOnTop(e.channel_id, kTipsAfterCloseHTLCSigned);
 }
 
 /**

@@ -1275,10 +1275,6 @@ class ObdApi {
       alert("empty h");
       return;
     }
-    if (info.property_id <= 0) {
-      alert("wrong property_id");
-      return;
-    }
     if (info.amount <= 0) {
       alert("wrong amount");
       return;

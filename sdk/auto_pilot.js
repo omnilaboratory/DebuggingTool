@@ -4,7 +4,6 @@
 // openChannel, bitcoinFundingCreated, assetFundingCreated, 
 // commitmentTransactionCreated, addHTLC, forwardR, closeHTLC.
 
-
 /**
  * auto response to -100032 (openChannel) 
  * listening to -110032 and send -100033 acceptChannel
@@ -265,31 +264,183 @@ function listening110040(e, netType) {
 }
 
 /**
+ * Step 2: automatically invoke -100040 addHTLC
+ * @param e
+ * @param myUserID
+ * @param channel_id
+ * @param from100105  get data from 100105
+ * @param nextPay  amount of pay to next ndoe
+ */
+function payInvoiceStep2(e, myUserID, channel_id, from100105, nextPay) {
+    return new Promise(async function(resolve, reject) {
+        let result = await getCounterparty(myUserID, channel_id);
+        let nodeID = result.toNodeID;
+        let userID = result.toUserID;
+        
+        let info                    = new addHTLCInfo();
+        info.recipient_user_peer_id = userID;
+        // info.property_id         = e.property_id;
+
+        if (from100105) {
+            info.amount          = nextPay;
+            info.amount_to_payee = e.htlc_amount_to_payee;
+            info.h               = e.htlc_h;
+            info.routing_packet  = e.htlc_routing_packet;
+            info.memo            = e.htlc_memo;
+            info.cltv_expiry     = e.htlc_cltv_expiry;
+
+        } else { // payInvoice
+            // Plus should pay htlc fee
+            let payFee = getPayHtlcFee();
+            let amount = Number(e.amount) + Number(payFee);
+
+            console.info('payInvoice payFee = ' + payFee);
+            console.info('payInvoice total amount = ' + amount);
+
+            info.amount          = amount;
+            info.amount_to_payee = e.amount;
+            info.h               = e.h;
+            info.routing_packet  = e.routing_packet;
+            info.memo            = e.memo;
+            info.cltv_expiry     = e.min_cltv_expiry;
+        }
+        
+        info.last_temp_address_private_key = getTempPrivKey(myUserID, kTempPrivKey, channel_id);
+    
+        let index  = getNewAddrIndex(myUserID);
+        let addr_1 = genAddressFromMnemonic(getMnemonicWithLogined(), index, true);
+        saveAddress(myUserID, addr_1);
+        info.curr_rsmc_temp_address_pub_key = addr_1.result.pubkey;
+    
+        index      = getNewAddrIndex(myUserID);
+        let addr_2 = genAddressFromMnemonic(getMnemonicWithLogined(), index, true);
+        saveAddress(myUserID, addr_2);
+        info.curr_htlc_temp_address_pub_key = addr_2.result.pubkey;
+    
+        index      = getNewAddrIndex(myUserID);
+        let addr_3 = genAddressFromMnemonic(getMnemonicWithLogined(), index, true);
+        saveAddress(myUserID, addr_3);
+        info.curr_htlc_temp_address_for_ht1a_pub_key = addr_3.result.pubkey;
+    
+        // Save address index to OBD and can get private key back if lose it.
+        info.curr_rsmc_temp_address_index          = addr_1.result.index;
+        info.curr_htlc_temp_address_index          = addr_2.result.index;
+        info.curr_htlc_temp_address_for_ht1a_index = addr_3.result.index;
+    
+        let privkey  = await getFundingPrivKey(myUserID, channel_id);
+        let isFunder = await getIsFunder(myUserID, channel_id);
+        let resp     = await addHTLC(myUserID, nodeID, userID, info, isFunder);
+
+        let returnData = {
+            nodeID:  nodeID,
+            userID:  userID,
+            info40:  info,
+            info100: resp,
+            privkey: privkey,
+        };
+    
+        resolve(returnData);
+    })
+}
+
+/**
  * payInvoice Step 4, Bob will send -100045 forwardR
  * @param myUserID 
  * @param nodeID 
  * @param userID 
  * @param channel_id
+ * @param e data from 100105
  */
-function payInvoiceStep4(myUserID, nodeID, userID, channel_id) {
+function payInvoiceStep4(myUserID, nodeID, userID, channel_id, e) {
     return new Promise(async function(resolve, reject) {
         let r = getPrivKeyFromPubKey(myUserID, getInvoiceH());
-        // console.info('payInvoiceStep4 R = ' + r);
-        
+        console.info('R = ' + r);
+
         // Bob has NOT R. Bob maybe a middleman node.
-        if (r === '') return resolve(false);
-    
-        // Bob will send -100045 forwardR
-        let info        = new ForwardRInfo();
-        info.channel_id = channel_id;
-        info.r          = r;
+        if (r === '') {
+            saveRoutingPacket(e.htlc_routing_packet);
+
+            // Find next channel_id in htlc_routing_packet
+            let routs = e.htlc_routing_packet.split(',');
+            let next_channel_id, nextPay;
+            for (let i = 0; i < routs.length; i++) {
+                if (routs[i] === channel_id) {
+                    next_channel_id = routs[i + 1];
+
+                    // Calculate how much assets should pay to next node.
+                    let amount  = e.htlc_amount_to_payee;
+                    let htlcFee = getFeeOfEveryHop(amount); // fee of every hop
+                    let midLeft = routs.length - i - 2; // how many middleman left
+                    nextPay = Number(amount) + accMul(midLeft, htlcFee);
+                    console.info('midLeft = ' + midLeft);
+                    console.info('nextPay = ' + nextPay);
+                    break;
+                }
+            }
+            console.info('Next channel_id = ' + next_channel_id);
+
+            // Launch a HTLC between Bob and Carol (next node).
+            let resp = await payInvoiceStep2(e, myUserID, next_channel_id, '100105', nextPay);
+
+            let returnData = {
+                status:    false,
+                infoStep2: resp,
+            };
+
+            resolve(returnData);
+
+        } else {
+            // Bob will send -100045 forwardR
+            let info        = new ForwardRInfo();
+            info.channel_id = channel_id;
+            info.r          = r;
+            
+            let isFunder = await getIsFunder(myUserID, channel_id);
+            let resp     = await forwardR(myUserID, nodeID, userID, info, isFunder);
         
-        let isFunder = await getIsFunder(myUserID, channel_id);
-        let resp     = await forwardR(myUserID, nodeID, userID, info, isFunder);
+            let returnData = {
+                status:  true,
+                info45:  info,
+                info106: resp,
+            };
+        
+            resolve(returnData);
+        }
+    })
+}
+
+/**
+ * payInvoice Step 6, Alice will send -100049 closeHTLC
+ * Save address index to OBD and can get private key back if lose it.
+ * @param myUserID 
+ * @param nodeID 
+ * @param userID 
+ * @param channel_id 
+ * @param privkey 
+ */
+function payInvoiceStep6(myUserID, nodeID, userID, channel_id, privkey) {
+    return new Promise(async function(resolve, reject) {
+        let info      = new CloseHtlcTxInfo();
+        let privkey_1 = getTempPrivKey(myUserID, kRsmcTempPrivKey, channel_id);
+        let privkey_2 = getTempPrivKey(myUserID, kHtlcTempPrivKey, channel_id);
+        let privkey_3 = getTempPrivKey(myUserID, kHtlcHtnxTempPrivKey, channel_id);
+        let addr      = genNewAddress(myUserID, true);
+        saveAddress(myUserID, addr);
     
+        info.channel_id                                  = channel_id;
+        info.last_rsmc_temp_address_private_key          = privkey_1;
+        info.last_htlc_temp_address_private_key          = privkey_2;
+        info.last_htlc_temp_address_for_htnx_private_key = privkey_3;
+        info.curr_temp_address_pub_key                   = addr.result.pubkey;
+        info.curr_temp_address_index                     = addr.result.index;
+    
+        let isFunder = await getIsFunder(myUserID, channel_id);
+        let resp     = await closeHTLC(myUserID, nodeID, userID, info, isFunder);
+
         let returnData = {
-            info45:  info,
-            info106: resp,
+            info49:  info,
+            info110: resp,
+            privkey: privkey,
         };
     
         resolve(returnData);
@@ -438,6 +589,7 @@ function listening110042(e, netType) {
                 userID:  resp.userID,
                 info104: signedInfo,
                 info105: resp.info105,
+                infoStep2: resp.infoStep2,
             };
 
         } else {
@@ -496,7 +648,8 @@ function listening110045(e) {
         
         let isFunder = await getIsFunder(myUserID, channel_id);
         saveChannelStatus(myUserID, channel_id, isFunder, kStatusForwardR);
-    
+        saveInvoiceR(e.r);
+
         // auto mode is closed
         if (isAutoMode != 'Yes') {  
             // Not in pay invoice case
@@ -536,48 +689,11 @@ function listening110045(e) {
 }
 
 /**
- * payInvoice Step 6, Alice will send -100049 closeHTLC
- * Save address index to OBD and can get private key back if lose it.
- * @param myUserID 
- * @param nodeID 
- * @param userID 
- * @param channel_id 
- * @param privkey 
- */
-function payInvoiceStep6(myUserID, nodeID, userID, channel_id, privkey) {
-    return new Promise(async function(resolve, reject) {
-        let info      = new CloseHtlcTxInfo();
-        let privkey_1 = getTempPrivKey(myUserID, kRsmcTempPrivKey, channel_id);
-        let privkey_2 = getTempPrivKey(myUserID, kHtlcTempPrivKey, channel_id);
-        let privkey_3 = getTempPrivKey(myUserID, kHtlcHtnxTempPrivKey, channel_id);
-        let addr      = genNewAddress(myUserID, true);
-        saveAddress(myUserID, addr);
-    
-        info.channel_id                                  = channel_id;
-        info.last_rsmc_temp_address_private_key          = privkey_1;
-        info.last_htlc_temp_address_private_key          = privkey_2;
-        info.last_htlc_temp_address_for_htnx_private_key = privkey_3;
-        info.curr_temp_address_pub_key                   = addr.result.pubkey;
-        info.curr_temp_address_index                     = addr.result.index;
-    
-        let isFunder = await getIsFunder(myUserID, channel_id);
-        let resp     = await closeHTLC(myUserID, nodeID, userID, info, isFunder);
-
-        let returnData = {
-            info49:  info,
-            info110: resp,
-            privkey: privkey,
-        };
-    
-        resolve(returnData);
-    })
-}
-
-/**
  * listening to -110046
  * @param e 
  */
 async function listening110046(e) {
+    console.info('listening110046');
     let myUserID   = e.to_peer_id;
     let channel_id = e.channel_id;
     let isFunder   = await getIsFunder(myUserID, channel_id);
@@ -690,14 +806,32 @@ function listening110050(e) {
     
         let resp = await sendSignedHex100112(myUserID, signedInfo);
 
-        let returnData = {
-            nodeID:  resp.nodeID,
-            userID:  resp.userID,
-            info112: signedInfo,
-            info113: resp.info113,
-        };
-    
-        resolve(returnData);
+        if (resp.status === true) {
+            let returnData = {
+                status:  true,
+                nodeID:  resp.nodeID,
+                userID:  resp.userID,
+                info112: signedInfo,
+                info113: resp.info113,
+            };
+        
+            resolve(returnData);
+            
+        } else { // A multi-hop
+            let returnData = {
+                status:  false,
+                nodeID:  resp.nodeID,
+                userID:  resp.userID,
+                info112: signedInfo,
+                info113: resp.info113,
+                nodeID2: resp.nodeID2,
+                userID2: resp.userID2,
+                info45:  resp.info45,
+                info106: resp.info106,
+            };
+        
+            resolve(returnData);
+        }
     })
 }
 
@@ -722,8 +856,28 @@ function listening110051(e) {
         signedInfo.channel_id                 = channel_id;
         signedInfo.c4b_rd_complete_signed_hex = brd_hex;
     
-        await sendSignedHex100114(signedInfo);
-        resolve(signedInfo);
+        let resp = await sendSignedHex100114(myUserID, channel_id, signedInfo);
+
+        if (resp === true) {
+            let returnData = {
+                status:  true,
+                info114: signedInfo,
+            };
+        
+            resolve(returnData);
+
+        } else {
+            let returnData = {
+                status:  false,
+                info114: signedInfo,
+                nodeID:  resp.nodeID,
+                userID:  resp.userID,
+                info45:  resp.info45,
+                info106: resp.info106,
+            };
+        
+            resolve(returnData);
+        }
     })
 }
 

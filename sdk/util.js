@@ -38,6 +38,51 @@ const kAutoPilot = 'auto_pilot';
 const kPayInvoiceCase = 'pay_invoice_case';
 
 /**
+ * Save MnemonicWithLogined
+ */
+const kMnemonicWithLogined = 'mnemonic_with_logined';
+
+/**
+ * Save R from final recipient of HTLC
+ */
+const kInvoiceR = 'invoice_r';
+
+/**
+ * 
+ */
+const kInvoiceH = 'invoice_h';
+
+/**
+ * 
+ */
+const kSenderRole = 'sender_role';
+
+/**
+ * 
+ */
+const kHTLCPathData = 'htlc_path_data';
+
+/**
+ * 
+ */
+const kRoutingPacket = 'routing_packet';
+
+/**
+ * 
+ */
+const kHtlcFeeRate = 'htlc_fee_rate';
+
+/**
+ * 
+ */
+const kHtlcMaxFee = 'htlc_max_fee';
+
+/**
+ * 
+ */
+const kPayHtlcFee = 'pay_htlc_fee';
+
+/**
  * Object of IndexedDB.
  */
 var db;
@@ -88,29 +133,7 @@ const kTbTempData = 'tb_temp_data';
  * Object Store (table) name of IndexedDB.
  * tb_channel_addr
  */
-const kTbHTLCPathData = 'tb_htlc_path_data';
-
-/**
- * Object Store (table) name of IndexedDB.
- * tb_channel_addr
- */
 const kTbForwardR = 'tb_forward_r';
-
-/**
- * Object Store (table) name of IndexedDB.
- * tb_channel_addr
- */
-const kTbInvoiceR = 'tb_invoice_r';
-
-/**
- * 
- */
-const kInvoiceH = 'invoice_h';
-
-/**
- * 
- */
-const kSenderRole = 'sender_role';
 
 /**
  * Object Store (table) name of IndexedDB.
@@ -941,14 +964,14 @@ function getMnemonic(myUserID, param) {
  * @param r
  */
 function saveInvoiceR(r) {
-    localStorage.setItem(kTbInvoiceR, r);
+    localStorage.setItem(kInvoiceR, r);
 }
 
 /**
  * get r from addInvoice type ( -100402 )
  */
 function getInvoiceR() {
-    return localStorage.getItem(kTbInvoiceR);
+    return localStorage.getItem(kInvoiceR);
 }
 
 /**
@@ -994,6 +1017,21 @@ function savePayInvoiceCase(value) {
  */
 function getPayInvoiceCase() {
     return localStorage.getItem(kPayInvoiceCase);
+}
+
+/**
+ * Save MnemonicWithLogined
+ * @param value
+ */
+function saveMnemonicWithLogined(value) {
+    localStorage.setItem(kMnemonicWithLogined, value);
+}
+
+/**
+ * Get MnemonicWithLogined
+ */
+function getMnemonicWithLogined() {
+    return localStorage.getItem(kMnemonicWithLogined);
 }
 
 /**
@@ -1054,14 +1092,74 @@ function checkChannelAddessExist(nodeID, userID, info) {
  * @param e
  */
 function saveHTLCPathData(e) {
-    localStorage.setItem(kTbHTLCPathData, JSON.stringify(e));
+    localStorage.setItem(kHTLCPathData, JSON.stringify(e));
 }
 
 /**
  * 
  */
 function getHTLCPathData() {
-    return JSON.parse(localStorage.getItem(kTbHTLCPathData));
+    return JSON.parse(localStorage.getItem(kHTLCPathData));
+}
+
+/**
+ * Save Routing Packet
+ * @param value
+ */
+function saveRoutingPacket(value) {
+    localStorage.setItem(kRoutingPacket, value);
+}
+
+/**
+ * Get Routing Packet
+ */
+function getRoutingPacket() {
+    return localStorage.getItem(kRoutingPacket);
+}
+
+/**
+ * Save HTLC Fee Rate
+ * @param value
+ */
+function saveHtlcFeeRate(value) {
+    localStorage.setItem(kHtlcFeeRate, value);
+}
+
+/**
+ * Get HTLC Fee Rate
+ */
+function getHtlcFeeRate() {
+    return localStorage.getItem(kHtlcFeeRate);
+}
+
+/**
+ * Save Max HTLC Fee
+ * @param value
+ */
+function saveHtlcMaxFee(value) {
+    localStorage.setItem(kHtlcMaxFee, value);
+}
+
+/**
+ * Get Max HTLC Fee
+ */
+function getHtlcMaxFee() {
+    return localStorage.getItem(kHtlcMaxFee);
+}
+
+/**
+ * Save how much HTLC Fee should pay
+ * @param value
+ */
+function savePayHtlcFee(value) {
+    localStorage.setItem(kPayHtlcFee, value);
+}
+
+/**
+ * Get how much HTLC Fee should pay
+ */
+function getPayHtlcFee() {
+    return localStorage.getItem(kPayHtlcFee);
 }
 
 /**
@@ -1148,19 +1246,19 @@ function openDB() {
     let request = window.indexedDB.open('data');
     
     request.onerror = function (e) {
-        // console.log('DB open error!');
+        console.log('DB open error!');
     };
 
     request.onsuccess = function (e) {
         db = request.result;
-        // console.log('DB open success!');
+        console.log('DB open success!');
     };
 
     // Create table and index
     request.onupgradeneeded = function (e) {
         db = e.target.result;
         createOS();
-        // console.log('DB onupgradeneeded success!');
+        console.log('DB onupgradeneeded success!');
     }
 }
 
@@ -1211,19 +1309,9 @@ function createOS() {
         os7 = db.createObjectStore(kTbTempData, { keyPath: 'key' });
     }
 
-    let os8;
-    if (!db.objectStoreNames.contains(kTbHTLCPathData)) {
-        os8 = db.createObjectStore(kTbHTLCPathData, { keyPath: 'key' });
-    }
-
     let os9;
     if (!db.objectStoreNames.contains(kTbForwardR)) {
         os9 = db.createObjectStore(kTbForwardR, { keyPath: 'key' });
-    }
-
-    let os10;
-    if (!db.objectStoreNames.contains(kTbInvoiceR)) {
-        os10 = db.createObjectStore(kTbInvoiceR, { keyPath: 'key' });
     }
 
     let os11;
@@ -1309,28 +1397,6 @@ function saveSenderRole(val) {
 function getSenderRole() {
     return localStorage.getItem(kSenderRole);
 }
-
-// OLD
-// function signP2PKH(txhex, privkey) {
-    
-//     if (txhex === '') return '';
-
-//     const network = btctool.bitcoin.networks.testnet;
-//     const tx      = btctool.bitcoin.Transaction.fromHex(txhex);
-//     const txb     = btctool.bitcoin.TransactionBuilder.fromTransaction(tx, network);
-//     const key     = btctool.bitcoin.ECPair.fromWIF(privkey, network);
-
-//     txb.sign({
-//         prevOutScriptType: 'p2pkh',
-//         vin: 0,
-//         keyPair: key,
-//     });
-
-//     // Export hex
-//     let toHex = txb.build().toHex();
-//     console.info('signP2PKH - toHex = ' + toHex);
-//     return toHex;
-// }
 
 /**
  * Sign P2PKH address with TransactionBuilder way
@@ -1429,4 +1495,24 @@ function accMul(arg1, arg2) {
     } catch (e) {}
 
     return Number(s1.replace(".", "")) * Number(s2.replace(".", "")) / Math.pow(10, m);
+}
+
+/**
+ * Calculate fee of every hop
+ * @param amount amount of will send
+ */
+function getFeeOfEveryHop(amount) {
+    let maxFee  = getHtlcMaxFee();
+    let feeRate = getHtlcFeeRate();
+    let htlcFee = accMul(amount, feeRate); // fee of every hop
+
+    if (Number(htlcFee) > Number(maxFee)) {
+        htlcFee = maxFee;
+    }
+
+    if (Number(htlcFee) < 0.00000001) {
+        htlcFee = 0;
+    }
+
+    return htlcFee;
 }

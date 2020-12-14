@@ -58,8 +58,11 @@ function genAddressFromMnemonic(mnemonic, index, netType) {
 function logIn(mnemonic) {
     return new Promise((resolve, reject) => {
         obdApi.logIn(mnemonic, function(e) {
-            // console.info('SDK: -102001 logIn = ' + JSON.stringify(e));
+            console.info('SDK: -102001 logIn = ' + JSON.stringify(e));
             saveMnemonic(e.userPeerId, mnemonic);
+            saveHtlcFeeRate(e.htlc_fee_rate);
+            saveHtlcMaxFee(e.htlc_max_fee);
+            saveRoutingPacket('');
             resolve(e);
         });
     })
