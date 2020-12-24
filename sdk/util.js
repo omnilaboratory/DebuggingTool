@@ -1455,7 +1455,7 @@ function signP2SH(is_first_sign, txhex, pubkey_1, pubkey_2, privkey, inputs) {
 
     // Sign all inputs
     for (let i = 0; i < inputs.length; i++) {
-        let amount = accMul(inputs[i].amount, 100000000);
+        let amount = times(inputs[i].amount, 100000000);
         txb.sign(i, key, p2sh.redeem.output, undefined, amount, undefined);
     }
 
@@ -1472,40 +1472,13 @@ function signP2SH(is_first_sign, txhex, pubkey_1, pubkey_2, privkey, inputs) {
 }
 
 /**
- * This function is used to get accurate multiplication result.
- * 
- * Explanation: There will be errors in the multiplication result of javascript, 
- * which is more obvious when multiplying two floating-point numbers. 
- * This function returns a more accurate multiplication result.
- * 
- * @param arg1
- * @param arg2
- */
-function accMul(arg1, arg2) {
-    let m  = 0,
-        s1 = arg1.toString(),
-        s2 = arg2.toString();
-
-    try {
-        m += s1.split(".")[1].length;
-    } catch (e) {}
-
-    try {
-        m += s2.split(".")[1].length;
-    } catch (e) {}
-
-    return Number(s1.replace(".", "")) * Number(s2.replace(".", "")) / Math.pow(10, m);
-}
-
-/**
  * Calculate fee of every hop
  * @param amount amount of will send
  */
 function getFeeOfEveryHop(amount) {
     let maxFee  = getHtlcMaxFee();
     let feeRate = getHtlcFeeRate();
-    let htlcFee = accMul(amount, feeRate); // fee of every hop
-
+    let htlcFee = times(amount, feeRate); // fee of every hop
     if (Number(htlcFee) > Number(maxFee)) {
         htlcFee = maxFee;
     }
@@ -1515,4 +1488,43 @@ function getFeeOfEveryHop(amount) {
     }
 
     return htlcFee;
+}
+
+/**
+ * Convert the value expressed in scientific notation to display normally
+ * @param num the value expressed in scientific notation
+ */
+function scientificToNumber(num) {
+    let str = num.toString();
+    let reg = /^(\d+)(e)([\-]?\d+)$/;
+    let arr, len, zero = '';
+
+    // Example: 6e7 or 6e+7 will be converted automatically
+    if (!reg.test(str)) {
+        return num;
+    } else {
+        // Example: 6e-7 will be converted manually
+        arr = reg.exec(str);
+        len = Math.abs(arr[3]) - 1;
+        for (let i = 0; i < len; i++) {
+            zero += '0';
+        }
+
+        return '0.' + zero + arr[1];
+    }
+}
+
+/**
+ * get lastest mnemonic that use to login
+ */
+function getLastestMnemonic() {
+    let mnemonic = JSON.parse(localStorage.getItem(kMnemonic));
+
+    // If has data
+    if (mnemonic) {
+        let lastest = mnemonic.result.length - 1;
+        return mnemonic.result[lastest].mnemonic;
+    } else {
+        return '';
+    }
 }

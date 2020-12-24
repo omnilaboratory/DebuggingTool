@@ -82,12 +82,13 @@ function listening110034(e) {
         let inputs     = data.inputs;
         let signed_hex = signP2SH(false, data.hex, data.pub_key_a, 
             data.pub_key_b, privkey, inputs);
-            
         saveSignedHex(myUserID, channel_id, signed_hex, kTbSignedHex);
         saveChannelStatus(myUserID, channel_id, false, kStatusAssetFundingCreated);
-    
+
         // auto mode is closed
-        if (isAutoMode != 'Yes') return resolve(true);
+        if (isAutoMode != 'Yes') {
+            return resolve(true);
+        }
     
         // console.info('listening110034 = ' + JSON.stringify(e));
     
@@ -190,38 +191,45 @@ function listening110040(e, netType) {
         let myUserID   = e.to_peer_id;
         let channel_id = e.channel_id;
         let isAutoMode = getAutoPilot();
-        // console.info('SDK: NOW isAutoMode = ' + isAutoMode);
+        saveInvoiceH(e.h);
     
+        // Check if in pay invoice case
+        if (e.is_pay_invoice === true) {
+            savePayInvoiceCase('Yes');
+        }
+
         // Receiver sign the tx on client side
         // NO.1
         let cr      = e.c3a_counterparty_partial_signed_data;
         let inputs  = cr.inputs;
         let privkey = await getFundingPrivKey(myUserID, channel_id);
         let cr_hex  = signP2SH(false, cr.hex, cr.pub_key_a, cr.pub_key_b, privkey, inputs);
-        saveSignedHex(myUserID, channel_id, cr_hex, kTbSignedHexCR110040);
     
         // NO.2
         let hr     = e.c3a_htlc_partial_signed_data;
         inputs     = hr.inputs;
         let hr_hex = signP2SH(false, hr.hex, hr.pub_key_a, hr.pub_key_b, privkey, inputs);
-        saveSignedHex(myUserID, channel_id, hr_hex, kTbSignedHexHR110040);
         
         // NO.3
         let rr     = e.c3a_rsmc_partial_signed_data;
         inputs     = rr.inputs;
         let rr_hex = signP2SH(false, rr.hex, rr.pub_key_a, rr.pub_key_b, privkey, inputs);
-        saveSignedHex(myUserID, channel_id, rr_hex, kTbSignedHexRR110040);
-    
-        // save some data
-        saveInvoiceH(e.h);
-        saveTempData(myUserID, channel_id, e.payer_commitment_tx_hash);
-    
-        let isFunder = await getIsFunder(myUserID, channel_id);
-        saveChannelStatus(myUserID, channel_id, isFunder, kStatusAddHTLC);
-        saveSenderRole(kIsReceiver);
-    
+        
         // auto mode is closed
-        if (isAutoMode != 'Yes') return resolve(true);
+        if (isAutoMode != 'Yes') {
+            if (e.is_pay_invoice != true) {
+                saveSignedHex(myUserID, channel_id, cr_hex, kTbSignedHexCR110040);
+                saveSignedHex(myUserID, channel_id, hr_hex, kTbSignedHexHR110040);
+                saveSignedHex(myUserID, channel_id, rr_hex, kTbSignedHexRR110040);
+                saveTempData(myUserID, channel_id, e.payer_commitment_tx_hash);
+    
+                let isFunder = await getIsFunder(myUserID, channel_id);
+                saveChannelStatus(myUserID, channel_id, isFunder, kStatusAddHTLC);
+                saveSenderRole(kIsReceiver);
+    
+                return resolve(true);
+            }
+        }
     
         // console.info('listening110040 = ' + JSON.stringify(e));
     
@@ -327,6 +335,14 @@ function payInvoiceStep2(e, myUserID, channel_id, from100105, nextPay) {
         info.curr_htlc_temp_address_index          = addr_2.result.index;
         info.curr_htlc_temp_address_for_ht1a_index = addr_3.result.index;
     
+        // Check if in pay invoice case
+        let isInPayInvoice = getPayInvoiceCase();
+        if (isInPayInvoice === 'Yes') {
+            info.is_pay_invoice = true;
+        } else {
+            info.is_pay_invoice = false;
+        }
+
         let privkey  = await getFundingPrivKey(myUserID, channel_id);
         let isFunder = await getIsFunder(myUserID, channel_id);
         let resp     = await addHTLC(myUserID, nodeID, userID, info, isFunder);
@@ -354,7 +370,7 @@ function payInvoiceStep2(e, myUserID, channel_id, from100105, nextPay) {
 function payInvoiceStep4(myUserID, nodeID, userID, channel_id, e) {
     return new Promise(async function(resolve, reject) {
         let r = getPrivKeyFromPubKey(myUserID, getInvoiceH());
-        console.info('R = ' + r);
+        // console.info('R = ' + r);
 
         // Bob has NOT R. Bob maybe a middleman node.
         if (r === '') {
@@ -371,13 +387,13 @@ function payInvoiceStep4(myUserID, nodeID, userID, channel_id, e) {
                     let amount  = e.htlc_amount_to_payee;
                     let htlcFee = getFeeOfEveryHop(amount); // fee of every hop
                     let midLeft = routs.length - i - 2; // how many middleman left
-                    nextPay = Number(amount) + accMul(midLeft, htlcFee);
-                    console.info('midLeft = ' + midLeft);
-                    console.info('nextPay = ' + nextPay);
+                    nextPay     = plus(amount, times(midLeft, htlcFee));
+                    // console.info('midLeft = ' + midLeft);
+                    // console.info('nextPay = ' + nextPay);
                     break;
                 }
             }
-            console.info('Next channel_id = ' + next_channel_id);
+            // console.info('Next channel_id = ' + next_channel_id);
 
             // Launch a HTLC between Bob and Carol (next node).
             let resp = await payInvoiceStep2(e, myUserID, next_channel_id, '100105', nextPay);
@@ -562,12 +578,12 @@ function listening110042(e, netType) {
         let brr_hex = signP2SH(false, brr.hex, brr.pub_key_a, brr.pub_key_b, temp1, inputs);
         
         // will send 100104
-        // new address
         let addr    = genNewAddress(myUserID, netType);
+        // save data to local disk
         saveAddress(myUserID, addr);
         // TempPrivKey NO.3
         saveTempPrivKey(myUserID, kHtlcHtnxTempPrivKey, channel_id, addr.result.wif);
-    
+
         let signedInfo                                   = new SignedInfo100104();
         signedInfo.channel_id                            = channel_id;
         signedInfo.curr_htlc_temp_address_for_he_pub_key = addr.result.pubkey;
@@ -623,37 +639,35 @@ function listening110043(e) {
  */
 function listening110045(e) {
     return new Promise(async function(resolve, reject) {
-        let isAutoMode = getAutoPilot();
-        // console.info('SDK: NOW isAutoMode = ' + isAutoMode);
-        
+        let isAutoMode     = getAutoPilot();
         let isInPayInvoice = getPayInvoiceCase();
-        // console.info('isInPayInvoice = ' + isInPayInvoice);
-    
-        let myUserID   = e.to_peer_id;
-        let channel_id = e.channel_id;
-    
+        let myUserID       = e.to_peer_id;
+        let channel_id     = e.channel_id;
+        let isFunder       = await getIsFunder(myUserID, channel_id);
+        
+        saveInvoiceR(e.r);
+
         // Sign the tx on client side
         // NO.1 
         let br      = e.c3b_htlc_hebr_raw_data;
         let inputs  = br.inputs;
         let privkey = await getFundingPrivKey(myUserID, channel_id);
         let br_hex  = signP2SH(true, br.hex, br.pub_key_a, br.pub_key_b, privkey, inputs);
-        saveSignedHex(myUserID, channel_id, br_hex, kTbSignedHexBR110045);
         
         // NO.2
         let rd     = e.c3b_htlc_herd_partial_signed_data;
         inputs     = rd.inputs;
         let rd_hex = signP2SH(false, rd.hex, rd.pub_key_a, rd.pub_key_b, privkey, inputs);
-        saveSignedHex(myUserID, channel_id, rd_hex, kTbSignedHexRD110045);
-        
-        let isFunder = await getIsFunder(myUserID, channel_id);
-        saveChannelStatus(myUserID, channel_id, isFunder, kStatusForwardR);
-        saveInvoiceR(e.r);
 
         // auto mode is closed
         if (isAutoMode != 'Yes') {  
             // Not in pay invoice case
-            if (isInPayInvoice != 'Yes') return resolve(true);
+            if (isInPayInvoice != 'Yes') {
+                saveSignedHex(myUserID, channel_id, br_hex, kTbSignedHexBR110045);
+                saveSignedHex(myUserID, channel_id, rd_hex, kTbSignedHexRD110045);
+                saveChannelStatus(myUserID, channel_id, isFunder, kStatusForwardR);
+                return resolve(true);
+            }
         }
     
         // console.info('listening110045 = ' + JSON.stringify(e));
@@ -693,7 +707,7 @@ function listening110045(e) {
  * @param e 
  */
 async function listening110046(e) {
-    console.info('listening110046');
+    // console.info('listening110046');
     let myUserID   = e.to_peer_id;
     let channel_id = e.channel_id;
     let isFunder   = await getIsFunder(myUserID, channel_id);
@@ -713,35 +727,27 @@ function listening110049(e, netType) {
     
         let myUserID   = e.to_peer_id;
         let channel_id = e.channel_id;
-    
+        let isFunder   = await getIsFunder(myUserID, channel_id);
+
         // Receiver sign the tx on client side
         // NO.1
         let cr      = e.c4a_counterparty_partial_signed_data;
         let inputs  = cr.inputs;
         let privkey = await getFundingPrivKey(myUserID, channel_id);
         let cr_hex  = signP2SH(false, cr.hex, cr.pub_key_a, cr.pub_key_b, privkey, inputs);
-        saveSignedHex(myUserID, channel_id, cr_hex, kTbSignedHexCR110040);
     
         // NO.2
         let rr     = e.c4a_rsmc_partial_signed_data;
         inputs     = rr.inputs;
         let rr_hex = signP2SH(false, rr.hex, rr.pub_key_a, rr.pub_key_b, privkey, inputs);
-        saveSignedHex(myUserID, channel_id, rr_hex, kTbSignedHexHR110040);
-    
-        // save some data
-        let isFunder = await getIsFunder(myUserID, channel_id);
-        saveChannelStatus(myUserID, channel_id, isFunder, kStatusCloseHTLC);
-        saveTempData(myUserID, channel_id, e.msg_hash);
-        saveSenderRole(kIsReceiver);
-    
+        
         // console.info('listening110049 = ' + JSON.stringify(e));
     
         let nodeID = e.sender_node_address;
         let userID = e.sender_peer_id;
-    
-        let addr = genNewAddress(myUserID, netType);
+        let addr   = genNewAddress(myUserID, netType);
         saveAddress(myUserID, addr);
-        
+
         // will send -100050 CloseHTLCSigned
         // is payInvoice Step 7 also
     
@@ -757,6 +763,14 @@ function listening110049(e, netType) {
         info.curr_temp_address_index = addr.result.index;
         
         let resp = await closeHTLCSigned(myUserID, nodeID, userID, info, isFunder);
+
+        // saveSignedHex(myUserID, channel_id, cr_hex, kTbSignedHexCR110040);
+        // saveSignedHex(myUserID, channel_id, rr_hex, kTbSignedHexHR110040);
+
+        // let isFunder = await getIsFunder(myUserID, channel_id);
+        // saveChannelStatus(myUserID, channel_id, isFunder, kStatusCloseHTLC);
+        // saveTempData(myUserID, channel_id, e.msg_hash);
+        // saveSenderRole(kIsReceiver);
 
         let returnData = {
             nodeID:  nodeID,
@@ -908,8 +922,6 @@ async function listening110081(e) {
 function listening110340(e) {
     return new Promise(async function(resolve, reject) {
         let isAutoMode = getAutoPilot();
-        // console.info('SDK: NOW isAutoMode = ' + isAutoMode);
-    
         let myUserID   = e.to_peer_id;
         let channel_id = e.temporary_channel_id;
     
@@ -920,10 +932,10 @@ function listening110340(e) {
         let signed_hex = signP2SH(false, data.hex, data.pub_key_a, 
             data.pub_key_b, privkey, inputs);
         saveSignedHex(myUserID, channel_id, signed_hex, kTbSignedHex);
-    
+
         // save some data
-        let status     = await getChannelStatus(channel_id, false);
-        console.info('listening110340 status = ' + status);
+        let status = await getChannelStatus(channel_id, false);
+        // console.info('listening110340 status = ' + status);
         switch (Number(status)) {
             case kStatusAcceptChannel:
                 saveChannelStatus(myUserID, channel_id, false, kStatusFirstBitcoinFundingCreated);
@@ -937,9 +949,11 @@ function listening110340(e) {
         }
                 
         saveTempData(myUserID, channel_id, e.funding_txid);
-    
+
         // auto mode is closed
-        if (isAutoMode != 'Yes') return resolve(true);
+        if (isAutoMode != 'Yes') {
+            return resolve(true);
+        }
     
         // console.info('listening110340 = ' + JSON.stringify(e));
     
@@ -1001,30 +1015,29 @@ function listening110351(e, netType) {
         let isAutoMode = getAutoPilot();
         let myUserID   = e.to_peer_id;
         let channel_id = e.channel_id;
-        // console.info('SDK: NOW isAutoMode = ' + isAutoMode);
-    
+        let isFunder   = await getIsFunder(myUserID, channel_id);
+
         // Receiver sign the tx on client side
         // NO.1 counterparty_raw_data
         let cr      = e.counterparty_raw_data;
         let inputs  = cr.inputs;
         let privkey = await getFundingPrivKey(myUserID, channel_id);
         let cr_hex  = signP2SH(false, cr.hex, cr.pub_key_a, cr.pub_key_b, privkey, inputs);
-        saveSignedHex(myUserID, channel_id, cr_hex, kTbSignedHexCR110351);
     
         // NO.2 rsmc_raw_data
         let rr     = e.rsmc_raw_data;
         inputs     = rr.inputs;
         let rr_hex = signP2SH(false, rr.hex, rr.pub_key_a, rr.pub_key_b, privkey, inputs);
-        saveSignedHex(myUserID, channel_id, rr_hex, kTbSignedHexRR110351);
-    
-        // save some data
-        let isFunder = await getIsFunder(myUserID, channel_id);
-        saveChannelStatus(myUserID, channel_id, isFunder, kStatusCommitmentTransactionCreated);
-        saveTempData(myUserID, channel_id, e.msg_hash);
-        saveSenderRole(kIsReceiver);
-    
+        
         // auto mode is closed
-        if (isAutoMode != 'Yes') return resolve(true);
+        if (isAutoMode != 'Yes') {
+            saveSignedHex(myUserID, channel_id, cr_hex, kTbSignedHexCR110351);
+            saveSignedHex(myUserID, channel_id, rr_hex, kTbSignedHexRR110351);
+            saveChannelStatus(myUserID, channel_id, isFunder, kStatusCommitmentTransactionCreated);
+            saveTempData(myUserID, channel_id, e.msg_hash);
+            saveSenderRole(kIsReceiver);
+            return resolve(true);
+        }
     
         //------------------------
         // auto mode is opening
@@ -1032,11 +1045,9 @@ function listening110351(e, netType) {
     
         let nodeID  = e.payer_node_address;
         let userID  = e.payer_peer_id;
-    
         let addr    = genNewAddress(myUserID, netType);
         let tempKey = addr.result.wif;
-        saveAddress(myUserID, addr);
-    
+        
         // will send -100352 commitmentTransactionAccepted
         let info                           = new CommitmentTxSigned();
         info.channel_id                    = channel_id;
@@ -1051,6 +1062,9 @@ function listening110351(e, netType) {
     
         let resp = await commitmentTransactionAccepted(myUserID, nodeID, 
             userID, info, isFunder, tempKey);
+
+        // save some data to local disk
+        saveAddress(myUserID, addr);
 
         let returnData = {
             nodeID:  nodeID,
@@ -1074,9 +1088,6 @@ function listening110352(e) {
         let myUserID = e.to_peer_id;
         let nodeID   = e.payee_node_address;
         let userID   = e.payee_peer_id;
-    
-        let isFunder = await getIsFunder(myUserID, e.channel_id);
-        saveChannelStatus(myUserID, e.channel_id, isFunder, kStatusCommitmentTransactionAccepted);
     
         // Receiver sign the tx on client side
         // NO.1
@@ -1104,6 +1115,10 @@ function listening110352(e) {
         signedInfo.c2a_rd_signed_hex           = rd_hex;
     
         let resp = await sendSignedHex100362(myUserID, nodeID, userID, signedInfo);
+
+        // save some data to local disk
+        let isFunder = await getIsFunder(myUserID, e.channel_id);
+        saveChannelStatus(myUserID, e.channel_id, isFunder, kStatusCommitmentTransactionAccepted);
 
         let returnData = {
             nodeID:  nodeID,

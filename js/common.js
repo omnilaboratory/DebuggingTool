@@ -98,6 +98,8 @@ function testSignP2SH() {
 async function sdkLogIn() {
 
     // testSignP2SH();
+    // console.info('val 1 = ' + (0.00109 + 0.000000109));
+    // console.info('val 2 = ' + plus(0.00109 , 0.000000109));
     // return;
 
     // If already logined, then return.
@@ -755,6 +757,8 @@ async function sdkAddHTLC() {
     info.curr_rsmc_temp_address_index          = Number(getIndexFromPubKey(info.curr_rsmc_temp_address_pub_key));
     info.curr_htlc_temp_address_index          = Number(getIndexFromPubKey(info.curr_htlc_temp_address_pub_key));
     info.curr_htlc_temp_address_for_ht1a_index = Number(getIndexFromPubKey(info.curr_htlc_temp_address_for_ht1a_pub_key));
+
+    info.is_pay_invoice = false; // define is in pay invoice case
 
     displaySentMessage100040(nodeID, userID, info);
 
@@ -1465,16 +1469,12 @@ function fillHTLCPathData() {
 
     // Plus should pay htlc fee
     let payFee = getPayHtlcFee();
-    let amount = Number(data.amount) + Number(payFee);
+    let amount = plus(data.amount, payFee);
     $("#amount").val(amount);
 
-    // let fee_in_amount = 'Fee in the amount is: ' + payFee;
-    //     fee_in_amount = '  Fee rate is: ' + getHtlcFeeRate();
-    $("#fee_in_amount").val(payFee);
+    // console.info('fillHTLCPathData payFee = ' + scientificToNumber(payFee));
+    $("#fee_in_amount").val(scientificToNumber(payFee));
     $("#fee_rate").val(getHtlcFeeRate());
-
-    console.info('fillHTLCPathData payFee = ' + payFee);
-    console.info('fillHTLCPathData total amount = ' + amount);
 
     $("#memo").val(data.memo);
     $("#h").val(data.h);
@@ -1609,6 +1609,8 @@ async function changeInvokeAPIEnable(status, isFunder, myUserID, channel_id) {
         case 'logIn':
             if (isLogined) { // loged in
                 disableInvokeAPI();
+            } else {
+                $("#mnemonic").val(getLastestMnemonic());
             }
             break;
         case 'connectP2PPeer':
@@ -5111,6 +5113,13 @@ async function listening110045ForGUITool(e) {
  * For GUI Tool. Display tips
  */
 function listening110046ForGUITool(e) {
+    let isInPayInvoice = getPayInvoiceCase();
+    // In pay invoice case
+    if (isInPayInvoice === 'Yes') {
+        tipsOnTop(e.channel_id, kPayInvoice);
+        return;
+    }
+
     tipsOnTop(e.channel_id, kTips110046, 'Close HTLC', 'closeHTLC');
 }
 

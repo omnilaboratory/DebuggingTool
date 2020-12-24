@@ -379,9 +379,14 @@ function commitmentTransactionCreated(myUserID, nodeID, userID, info, isFunder, 
             // NO.1 counterparty_raw_data
             let cr      = e.counterparty_raw_data;
             let inputs  = cr.inputs;
+
+            console.info('START = ' + new Date().getTime());
             let privkey = await getFundingPrivKey(myUserID, e.channel_id);
+            console.info('END READ DB = ' + new Date().getTime());
+
             let cr_hex  = signP2SH(true, cr.hex, cr.pub_key_a, cr.pub_key_b, 
                 privkey, inputs);
+            console.info('END SIGN = ' + new Date().getTime());
 
             // NO.2 rsmc_raw_data
             let rr     = e.rsmc_raw_data;

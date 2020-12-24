@@ -21,17 +21,17 @@ function addInvoice(info, callback) {
 function HTLCFindPath(info) {
     return new Promise((resolve, reject) => {
         obdApi.HTLCFindPath(info, function(e) {
-            console.info('SDK: -100401 - HTLCFindPath = ' + JSON.stringify(e));
+            // console.info('SDK: -100401 - HTLCFindPath = ' + JSON.stringify(e));
             saveHTLCPathData(e);
             saveRoutingPacket(e.routing_packet);
 
             // Calculate how much htlc fee the sender should pay
             let htlcFee = getFeeOfEveryHop(e.amount); // fee of every hop
             let routs   = e.routing_packet.split(',');
-            let payFee  = accMul(routs.length - 1, htlcFee); // should pay
-            savePayHtlcFee(payFee);
-            console.info('HTLCFindPath payFee = ' + payFee);
+            let payFee  = times(routs.length - 1, htlcFee); // should pay
 
+            console.info('HTLCFindPath payFee = ' + payFee);
+            savePayHtlcFee(payFee);
             resolve(e);
         });
     })
@@ -412,7 +412,7 @@ function forwardR(myUserID, nodeID, userID, info, isFunder) {
             signedInfo.channel_id                       = channel_id;
             signedInfo.c3b_htlc_herd_partial_signed_hex = hex;
 
-            sendSignedHex100106(nodeID, userID, signedInfo);
+            await sendSignedHex100106(nodeID, userID, signedInfo);
             saveChannelStatus(myUserID, channel_id, isFunder, kStatusForwardR);
             resolve(signedInfo);
         });
@@ -567,7 +567,7 @@ function continueForwardR(myUserID, channel_id) {
         let prevStep;
         let path = getRoutingPacket();
         if (path === null || path === '') {
-            console.info('RoutingPacket IS NULL');
+            // console.info('RoutingPacket IS NULL');
             resolve(true);
             return;
         }
@@ -579,7 +579,7 @@ function continueForwardR(myUserID, channel_id) {
                 break;
             }
         }
-        console.info('previous channel_id = ' + prevStep);
+        // console.info('previous channel_id = ' + prevStep);
 
         // This is a multi-hop
         if (prevStep >= 0) {
@@ -591,7 +591,7 @@ function continueForwardR(myUserID, channel_id) {
             info.channel_id = prev_channel_id;
             info.r          = getInvoiceR();
 
-            console.info('continueForwardR ForwardRInfo = ' + JSON.stringify(info));
+            // console.info('continueForwardR ForwardRInfo = ' + JSON.stringify(info));
 
             let isFunder = await getIsFunder(myUserID, prev_channel_id);
             let cp       = await getCounterparty(myUserID, prev_channel_id);
@@ -622,8 +622,9 @@ function sendSignedHex100114(myUserID, channel_id, signedInfo) {
     return new Promise((resolve, reject) => {
         obdApi.sendSignedHex100114(signedInfo, async function(e) {
             // console.info('sendSignedHex100114 = ' + JSON.stringify(e));
-            // Clear H at Bob side
+            // Reset some data at Bob side
             saveInvoiceH('');
+            savePayInvoiceCase('No');
 
             // Find previous channel_id in htlc_routing_packet
             let resp = await continueForwardR(myUserID, channel_id);

@@ -242,6 +242,7 @@ class HTLCFindPathInfo extends InvoiceInfo {
 }
 
 class addHTLCInfo {
+  is_pay_invoice: boolean = false;
   recipient_user_peer_id: string = "";
   // property_id: number = 0;
   amount: number = 0;
