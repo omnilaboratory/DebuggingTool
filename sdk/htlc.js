@@ -12,6 +12,43 @@ function addInvoice(info, callback) {
 }
 
 /**
+ * automatically transfer asset to counterparty
+ * @param myUserID The user id of logged in
+ * @param channel_id 
+ * @param invoice 
+ */
+function payInvoice(myUserID, channel_id, invoice) {
+    return new Promise(async function(resolve, reject) {
+        // Step 1: HTLCFindPath
+        let info     = new HTLCFindPathInfo();
+        info.invoice = invoice;
+        
+        let e    = await HTLCFindPath(info);
+        let path = e.routing_packet.split(',');
+        if (channel_id != path[0]) {
+            // Using new channel to process htlc.
+            channel_id = path[0];
+        }
+        
+        savePayInvoiceCase('Yes');
+    
+        // Step 2: addHTLC
+        let resp = await payInvoiceStep2(e, myUserID, channel_id);
+
+        let returnData = {
+            nodeID:  resp.nodeID,
+            userID:  resp.userID,
+            info40:  resp.info40,
+            info100: resp.info100,
+            privkey: resp.privkey,
+            channel_id: channel_id,
+        };
+    
+        resolve(returnData);
+    })
+}
+
+/**
  * This protocol is the first step of a payment, 
  * which seeks a full path of nodes, decide which path is the 
  * optimistic one, in terms of hops, node's histroy service quility, and fees.

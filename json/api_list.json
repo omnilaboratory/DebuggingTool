@@ -2,13 +2,13 @@
     "data": [
         {
             "id": "genMnemonic",
-            "type_id": -102004,
+            "type_id": 101,
             "description": "genMnemonic is used to sign up a new user by hirarchecal deterministic wallet system integrated in the local client. Client generates mnemonic words and the hash of the mnemonic words as the UserID.",
             "parameters": []
         },
         {
             "id": "genAddressFromMnemonic",
-            "type_id": -103000,
+            "type_id": 102,
             "description": "NewAddressWithMnemonic is used to create a new address with mnemonic words.",
             "parameters": []
         },
@@ -638,7 +638,7 @@
         },
         {
             "id": "payInvoice",
-            "type_id": -10,
+            "type_id": 100,
             "description": "payInvoice is used to automatically transfer asset to counterparty.",
             "parameters": [
                 {

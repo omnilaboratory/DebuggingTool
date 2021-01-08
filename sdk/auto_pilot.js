@@ -302,8 +302,8 @@ function payInvoiceStep2(e, myUserID, channel_id, from100105, nextPay) {
             let payFee = getPayHtlcFee();
             let amount = Number(e.amount) + Number(payFee);
 
-            console.info('payInvoice payFee = ' + payFee);
-            console.info('payInvoice total amount = ' + amount);
+            // console.info('payInvoice payFee = ' + payFee);
+            // console.info('payInvoice total amount = ' + amount);
 
             info.amount          = amount;
             info.amount_to_payee = e.amount;

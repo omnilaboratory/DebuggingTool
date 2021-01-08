@@ -394,6 +394,11 @@ class P2PPeer {
 class MessageType {
   MsgType_Error_0 = 0;
 
+  // type id of functions in JS SDK
+  MsgType_JS_SDK_100 = 100;
+  MsgType_JS_SDK_101 = 101;
+  MsgType_JS_SDK_102 = 102;
+
   MsgType_UserLogin_2001          = -102001;
   MsgType_UserLogout_2002         = -102002;
   MsgType_p2p_ConnectPeer_2003    = -102003;

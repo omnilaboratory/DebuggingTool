@@ -198,9 +198,9 @@ class ObdApi {
             case this.messageType.MsgType_Core_Omni_FundingAsset_2120:
                 this.onFundingAsset(resultData);
                 break;
-            case this.messageType.MsgType_Mnemonic_CreateAddress_3000:
-                this.onGenAddressFromMnemonic(resultData);
-                break;
+            // case this.messageType.MsgType_Mnemonic_CreateAddress_3000:
+            //   this.onGenAddressFromMnemonic(resultData);
+            //   break;
             case this.messageType.MsgType_Mnemonic_GetAddressByIndex_3001:
                 this.onGetAddressInfo(resultData);
                 break;
@@ -511,15 +511,20 @@ class ObdApi {
     }
     onSendAsset(jsonData) { }
     /**
+     * Comment by Kevin 2021-1-8
+     * This function is replaced by function in JS SDK
+     *
      * MsgType_Mnemonic_CreateAddress_3000
      * @param callback function
      */
-    genAddressFromMnemonic(callback) {
-        let msg = new Message();
-        msg.type = this.messageType.MsgType_Mnemonic_CreateAddress_3000;
-        this.sendData(msg, callback);
+    /*
+    public genAddressFromMnemonic(callback: Function) {
+      let msg = new Message();
+      msg.type = this.messageType.MsgType_Mnemonic_CreateAddress_3000;
+      this.sendData(msg, callback);
     }
-    onGenAddressFromMnemonic(jsonData) { }
+    public onGenAddressFromMnemonic(jsonData: any) {}
+    */
     /**
      * MsgType_Mnemonic_GetAddressByIndex_3001
      * @param index:number

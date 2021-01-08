@@ -681,6 +681,27 @@ function sdkAddInvoice() {
 /**
  * automatically transfer asset to counterparty
  */
+async function sdkPayInvoice() {
+
+    disableInvokeAPI();
+    tipsOnTop('', kPayInvoice);
+
+    let myUserID   = $("#logined").text();
+    let channel_id = $("#curr_channel_id").text();
+    let invoice    = $("#invoice").val();
+    let resp       = await payInvoice(myUserID, channel_id, invoice);
+    
+    $("#curr_channel_id").text(resp.channel_id);
+    displaySentMessage100401(invoice, true);
+    displaySentMessage100040(resp.nodeID, resp.userID, resp.info40, resp.privkey);
+    displaySentMessage100100(resp.nodeID, resp.userID, resp.info100);
+}
+
+/**
+ * OLD FUNC
+ * automatically transfer asset to counterparty
+ */
+/*
 async function payInvoice() {
 
     let myUserID   = $("#logined").text();
@@ -707,7 +728,7 @@ async function payInvoice() {
     let resp = await payInvoiceStep2(e, myUserID, channel_id);
     displaySentMessage100040(resp.nodeID, resp.userID, resp.info40, resp.privkey);
     displaySentMessage100100(resp.nodeID, resp.userID, resp.info100);
-}
+}*/
 
 /**
  * Make QR code of a invoice
@@ -890,11 +911,11 @@ async function sdkCommitmentTransactionAccepted() {
 function invokeAPIs(obj) {
 
     let msgType = Number(obj.getAttribute('type_id'));
-    // console.info('type_id = ' + msgType);
+    console.info('type_id = ' + msgType);
 
     switch (msgType) {
-        case -10: // payInvoice is a local solution.
-            payInvoice();
+        case enumMsgType.MsgType_JS_SDK_100:
+            sdkPayInvoice();
             break;
         case enumMsgType.MsgType_Core_Omni_Getbalance_2112:
             sdkGetAllBalancesForAddress();
@@ -947,7 +968,8 @@ function invokeAPIs(obj) {
         case enumMsgType.MsgType_CommitmentTx_AllBRByChanId_3208:
             sdkGetAllBreachRemedyTransactions();
             break;
-        case enumMsgType.MsgType_Mnemonic_CreateAddress_3000:
+        // case enumMsgType.MsgType_Mnemonic_CreateAddress_3000:
+        case enumMsgType.MsgType_JS_SDK_102:
             let result = sdkGenAddressFromMnemonic();
             if (result === '') return;
             saveAddress($("#logined").text(), result);
@@ -962,7 +984,8 @@ function invokeAPIs(obj) {
         case enumMsgType.MsgType_UserLogout_2002:
             obdApi.logout();
             break;
-        case enumMsgType.MsgType_GetMnemonic_2004:
+        // case enumMsgType.MsgType_GetMnemonic_2004:
+        case enumMsgType.MsgType_JS_SDK_101:
             let mnemonic = sdkGenMnemonic();
             createOBDResponseDiv(mnemonic);
             break;
@@ -4145,7 +4168,7 @@ function displaySentMessage100401(info, isInvPay) {
         msgSend = {
             type: -100401,
             data: {
-                invoice: info.invoice
+                invoice: info
             }
         }
     } else {

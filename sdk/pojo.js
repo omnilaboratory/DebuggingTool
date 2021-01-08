@@ -445,6 +445,10 @@ class P2PPeer {
 class MessageType {
     constructor() {
         this.MsgType_Error_0 = 0;
+        // type id of functions in JS SDK
+        this.MsgType_JS_SDK_100 = 100;
+        this.MsgType_JS_SDK_101 = 101;
+        this.MsgType_JS_SDK_102 = 102;
         this.MsgType_UserLogin_2001 = -102001;
         this.MsgType_UserLogout_2002 = -102002;
         this.MsgType_p2p_ConnectPeer_2003 = -102003;
