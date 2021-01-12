@@ -60,8 +60,8 @@ function logIn(mnemonic) {
         obdApi.logIn(mnemonic, function(e) {
             // console.info('SDK: -102001 logIn = ' + JSON.stringify(e));
             saveMnemonic(e.userPeerId, mnemonic);
-            saveHtlcFeeRate(e.htlc_fee_rate);
-            saveHtlcMaxFee(e.htlc_max_fee);
+            saveHtlcFeeRate(e.htlcFeeRate);
+            saveHtlcMaxFee(e.htlcMaxFee);
             saveRoutingPacket('');
             resolve(e);
         });

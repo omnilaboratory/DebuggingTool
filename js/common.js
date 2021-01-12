@@ -47,6 +47,11 @@ var channelHadBtcData = '';
  */
 var timer1, timer2;
 
+/**
+ * mainnet or testnet
+ */
+var networkType;
+
 
 ////////////////////////////////
 // Functions are here
@@ -108,8 +113,16 @@ async function sdkLogIn() {
     let mnemonic = $("#mnemonic").val();
     let e = await logIn(mnemonic);
     
+    // chain network type
+    if (e.chainNodeType === 'test') {
+        networkType = true;
+    } else {
+        networkType = false;
+    }
+    console.info('networkType = ' + networkType);
+
     // Register event needed for listening.
-    registerEvent(true);
+    registerEvent(networkType);
 
     // a new loginning.
     mnemonicWithLogined = mnemonic;
@@ -2607,8 +2620,9 @@ function createOBDResponseDiv(response, msgType) {
             let msg = response + '. Please refresh the page if you want to connect again.';
             createElement(obd_response_div, 'p', msg);
             break;
-        case enumMsgType.MsgType_Mnemonic_CreateAddress_3000:
+        // case enumMsgType.MsgType_Mnemonic_CreateAddress_3000:
         case enumMsgType.MsgType_Mnemonic_GetAddressByIndex_3001:
+        case enumMsgType.MsgType_JS_SDK_102:
             parseData3000_3001(response);
             break;
         case enumMsgType.MsgType_UserLogin_2001:
@@ -3696,7 +3710,7 @@ function sdkGenAddressFromMnemonic() {
     }
 
     let index = getNewAddrIndex($("#logined").text());
-    return genAddressFromMnemonic(mnemonicWithLogined, index, true);
+    return genAddressFromMnemonic(mnemonicWithLogined, index, networkType);
 }
 
 /**
@@ -3711,7 +3725,7 @@ function sdkGetAddressInfo(msgType) {
     }
 
     let index  = $("#index").val();
-    let result = getAddressInfo(mnemonicWithLogined, index, true);
+    let result = getAddressInfo(mnemonicWithLogined, index, networkType);
     if (result === '') return;
     createOBDResponseDiv(result, msgType);
 }

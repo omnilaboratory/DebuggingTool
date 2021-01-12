@@ -316,17 +316,17 @@ function payInvoiceStep2(e, myUserID, channel_id, from100105, nextPay) {
         info.last_temp_address_private_key = getTempPrivKey(myUserID, kTempPrivKey, channel_id);
     
         let index  = getNewAddrIndex(myUserID);
-        let addr_1 = genAddressFromMnemonic(getMnemonicWithLogined(), index, true);
+        let addr_1 = genAddressFromMnemonic(getMnemonicWithLogined(), index, networkType);
         saveAddress(myUserID, addr_1);
         info.curr_rsmc_temp_address_pub_key = addr_1.result.pubkey;
     
         index      = getNewAddrIndex(myUserID);
-        let addr_2 = genAddressFromMnemonic(getMnemonicWithLogined(), index, true);
+        let addr_2 = genAddressFromMnemonic(getMnemonicWithLogined(), index, networkType);
         saveAddress(myUserID, addr_2);
         info.curr_htlc_temp_address_pub_key = addr_2.result.pubkey;
     
         index      = getNewAddrIndex(myUserID);
-        let addr_3 = genAddressFromMnemonic(getMnemonicWithLogined(), index, true);
+        let addr_3 = genAddressFromMnemonic(getMnemonicWithLogined(), index, networkType);
         saveAddress(myUserID, addr_3);
         info.curr_htlc_temp_address_for_ht1a_pub_key = addr_3.result.pubkey;
     
@@ -440,7 +440,7 @@ function payInvoiceStep6(myUserID, nodeID, userID, channel_id, privkey) {
         let privkey_1 = getTempPrivKey(myUserID, kRsmcTempPrivKey, channel_id);
         let privkey_2 = getTempPrivKey(myUserID, kHtlcTempPrivKey, channel_id);
         let privkey_3 = getTempPrivKey(myUserID, kHtlcHtnxTempPrivKey, channel_id);
-        let addr      = genNewAddress(myUserID, true);
+        let addr      = genNewAddress(myUserID, networkType);
         saveAddress(myUserID, addr);
     
         info.channel_id                                  = channel_id;
