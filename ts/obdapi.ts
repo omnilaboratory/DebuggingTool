@@ -1971,7 +1971,7 @@ class ObdApi {
       alert("empty divisible_type");
       return;
     }
-    if (info.amount == null || info.amount <= 1) {
+    if (info.amount == null || info.amount < 1) {
       alert("wrong amount");
       return;
     }
