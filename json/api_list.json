@@ -332,6 +332,7 @@
                 },
                 {
                     "name": "amount",
+                    "help": "The number of deposit to channel and minimum amount is 0.001",
                     "buttons": []
                 },
                 {
@@ -488,6 +489,7 @@
                 },
                 {
                     "name": "amount",
+                    "help": "The number of transfer and minimum amount is 0.001.",
                     "buttons": []
                 },
                 {
@@ -612,6 +614,7 @@
                 },
                 {
                     "name": "amount",
+                    "help": "The number of transfer and minimum amount is 0.001.",
                     "buttons": []
                 },
                 {
@@ -685,6 +688,7 @@
                 },
                 {
                     "name": "amount",
+                    "help": "The number of transfer and minimum amount is 0.001.",
                     "buttons": []
                 },
                 {
@@ -734,6 +738,7 @@
                 },
                 {
                     "name": "amount",
+                    "help": "The number of transfer and minimum amount is 0.001.",
                     "buttons": []
                 },
                 {
@@ -1279,6 +1284,7 @@
                 },
                 {
                     "name": "amount",
+                    "help": "The number of transfer and minimum amount is 0.001.",
                     "buttons": [
                     ]
                 },
@@ -1361,6 +1367,7 @@
                 },
                 {
                     "name": "amount",
+                    "help": "The number of transfer and minimum amount is 0.001.",
                     "buttons": [
                     ]
                 },

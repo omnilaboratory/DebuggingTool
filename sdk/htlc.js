@@ -20,9 +20,10 @@ function addInvoice(info, callback) {
 function payInvoice(myUserID, channel_id, invoice) {
     return new Promise(async function(resolve, reject) {
         // Step 1: HTLCFindPath
-        let info     = new HTLCFindPathInfo();
-        info.invoice = invoice;
-        
+        let info        = new HTLCFindPathInfo();
+        info.invoice    = invoice;
+        info.is_inv_pay = true;// Is invoice payment
+
         let e    = await HTLCFindPath(info);
         let path = e.routing_packet.split(',');
         if (channel_id != path[0]) {

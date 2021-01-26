@@ -98,7 +98,7 @@ function testSignP2SH() {
 }
 
 /**
- * 
+ * networkType -- true: testnet  false: mainnet
  */
 async function sdkLogIn() {
 
@@ -114,12 +114,19 @@ async function sdkLogIn() {
     let e = await logIn(mnemonic);
     
     // chain network type
+    let chainType;
     if (e.chainNodeType === 'test') {
         networkType = true;
+        chainType = 'Testnet';
     } else {
         networkType = false;
+        chainType = 'Mainnet';
     }
     console.info('networkType = ' + networkType);
+
+    //
+    let val = $("#status").text();
+    $("#status").text(val + " ( " + chainType + " )");
 
     // Register event needed for listening.
     registerEvent(networkType);
@@ -711,39 +718,6 @@ async function sdkPayInvoice() {
 }
 
 /**
- * OLD FUNC
- * automatically transfer asset to counterparty
- */
-/*
-async function payInvoice() {
-
-    let myUserID   = $("#logined").text();
-    let channel_id = $("#curr_channel_id").text();
-
-    // Step 1: HTLCFindPath
-    let info     = new HTLCFindPathInfo();
-    info.invoice = $("#invoice").val();
-    
-    displaySentMessage100401(info, true);
-    let e    = await HTLCFindPath(info);
-    let path = e.routing_packet.split(',');
-    if (channel_id != path[0]) {
-        // Using new channel to process htlc.
-        $("#curr_channel_id").text(path[0]);
-        channel_id = path[0];
-    }
-    
-    disableInvokeAPI();
-    tipsOnTop('', kPayInvoice);
-    savePayInvoiceCase('Yes');
-
-    // Step 2: addHTLC
-    let resp = await payInvoiceStep2(e, myUserID, channel_id);
-    displaySentMessage100040(resp.nodeID, resp.userID, resp.info40, resp.privkey);
-    displaySentMessage100100(resp.nodeID, resp.userID, resp.info100);
-}*/
-
-/**
  * Make QR code of a invoice
  * @param e OBD response result
  */
@@ -847,6 +821,9 @@ async function sdkHTLCFindPath() {
         info.description            = $("#description").val();
         info.is_private             = $("#checkbox_n401").prop("checked");
     }
+
+    // Is invoice payment
+    info.is_inv_pay = isInvPay;
 
     displaySentMessage100401(info, isInvPay);
     let e = await HTLCFindPath(info);

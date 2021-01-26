@@ -574,11 +574,11 @@ function saveChannelAddr(channel_id, channel_addr) {
         .put({ channel_id: channel_id, channel_addr: channel_addr });
   
     request.onsuccess = function (e) {
-        // console.log('saveChannelAddr Data write success.');
+        console.log('saveChannelAddr Data write success.');
     };
   
     request.onerror = function (e) {
-        // console.log('saveChannelAddr Data write false.');
+        console.log('saveChannelAddr Data write false.');
     }
 }
 

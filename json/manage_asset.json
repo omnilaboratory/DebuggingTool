@@ -41,7 +41,7 @@
                 },
                 {
                     "name": "amount",
-                    "help": "the number of tokens to create",
+                    "help": "the number of tokens to create. The minimum amount is 1.",
                     "buttons": []
                 }
             ]

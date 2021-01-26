@@ -544,7 +544,7 @@ class ObdApi {
       return;
     }
 
-    if (info.amount == null || info.amount <= 0) {
+    if (info.amount == null || info.amount < 0.001) {
       alert("wrong amount");
       return;
     }
@@ -973,7 +973,7 @@ class ObdApi {
       alert("empty curr_temp_address_pub_key");
       return;
     }
-    if (info.amount == null || info.amount <= 0) {
+    if (info.amount == null || info.amount < 0.001) {
       alert("wrong amount");
       return;
     }
@@ -1215,7 +1215,7 @@ class ObdApi {
       return;
     }
 
-    if (info.amount == null || info.amount <= 0) {
+    if (info.amount == null || info.amount < 0.001) {
       alert("wrong amount");
       return;
     }
@@ -1244,6 +1244,32 @@ class ObdApi {
    * @param callback function
    */
   public HTLCFindPath(info: HTLCFindPathInfo, callback: Function) {
+
+    if (!info.is_inv_pay) {
+      if (info.property_id == null || info.property_id <= 0) {
+        alert("empty property_id");
+        return;
+      }
+  
+      if (info.amount == null || info.amount < 0.001) {
+        alert("wrong amount");
+        return;
+      }
+  
+      if (this.isNotString(info.h)) {
+        alert("empty h");
+        return;
+      }
+  
+      if (this.isNotString(info.expiry_time)) {
+        alert("empty expiry_time");
+        return;
+      }
+      
+    } else if (this.isNotString(info.invoice)) {
+      alert("empty invoice");
+      return;
+    }
 
     let msg  = new Message();
     msg.type = this.messageType.MsgType_HTLC_FindPath_401;
@@ -1279,7 +1305,7 @@ class ObdApi {
       alert("empty h");
       return;
     }
-    if (info.amount <= 0) {
+    if (info.amount < 0.001) {
       alert("wrong amount");
       return;
     }
@@ -2552,7 +2578,7 @@ class ObdApi {
       alert("wrong property_sent");
       return;
     }
-    if (info.amount <= 0) {
+    if (info.amount < 0.001) {
       alert("wrong amount");
       return;
     }
@@ -2619,7 +2645,7 @@ class ObdApi {
       alert("wrong property_sent");
       return;
     }
-    if (info.amount <= 0) {
+    if (info.amount < 0.001) {
       alert("wrong amount");
       return;
     }

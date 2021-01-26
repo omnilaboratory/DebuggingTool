@@ -370,7 +370,7 @@ function payInvoiceStep2(e, myUserID, channel_id, from100105, nextPay) {
 function payInvoiceStep4(myUserID, nodeID, userID, channel_id, e) {
     return new Promise(async function(resolve, reject) {
         let r = getPrivKeyFromPubKey(myUserID, getInvoiceH());
-        // console.info('R = ' + r);
+        console.info('R = ' + r);
 
         // Bob has NOT R. Bob maybe a middleman node.
         if (r === '') {
@@ -379,6 +379,13 @@ function payInvoiceStep4(myUserID, nodeID, userID, channel_id, e) {
             // Find next channel_id in htlc_routing_packet
             let routs = e.htlc_routing_packet.split(',');
             let next_channel_id, nextPay;
+
+            console.info('routs.length = ' + routs.length);
+            if (routs.length === 1) { // no multi-hop
+                alert("Not found the R. Invoke forwardR API again please.");
+                return;
+            }
+
             for (let i = 0; i < routs.length; i++) {
                 if (routs[i] === channel_id) {
                     next_channel_id = routs[i + 1];
@@ -393,7 +400,7 @@ function payInvoiceStep4(myUserID, nodeID, userID, channel_id, e) {
                     break;
                 }
             }
-            // console.info('Next channel_id = ' + next_channel_id);
+            console.info('Next channel_id = ' + next_channel_id);
 
             // Launch a HTLC between Bob and Carol (next node).
             let resp = await payInvoiceStep2(e, myUserID, next_channel_id, '100105', nextPay);
