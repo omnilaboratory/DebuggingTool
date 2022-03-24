@@ -3,19 +3,19 @@
         {
             "id": "genMnemonic",
             "type_id": 101,
-            "description": "genMnemonic is used to sign up a new user by hirarchecal deterministic wallet system integrated in the local client. Client generates mnemonic words and the hash of the mnemonic words as the UserID.",
+            "description": "genMnemonic is used to sign up a new user to the HD(hirarchecal deterministic) wallet integrated in the local client. Client generates mnemonic words and the hash of the mnemonic words as the UserID.",
             "parameters": []
         },
         {
             "id": "genAddressFromMnemonic",
             "type_id": 102,
-            "description": "NewAddressWithMnemonic is used to create a new address with mnemonic words.",
+            "description": "NewAddressWithMnemonic is used to create a new address by mnemonic words.",
             "parameters": []
         },
         {
             "id": "logIn",
             "type_id": -102001,
-            "description": "LogIn is used to login to OBD.",
+            "description": "LogIn is used to unlock your wallet and connect to your OBD.",
             "parameters": [
                 {
                     "name": "mnemonic",
@@ -35,7 +35,7 @@
         {
             "id": "connectP2PPeer",
             "type_id": -102003,
-            "description": "connectP2PPeer is a temp func in debugging mode. It connects to a p2p node.",
+            "description": "connectP2PPeer is a temp func in debugging mode. It connects to an OBD node in the p2p network.",
             "parameters": [
                 {
                     "name": "remote_node_address",
@@ -86,7 +86,7 @@
         {
             "id": "acceptChannel",
             "type_id": -100033,
-            "description": "AcceptChannel is used to response to request of creating channel. Bob replies to accept, his OBD completes his message and routes it to Alice's OBD. Then Alice sees the response of acceptance.",
+            "description": "AcceptChannel is used to response to the request of creating channel. Bob replies to accept, his OBD completes his message and routes it back to Alice's OBD. Then Alice sees the response of acceptance.",
             "parameters": [
                 {
                     "name": "recipient_node_peer_id",
@@ -108,7 +108,7 @@
                 },
                 {
                     "name": "temporary_channel_id",
-                    "help": "After invoked the OpenChannel API by counterparty, OBD will generate a temporary channel id.",
+                    "help": "After invoking the OpenChannel interface and accepted by the counterparty, OBD will generate a temporary channel id.",
                     "buttons": [
                         {
                             "innerText": "Display",
@@ -118,7 +118,7 @@
                 },
                 {
                     "name": "funding_pubkey",
-                    "help": "This Public Key of a wallet address will be used to generate a channel 2-2 multi-sig address with another PubKey from counterparty.",
+                    "help": "This Public Key of your wallet address, together with the PubKey from the counterparty, will be used to generate a channel 2-2 multi-sig address.",
                     "imgPath": "doc/tooltip/funding_pubkey.png",
                     "buttons": [
                         {
@@ -136,7 +136,7 @@
         {
             "id": "fundingBitcoin",
             "type_id": -102109,
-            "description": "fundingBitcoin is used for depositing bitcoin into a channel. Since the basic Omnilayer protocal uses BTC as miner fee in transferring assets, this message -102109 is special for depositing BTC for future transactions.  NOTE: For the current design, [fundingBitcoin] need to be run 3 times. And every time [fundingBitcoin] done, [bitcoinFundingCreated] and [bitcoinFundingSigned] need to be run in order. Omni Core will support sendmany soon, so the 3 times BTC funding will not be required in the next version of OBD.",
+            "description": "fundingBitcoin is used for depositing bitcoin into the channel. Since the basic Omnilayer protocol uses BTC as miner fee in transferring assets, this message -102109 is special for depositing BTC for future transactions.  NOTE: For the current design, [fundingBitcoin] need to run 3 times. And every time [fundingBitcoin] is done, [bitcoinFundingCreated] and [bitcoinFundingSigned] need to be executed in order. Omni Core will support sendToMany soon, so that the 3 times bitcoin funding will not be required in the next version of OBD.",
             "parameters": [
                 {
                     "name": "from_address",
@@ -158,13 +158,13 @@
                 },
                 {
                     "name": "from_address_private_key",
-                    "help": "Client sign the transaction with this private key.",
+                    "help": "Client signs the transaction with its private key.",
                     "disable": "yes",
                     "buttons": []
                 },
                 {
                     "name": "to_address",
-                    "help": "This is channel 2-2 multi-sig address generated after AcceptChannel API invoked with counterparty.",
+                    "help": "This is the 2-2 multi-sig address generated after the counterparty accepts opening the channel.",
                     "buttons": [
                         {
                             "innerText": "Display (Channel Address)",
@@ -174,7 +174,7 @@
                 },
                 {
                     "name": "amount",
-                    "help": "It can automatically calculate how much bitcoin needs to be recharged in the channel.",
+                    "help": "It can automatically calculate how much bitcoin needs to be funded into the channel.",
                     "buttons": [
                         {
                             "innerText": "Auto Calc",
@@ -196,7 +196,7 @@
         {
             "id": "bitcoinFundingCreated",
             "type_id": -100340,
-            "description": "bitcoinFundingCreated is used to notify the success of funding BTC to the counterparty of the channel. Alice tells her OBD to notify Bob that she created the funding transaction by payloads packed in this message -3400.",
+            "description": "bitcoinFundingCreated is used to notify the success of funding BTC to the counterparty. Alice tells her OBD to notify Bob that she created the funding transaction by the payload packed in this message -3400.",
             "parameters": [
                 {
                     "name": "recipient_node_peer_id",
@@ -227,14 +227,14 @@
                 },
                 {
                     "name": "funding_tx_hex",
-                    "help": "The commitment transaction hex created in fundingBitcoin api (type 1009).",
+                    "help": "The commitment transaction hex created in fundingBitcoin (type 1009).",
                     "imgPath": "doc/tooltip/3400-3500.png",
                     "buttons": [
                     ]
                 },
                 {
                     "name": "channel_address_private_key",
-                    "help": "OBD create a revockable delivery transaction (RD Tx). Client sign the transaction with this private key. The RD tx get bitcoin of deposit to channel (type 2109) back to sender if counterparty always does not response.",
+                    "help": "OBD creates a revockable delivery transaction (RD Tx). Client signs the transaction with his private key. The RD tx gets deposited bitcoins refunded to the funder if the counterparty does not response for a long time.",
                     "disable": "yes",
                     "buttons": []
                 }
@@ -243,7 +243,7 @@
         {
             "id": "bitcoinFundingSigned",
             "type_id": -100350,
-            "description": "bitcoinFundingSigned is used to response the transfering bitcoin event by the partner of the channel. Bob tells his OBD to reply Alice that he knows the funding by message -3500.",
+            "description": "bitcoinFundingSigned is used to acknowedge the funding transction. Bob tells his OBD to reply Alice that he knows the funding by message -3500.",
             "parameters": [
                 {
                     "name": "recipient_node_peer_id",
@@ -274,7 +274,7 @@
                 },
                 {
                     "name": "funding_txid",
-                    "help": "The commitment transaction txid created in fundingBitcoin api (type 1009).",
+                    "help": "The commitment transaction id created in fundingBitcoin api (type 1009).",
                     "imgPath": "doc/tooltip/3400-3500.png",
                     "buttons": []
                 },
@@ -284,7 +284,7 @@
                 },
                 {
                     "name": "channel_address_private_key",
-                    "help": "This key is the private key of the Bob's address used to create the Channel Address. Client sign the transaction with it. This RD transaction get bitcoin of deposit to channel (type 2109) back to Alice if Bob always does not response.",
+                    "help": "This is the private key of Bob's address used in channel creation. Client signs this transaction by it. The RD(Revockable Delivery) transaction sends funded bitcoin back to a multi sig address (type 2109) if Bob does not response for a long time.",
                     "disable": "yes",
                     "buttons": []
                 }
@@ -293,7 +293,7 @@
         {
             "id": "fundingAsset",
             "type_id": -102120,
-            "description": "fundingAsset do: Alice starts to deposit omni assets to the channel. This is quite similar to the the btc funding procedure.",
+            "description": "Alice starts to deposit omni assets to the channel. This is same to the the btc funding procedure.",
             "parameters": [
                 {
                     "name": "from_address",
@@ -315,14 +315,14 @@
                 },
                 {
                     "name": "from_address_private_key",
-                    "help": "OBD create a transfer commitment transaction. Client sign it with this private key.",
+                    "help": "OBD creates a transfer commitment transaction. Client signs it by this private key.",
                     "imgPath": "doc/tooltip/FundingAsset.png",
                     "disable": "yes",
                     "buttons": []
                 },
                 {
                     "name": "to_address",
-                    "help": "This is channel 2-2 multi-sig address generated after AcceptChannel API invoked with counterparty.",
+                    "help": "This is a channel 2-2 multi-sig address generated after AcceptChannel API invoked by the counterparty.",
                     "buttons": [
                         {
                             "innerText": "Display (Channel Address)",
@@ -332,12 +332,12 @@
                 },
                 {
                     "name": "amount",
-                    "help": "The number of deposit to channel and minimum amount is 0.001",
+                    "help": "The number of tokens deposited and the minimum amount is 0.001",
                     "buttons": []
                 },
                 {
                     "name": "property_id",
-                    "help": "This is property id of a omni asset.",
+                    "help": "This is property id of an omni asset.",
                     "buttons": [
                         {
                             "innerText": "Display",
@@ -350,7 +350,7 @@
         {
             "id": "assetFundingCreated",
             "type_id": -100034,
-            "description": "assetFundingCreated is used to notify the success of omni asset funding transaction to the counter partner of the channel.",
+            "description": "assetFundingCreated is used to notify the success of omni asset funding transaction to the counter party.",
             "parameters": [
                 {
                     "name": "recipient_node_peer_id",
@@ -381,28 +381,28 @@
                 },
                 {
                     "name": "funding_tx_hex",
-                    "help": "The commitment transaction hex created in FundingAsset api (type 2001).",
+                    "help": "The commitment transaction hex created by FundingAsset api (type 2001).",
                     "imgPath": "doc/tooltip/FundingAsset.png",
                     "buttons": [
                     ]
                 },
                 {
                     "name": "temp_address_pub_key",
-                    "help": "This public key of an address (Alice2 in picture below) will be used to create a temp 2-2 multi-sig address as output 0 of C1a transaction.",
+                    "help": "This public key of the address (Alice2 in picture below) will be used to create a temp 2-2 multi-sig address as output 0 of C1a transaction.",
                     "imgPath": "doc/tooltip/Cx-RDx.png",
                     "disable": "yes",
                     "buttons": []
                 },
                 {
                     "name": "temp_address_private_key",
-                    "help": "This private key of an address (Alice2 in picture below) will be used to sign RD1a transaction. The RD1a transaction get omni asset in channel back to Alice after a certain time (like seq = 1000 blocks) if Alice forced to close channel (broadcast C1a transaction).",
+                    "help": "This private key of the address (Alice2 in picture below) will be used to sign RD1a transaction. The RD1a transaction return omni asset back to Alice after a certain time lock (like seq = 1000 blocks) if Alice forced to close channel (broadcast C1a transaction).",
                     "imgPath": "doc/tooltip/Cx-RDx.png",
                     "disable": "yes",
                     "buttons": []
                 },
                 {
                     "name": "channel_address_private_key",
-                    "help": "OBD create C1a transaction. Client sign it with this private key. The C1a transaction represents the balance distribution in the channel.",
+                    "help": "OBD creates C1a transaction. Client signs it by this private key. The C1a transaction represents the balance distribution in the channel.",
                     "imgPath": "doc/tooltip/Cx-RDx.png",
                     "disable": "yes",
                     "buttons": []
@@ -412,7 +412,7 @@
         {
             "id": "assetFundingSigned",
             "type_id": -100035,
-            "description": "AssetFundingSigned is used to response the transfering omni asset event by the partner of the channel. Bob tells his OBD to reply Alice that he knows the funding by message -35, and OBD will creat commitment transactions (C1a & RD1a).",
+            "description": "AssetFundingSigned is used to acknowledge omni asset funding event. Bob tells his OBD to reply Alice that he knows the funding by message -35, and OBD will creat commitment transactions (C1a & RD1a).",
             "parameters": [
                 {
                     "name": "recipient_node_peer_id",
@@ -448,7 +448,7 @@
                 },
                 {
                     "name": "channel_address_private_key",
-                    "help": "Client use the private key to sign the C1a and RD1a transactions created by AssetFundingCreated (type -100034).",
+                    "help": "Client uses the private key to sign the C1a and RD1a transactions created by AssetFundingCreated (type -100034).",
                     "imgPath": "doc/tooltip/34-35.png",
                     "disable": "yes",
                     "buttons": []
@@ -458,7 +458,7 @@
         {
             "id": "commitmentTransactionCreated",
             "type_id": -100351,
-            "description": "RSMC Commitment Transaction Created is used for paying omni assets by Revocable Sequence Maturity Contract(RSMC) within a channel. After creating a channel and funding the channel by BTC and assets, Alice/Bob then is able to use this channel to pay to the counterparty. OBD constructs commitment transaction for each payment between the two counterparties. The i-th commitment transaction will be invalidated after creating the (i+1)-th commitment transaction. [These temp addresses] are some data generated by OBD used in contructing temporary multi-sig addresses and temporary transactions for i-th commitment transaction. You shall find your corresponding temporary data within the responses of your OBD.",
+            "description": "RSMC Commitment Transaction Created is used for paying omni assets by Revocable Sequence Maturity Contract(RSMC) within a channel. After creating and funding the channel by BTC and assets, Alice/Bob then is able to use this channel to pay to each other. The i-th commitment transaction will be invalidated after creating the (i+1)-th commitment transaction. [These temp addresses] are generated for temporary transactions in the i-th commitment transaction. You could find your corresponding temporary data within the responses of your OBD.",
             "parameters": [
                 {
                     "name": "recipient_node_peer_id",
@@ -489,33 +489,33 @@
                 },
                 {
                     "name": "amount",
-                    "help": "The number of transfer and minimum amount is 0.001.",
+                    "help": "The number to be transferred and the minimum amount is 0.001.",
                     "buttons": []
                 },
                 {
                     "name": "channel_address_private_key",
-                    "help": "Client use the private key to sign the C2a transaction in below picture as <Alice Sig>.",
+                    "help": "Client uses the private key to sign the C2a transaction, as <Alice Sig> in the picture below.",
                     "imgPath": "doc/tooltip/C2a.png",
                     "disable": "yes",
                     "buttons": []
                 },
                 {
                     "name": "curr_temp_address_pub_key",
-                    "help": "This public key of an address (Alice3 in below picture) will be used to create a temp 2-2 multi-sig address as output 0 of newer Cx transaction like C2a in below picture.",
+                    "help": "This public key of an address (Alice3 in the picture below) will be used to create a temp 2-2 multi-sig address as output 0 of new Cx transaction like C2a in the picture below.",
                     "imgPath": "doc/tooltip/C2a.png",
                     "disable": "yes",
                     "buttons": []
                 },
                 {
                     "name": "curr_temp_address_private_key",
-                    "help": "This private key of an address (Alice3's) will be used to sign RD2a transaction in below picture. The RD transaction get omni asset in channel back to Alice delay a lock time (like seq = 1000 blocks) if Alice forced to close channel (broadcast C2a transaction).",
+                    "help": "This private key of the address (Alice3's) will be used to sign RD2a transaction. The RD transaction sends omni asset back to Alice after a time lock(e.g. seq = 1000 blocks) if Alice forces to close channel (broadcast C2a transaction).",
                     "imgPath": "doc/tooltip/C2a.png",
                     "disable": "yes",
                     "buttons": []
                 },
                 {
                     "name": "last_temp_address_private_key",
-                    "help": "See below picture, this is the private key of Alice2 in the last RSMC transaction (C1a). It will be used to sign BR1a transaction. When Alice cheats, the BR transaction will punish Alice and transfer all assets belonging to Alice to Bob.",
+                    "help": "This is the private key of Alice2 in the last RSMC transaction (C1a). It will be used to sign BR1a transaction. When Alice cheats, the BR transaction will punish Alice and transfer all assets belonging to Alice to Bob.",
                     "imgPath": "doc/tooltip/BR1a.png",
                     "disable": "yes",
                     "buttons": []
@@ -570,28 +570,28 @@
                 },
                 {
                     "name": "channel_address_private_key",
-                    "help": "Client use the private key to sign the C2a and BR1a transaction in below picture as Bob Sig. And used to create and sign C2b, RD2a transaction.",
+                    "help": "Client uses this private key to sign the C2a and BR1a transaction(Bob sig) in the picture below. And uses to create and sign C2b, RD2a transaction.",
                     "imgPath": "doc/tooltip/BR1a.png",
                     "disable": "yes",
                     "buttons": []
                 },
                 {
                     "name": "curr_temp_address_pub_key",
-                    "help": "This public key of an address (Bob3 in below picture) will be used to create a temp 2-2 multi-sig address as output 0 of newer Cx transaction like C2b in below picture.",
+                    "help": "This public key of the address (Bob3 in the picture below) will be used to create a temp 2-2 multi-sig address as output 0 of the new Cx transaction like C2b.",
                     "imgPath": "doc/tooltip/C2b.png",
                     "disable": "yes",
                     "buttons": []
                 },
                 {
                     "name": "curr_temp_address_private_key",
-                    "help": "This private key of an address (Bob3's) will be used to sign RD2b transaction in below picture. The RD transaction get omni asset in channel back to Bob delay a lock time (like seq = 1000 blocks) if Bob forced to close channel (broadcast C2b transaction).",
+                    "help": "This private key of an address (Bob3's) will be used to sign RD2b transaction. The RD transaction sends omni asset back to Bob after time lock (e.g. seq = 1000 blocks) if Bob forces to close channel (broadcast C2b transaction).",
                     "imgPath": "doc/tooltip/C2b.png",
                     "disable": "yes",
                     "buttons": []
                 },
                 {
                     "name": "last_temp_address_private_key",
-                    "help": "See below picture, this is the private key of Alice2 in the last RSMC transaction (C1a). It will be used to sign BR1a transaction. When Alice cheats, the BR transaction will punish Alice and transfer all assets belonging to Alice to Bob.",
+                    "help": "This is the private key of Alice2 in the last RSMC transaction (C1a). It will be used to sign BR1a transaction. When Alice cheats, the BR transaction will punish Alice and transfer all assets belonging to Alice to Bob.",
                     "imgPath": "doc/tooltip/BR1a.png",
                     "disable": "yes",
                     "buttons": []
@@ -614,12 +614,12 @@
                 },
                 {
                     "name": "amount",
-                    "help": "The number of transfer and minimum amount is 0.001.",
+                    "help": "The amount to transfer and the minimum amount is 0.001.",
                     "buttons": []
                 },
                 {
                     "name": "h",
-                    "help": "The H (Hash of a Preimage R) currently is Public Key of a wallet address, and the R (Preimage R) is Private Key of a wallet address. This is a temporary solution.",
+                    "help": "The H (Hash of a Preimage R) currently is a Public Key of a wallet address, and the R (Preimage R) is Private Key of a wallet address. This is a temporary solution. Will be updated after sendToMany in omnicore is ready",
                     "buttons": [
                         {
                             "innerText": "Create",
@@ -642,7 +642,7 @@
         {
             "id": "payInvoice",
             "type_id": 100,
-            "description": "payInvoice is used to automatically transfer asset to counterparty.",
+            "description": "payInvoice transfers asset to the counterparty.",
             "parameters": [
                 {
                     "name": "invoice",
@@ -653,7 +653,7 @@
         {
             "id": "HTLCFindPath",
             "type_id": -100401,
-            "description": "HTLCFindPath is used to find a routing between A and B node for launch a HTLC transfer.",
+            "description": "HTLCFindPath is used to find a routing path between A and B when starts a HTLC transfer.",
             "parameters": [
                 {
                     "name": "invoice",
@@ -716,7 +716,7 @@
         {
             "id": "addHTLC",
             "type_id": -100040,
-            "description": "addHTLC is used for looking for a path to transfer to target and Send H to middleman.",
+            "description": "addHTLC looks for a path and Send H to the next hop.",
             "parameters": [
                 {
                     "name": "recipient_node_peer_id",
@@ -738,7 +738,7 @@
                 },
                 {
                     "name": "amount",
-                    "help": "The number of transfer and minimum amount is 0.001.",
+                    "help": "The amount to transfer and minimum amount is 0.001.",
                     "buttons": []
                 },
                 {
@@ -757,13 +757,13 @@
                 },
                 {
                     "name": "h",
-                    "help": "The H (Hash of a Preimage R) currently is Public Key of a wallet address, and the R (Preimage R) is Private Key of a wallet address. This is a temporary solution.",
+                    "help": "The H (Hash of a Preimage R) currently is Public Key of a wallet address, and the R (Preimage R) is Private Key of a wallet address. This is a temporary solution, and will be updated after sendToMany is ready in omnicore.",
                     "buttons": [
                     ]
                 },
                 {
                     "name": "routing_packet",
-                    "help": "The path from sender to final receiver.",
+                    "help": "The path from the payer to the final receiver.",
                     "buttons": [
                     ]
                 },
@@ -774,56 +774,56 @@
                 },
                 {
                     "name": "channel_address_private_key",
-                    "help": "Client use the private key to sign C2a and BR2a transaction in below picture as Alice Sig.",
+                    "help": "Client uses the private key to sign C2a and BR2a transaction(as Alice Sig).",
                     "imgPath": "doc/tooltip/HTLC-1.png",
                     "disable": "yes",
                     "buttons": []
                 },
                 {
                     "name": "curr_rsmc_temp_address_pub_key",
-                    "help": "This public key of an address (Alice's address in output 0 of C2a in below picture) will be used to create a temp 2-2 multi-sig address as output 0 of newer Cx transaction like C2a in below picture.",
+                    "help": "This public key of an address (Alice's address in output 0 of C2a) will be used to create a temp 2-2 multi-sig address as output 0 of the new Cx transaction, e.g. C2a.",
                     "imgPath": "doc/tooltip/HTLC-1.png",
                     "disable": "yes",
                     "buttons": []
                 },
                 {
                     "name": "curr_rsmc_temp_address_private_key",
-                    "help": "This private key of an address (Alice's) will be used to sign RD2a and BR2a transaction in below picture.",
+                    "help": "This private key of an address (Alice's) will be used to sign RD2a and BR2a transaction.",
                     "imgPath": "doc/tooltip/HTLC-1.png",
                     "disable": "yes",
                     "buttons": []
                 },
                 {
                     "name": "curr_htlc_temp_address_pub_key",
-                    "help": "This public key of an address (Alice's address in output 2 of C2a in below picture) will be used to create a temp 2-2 multi-sig address as output 2 of newer Cx transaction like C2a in below picture.",
+                    "help": "This public key of an address (Alice's address in output 2 of C2a) will be used to create a temp 2-2 multi-sig address as output 2 of the new Cx transaction, e.g. C2a.",
                     "imgPath": "doc/tooltip/HTLC-2.png",
                     "disable": "yes",
                     "buttons": []
                 },
                 {
                     "name": "curr_htlc_temp_address_private_key",
-                    "help": "This private key of an address (Alice's) will be used to sign HED1a transaction in below picture.",
+                    "help": "This private key of an address (Alice's) will be used to sign HED1a transaction.",
                     "imgPath": "doc/tooltip/HTLC-2.png",
                     "disable": "yes",
                     "buttons": []
                 },
                 {
                     "name": "curr_htlc_temp_address_for_ht1a_pub_key",
-                    "help": "This public key of an address (Alice's address in output 2 of C2a in below picture) will be used to create a temp 2-2 multi-sig address as output 2 of newer Cx transaction like C2a in below picture.",
+                    "help": "This public key of an address (Alice's address in output 2 of C2a) will be used to create a temp 2-2 multi-sig address as output 2 of the new Cx transaction, e.g. C2a.",
                     "imgPath": "doc/tooltip/HTLC-2.png",
                     "disable": "yes",
                     "buttons": []
                 },
                 {
                     "name": "curr_htlc_temp_address_for_ht1a_private_key",
-                    "help": "This private key of an address (Alice's) will be used to sign HT1a transaction in below picture.",
+                    "help": "This private key of an address (Alice's) will be used to sign HT1a transaction.",
                     "imgPath": "doc/tooltip/HTLC-2.png",
                     "disable": "yes",
                     "buttons": []
                 },
                 {
                     "name": "last_temp_address_private_key",
-                    "help": "This is the private key used in last transaction by Alice. It will be used to sign ?  transaction in below picture as Alice Sig.",
+                    "help": "This is the private key used in the last transaction by Alice. It will be used to sign ?  transaction, e.g. Alice Sig.",
                     "imgPath": "doc/tooltip/HTLC-2.png",
                     "disable": "yes",
                     "buttons": []
@@ -833,7 +833,7 @@
         {
             "id": "HTLCSigned",
             "type_id": -100041,
-            "description": "HTLCSigned is used to response a routing request by middleman.",
+            "description": "HTLCSigned is used to response a routing request by a hop.",
             "parameters": [
                 {
                     "name": "recipient_node_peer_id",
@@ -872,42 +872,42 @@
                 },
                 {
                     "name": "channel_address_private_key",
-                    "help": "Client use the private key to sign C2b and BR2b transaction in below picture as Bob Sig.",
+                    "help": "Client uses the private key to sign C2b and BR2b transaction, e.g. Bob Sig.",
                     "imgPath": "doc/tooltip/HTLC-3.png",
                     "disable": "yes",
                     "buttons": []
                 },
                 {
                     "name": "curr_rsmc_temp_address_pub_key",
-                    "help": "This public key of an address (Bob's address in output 1 of C2b in below picture) will be used to create a temp 2-2 multi-sig address as output 1 of newer Cx transaction like C2b in below picture.",
+                    "help": "This public key of an address (Bob's address in output 1 of C2b) will be used to create a temp 2-2 multi-sig address as output 1 of the new Cx transaction, e.g. C2b.",
                     "imgPath": "doc/tooltip/HTLC-3.png",
                     "disable": "yes",
                     "buttons": []
                 },
                 {
                     "name": "curr_rsmc_temp_address_private_key",
-                    "help": "This private key of an address (Bob's) will be used to sign RD2b and BR2b transaction in below picture.",
+                    "help": "This private key of an address (Bob's) will be used to sign RD2b and BR2b transaction.",
                     "imgPath": "doc/tooltip/HTLC-3.png",
                     "disable": "yes",
                     "buttons": []
                 },
                 {
                     "name": "curr_htlc_temp_address_pub_key",
-                    "help": "This public key of an address (Bob's address in output 2 of C2b in below picture) will be used to create a temp 2-2 multi-sig address as output 2 of newer Cx transaction like C2b in below picture.",
+                    "help": "This public key of an address (Bob's address in output 2 of C2b) will be used to create a temp 2-2 multi-sig address as output 2 of the new Cx transaction, e.g.C2b.",
                     "imgPath": "doc/tooltip/HTLC-3.png",
                     "disable": "yes",
                     "buttons": []
                 },
                 {
                     "name": "curr_htlc_temp_address_private_key",
-                    "help": "This private key of an address (Bob's) will be used to sign HE1b transaction in below picture.",
+                    "help": "This private key of an address (Bob's) will be used to sign HE1b transaction.",
                     "imgPath": "doc/tooltip/HTLC-4.png",
                     "disable": "yes",
                     "buttons": []
                 },
                 {
                     "name": "last_temp_address_private_key",
-                    "help": "This is the private key used in last transaction by Alice. It will be used to sign ?  transaction in below picture as Bob Sig.",
+                    "help": "This is the private key used in the last transaction by Alice. It will be used to sign ?  transaction as Bob Sig.",
                     "imgPath": "doc/tooltip/HTLC-4.png",
                     "disable": "yes",
                     "buttons": []
@@ -917,7 +917,7 @@
         {
             "id": "forwardR",
             "type_id": -100045,
-            "description": "forwardR is used to forward R to a node.",
+            "description": "forwardR is used to forward R to a hop.",
             "parameters": [
                 {
                     "name": "recipient_node_peer_id",
@@ -948,7 +948,7 @@
                 },
                 {
                     "name": "r",
-                    "help": "The R (a Preimage R) currently is Private Key of a wallet address, and the H (Hash of a Preimage R) is Public Key of a wallet address. This is a temporary solution.",
+                    "help": "The R (a Preimage R) currently is Private Key of a wallet address, and the H (Hash of a Preimage R) is Public Key of a wallet address. This is a temporary solution, and will be updated when sendToMany is ready in core",
                     "buttons": [
                         {
                             "innerText": "Display",
@@ -958,7 +958,7 @@
                 },
                 {
                     "name": "channel_address_private_key",
-                    "help": "Client use the private key to sign HTD1b transaction in below picture.",
+                    "help": "Client uses the private key to sign HTD1b transaction.",
                     "imgPath": "doc/tooltip/HTLC-4.png",
                     "disable": "yes",
                     "buttons": []
@@ -968,7 +968,7 @@
         {
             "id": "signR",
             "type_id": -100046,
-            "description": "signR: Reciever reverify R. If correct, then creates rest HTLC commitment transactions.",
+            "description": "signR: Reciever reverify R. If correct, then creates the commitment transactions to terminate current HTLC.",
             "parameters": [
                 {
                     "name": "recipient_node_peer_id",
@@ -1007,7 +1007,7 @@
                 },
                 {
                     "name": "channel_address_private_key",
-                    "help": "Client use the private key to sign HERD1b transaction in below picture.",
+                    "help": "Client uses the private key to sign HERD1b transaction.",
                     "imgPath": "doc/tooltip/HTLC-4.png",
                     "disable": "yes",
                     "buttons": []
@@ -1017,7 +1017,7 @@
         {
             "id": "closeHTLC",
             "type_id": -100049,
-            "description": "closeHTLC is used to close a HTLC channel. For continue using OBD to transfer assets OR some reasons Alice need to close this HTLC channel between she and Bob. Then Alice launch the closing request.",
+            "description": "closeHTLC is used to close a HTLC.",
             "parameters": [
                 {
                     "name": "recipient_node_peer_id",
@@ -1048,38 +1048,38 @@
                 },
                 {
                     "name": "channel_address_private_key",
-                    "help": "Client use the private key to sign newer RSMC transaction like C3a.",
+                    "help": "Client uses the private key to sign the new RSMC transaction, e.g. C3a.",
                     "imgPath": "doc/tooltip/HTLC-1.png",
                     "disable": "yes",
                     "buttons": []
                 },
                 {
                     "name": "last_rsmc_temp_address_private_key",
-                    "help": "Private Key of creating temporary 2-2 multi-sig address in previous RSMC transaction.",
+                    "help": "Private Key for creating temporary 2-2 multi-sig address in the previous RSMC.",
                     "disable": "yes",
                     "buttons": []
                 },
                 {
                     "name": "last_htlc_temp_address_private_key",
-                    "help": "Private Key of creating temporary 2-2 multi-sig address in previous HTLC transaction.",
+                    "help": "Private Key for creating temporary 2-2 multi-sig address in the previous HTLC.",
                     "disable": "yes",
                     "buttons": []
                 },
                 {
                     "name": "last_htlc_temp_address_for_htnx_private_key",
-                    "help": "Private Key of creating temporary 2-2 multi-sig address in previous HTLC htnx transaction.",
+                    "help": "Private Key for creating temporary 2-2 multi-sig address in previous HTLC htnx transaction.",
                     "disable": "yes",
                     "buttons": []
                 },
                 {
                     "name": "curr_temp_address_pub_key",
-                    "help": "This public key of an address will be used to create a temp 2-2 multi-sig address as output 0 of newer Cx transaction in RSMC.",
+                    "help": "This public key of an address will be used to create a temp 2-2 multi-sig address as output 0 of the new Cx transaction in RSMC.",
                     "disable": "yes",
                     "buttons": []
                 },
                 {
                     "name": "curr_temp_address_private_key",
-                    "help": "This private key of an address will be used to sign newer RDxa and BRxa transaction.",
+                    "help": "This private key of an address will be used to sign the new RDxa and BRxa transaction.",
                     "disable": "yes",
                     "buttons": []
                 }
@@ -1088,7 +1088,7 @@
         {
             "id": "closeHTLCSigned",
             "type_id": -100050,
-            "description": "closeHTLCSigned is used to response the request of close HTLC channel.",
+            "description": "closeHTLCSigned is used to response the request of closing HTLC.",
             "parameters": [
                 {
                     "name": "recipient_node_peer_id",
@@ -1116,20 +1116,20 @@
                 },
                 {
                     "name": "channel_address_private_key",
-                    "help": "Client use the private key to sign newer RSMC transaction like C3b.",
+                    "help": "Client uses the private key to sign the new RSMC, e.g. C3b.",
                     "imgPath": "doc/tooltip/HTLC-5.png",
                     "disable": "yes",
                     "buttons": []
                 },
                 {
                     "name": "last_rsmc_temp_address_private_key",
-                    "help": "Private Key of creating temporary 2-2 multi-sig address in previous RSMC transaction.",
+                    "help": "Private Key of creating temporary 2-2 multi-sig address in previous RSMC.",
                     "disable": "yes",
                     "buttons": []
                 },
                 {
                     "name": "last_htlc_temp_address_private_key",
-                    "help": "Private Key of creating temporary 2-2 multi-sig address in previous HTLC transaction.",
+                    "help": "Private Key of creating temporary 2-2 multi-sig address in previous HTLC.",
                     "disable": "yes",
                     "buttons": []
                 },
@@ -1141,13 +1141,13 @@
                 },
                 {
                     "name": "curr_temp_address_pub_key",
-                    "help": "This public key of an address will be used to create a temp 2-2 multi-sig address as output 0 of newer Cx transaction in RSMC.",
+                    "help": "This public key of an address will be used to create a temp 2-2 multi-sig address as output 0 of the new Cx transaction in RSMC.",
                     "disable": "yes",
                     "buttons": []
                 },
                 {
                     "name": "curr_temp_address_private_key",
-                    "help": "This private key of an address will be used to sign newer RDxa and BRxa transaction.",
+                    "help": "This private key of an address will be used to sign the new RDxa and BRxa transaction.",
                     "disable": "yes",
                     "buttons": []
                 }
@@ -1156,7 +1156,7 @@
         {
             "id": "closeChannel",
             "type_id": -100038,
-            "description": "closeChannel request to close a channel.",
+            "description": "closeChannel requests to close a channel.",
             "parameters": [
                 {
                     "name": "recipient_node_peer_id",
@@ -1190,7 +1190,7 @@
         {
             "id": "closeChannelSigned",
             "type_id": -100039,
-            "description": "closeChannelSigned response to request of close a channel.",
+            "description": "closeChannelSigned responses to the request of closing a channel.",
             "parameters": [
                 {
                     "name": "recipient_node_peer_id",
@@ -1221,7 +1221,7 @@
                 },
                 {
                     "name": "request_close_channel_hash",
-                    "help": "The hash of request created in CloseChannel (type -38).",
+                    "help": "The hash of the request created in CloseChannel (type -38).",
                     "buttons": [
                     ]
                 }
@@ -1284,7 +1284,7 @@
                 },
                 {
                     "name": "amount",
-                    "help": "The number of transfer and minimum amount is 0.001.",
+                    "help": "The amount to transfer and the minimum amount is 0.001.",
                     "buttons": [
                     ]
                 },
@@ -1367,7 +1367,7 @@
                 },
                 {
                     "name": "amount",
-                    "help": "The number of transfer and minimum amount is 0.001.",
+                    "help": "The amount to transfer and the minimum amount is 0.001.",
                     "buttons": [
                     ]
                 },
