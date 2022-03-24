@@ -3,11 +3,11 @@
         {
             "id": "issueFixedAmount",
             "type_id": -102113,
-            "description": "issueFixedAmount is used to create new tokens with fixed amount supply.",
+            "description": "issueFixedAmount is used to create new tokens with fixed total supply.",
             "parameters": [
                 {
                     "name": "from_address",
-                    "help": "The address to send from. This address must be belong to wallet (ismine = true) and has enough bitcoin to pay miner fee. You could be import the address to omni core (will be ismine = true).",
+                    "help": "The address sends out tokens. This address must belong to my wallet (ismine = true) and has enough satoshis to pay miner fee. You could import the address to omnicore (will be ismine = true).",
                     "buttons": [
                         {
                             "innerText": "Select",
@@ -21,12 +21,12 @@
                 },
                 {
                     "name": "name",
-                    "help": "the name of the new tokens to create",
+                    "help": "the name for the new tokens to be created",
                     "buttons": []
                 },
                 {
                     "name": "ecosystem",
-                    "help": "the ecosystem to create the tokens in (1 for main ecosystem, 2 for test ecosystem)",
+                    "help": "the ecosystem to create the tokens in (1 for main ecosystem, 2 for testing ecosystem)",
                     "buttons": []
                 },
                 {
@@ -36,7 +36,7 @@
                 },
                 {
                     "name": "data",
-                    "help": "a description for the new tokens (can be '')",
+                    "help": "a description for the new tokens (can be empty '')",
                     "buttons": []
                 },
                 {
@@ -53,7 +53,7 @@
             "parameters": [
                 {
                     "name": "from_address",
-                    "help": "the address to send from. This address must be belong to wallet (ismine = true) and has enough bitcoin to pay miner fee. You could be import the address to omni core (will be ismine = true).",
+                    "help": "the address sends out tokens. This address must belong to your wallet (ismine = true) and has enough satoshis to pay miner fee. You could import the address to omnicore (will be ismine = true).",
                     "buttons": [
                         {
                             "innerText": "Select",
@@ -72,7 +72,7 @@
                 },
                 {
                     "name": "ecosystem",
-                    "help": "the ecosystem to create the tokens in (1 for main ecosystem, 2 for test ecosystem)",
+                    "help": "the ecosystem to create the tokens in (1 for main ecosystem, 2 for testing ecosystem)",
                     "buttons": []
                 },
                 {
@@ -82,7 +82,7 @@
                 },
                 {
                     "name": "data",
-                    "help": "a description for the new tokens (can be '')",
+                    "help": "a description for the new tokens (can be empty '')",
                     "buttons": []
                 }
             ]
@@ -104,7 +104,7 @@
                 },
                 {
                     "name": "property_id",
-                    "help": "The identifier of the tokens to grant. Get it by invoke GetTransaction (type 1206) API through input the txid returned by issuanceManaged (type 1202) API.",
+                    "help": "The identifier of the tokens to grant. Get it by invoke GetTransaction (type 1206) interface by the txid returned by issuanceManaged (type 1202) API.",
                     "buttons": []
                 },
                 {
@@ -136,7 +136,7 @@
                 },
                 {
                     "name": "property_id",
-                    "help": "The identifier of the tokens to revoke. Get it by invoke GetTransaction (type 1206) API through input the txid returned by issuanceManaged (type 1202) API.",
+                    "help": "The identifier of the tokens to be revoked. Get it by invoke GetTransaction (type 1206) API by the txid returned by issuanceManaged (type 1202) API.",
                     "buttons": []
                 },
                 {
