@@ -18,7 +18,7 @@
             "description": "LogIn is used to login to OBD.",
             "parameters": [
                 {
-                    "name": "mnemonic",
+                    "name": "wallet_id",
                     "buttons": [
                         {
                             "innerText": "Select",

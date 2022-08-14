@@ -110,7 +110,11 @@ async function sdkLogIn() {
     // If already logined, then return.
     if (isLogined) return;
 
-    let mnemonic = $("#mnemonic").val();
+    let mnemonic = $("#wallet_id").val();
+    console.log('mnemonic old = ', mnemonic)
+    let hashWalletId = mnemonic.hashCode();
+    console.log('mnemonic hash = ', hashWalletId)
+    
     let e = await logIn(mnemonic);
     
     // chain network type
